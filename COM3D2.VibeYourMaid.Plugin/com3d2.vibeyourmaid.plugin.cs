@@ -27,12 +27,16 @@ namespace CM3D2.VibeYourMaid.Plugin
       PluginFilter("COM3D2OHx64"),
       PluginFilter("COM3D2OHVRx64"),
       PluginName("VibeYourMaid"),
-      PluginVersion("2.0.5.3")]
+      PluginVersion("2.0.5.4")]
 
 
     public class VibeYourMaid : ExPluginBase
     {
 
+		//version number
+		private string vernum = "2.0.5.4";
+		
+		
         public BasicVoiceSet[] bvs = new BasicVoiceSet[20]; //性格追加時に更新
 
 
@@ -316,7 +320,7 @@ namespace CM3D2.VibeYourMaid.Plugin
                             node.height = 20;
                         }
 
-                        node = GUI.Window(324101, node, WindowCallback, "リモコンスイッチ  Ver2.0.5.2", gsWin);
+                        node = GUI.Window(324101, node, WindowCallback, "リモコンスイッチ  Ver" + vernum, gsWin);
 
                         if (cfgw.configGuiFlag) node3 = GUI.Window(324103, node3, WindowCallback3, "VibeYourMaid 設定画面", gsWin);
 
@@ -614,9 +618,10 @@ namespace CM3D2.VibeYourMaid.Plugin
 				foreach (int maidID in vmId)
 				{
 				maidsState[maidID].boostBase = 66;
+				maidsState[maidID].uDatsuWait = 3;
 				//maidsState[maidID].uDatsuStock = 66;
-				//maidsState[maidID].uDatsu = 1;
-				maidsState[maidID].uDatsu = 2;
+				maidsState[maidID].uDatsu = 1;
+				//maidsState[maidID].uDatsu = 2;
 				EffectUterusDatsu(maidID);
 				}
             manualTriggeredUterusDatsu = false;
@@ -5481,7 +5486,6 @@ namespace CM3D2.VibeYourMaid.Plugin
                 if (maidsState[maidID].boostBase + maidsState[maidID].uDatsuStock < 65 || !cfgw.uDatsuEnabled)
                 { //65以下なら子宮脱しない
                     maidsState[maidID].uDatsu = 3;
-
                 }
                 else if (maidsState[maidID].uDatsuWait < 0)
                 { //子宮脱開始
@@ -5496,6 +5500,7 @@ namespace CM3D2.VibeYourMaid.Plugin
                 else
                 {
                     maidsState[maidID].uDatsuWait -= timerRate;
+					Console.WriteLine("now uDatsuWait is：" + maidsState[maidID].uDatsuWait);
                 }
             }
 
