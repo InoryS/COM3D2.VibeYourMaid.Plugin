@@ -320,7 +320,7 @@ namespace CM3D2.VibeYourMaid.Plugin
                             node.height = 20;
                         }
 
-                        node = GUI.Window(324101, node, WindowCallback, "リモコンスイッチ  Ver" + vernum, gsWin);
+                        node = GUI.Window(324101, node, WindowCallback, "VibeYourMaid  Ver" + vernum, gsWin);
 
                         if (cfgw.configGuiFlag) node3 = GUI.Window(324103, node3, WindowCallback3, "VibeYourMaid 設定画面", gsWin);
 
@@ -618,7 +618,7 @@ namespace CM3D2.VibeYourMaid.Plugin
 				foreach (int maidID in vmId)
 				{
 				maidsState[maidID].boostBase = 66;
-				maidsState[maidID].uDatsuWait = 3;
+				maidsState[maidID].uDatsuWait = -1.1f;
 				//maidsState[maidID].uDatsuStock = 66;
 				maidsState[maidID].uDatsu = 1;
 				//maidsState[maidID].uDatsu = 2;
@@ -5489,6 +5489,7 @@ namespace CM3D2.VibeYourMaid.Plugin
                 }
                 else if (maidsState[maidID].uDatsuWait < 0)
                 { //子宮脱開始
+					Console.WriteLine("子宮脱開始");
                     maidsState[maidID].uDatsuValue2 = maidsState[maidID].boostBase + maidsState[maidID].uDatsuStock;
                     if (maidsState[maidID].uDatsuValue2 > 100f) maidsState[maidID].uDatsuValue2 = 100f;
                     maidsState[maidID].uDatsuStock = 0;
@@ -11302,9 +11303,10 @@ namespace CM3D2.VibeYourMaid.Plugin
                 GUI.Label(new Rect(5, 30, 190, 20), "【エロステータス（β版）】", gsLabel);
 
                 GUI.Label(new Rect(10, 60, 300, 20), "クリトリス肥大度：" + Math.Round(maidsState[tgID].cliHidai, 1, MidpointRounding.AwayFromZero), gsLabel);
-                //GUI.Label (new Rect (10, 80, 300, 20), "乳首肥大度　　　：" + Math.Round(maidsState[tgID].chikubiHidai, 1,  MidpointRounding.AwayFromZero) , gsLabel);
+                GUI.Label (new Rect (10, 80, 300, 20), "乳首肥大度　　　：" + Math.Round(maidsState[tgID].chikubiHidai, 1,  MidpointRounding.AwayFromZero) , gsLabel);
 
-                GUI.Label(new Rect(10, 110, 300, 20), "トータル絶頂数：" + maidsState[tgID].orgTotal + " 回", gsLabel);
+                GUI.Label(new Rect(10, 90, 300, 20), "トータル絶頂数：" + maidsState[tgID].orgTotal + " 回", gsLabel);
+				GUI.Label(new Rect(10, 110, 300, 20), "連続絶頂数：" + maidsState[tgID].orgasmCmb + " 回", gsLabel);
                 GUI.Label(new Rect(10, 130, 300, 20), "最大連続絶頂数：" + maidsState[tgID].orgMax + " 回", gsLabel);
 
                 GUI.Label(new Rect(10, 160, 300, 20), "中出し回数（膣）　：" + maidsState[tgID].syaseiTotal1[0] + " 回（" + Math.Round(maidsState[tgID].syaseiTotal2[0], 2, MidpointRounding.AwayFromZero) + " ml）", gsLabel);
@@ -11321,6 +11323,20 @@ namespace CM3D2.VibeYourMaid.Plugin
 
                 GUI.Label(new Rect(10, 350, 300, 20), "潮：" + maidsState[tgID].sioVolume, gsLabel);
                 GUI.Label(new Rect(10, 370, 300, 20), "尿：" + maidsState[tgID].nyoVolume, gsLabel);
+				
+				
+                GUI.Label (new Rect (10, 400, 300, 20), "マウス：" + mouse_move , gsLabel);
+                GUI.Label (new Rect (10, 420, 300, 20), "お触りポイント：" + hitName , gsLabel);
+
+
+				//hidden info
+                GUI.Label (new Rect (310, 60, 300, 20), "快感值：" + maidsState[tgID].kaikanLevel , gsLabel);
+                GUI.Label (new Rect (310, 80, 300, 20), "女仆耐力：" + maidsState[tgID].maidStamina , gsLabel);
+                GUI.Label (new Rect (310, 100, 300, 20), "勃起値：" + maidsState[tgID].bokkiValue1 , gsLabel);
+				GUI.Label (new Rect (310, 120, 300, 20), "感度value：" + maidsState[tgID].boostValue , gsLabel);
+				GUI.Label (new Rect (310, 140, 300, 20), "感度base：" + maidsState[tgID].boostBase , gsLabel);
+                GUI.Label (new Rect (310, 160, 300, 20), "高潮数：" + maidsState[tgID].orgasmCount , gsLabel);						
+
 
                 /*自分用
                 GUI.Label (new Rect (10, 400, 300, 20), "マウス：" + mouse_move , gsLabel);
