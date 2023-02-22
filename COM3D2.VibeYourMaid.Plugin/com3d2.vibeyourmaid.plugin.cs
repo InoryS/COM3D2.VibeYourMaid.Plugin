@@ -27,14 +27,14 @@ namespace CM3D2.VibeYourMaid.Plugin
       PluginFilter("COM3D2OHx64"),
       PluginFilter("COM3D2OHVRx64"),
       PluginName("VibeYourMaid"),
-      PluginVersion("2.0.5.4")]
+      PluginVersion("2.0.5.5")]
 
 
     public class VibeYourMaid : ExPluginBase
     {
 
 		//version number
-		private string vernum = "2.0.5.4";
+		private string VerNum = "2.0.5.5-Inory";
 		
 		
         public BasicVoiceSet[] bvs = new BasicVoiceSet[20]; //性格追加時に更新
@@ -320,7 +320,7 @@ namespace CM3D2.VibeYourMaid.Plugin
                             node.height = 20;
                         }
 
-                        node = GUI.Window(324101, node, WindowCallback, "VibeYourMaid  Ver" + vernum, gsWin);
+                        node = GUI.Window(324101, node, WindowCallback, "VibeYourMaid  Ver" + VerNum, gsWin);
 
                         if (cfgw.configGuiFlag) node3 = GUI.Window(324103, node3, WindowCallback3, "VibeYourMaid 設定画面", gsWin);
 
