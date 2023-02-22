@@ -599,11 +599,24 @@ namespace CM3D2.VibeYourMaid.Plugin
 
                 //お触り処理
                 if (cfgw.osawariEnabled) osawariHand();
-
+				
             }
             //メイン処理終了---
 
 
+			//子宮脱按钮
+			if (this.manualTriggeredUterus)
+			{
+				foreach (int maidID in this.maids.Keys)
+				{
+				//maidsState[maidID].boostBase == 66;
+				//maidsState[maidID].uDatsuStock == 66;
+				//maidsState[maidID].uDatsu == 1;
+				maidsState[maidID].uDatsu == 2
+				EffectUterusDatsu(maidID);
+				}
+            this.manualTriggeredUterus = false;
+			}
 
             //プラグインの有効無効切替
             if (Input.GetKeyDown(cfgw.keyPluginToggleV0) && !scKeyOff && AndKey())
@@ -9746,6 +9759,12 @@ namespace CM3D2.VibeYourMaid.Plugin
                     {
                         gameObject_ui.SetActive(!gameObject_ui.activeSelf);
                     }
+					if (GUI.Button(new Rect(420, 355, 150, 20), "に押します子宮脱", gsButton))
+                    {
+                        this.manualTriggeredUterus = true;
+                    }
+					
+					
                 }
 
                 /*開発用
