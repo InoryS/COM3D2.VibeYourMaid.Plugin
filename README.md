@@ -12,7 +12,7 @@ But https://twitter.com/kawauchi_yasen/status/1618633704062222339 said all modif
 
 This repository is for personal purposes, I added some custom modifications.
 
-If you alse want, then go 'Actions' to download.
+If you alse want it, just go 'Actions' to download.
 
 # Plguin Info
 This is Sybaris/UnityInjector plugin for COM3D2.
