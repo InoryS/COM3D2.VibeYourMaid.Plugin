@@ -136,6 +136,10 @@ namespace CM3D2.VibeYourMaid.Plugin
         private string[] SucoreText1 = new string[] { "☆ ☆ ☆", "★ ☆ ☆", "★ ★ ☆", "★ ★ ★" };
         private string[] SucoreText2 = new string[] { "☆ ☆ ☆", "★ ☆ ☆", "★ ★ ☆", "★ ★ ★" };
         private string[] SucoreText3 = new string[] { "☆ ☆ ☆", "★ ☆ ☆", "★ ★ ☆", "★ ★ ★" };
+		
+		
+		//子宫脱按钮用
+		private bool manualTriggeredUterusDatsu = false;
 
 
 
@@ -605,17 +609,17 @@ namespace CM3D2.VibeYourMaid.Plugin
 
 
 			//子宮脱按钮
-			if (this.manualTriggeredUterus)
+			if (manualTriggeredUterusDatsu)
 			{
-				foreach (int maidID in this.maids.Keys)
+				foreach (int maidID in vmId)
 				{
-				//maidsState[maidID].boostBase == 66;
-				//maidsState[maidID].uDatsuStock == 66;
-				//maidsState[maidID].uDatsu == 1;
-				maidsState[maidID].uDatsu == 2;
+				maidsState[maidID].boostBase = 66;
+				//maidsState[maidID].uDatsuStock = 66;
+				//maidsState[maidID].uDatsu = 1;
+				maidsState[maidID].uDatsu = 2;
 				EffectUterusDatsu(maidID);
 				}
-            this.manualTriggeredUterus = false;
+            manualTriggeredUterusDatsu = false;
 			}
 
             //プラグインの有効無効切替
@@ -9761,7 +9765,7 @@ namespace CM3D2.VibeYourMaid.Plugin
                     }
 					if (GUI.Button(new Rect(420, 355, 150, 20), "に押します子宮脱", gsButton))
                     {
-                        this.manualTriggeredUterus = true;
+                        manualTriggeredUterusDatsu = true;
                     }
 					
 					
