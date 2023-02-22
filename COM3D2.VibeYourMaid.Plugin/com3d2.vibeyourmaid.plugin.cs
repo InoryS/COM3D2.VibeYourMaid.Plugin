@@ -612,7 +612,7 @@ namespace CM3D2.VibeYourMaid.Plugin
 				//maidsState[maidID].boostBase == 66;
 				//maidsState[maidID].uDatsuStock == 66;
 				//maidsState[maidID].uDatsu == 1;
-				maidsState[maidID].uDatsu == 2
+				maidsState[maidID].uDatsu == 2;
 				EffectUterusDatsu(maidID);
 				}
             this.manualTriggeredUterus = false;
