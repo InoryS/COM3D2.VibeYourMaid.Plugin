@@ -12,28 +12,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - name: Setup .NET Core SDK
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: '5.0.x'
+      - name: Setup MSBuild.exe path
+        run: |
+          sudo apt-get install -y apt-transport-https
+          sudo apt-get update
+          sudo apt-get install -y mono-devel
+          sudo apt-get install -y msbuild
+          echo "msbuild: $(which msbuild)"
+        
+      - name: Build
+        run: |
+          msbuild /p:Configuration=Release /p:TargetFrameworkVersion=v3.5
 
-    - name: Install dependencies
-      run: dotnet restore
-
-    - name: Build plugin
-      run: dotnet build --configuration Release
-
-    - name: Create ZIP archive
-      run: |
-        mkdir -p dist
-        dotnet publish -c Release -o dist
-        cd dist && zip -r ../VibeYourMaid.zip *
-
-    - name: Upload ZIP archive
-      uses: actions/upload-artifact@v2
-      with:
-        name: VibeYourMaid
-        path: VibeYourMaid.zip
+      - name: Publish Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: COM3D2.VibeYourMaid.Plugin
+          path: COM3D2.VibeYourMaid.Plugin/bin/Release/COM3D2.VibeYourMaid.Plugin.dll
