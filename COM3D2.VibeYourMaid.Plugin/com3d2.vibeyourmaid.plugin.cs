@@ -4720,23 +4720,25 @@ else if (cfgw.mainGuiFlag == 2)
 
         }
 
-        //リアクション音声・表情の再生
-        private void ReactionPlay(int maidID)
-        {
-            Maid maid = stockMaids[maidID].mem;
-            int iPersonal = Array.IndexOf(personalList[1], stockMaids[maidID].personal);
-            if (maidsState[maidID].voiceMode2 > 0) iPersonal = maidsState[maidID].voiceMode2 - 1;
-            string[] VoiceList = BasicVoiceSetup.reactionVoice[iPersonal];
-            int iRandom = UnityEngine.Random.Range(0, VoiceList.Length);
+//リアクション音声・表情の再生
+private void ReactionPlay(int maidID)
+{
+    Maid maid = stockMaids[maidID].mem;
+    int iPersonal = Array.IndexOf(personalList[1], stockMaids[maidID].personal);
+    if (maidsState[maidID].voiceMode2 > 0)
+        iPersonal = maidsState[maidID].voiceMode2 - 1;
+    string[] VoiceList = BasicVoiceSetup.reactionVoice[iPersonal];
+    int iRandom = UnityEngine.Random.Range(0, VoiceList.Length);
 
-            maid.AudioMan.LoadPlay(VoiceList[iRandom], 0f, false, false);
-            //maidsState[maidID].vsFlag = 2;
-            maidsState[maidID].orgasmVoice = 2;
+    maid.AudioMan.LoadPlay(VoiceList[iRandom], 0f, false, false);
+    //maidsState[maidID].vsFlag = 2;
+    maidsState[maidID].orgasmVoice = 2;
 
-            iRandom = UnityEngine.Random.Range(0, cfgw.sFaceAnime30Vibe[3].Length);
-            maid.FaceAnime(cfgw.sFaceAnime30Vibe[3][iRandom], 0.5f, 0);
-            maidsState[maidID].faceHoldTime = cfgw.vStateAltTimeVBase + UnityEngine.Random.Range(0f, cfgw.vStateAltTimeVRandomExtend); //次の表情変更タイマーセット
-        }
+    iRandom = UnityEngine.Random.Range(0, cfgw.sFaceAnime30Vibe[3].Length);
+    maid.FaceAnime(cfgw.sFaceAnime30Vibe[3][iRandom], 0.5f, 0);
+    maidsState[maidID].faceHoldTime = cfgw.vStateAltTimeVBase + UnityEngine.Random.Range(0f, cfgw.vStateAltTimeVRandomExtend); //次の表情変更タイマーセット
+}
+
 
 
 
@@ -8757,10 +8759,14 @@ public class SeiekiInfo{
         //シェイプキー操作Fix(基本はUpdate等の最後に一度呼ぶだけで良いはず）
         static public void VertexMorph_FixBlendValues()
         {
+                void FixBlendValues(TMorph tm)
+    {
+        tm.FixBlendValues();
+    }
 
             foreach (TMorph tm in m_NeedFixTMorphs)
             {
-                tm.FixBlendValues();
+                FixBlendValues(tm);
             }
             m_NeedFixTMorphs.Clear();
         }
