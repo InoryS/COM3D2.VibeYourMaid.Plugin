@@ -26,11 +26,11 @@ namespace CM3D2.VibeYourMaid.Plugin {
 	PluginFilter("COM3D2OHx64"),
 	PluginFilter("COM3D2OHVRx64"),
 	PluginName("VibeYourMaid"),
-	PluginVersion("2.0.5.6.ovr")]
+	PluginVersion("2.0.5.4.ovr")]
 
     public class VibeYourMaid : ExPluginBase
     {
-      string PluginVersionLabel = "2.0.5.6-Inory";
+      string PluginVersionLabel = "2.0.5.4";
 
         public BasicVoiceSet[] bvs = new BasicVoiceSet[22]; //性格追加時に更新
         public class BasicVoiceSet {
@@ -12716,6 +12716,7 @@ static public void VertexMorph_FixBlendValues()
         Vector2 YotogiScrollPos2 = Vector2.zero;
         private bool smHidden = false;
         //private bool unzipSelect = false;
+        private bool allMaid = false;
         private GUIStyleState styleYellow;
         private GUIStyleState styleWhite;
         void WindowCallback4(int id){
@@ -12749,6 +12750,7 @@ static public void VertexMorph_FixBlendValues()
                 }
                 
                 smHidden = GUI.Toggle(new Rect(400, 0, 170, 20), smHidden, "サブモーション非表示", gsToggle);
+                 allMaid = GUI.Toggle(new Rect(310, 0, 170, 20), allMaid, "All Maid", gsToggle); //서브 모션 숨기기
                 
                 int y = 1;
                 int x = 5;
@@ -12810,7 +12812,117 @@ static public void VertexMorph_FixBlendValues()
                       gsButton.hover.textColor = Color.yellow;
                     }
                     
-                    if(GUI.Button(new Rect ( x, y*22, w, 20), name, gsButton)) {
+                    if (GUI.Button(new Rect(x, y * 22, w, 20), name, gsButton))
+                    {
+                        if (allMaid)
+                        {
+                            foreach (var md in stockMaids)
+                            {
+                                motionSelect(md.mem, t, md.id);
+                            }
+                        }
+                        else
+                        {
+                            motionSelect(maid, t, tgID);
+                        }
+
+                    }
+
+                    if (select)
+                    {
+                        gsButton.normal.textColor = Color.white;
+                        gsButton.hover.textColor = Color.white;
+                    }
+
+                    x += w + 2;
+                    if (x + w > 590)
+                    {
+                        x = 0;
+                        y += 1;
+                    }
+
+                }
+
+
+            }
+            else
+            {
+                //ランダムモーションセット 랜덤 모션 세트
+                y = 5;
+                x = 0;
+                w = 195;
+
+                if (maidsState[tgID].editMotionSetName != "")
+                {
+                    if (GUI.Button(new Rect(x, y, 50, 20), "解除", gsButton)) //승강기
+                    {
+                        MotionSetClear(tgID);
+                    }
+                    GUI.Label(new Rect(x + 60, y, 300, 20), "『" + maidsState[tgID].editMotionSetName + "』を適用中", gsLabel); // 적용 중
+                    y += 25;
+                }
+
+                foreach (string f in emsFiles)
+                {
+                    string FileName = f.Replace("ems_", "").Replace(".xml", "");
+                    if (GUI.Button(new Rect(x, y, w, 20), FileName, gsButton))
+                    {
+                        //motionSelect2(maid, f);
+                        if (allMaid)
+                        {
+                            foreach (var md in stockMaids)
+                            {
+                                motionSelect2(md.mem, f, md.id);
+                            }
+                        }
+                        else
+                        {
+                            motionSelect2(maid, f, tgID);
+                        }
+                    }
+
+                    x += w + 2;
+                    if (x + w > 590)
+                    {
+                        x = 0;
+                        y += 22;
+                    }
+                }
+            }
+
+            GUI.EndScrollView();
+
+
+            GUI.DragWindow();
+        }
+
+        private void motionSelect2(Maid maid, string f, int tgID)
+        {
+            if (maid == null) return;
+
+            MotionSetClear(tgID);
+            MotionSetLoad(f, tgID);
+
+            //男の自動表示 남자의 자동 표시
+            if (cfgw.autoManEnabled && !MansTgCheck(tgID) && MotionOldCheck(Regex.Replace(maidsState[tgID].editMotionSet[0][0], @"_f(|[0-9])", "_m")) != -1)
+            {
+                for (int im = 0; im < SubMans.Length; im++)
+                {
+                    if (!SubMans[im]) SubMans[im] = GameMain.Instance.CharacterMgr.GetMan(im);
+                    if (SubMans[im].Visible) continue;
+                    StartCoroutine("MansVisible", im);
+                    maid.EyeToCamera((Maid.EyeMoveType)0, 0.8f);
+                    break;
+                }
+            }
+
+            //いたずら開始フラグ 장난 시작 플래그
+            if (lifeStart >= 5) maidsState[tgID].elItazuraFlag = true;
+        }
+
+        private void motionSelect(Maid maid, string t,int tgID)
+        {
+            if (maid == null) return;
                     
                       //モーションアジャスト実行
                       MotionAdjustDo(tgID, t, true, -1);
