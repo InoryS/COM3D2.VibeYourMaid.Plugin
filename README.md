@@ -12,6 +12,8 @@ But https://twitter.com/kawauchi_yasen/status/1618633704062222339 said all modif
 
 This repository is for personal purposes, I added some custom modifications.
 
+NO QA random code.
+
 If you alse want it, just go 'Actions' to download.
 
 # Plguin Info
