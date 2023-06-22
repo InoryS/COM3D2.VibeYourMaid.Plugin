@@ -4659,7 +4659,9 @@ else if (cfgw.mainGuiFlag == 2)
                 {
                     maid.AudioMan.LoadPlay(VoiceList[iRandomVoice], 0f, false, false);
                     maidsState[maidID].orgasmVoice = 2;   //絶頂音声再生中のフラグ
-                }
+                }            
+                Console.WriteLine(stockMaids[maidID].personal +" ["+(maidsState[maidID].orgasmVoice == 0?"L":"O")+maidsState[maidID].vStateMajor+":"+vi+":"+iRandomVoice+"] "+VoiceList[iRandomVoice]);
+          }
             }
 
 
@@ -4689,8 +4691,7 @@ else if (cfgw.mainGuiFlag == 2)
                       else if (kaikan <= 10)  kaikan = 5; //9-10
                       else kaikan = 6; //11-12
                 }
-                else
-                {
+
                     VoiceValue = Math.Min(4, Math.Max(maidsState[maidID].exciteLevel, kaikan-1) - 1 + vi);
                     #if DEBUG
                     Console.WriteLine("exciteLevel="+maidsState[maidID].exciteLevel+" kaikanLevel="+maidsState[maidID].kaikanLevel+" motionHoldTime="+maidsState[maidID].motionHoldTime);
@@ -4712,11 +4713,11 @@ else if (cfgw.mainGuiFlag == 2)
                 Console.WriteLine(stockMaids[maidID].personal +" ["+maidsState[maidID].vStateMajor+":"+VoiceValue+"] "+VoiceList[VoiceValue]);
                 }
 
+
             //余韻終了時
-            if (maidsState[maidID].vStateMajor == 10 && maidsState[maidID].vStateMajorOld == 50)
-            {
-                maid.AudioMan.Stop(1.5f);
-            }
+          if(maidsState[maidID].vStateMajor == 10 && maidsState[maidID].vStateMajorOld == 50) {
+            maid.AudioMan.Stop(1.5f);
+          }
 
         }
 
