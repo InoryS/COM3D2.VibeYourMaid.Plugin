@@ -2049,62 +2049,59 @@ namespace CM3D2.VibeYourMaid.Plugin{
 
         Texture2D guiBgTexture; //背景色
 
-        void OnGUI()
+void OnGUI()
+{
+    if (!cfgw.bPluginEnabledV || cfgw.mainGuiFlag == 0) return;
+
+    GUIStyle gsWin = new GUIStyle("box");
+    gsWin.fontSize = 12;
+    gsWin.alignment = TextAnchor.UpperLeft;
+
+    if (tgID != -1 && !reGetMaid)
+    { //フェードアウト中はGUIを更新しない
+
+        if (SceneLevelEnable)
         {
-            if (!cfgw.bPluginEnabledV || cfgw.mainGuiFlag == 0) return;
+            if (vSceneLevel == 15 && WaitTime < 120)
+            {
+                WaitTime += timerRate;
+            }
+            else
+            {
+                //背景色設定
+                gsWin.onHover.background = guiBgTexture;
+                gsWin.hover.background = guiBgTexture;
+                gsWin.onFocused.background = guiBgTexture;
+                gsWin.focused.background = guiBgTexture;
+                gsWin.onHover.textColor = Color.white;
+                gsWin.hover.textColor = Color.white;
+                gsWin.onFocused.textColor = Color.white;
+                gsWin.focused.textColor = Color.white;
 
-            GUIStyle gsWin = new GUIStyle("box");
-            gsWin.fontSize = 12;
-            gsWin.alignment = TextAnchor.UpperLeft;
+                node = GUI.Window(324101, node, WindowCallback, "VibeYourMaid  Ver" + VerNum, gsWin);
 
-            if (tgID != -1 && !reGetMaid){ //フェードアウト中はGUIを更新しない
-
-                if (SceneLevelEnable)
+                if (cfgw.mainGuiFlag == 1)
                 {
+                    node.height = 220;
+                }
+                else if (cfgw.mainGuiFlag == 2)
+                {
+                    node.height = 20;
+                }
 
-                    if (vSceneLevel == 15 && WaitTime < 120)
-                    {
+                node = GUI.Window(324103, node, WindowCallback, "VibeYourMaid  Ver" + VerNum, gsWin);
 
-                        WaitTime += timerRate;
+                if (cfgw.configGuiFlag) node3 = GUI.Window(324103, node3, WindowCallback3, "VibeYourMaid 設定画面", gsWin);
 
-                    }
-                    else
-                    {
-                        //背景色設定
-                        gsWin.onHover.background = guiBgTexture;
-                        gsWin.hover.background = guiBgTexture;
-                        gsWin.onFocused.background = guiBgTexture;
-                        gsWin.focused.background = guiBgTexture;
-                        gsWin.onHover.textColor = Color.white;
-                        gsWin.hover.textColor = Color.white;
-                        gsWin.onFocused.textColor = Color.white;
-                        gsWin.focused.textColor = Color.white;
+                if (cfgw.unzipGuiFlag)
+                {
+                    node4 = GUI.Window(324104, node4, WindowCallback_unzip, "ムラムラしたのでメイドさんを押し倒す", gsWin);//무라무라 때문에 메이드 씨를 밀어
 
-                        node = GUI.Window(324101, node, WindowCallback, "VibeYourMaid  Ver" + VerNum, gsWin);
-
-                        if (cfgw.mainGuiFlag == 1)
-                        {
-                            node.height = 220;
-                        }
-                        else if (cfgw.mainGuiFlag == 2)
-                        {
-                            node.height = 20;
-                        }
-
-                        node = GUI.Window(324103, node, WindowCallback, "VibeYourMaid  Ver" + VerNum, gsWin);
-
-                        if (cfgw.configGuiFlag) node3 = GUI.Window(324103, node3, WindowCallback3, "VibeYourMaid 設定画面", gsWin);
-
-                        if (cfgw.unzipGuiFlag)
-                        {
-                            node4 = GUI.Window(324104, node4, WindowCallback_unzip, "ムラムラしたのでメイドさんを押し倒す", gsWin);//무라무라 때문에 메이드 씨를 밀어
-
-                            /*調整中
-                            if(maidsState[tgID].senyouTokusyuMotion.Count > 0){
-                              node4a = new Rect( node4.x - 220 , node4.y , 220 , 220 );
-                              node4a = GUI.Window(3241042, node4a, WindowCallback4a, "特殊モーション", gsWin);
-                            }*/
-
+                    /*調整中
+                    if(maidsState[tgID].senyouTokusyuMotion.Count > 0){
+                      node4a = new Rect( node4.x - 220 , node4.y , 220 , 220 );
+                      node4a = GUI.Window(3241042, node4a, WindowCallback4a, "特殊モーション", gsWin);
+                    }*/
                         }
 
                         }else if (cfgw.mainGuiFlag == 2){
