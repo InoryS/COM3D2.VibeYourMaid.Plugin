@@ -2080,37 +2080,37 @@ void OnGUI()
 
                 node = GUI.Window(324101, node, WindowCallback, "VibeYourMaid  Ver" + VerNum, gsWin);
 
-                if (cfgw.mainGuiFlag == 1)
-                {
-                    node.height = 220;
-                }
-                else if (cfgw.mainGuiFlag == 2)
-                {
-                    node.height = 20;
-                }
+if (cfgw.mainGuiFlag == 1)
+{
+    node.height = 220;
+}
+else if (cfgw.mainGuiFlag == 2)
+{
+    node.height = 20;
+}
 
-                node = GUI.Window(324103, node, WindowCallback, "VibeYourMaid  Ver" + VerNum, gsWin);
+node = GUI.Window(324103, node, WindowCallback, "VibeYourMaid  Ver" + VerNum, gsWin);
 
-                if (cfgw.configGuiFlag) node3 = GUI.Window(324103, node3, WindowCallback3, "VibeYourMaid 設定画面", gsWin);
+if (cfgw.configGuiFlag) 
+    node3 = GUI.Window(324103, node3, WindowCallback3, "VibeYourMaid 設定画面", gsWin);
 
-                if (cfgw.unzipGuiFlag)
-                {
-                    node4 = GUI.Window(324104, node4, WindowCallback_unzip, "ムラムラしたのでメイドさんを押し倒す", gsWin);//무라무라 때문에 메이드 씨를 밀어
+if (cfgw.unzipGuiFlag)
+{
+    node4 = GUI.Window(324104, node4, WindowCallback_unzip, "ムラムラしたのでメイドさんを押し倒す", gsWin);//무라무라 때문에 메이드 씨를 밀어
 
-                    /*調整中
-                    if(maidsState[tgID].senyouTokusyuMotion.Count > 0){
-                      node4a = new Rect( node4.x - 220 , node4.y , 220 , 220 );
-                      node4a = GUI.Window(3241042, node4a, WindowCallback4a, "特殊モーション", gsWin);
-                    }*/
-                        }
-
-                        }else if (cfgw.mainGuiFlag == 2){
-                            node.height = 20;
-                        }
-                    }
-                }
-            }
-
+    /*調整中
+    if(maidsState[tgID].senyouTokusyuMotion.Count > 0){
+        node4a = new Rect( node4.x - 220 , node4.y , 220 , 220 );
+        node4a = GUI.Window(3241042, node4a, WindowCallback4a, "特殊モーション", gsWin);
+    }*/
+}
+else if (cfgw.mainGuiFlag == 2)
+{
+    node.height = 20;
+}
+}
+}
+}
             if (cfgw.bPluginEnabledV && cfgw.mainGuiFlag > 0 && (tgID != -1 || (lifeStart > 0 && !elFade)))
             {
                 if (cfgw.subGuiFlag == 2)
