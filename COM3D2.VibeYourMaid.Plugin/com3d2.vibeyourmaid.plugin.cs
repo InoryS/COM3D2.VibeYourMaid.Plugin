@@ -8730,46 +8730,47 @@ public class SeiekiInfo{
 
         static List<TMorph> m_NeedFixTMorphs = new List<TMorph>();
 
-        //シェイプキー操作
-        //戻り値はsTagの存在有無にしているので必要に応じて変更してください
-        public static bool VertexMorph_FromProcItem(TBody body, string sTag, float f)
+//シェイプキー操作
+//戻り値はsTagの存在有無にしているので必要に応じて変更してください
+public static bool VertexMorph_FromProcItem(TBody body, string sTag, float f)
+{
+    bool result = false;
+    if (!body || sTag == null || sTag == "")
+    {
+        return false;
+    }
+    for (int i = 0; i < body.goSlot.Count; i++)
+    {
+        TMorph morph = body.goSlot[i].morph;
+        if (morph != null && morph.Contains(sTag))
         {
-            bool result = false;
-            if (!body || sTag == null || sTag == "")
+            result = true;
+            int f_nIdx = (int)morph.hash[sTag];
+            morph.SetBlendValues(f_nIdx, f);
+            if (!VibeYourMaid.m_NeedFixTMorphs.Contains(morph))
             {
-                return false;
+                VibeYourMaid.m_NeedFixTMorphs.Add(morph);
             }
-            for (int i = 0; i < body.goSlot.Count; i++)
-            {
-                TMorph morph = body.goSlot[i].morph;
-                if (morph != null && morph.Contains(sTag))
-                {
-                    result = true;
-                    int f_nIdx = (int)morph.hash[sTag];
-                    morph.SetBlendValues(f_nIdx, f);
-                    if (!VibeYourMaid.m_NeedFixTMorphs.Contains(morph))
-                    {
-                        VibeYourMaid.m_NeedFixTMorphs.Add(morph);
-                    }
-                }
-            }
-            return result;
         }
+    }
+    return result;
+}
 
-        //シェイプキー操作Fix(基本はUpdate等の最後に一度呼ぶだけで良いはず）
-        static public void VertexMorph_FixBlendValues()
-        {
-                void FixBlendValues(TMorph tm)
+//シェイプキー操作Fix(基本はUpdate等の最後に一度呼ぶだけで良いはず）
+static public void VertexMorph_FixBlendValues()
+{
+    void FixBlendValues(TMorph tm)
     {
         tm.FixBlendValues();
     }
 
-            foreach (TMorph tm in m_NeedFixTMorphs)
-            {
-                FixBlendValues(tm);
-            }
-            m_NeedFixTMorphs.Clear();
-        }
+    foreach (TMorph tm in m_NeedFixTMorphs)
+    {
+        FixBlendValues(tm);
+    }
+    m_NeedFixTMorphs.Clear();
+}
+
 
 
         //シェイプキーが存在するかのチェック
@@ -8867,20 +8868,18 @@ public class SeiekiInfo{
 
 
         //シェイプランダム
-        private void ShapeKeyRandam(int maidID, string[] name, float min, float max)
-        {
+        private void ShapeKeyRandam(int maidID, string[] name, float min, float max){
+          
+          Maid maid = stockMaids[maidID].mem;
+          maidsState[maidID].shapeKeyRandomDelta -= timerRate;
+          
+          if (maidsState[maidID].shapeKeyRandomDelta > 0)return;
+          maidsState[maidID].shapeKeyRandomDelta = 0.1f;
 
-            Maid maid = stockMaids[maidID].mem;
-            maidsState[maidID].shapeKeyRandomDelta -= timerRate;
-
-            if (maidsState[maidID].shapeKeyRandomDelta > 0) return;
-            maidsState[maidID].shapeKeyRandomDelta = 0.1f;
-
-            for (int i = 0; i < name.Length; i++)
-            {
-                float value = UnityEngine.Random.Range(min, max);
-                try { VertexMorph_FromProcItem(maid.body0, name[i], value / 100f); } catch { /*LogError(ex);*/ }
-            }
+          for (int i=0; i<name.Length; i++){
+            float value = UnityEngine.Random.Range(min, max);
+            try { VertexMorph_FromProcItem(maid.body0, name[i], value/100f); } catch { /*LogError(ex);*/ }
+          }
         }
 
 
