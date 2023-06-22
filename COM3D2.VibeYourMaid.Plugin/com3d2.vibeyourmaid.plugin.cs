@@ -4467,134 +4467,79 @@ else if (cfgw.mainGuiFlag == 2)
         //-------------------------------------------------
         //サウンド処理関係---------------------------------
 
-        //メイドの音声再生処理
-        private void MaidVoicePlay(int maidID)
-        {
+         //メイドの音声再生処理
+        private void MaidVoicePlay(int maidID) {
 
-            //フェラしているかのチェック
-            checkBlowjobing(maidID);
+          //フェラしているかのチェック
+          checkBlowjobing(maidID);
 
-            if (maidsState[maidID].autoVoiceEnabled)
-            {
-                if (maidsState[maidID].bIsBlowjobing > 0)
-                {
-                    maidsState[maidID].voiceMode = 1;
-                }
-                else
-                {
-                    maidsState[maidID].voiceMode = 0;
-                }
+          if (maidsState[maidID].autoVoiceEnabled){
+            if (maidsState[maidID].bIsBlowjobing > 0){
+              maidsState[maidID].voiceMode = 1;
+            } else {
+              maidsState[maidID].voiceMode = 0;
             }
+          }
 
-            Maid maid = stockMaids[maidID].mem;
-            int iPersonal = Array.IndexOf(personalList[1], stockMaids[maidID].personal);
-            if (iPersonal < 0) iPersonal = 0;
-            if (maidsState[maidID].voiceMode2 > 0) iPersonal = maidsState[maidID].voiceMode2 - 1;
-            string[] VoiceList = new string[1];
-            int vi = 0;
-
-            Console.WriteLine(stockMaids[maidID].personal);
-
-            //バイブ弱の音声
-            if (maidsState[maidID].vStateMajor == 20)
-            {
-                if (maidsState[maidID].stunFlag)
-                {
-                    vi = 4;
-                }
-                else
-                {
-                    vi = maidsState[maidID].exciteLevel - 1;
+          Maid maid = stockMaids[maidID].mem;
+          int iPersonal = Array.IndexOf(personalList[1], stockMaids[maidID].personal);
+          if(iPersonal < 0)iPersonal = 0;
+          if(maidsState[maidID].voiceMode2 > 0)iPersonal = maidsState[maidID].voiceMode2 - 1;
+          string[] VoiceList = new string[1];
+          int vi = 0;
+          
+          //バイブ弱の音声
+          if (maidsState[maidID].vStateMajor == 20){
+                if(maidsState[maidID].stunFlag){
+                  vi = 4;
+                }else{
+                  vi = maidsState[maidID].exciteLevel - 1;
                 }
 
-                if (maidsState[maidID].voiceMode == 0)
-                { //通常音声
-                    VoiceList = bvs[iPersonal].sLoopVoice20Vibe[vi];
+                if (maidsState[maidID].voiceMode == 0){ //通常音声
+                  VoiceList = bvs[iPersonal].sLoopVoice20Vibe[vi];
+                  
+                }else if (maidsState[maidID].voiceMode == 1){ //フェラ音声
+                  VoiceList = bvs[iPersonal].sLoopVoice20Fera[vi];
+                  
+                } else if (maidsState[maidID].voiceMode == 2){ //カスタム音声１
+                    VoiceList = sLoopVoice20Custom1[vi];
+                }else if (maidsState[maidID].voiceMode == 3){ //カスタム音声２
+                    VoiceList = sLoopVoice20Custom2[vi];
+                }else if (maidsState[maidID].voiceMode == 4){ //カスタム音声３
+                    VoiceList = sLoopVoice20Custom3[vi];
+                }else if (maidsState[maidID].voiceMode == 5){ //カスタム音声４
+                    VoiceList = sLoopVoice20Custom4[vi];
+                }
+          }
 
-                }
-                else if (maidsState[maidID].voiceMode == 1)
-                { //フェラ音声
-                    VoiceList = bvs[iPersonal].sLoopVoice20Fera[vi];
+          //バイブ強の音声
+          if (maidsState[maidID].vStateMajor == 30){
+                if (maidsState[maidID].orgasmVoice == 0){
 
-                }
-                else if (maidsState[maidID].voiceMode == 2)
-                { //カスタム音声１
-                    VoiceList = BasicVoiceSetup.sLoopVoice20Custom1[vi];
-                }
-                else if (maidsState[maidID].voiceMode == 3)
-                { //カスタム音声２
-                    VoiceList = BasicVoiceSetup.sLoopVoice20Custom2[vi];
-                }
-                else if (maidsState[maidID].voiceMode == 4)
-                { //カスタム音声３
-                    VoiceList = BasicVoiceSetup.sLoopVoice20Custom3[vi];
-                }
-                else if (maidsState[maidID].voiceMode == 5)
-                { //カスタム音声４
-                    VoiceList = BasicVoiceSetup.sLoopVoice20Custom4[vi];
-                }
-            }
-
-            //バイブ強の音声
-            if (maidsState[maidID].vStateMajor == 30)
-            {
-                if (maidsState[maidID].orgasmVoice == 0)
-                {
-
-                    if (maidsState[maidID].stunFlag)
-                    {
-                        vi = 4;
-                    }
-                    else
-                    {
-                        vi = maidsState[maidID].exciteLevel - 1;
+                    if(maidsState[maidID].stunFlag){
+                      vi = 4;
+                    }else{
+                      vi = maidsState[maidID].exciteLevel - 1;
                     }
 
-                    if (maidsState[maidID].voiceMode == 0)
-                    { //通常音声
-                        VoiceList = bvs[iPersonal].sLoopVoice30Vibe[vi];
+                    if (maidsState[maidID].voiceMode == 0){ //通常音声
+                      VoiceList = bvs[iPersonal].sLoopVoice30Vibe[vi];
+                        
+                    }else if (maidsState[maidID].voiceMode == 1){ //フェラ音声
+                      VoiceList = bvs[iPersonal].sLoopVoice30Fera[vi];
 
-                    }
-                    else if (maidsState[maidID].voiceMode == 1)
-                    { //フェラ音声
-                        VoiceList = bvs[iPersonal].sLoopVoice30Fera[vi];
-
-                    }
-                    else if (maidsState[maidID].voiceMode == 2)
-                    { //カスタム音声１
-                        VoiceList = BasicVoiceSetup.sLoopVoice30Custom1[vi];
-                    }
-                    else if (maidsState[maidID].voiceMode == 3)
-                    { //カスタム音声２
-                        VoiceList = BasicVoiceSetup.sLoopVoice30Custom2[vi];
-                    }
-                    else if (maidsState[maidID].voiceMode == 4)
-                    { //カスタム音声３
-                        VoiceList = BasicVoiceSetup.sLoopVoice30Custom3[vi];
-                    }
-                    else if (maidsState[maidID].voiceMode == 5)
-                    { //カスタム音声４
-                        VoiceList = BasicVoiceSetup.sLoopVoice30Custom4[vi];
+                    }else if (maidsState[maidID].voiceMode == 2){ //カスタム音声１
+                        VoiceList = sLoopVoice30Custom1[vi];
+                    }else if (maidsState[maidID].voiceMode == 3){ //カスタム音声２
+                        VoiceList = sLoopVoice30Custom2[vi];
+                    }else if (maidsState[maidID].voiceMode == 4){ //カスタム音声３
+                        VoiceList = sLoopVoice30Custom3[vi];
+                    }else if (maidsState[maidID].voiceMode == 5){ //カスタム音声４
+                        VoiceList = sLoopVoice30Custom4[vi];
                     }
 
-                }
-                else
-                {  //絶頂時音声
-
-                    // if (maidsState[maidID].stunFlag)
-                    // {
-                    //     vi = 4;
-                    // }
-                    // else if (maidsState[maidID].orgasmCmb < 4)
-                    // {
-                    //     vi = maidsState[maidID].exciteLevel - 2;
-                    //     if (vi < 0) vi = 0;
-                    // }
-                    // else
-                    // {
-                    //     vi = 3;
-                    // }
-
+                }else{  //絶頂時音声
                     #if DEBUG
                     Console.WriteLine("exciteLevel="+maidsState[maidID].exciteLevel+" kaikanLevel="+maidsState[maidID].kaikanLevel+" orgasmCmb="+maidsState[maidID].orgasmCmb+" orgasmCount="+maidsState[maidID].orgasmCount);
                     #endif
@@ -4612,8 +4557,8 @@ else if (cfgw.mainGuiFlag == 2)
 
                     if (maidsState[maidID].voiceMode == 0)
                     { //通常音声
-                        VoiceList = bvs[iPersonal].sOrgasmVoice30Vibe[vi];
-
+                      VoiceList = bvs[iPersonal].sOrgasmVoice30Vibe[vi];
+                        
                     }else if (maidsState[maidID].voiceMode == 1)
                     { //フェラ音声
                       VoiceList = bvs[iPersonal].sOrgasmVoice30Fera[vi];
@@ -4632,57 +4577,46 @@ else if (cfgw.mainGuiFlag == 2)
                         VoiceList = sOrgasmVoice30Custom4[vi];
                     }
                 }
-            }
-
-
-            int iRandomVoice = UnityEngine.Random.Range(0, VoiceList.Length);
-
-            //絶頂音声が重複しないようにする
-            if (maidsState[maidID].orgasmVoice != 0)
-            {
-                while (iRandomVoice == maidsState[maidID].iRandomVoiceBackup && VoiceList.Length > 1)
-                {
-                    iRandomVoice = UnityEngine.Random.Range(0, VoiceList.Length);
-                }
-                maidsState[maidID].iRandomVoiceBackup = iRandomVoice;
-            }
-
-
-            //バイブ動作時の音声を実際に再生する
-            if (maidsState[maidID].vStateMajor == 30 || maidsState[maidID].vStateMajor == 20)
-            {
-                if (maidsState[maidID].orgasmVoice == 0)
-                {
-                    maid.AudioMan.LoadPlay(VoiceList[iRandomVoice], 0f, false, true);
-                }
-                else
-                {
-                    maid.AudioMan.LoadPlay(VoiceList[iRandomVoice], 0f, false, false);
-                    maidsState[maidID].orgasmVoice = 2;   //絶頂音声再生中のフラグ
-                }            
-                Console.WriteLine(stockMaids[maidID].personal +" ["+(maidsState[maidID].orgasmVoice == 0?"L":"O")+maidsState[maidID].vStateMajor+":"+vi+":"+iRandomVoice+"] "+VoiceList[iRandomVoice]);
           }
+
+          
+          int iRandomVoice = UnityEngine.Random.Range(0, VoiceList.Length);
+          
+          //絶頂音声が重複しないようにする
+          if (maidsState[maidID].orgasmVoice != 0){
+              while (iRandomVoice == maidsState[maidID].iRandomVoiceBackup && VoiceList.Length > 1){
+                  iRandomVoice = UnityEngine.Random.Range(0, VoiceList.Length);
+              }
+              maidsState[maidID].iRandomVoiceBackup = iRandomVoice;
+          }
+          
+          
+          //バイブ動作時の音声を実際に再生する
+          if(maidsState[maidID].vStateMajor == 30 || maidsState[maidID].vStateMajor == 20){
+            if (maidsState[maidID].orgasmVoice == 0){
+              maid.AudioMan.LoadPlay(VoiceList[iRandomVoice], 0f, false, true);
+            }else{
+              maid.AudioMan.LoadPlay(VoiceList[iRandomVoice], 0f, false, false);
+              maidsState[maidID].orgasmVoice = 2;   //絶頂音声再生中のフラグ
             }
+            Console.WriteLine(stockMaids[maidID].personal +" ["+(maidsState[maidID].orgasmVoice == 0?"L":"O")+maidsState[maidID].vStateMajor+":"+vi+":"+iRandomVoice+"] "+VoiceList[iRandomVoice]);
+          }
 
 
-            //バイブ停止時の音声
-            if (maidsState[maidID].vStateMajor == 40)
-            {
+          //バイブ停止時の音声
+          if (maidsState[maidID].vStateMajor == 40){
                 int VoiceValue;
 
-                if (maidsState[maidID].stunFlag)
-                {
-                    vi = 1;
-                }
-                else
-                {
-                    vi = 0;
+                if(maidsState[maidID].stunFlag){
+                  vi = 1;
+                }else{
+                  vi = 0;
                 }
 
-                if (maidsState[maidID].orgasmCmb > 0)
-                {
+                if (maidsState[maidID].orgasmCmb > 0){
                     VoiceValue = 3 + vi;
-                }else{
+                }else
+                {
                     //VoiceValue = maidsState[maidID].exciteLevel - 1 + vi;
                     //kaikanLevel 1～12 1以下になったらボイス終了
                     int kaikan = maidsState[maidID].kaikanLevel;
@@ -4690,8 +4624,7 @@ else if (cfgw.mainGuiFlag == 2)
                       if (kaikan <= 8) kaikan = 4; //6-8
                       else if (kaikan <= 10)  kaikan = 5; //9-10
                       else kaikan = 6; //11-12
-                }
-
+                    }
                     VoiceValue = Math.Min(4, Math.Max(maidsState[maidID].exciteLevel, kaikan-1) - 1 + vi);
                     #if DEBUG
                     Console.WriteLine("exciteLevel="+maidsState[maidID].exciteLevel+" kaikanLevel="+maidsState[maidID].kaikanLevel+" motionHoldTime="+maidsState[maidID].motionHoldTime);
@@ -4711,34 +4644,33 @@ else if (cfgw.mainGuiFlag == 2)
                 }
                 maid.AudioMan.LoadPlay(VoiceList[VoiceValue], 0f, false, true);
                 Console.WriteLine(stockMaids[maidID].personal +" ["+maidsState[maidID].vStateMajor+":"+VoiceValue+"] "+VoiceList[VoiceValue]);
-                }
-
-
-            //余韻終了時
+          }
+          
+          
+          //余韻終了時
           if(maidsState[maidID].vStateMajor == 10 && maidsState[maidID].vStateMajorOld == 50) {
             maid.AudioMan.Stop(1.5f);
           }
 
         }
+        //リアクション音声・表情の再生
+        private void ReactionPlay(int maidID)
+        {
+            Maid maid = stockMaids[maidID].mem;
+            int iPersonal = Array.IndexOf(personalList[1], stockMaids[maidID].personal);
+            if (maidsState[maidID].voiceMode2 > 0)
+                iPersonal = maidsState[maidID].voiceMode2 - 1;
+            string[] VoiceList = BasicVoiceSetup.reactionVoice[iPersonal];
+            int iRandom = UnityEngine.Random.Range(0, VoiceList.Length);
 
-//リアクション音声・表情の再生
-private void ReactionPlay(int maidID)
-{
-    Maid maid = stockMaids[maidID].mem;
-    int iPersonal = Array.IndexOf(personalList[1], stockMaids[maidID].personal);
-    if (maidsState[maidID].voiceMode2 > 0)
-        iPersonal = maidsState[maidID].voiceMode2 - 1;
-    string[] VoiceList = BasicVoiceSetup.reactionVoice[iPersonal];
-    int iRandom = UnityEngine.Random.Range(0, VoiceList.Length);
+            maid.AudioMan.LoadPlay(VoiceList[iRandom], 0f, false, false);
+            //maidsState[maidID].vsFlag = 2;
+            maidsState[maidID].orgasmVoice = 2;
 
-    maid.AudioMan.LoadPlay(VoiceList[iRandom], 0f, false, false);
-    //maidsState[maidID].vsFlag = 2;
-    maidsState[maidID].orgasmVoice = 2;
-
-    iRandom = UnityEngine.Random.Range(0, cfgw.sFaceAnime30Vibe[3].Length);
-    maid.FaceAnime(cfgw.sFaceAnime30Vibe[3][iRandom], 0.5f, 0);
-    maidsState[maidID].faceHoldTime = cfgw.vStateAltTimeVBase + UnityEngine.Random.Range(0f, cfgw.vStateAltTimeVRandomExtend); //次の表情変更タイマーセット
-}
+            iRandom = UnityEngine.Random.Range(0, cfgw.sFaceAnime30Vibe[3].Length);
+            maid.FaceAnime(cfgw.sFaceAnime30Vibe[3][iRandom], 0.5f, 0);
+            maidsState[maidID].faceHoldTime = cfgw.vStateAltTimeVBase + UnityEngine.Random.Range(0f, cfgw.vStateAltTimeVRandomExtend); //次の表情変更タイマーセット
+        }
 
 
 
