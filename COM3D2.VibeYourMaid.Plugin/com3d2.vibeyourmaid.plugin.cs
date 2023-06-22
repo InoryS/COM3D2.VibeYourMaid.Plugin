@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Diagnostics;
 using System.Reflection;
@@ -18,8 +18,7 @@ using CM3D2.ExternalSaveData.Managed;
 
 // コンパイル用コマンド　"C:\Windows\Microsoft.NET\Framework\v3.5\csc" /t:library /lib:..\CM3D2x64_Data（環境に合わせて変更）\Managed /r:UnityEngine.dll /r:UnityInjector.dll /r:Assembly-CSharp.dll /r:Assembly-CSharp-firstpass.dll /r:ExIni.dll /r:..\COM3D2.ExternalSaveData.Managed.dll COM3D2.VibeYourMaid.Plugin.cs
 
-namespace CM3D2.VibeYourMaid.Plugin
-{
+namespace CM3D2.VibeYourMaid.Plugin{
 
     [
         PluginFilter("COM3D2x64"),
@@ -27,20 +26,1698 @@ namespace CM3D2.VibeYourMaid.Plugin
       PluginFilter("COM3D2OHx64"),
       PluginFilter("COM3D2OHVRx64"),
       PluginName("VibeYourMaid"),
-      PluginVersion("2.0.5.5")]
+      PluginVersion("2.0.5.6")]
 
 
     public class VibeYourMaid : ExPluginBase
     {
-
 		//version number
-		private string VerNum = "2.0.5.5-Inory";
-		
-		
-        public BasicVoiceSet[] bvs = new BasicVoiceSet[20]; //性格追加時に更新
+		private string VerNum = "2.0.5.6-Inory";
+
+        public BasicVoiceSet[] bvs = new BasicVoiceSet[22]; //性格追加時に更新
+        public class BasicVoiceSet {
+		  public BasicVoiceSet(string[][] v1, string[][] v2, string[][] v3, string[][] v4, string[][] v5, string[][] v6, string[] v7){
+            sLoopVoice20Vibe = v1;
+            sLoopVoice20Fera = v2;
+            sLoopVoice30Vibe = v3;
+            sLoopVoice30Fera = v4;
+            sOrgasmVoice30Vibe = v5;
+            sOrgasmVoice30Fera = v6;
+            sLoopVoice40Vibe = v7;
+          }
+          public BasicVoiceSet(){
+            sLoopVoice20Vibe = new string[][]{};
+            sLoopVoice20Fera = new string[][]{};
+            sLoopVoice30Vibe = new string[][]{};
+            sLoopVoice30Fera = new string[][]{};
+            sOrgasmVoice30Vibe = new string[][]{};
+            sOrgasmVoice30Fera = new string[][]{};
+            sLoopVoice40Vibe = new string[]{};
+          }
+
+          //弱バイブ　通常
+          public string[][] sLoopVoice20Vibe;
+          //弱バイブ　フェラ
+          public string[][] sLoopVoice20Fera;
+          //強バイブ　通常
+          public string[][] sLoopVoice30Vibe;
+          //強バイブ　フェラ
+          public string[][] sLoopVoice30Fera;
+          //絶頂　通常
+          public string[][] sOrgasmVoice30Vibe;
+          //絶頂　フェラ
+          public string[][] sOrgasmVoice30Fera;
+          //停止時
+          public string[] sLoopVoice40Vibe;
+        }
+
+
+          #region VoiceSet
+            //性格別声テーブル　ツンデレ---------------------------------------------------------------
+              //弱バイブ　通常
+              public string[][] sLoopVoice20PrideVibe = new string[][] {
+              new string[] { "S0_01244.ogg" , "S0_01245.ogg" , "S0_01252.ogg" , "S0_01253.ogg" , "s0_01236.ogg" , "s0_01237.ogg" },
+              new string[] { "S0_01236.ogg" , "S0_01237.ogg" , "S0_103950.ogg", "S0_103951.ogg", "s0_01238.ogg" , "s0_01239.ogg" },
+              new string[] { "S0_01246.ogg" , "S0_01247.ogg" , "S0_01254.ogg" , "S0_01255.ogg" },
+              new string[] { "S0_01238.ogg" , "S0_01239.ogg" , "S0_103952.ogg", "S0_103953.ogg" },
+              //new string[] { "S0_01268.ogg" , "S0_01269.ogg" , "S0_01270.ogg" , "S0_01271.ogg" } //ca001e(L0-L3)首絞め 
+              new string[] { "S0_01296.ogg" , "S0_01297.ogg" , "S0_01304.ogg" , "S0_01305.ogg" }
+              };
+              //弱バイブ　フェラ
+              public string[][] sLoopVoice20PrideFera = new string[][] {
+              new string[] { "S0_01383.ogg" , "S0_01367.ogg" , "S0_01384.ogg" , "S0_01369.ogg" },
+              new string[] { "S0_01383.ogg" , "S0_01367.ogg" , "S0_01384.ogg" , "S0_01369.ogg" },
+              new string[] { "S0_01383.ogg" , "S0_01367.ogg" , "S0_01384.ogg" , "S0_01369.ogg" },
+              new string[] { "S0_01383.ogg" , "S0_01367.ogg" , "S0_01384.ogg" , "S0_01369.ogg" },
+              new string[] { "S0_01383.ogg" , "S0_01367.ogg" , "S0_01384.ogg" , "S0_01369.ogg" }
+              };
+              //強バイブ　通常
+              public string[][] sLoopVoice30PrideVibe = new string[][] {
+              new string[] { "S0_01248.ogg" , "S0_01249.ogg" , "S0_01255.ogg" , "S0_01256.ogg" },
+              new string[] { "S0_01240.ogg" , "S0_01241.ogg" , "S0_103954.ogg", "S0_103955.ogg", "s0_01326.ogg" , "s0_01327.ogg" },
+              new string[] { "S0_01250.ogg" , "S0_01251.ogg" , "S0_01257.ogg" , "S0_01258.ogg" , "s0_01330.ogg" , "s0_01331.ogg" },
+              new string[] { "S0_01242.ogg" , "S0_01243.ogg" , "S0_103956.ogg", "S0_103957.ogg" },
+              //new string[] { "S0_01272.ogg" , "S0_01273.ogg" , "S0_01274.ogg" , "S0_01275.ogg" } //ca001e(L4-L7)首絞め
+              new string[] { "S0_01298.ogg" , "S0_01299.ogg" , "S0_01306.ogg" , "S0_01307.ogg" }
+              };
+              //強バイブ　フェラ
+              public string[][] sLoopVoice30PrideFera = new string[][] {
+              new string[] { "S0_01385.ogg" , "S0_01371.ogg" , "S0_01386.ogg" , "S0_01387.ogg" },
+              new string[] { "S0_01385.ogg" , "S0_01371.ogg" , "S0_01386.ogg" , "S0_01387.ogg" },
+              new string[] { "S0_01385.ogg" , "S0_01371.ogg" , "S0_01386.ogg" , "S0_01387.ogg" },
+              new string[] { "S0_01385.ogg" , "S0_01371.ogg" , "S0_01386.ogg" , "S0_01387.ogg" },
+              new string[] { "S0_01383.ogg" , "S0_01367.ogg" , "S0_01384.ogg" , "S0_01369.ogg" }
+              };
+              //絶頂　通常
+              public string[][] sOrgasmVoice30PrideVibe = new string[][] {
+              new string[] { "s0_01898.ogg" , "s0_01899.ogg" , "s0_01902.ogg" , "s0_01900.ogg" },
+              new string[] { "s0_01913.ogg" , "s0_01918.ogg" , "s0_01919.ogg" , "s0_01917.ogg" , "S0_104118.ogg", "S0_104122.ogg" },
+              new string[] { "s0_09072.ogg" , "s0_09070.ogg" , "s0_09099.ogg" , "s0_09059.ogg" ,
+                             "S0_104554.ogg", "S0_17233.ogg" , "S0_00774.ogg" ,
+                             "s0_01913.ogg" , "s0_01918.ogg" , "s0_01919.ogg" , "s0_01917.ogg" , "S0_104118.ogg", "S0_104122.ogg" }, //2行目と同じ
+              new string[] { "s0_09067.ogg" , "s0_09068.ogg" , "s0_09069.ogg" , "s0_09071.ogg" , "s0_09085.ogg" , "s0_09086.ogg" , "s0_09087.ogg" , "s0_09091.ogg" ,
+                             "S0_104554.ogg", "S0_17233.ogg" , "S0_00774.ogg" , //4行目と同じ
+                             "S0_104564.ogg", "S0_104498.ogg", "S0_104504.ogg" },
+              new string[] { "s0_01898.ogg" , "s0_01899.ogg" , "s0_01902.ogg" , "s0_01900.ogg" }
+              };
+              //絶頂　フェラ
+              public string[][] sOrgasmVoice30PrideFera = new string[][] {
+              new string[] { "S0_01922.ogg" , "S0_01920.ogg" , "S0_01921.ogg" },
+              new string[] { "S0_01922.ogg" , "S0_01920.ogg" , "S0_01921.ogg" },
+              new string[] { "S0_01922.ogg" , "S0_01920.ogg" , "S0_01921.ogg" },
+              new string[] { "S0_11361.ogg" , "S0_01931.ogg" , "S0_11350.ogg" , "S0_11349.ogg" },
+              new string[] { "S0_01922.ogg" , "S0_01920.ogg" , "S0_01921.ogg" }
+              };
+              //停止時
+              public string[] sLoopVoice40PrideVibe = new string[] { "S0_01967.ogg" , "S0_01968.ogg" , "S0_01968.ogg" , "S0_01969.ogg" , "S0_01969.ogg" };
 
 
 
+            //性格別声テーブル　クーデレ---------------------------------------------------------------
+              //弱バイブ　通常
+              public string[][] sLoopVoice20CoolVibe = new string[][] {
+              new string[] { "S1_02317.ogg" , "S1_02318.ogg" , "S1_02325.ogg" , "S1_02326.ogg" , "s1_02396.ogg" , "s1_02390.ogg" },
+              new string[] { "S1_02309.ogg" , "S1_02310.ogg" , "S1_102717.ogg", "S1_102718.ogg", "s1_02391.ogg" , "s1_02392.ogg" },
+              new string[] { "S1_02319.ogg" , "S1_02320.ogg" , "S1_02327.ogg" , "S1_02328.ogg" },
+              new string[] { "S1_02311.ogg" , "S1_02312.ogg" , "S1_102719.ogg", "S1_102720.ogg" },
+              //new string[] { "S1_02341.ogg" , "S1_02342.ogg" , "S1_02343.ogg" , "S1_02344.ogg" } //ca001e(L0-L3)首絞め 
+              new string[] { "S1_02369.ogg" , "S1_02370.ogg" , "S1_02377.ogg" , "S1_02378.ogg" }
+              };
+              //弱バイブ　フェラ
+              public string[][] sLoopVoice20CoolFera = new string[][] {
+              new string[] { "S1_02455.ogg" , "S1_02440.ogg" , "S1_02457.ogg" , "S1_02442.ogg" },
+              new string[] { "S1_02455.ogg" , "S1_02440.ogg" , "S1_02457.ogg" , "S1_02442.ogg" },
+              new string[] { "S1_02455.ogg" , "S1_02440.ogg" , "S1_02457.ogg" , "S1_02442.ogg" },
+              new string[] { "S1_02455.ogg" , "S1_02440.ogg" , "S1_02457.ogg" , "S1_02442.ogg" },
+              new string[] { "S1_02455.ogg" , "S1_02440.ogg" , "S1_02457.ogg" , "S1_02442.ogg" }
+              };
+              //強バイブ　通常
+              public string[][] sLoopVoice30CoolVibe = new string[][] {
+              new string[] { "S1_02321.ogg" , "S1_02322.ogg" , "S1_02329.ogg" , "S1_02330.ogg" },
+              new string[] { "S1_02313.ogg" , "S1_02314.ogg" , "S1_102721.ogg", "S1_102722.ogg", "s1_02401.ogg" , "s1_02400.ogg" },
+              new string[] { "S1_02323.ogg" , "S1_02324.ogg" , "S1_02331.ogg" , "S1_02332.ogg" , "s1_02402.ogg" , "s1_02404.ogg" },
+              new string[] { "S1_02315.ogg" , "S1_02316.ogg" , "S1_102723.ogg", "S1_102724.ogg" },
+              //new string[] { "S1_02345.ogg" , "S1_02346.ogg" , "S1_02347.ogg" , "S1_02348.ogg" } //ca001e(L4-L7)首絞め
+              new string[] { "S1_02371.ogg" , "S1_02372.ogg" , "S1_02379.ogg" , "S1_02380.ogg" }
+              };
+              //強バイブ　フェラ
+              public string[][] sLoopVoice30CoolFera = new string[][] {
+              new string[] { "S1_02458.ogg" , "S1_02459.ogg" , "S1_02444.ogg" , "S1_02460.ogg" },
+              new string[] { "S1_02458.ogg" , "S1_02459.ogg" , "S1_02444.ogg" , "S1_02460.ogg" },
+              new string[] { "S1_02458.ogg" , "S1_02459.ogg" , "S1_02444.ogg" , "S1_02460.ogg" },
+              new string[] { "S1_02458.ogg" , "S1_02459.ogg" , "S1_02444.ogg" , "S1_02460.ogg" },
+              new string[] { "S1_02455.ogg" , "S1_02440.ogg" , "S1_02457.ogg" , "S1_02442.ogg" }
+              };
+              //絶頂　通常
+              public string[][] sOrgasmVoice30CoolVibe = new string[][] {
+              new string[] { "s1_03223.ogg" , "s1_03246.ogg" , "s1_03247.ogg" , "s1_03210.ogg" },
+              new string[] { "s1_03214.ogg" , "s1_03215.ogg" , "s1_03216.ogg" , "s1_03209.ogg" , "S1_104637.ogg", "S1_100941.ogg" },
+              new string[] { "s1_03207.ogg" , "s1_03205.ogg" , "s1_08993.ogg" , "s1_08971.ogg" ,
+                             "S1_100945.ogg", "S1_101869.ogg", "S1_101750.ogg" ,
+                             "s1_03214.ogg" , "s1_03215.ogg" , "s1_03216.ogg" , "s1_03209.ogg" , "S1_104637.ogg", "S1_100941.ogg" }, //2行目と同じ
+              new string[] { "s1_09344.ogg" , "s1_09370.ogg" , "s1_09371.ogg" , "s1_09372.ogg" , "s1_09374.ogg" , "s1_09398.ogg" , "s1_09392.ogg" , "s1_09365.ogg" ,
+                             "S1_100945.ogg", "S1_101869.ogg", "S1_101750.ogg" , //4行目と同じ
+                             "S1_104903.ogg", "S1_100946.ogg", "S1_100953.ogg", "S1_100957.ogg", "S1_101537.ogg", "S1_103993.ogg", "S1_100933.ogg", "S1_103640.ogg" , "S1_104784.ogg"},
+              new string[] { "s1_03223.ogg" , "s1_03246.ogg" , "s1_03247.ogg" , "s1_03210.ogg" }
+              };
+              //絶頂　フェラ
+              public string[][] sOrgasmVoice30CoolFera = new string[][] {
+              new string[] { "S1_03219.ogg" , "S1_03218.ogg" , "S1_03228.ogg" },
+              new string[] { "S1_03219.ogg" , "S1_03218.ogg" , "S1_03228.ogg" },
+              new string[] { "S1_03219.ogg" , "S1_03218.ogg" , "S1_03228.ogg" },
+              new string[] { "S1_11440.ogg" , "S1_11429.ogg" , "S1_11952.ogg" , "S1_19221.ogg" },
+              new string[] { "S1_03219.ogg" , "S1_03218.ogg" , "S1_03228.ogg" }
+              };
+              //停止時
+              public string[] sLoopVoice40CoolVibe = new string[] { "S1_03264.ogg" , "S1_03265.ogg" , "S1_03265.ogg" , "S1_03266.ogg" , "S1_03266.ogg" };
+
+
+
+            //性格別声テーブル　純真---------------------------------------------------------------
+              //弱バイブ　通常
+              public string[][] sLoopVoice20PureVibe = new string[][] {
+              new string[] { "S2_01158.ogg" , "S2_01159.ogg" , "S2_01166.ogg" , "S2_01167.ogg" , "s2_01235.ogg" , "s2_01236.ogg" },
+              new string[] { "S2_01150.ogg" , "S2_01151.ogg" , "S2_104161.ogg", "S2_104162.ogg", "s2_01237.ogg" , "s2_01238.ogg" },
+              new string[] { "S2_01160.ogg" , "S2_01161.ogg" , "S2_01168.ogg" , "S2_01169.ogg" },
+              new string[] { "S2_01152.ogg" , "S2_01153.ogg" , "S2_104163.ogg", "S2_104164.ogg" },
+              new string[] { "S2_01182.ogg" , "S2_01183.ogg" , "S2_01184.ogg" , "S2_01185.ogg" } //ca001e(L4-L7)首絞め
+              };
+              //弱バイブ　フェラ
+              public string[][] sLoopVoice20PureFera = new string[][] {
+              new string[] { "S2_01296.ogg" , "S2_01281.ogg" , "S2_01298.ogg" , "S2_01282.ogg" },
+              new string[] { "S2_01296.ogg" , "S2_01281.ogg" , "S2_01298.ogg" , "S2_01282.ogg" },
+              new string[] { "S2_01296.ogg" , "S2_01281.ogg" , "S2_01298.ogg" , "S2_01282.ogg" },
+              new string[] { "S2_01296.ogg" , "S2_01281.ogg" , "S2_01298.ogg" , "S2_01282.ogg" },
+              new string[] { "S2_01296.ogg" , "S2_01281.ogg" , "S2_01298.ogg" , "S2_01282.ogg" }
+              };
+              //強バイブ　通常
+              public string[][] sLoopVoice30PureVibe = new string[][] {
+              new string[] { "S2_01162.ogg" , "S2_01163.ogg" , "S2_01170.ogg" , "S2_01171.ogg" },
+              new string[] { "S2_01154.ogg" , "S2_01155.ogg" , "S2_104165.ogg", "S2_104166.ogg", "s2_01185.ogg" , "s2_01186.ogg" },
+              new string[] { "S2_01164.ogg" , "S2_01165.ogg" , "S2_01172.ogg" , "S2_01173.ogg" , "s2_01187.ogg" , "s2_01188.ogg" },
+              new string[] { "S2_01156.ogg" , "S2_01157.ogg" , "S2_104167.ogg", "S2_104168.ogg" },
+              new string[] { "S2_01186.ogg" , "S2_01187.ogg" , "S2_01188.ogg" , "S2_01189.ogg" } //ca001e(L4-L7)首絞め
+              };
+              //強バイブ　フェラ
+              public string[][] sLoopVoice30PureFera = new string[][] {
+              new string[] { "S2_01299.ogg" , "S2_01300.ogg" , "S2_01285.ogg" , "S2_01301.ogg" },
+              new string[] { "S2_01299.ogg" , "S2_01300.ogg" , "S2_01285.ogg" , "S2_01301.ogg" },
+              new string[] { "S2_01299.ogg" , "S2_01300.ogg" , "S2_01285.ogg" , "S2_01301.ogg" },
+              new string[] { "S2_01299.ogg" , "S2_01300.ogg" , "S2_01285.ogg" , "S2_01301.ogg" },
+              new string[] { "S2_01296.ogg" , "S2_01281.ogg" , "S2_01298.ogg" , "S2_01282.ogg" }
+              };
+              //絶頂　通常
+              public string[][] sOrgasmVoice30PureVibe = new string[][] {
+              new string[] { "s2_01478.ogg" , "s2_01477.ogg" , "s2_01476.ogg" , "s2_01475.ogg" },
+              new string[] { "s2_01432.ogg" , "s2_01433.ogg" , "s2_01434.ogg" , "s2_01436.ogg" , "S2_00713.ogg" },
+              new string[] { "s2_09039.ogg" , "s2_09067.ogg" , "s2_09052.ogg" , "s2_08502.ogg" , "s2_103519.ogg",
+                             "S2_104346.ogg", "S2_104720.ogg", "S2_104670.ogg", "S2_00715.ogg" , "S2_100074.ogg",
+                             "s2_01432.ogg" , "s2_01433.ogg" , "s2_01434.ogg" , "s2_01436.ogg" , "S2_00713.ogg" }, //2行目と同じ
+              new string[] { "s2_09047.ogg" , "s2_09048.ogg" , "s2_09049.ogg" , "s2_09050.ogg" , "s2_09051.ogg" , "s2_09066.ogg" , "s2_09069.ogg" , "s2_09073.ogg",
+                             "S2_104346.ogg", "S2_104720.ogg", "S2_104670.ogg", "S2_00715.ogg" , "S2_100074.ogg",  //4行目と同じ
+                             "S2_104730.ogg", "S2_100492.ogg", "S2_100488.ogg", "S2_100540.ogg", "S2_101263.ogg", "S2_104611.ogg", "S2_100265.ogg", "s2_103499.ogg", "s2_103507.ogg" },
+              new string[] { "s2_01478.ogg" , "s2_01477.ogg" , "s2_01476.ogg" , "s2_01475.ogg" }
+              };
+              //絶頂　フェラ
+              public string[][] sOrgasmVoice30PureFera = new string[][] {
+              new string[] { "S2_01446.ogg" , "S2_01445.ogg" , "S2_01495.ogg" },
+              new string[] { "S2_01446.ogg" , "S2_01445.ogg" , "S2_01495.ogg" },
+              new string[] { "S2_01446.ogg" , "S2_01445.ogg" , "S2_01495.ogg" },
+              new string[] { "S2_11371.ogg" , "S2_11370.ogg" , "S2_11358.ogg" , "S2_11347.ogg" },
+              new string[] { "S2_01446.ogg" , "S2_01445.ogg" , "S2_01495.ogg" }
+              };
+              //停止時
+              public string[] sLoopVoice40PureVibe = new string[] { "s2_01491.ogg" , "s2_01492.ogg" , "s2_01492.ogg" , "s2_01493.ogg" , "s2_01493.ogg" };
+
+
+
+            //性格別声テーブル　ヤンデレ---------------------------------------------------------------
+              //弱バイブ　通常
+              public string[][] sLoopVoice20YandereVibe = new string[][] {
+              new string[] { "S3_02695.ogg" , "S3_02696.ogg" , "S3_02703.ogg" , "S3_02704.ogg" , "s3_02767.ogg" , "s3_02768.ogg" },
+              new string[] { "S3_02687.ogg" , "S3_02688.ogg" , "S3_101125.ogg", "S3_101126.ogg", "s3_02769.ogg" , "s3_02770.ogg" },
+              new string[] { "S3_02697.ogg" , "S3_02698.ogg" , "S3_02705.ogg" , "S3_02706.ogg" },
+              new string[] { "S3_02689.ogg" , "S3_02690.ogg" , "S3_101127.ogg", "S3_101128.ogg" },
+              new string[] { "S3_02747.ogg" , "S3_02748.ogg" , "S3_02755.ogg" , "S3_02756.ogg" } //ca001f(L4-L5)喪失 + ca001g(L4-L5)酔い
+              };
+              //弱バイブ　フェラ
+              public string[][] sLoopVoice20YandereFera = new string[][] {
+              new string[] { "S3_02833.ogg" , "S3_02818.ogg" , "S3_02835.ogg" , "S3_02820.ogg" },
+              new string[] { "S3_02833.ogg" , "S3_02818.ogg" , "S3_02835.ogg" , "S3_02820.ogg" },
+              new string[] { "S3_02833.ogg" , "S3_02818.ogg" , "S3_02835.ogg" , "S3_02820.ogg" },
+              new string[] { "S3_02833.ogg" , "S3_02818.ogg" , "S3_02835.ogg" , "S3_02820.ogg" },
+              new string[] { "S3_02833.ogg" , "S3_02818.ogg" , "S3_02835.ogg" , "S3_02820.ogg" }
+              };
+
+              //強バイブ　通常
+              public string[][] sLoopVoice30YandereVibe = new string[][] {
+              new string[] { "S3_02699.ogg" , "S3_02700.ogg" , "S3_02707.ogg" , "S3_02708.ogg" },
+              new string[] { "S3_02691.ogg" , "S3_02692.ogg" , "S3_101129.ogg", "S3_101130.ogg", "s3_02797.ogg" , "s3_02798.ogg" },
+              new string[] { "S3_02701.ogg" , "S3_02702.ogg" , "S3_02709.ogg" , "S3_02710.ogg" , "s3_02691.ogg" , "s3_02796.ogg" },
+              new string[] { "S3_02693.ogg" , "S3_02694.ogg" , "S3_02757.ogg" , "S3_02758.ogg" }, //ca001g(L6,L7)酔い 入れ替え
+              new string[] { "S3_02749.ogg" , "S3_02750.ogg" , "S3_101147.ogg", "S3_101148.ogg" } //ca001f(L6,L7)処女喪失 ca001k(L6,L7)発情奉仕
+              };
+              //強バイブ　フェラ
+              public string[][] sLoopVoice30YandereFera = new string[][] {
+              new string[] { "S3_02836.ogg" , "S3_02837.ogg" , "S3_02822.ogg" , "S3_02838.ogg" },
+              new string[] { "S3_02836.ogg" , "S3_02837.ogg" , "S3_02822.ogg" , "S3_02838.ogg" },
+              new string[] { "S3_02836.ogg" , "S3_02837.ogg" , "S3_02822.ogg" , "S3_02838.ogg" },
+              new string[] { "S3_02836.ogg" , "S3_02837.ogg" , "S3_02822.ogg" , "S3_02838.ogg" },
+              new string[] { "S3_02833.ogg" , "S3_02818.ogg" , "S3_02835.ogg" , "S3_02820.ogg" }
+              };
+              //絶頂　通常
+              public string[][] sOrgasmVoice30YandereVibe = new string[][] {
+              new string[] { "s3_02908.ogg" , "s3_02950.ogg" , "s3_02923.ogg" , "s3_02932.ogg" , "S3_02882.ogg" , "S3_02947.ogg" , "S3_02886.ogg" , "S3_02866.ogg" , "S3_101160.ogg" },
+              new string[] { "s3_02909.ogg" , "s3_02910.ogg" , "s3_02915.ogg" , "s3_02914.ogg" , "S3_104995.ogg", "S3_104612.ogg" },
+              new string[] { "s3_02905.ogg" , "s3_02906.ogg" , "s3_02907.ogg" , "s3_05540.ogg" ,
+                             "S3_104994.ogg", "S3_104995.ogg", "S3_33652.ogg" , "S3_08304.ogg" , "S3_104853.ogg",
+                             "s3_02909.ogg" , "s3_02910.ogg" , "s3_02915.ogg" , "s3_02914.ogg" , "S3_104995.ogg", "S3_104612.ogg" }, //2行目と同じ
+              new string[] { "s3_05658.ogg" , "s3_05659.ogg" , "s3_05660.ogg" , "s3_05661.ogg" , "s3_05651.ogg" ,
+                             "S3_104994.ogg", "S3_104995.ogg", "S3_33652.ogg" , "S3_08304.ogg" , "S3_104853.ogg", //4行目と同じ
+                             "S3_104935.ogg", "S3_104936.ogg", "S3_102812.ogg" },
+              new string[] { "s3_02908.ogg" , "s3_02950.ogg" , "s3_02923.ogg" , "s3_02932.ogg" , "S3_02882.ogg" , "S3_02947.ogg" , "S3_02886.ogg" , "S3_02866.ogg" , "S3_101160.ogg" }
+              };
+              //絶頂　フェラ
+              public string[][] sOrgasmVoice30YandereFera = new string[][] {
+              new string[] { "S3_02919.ogg" , "S3_02918.ogg" , "S3_02928.ogg" },
+              new string[] { "S3_02919.ogg" , "S3_02918.ogg" , "S3_02928.ogg" },
+              new string[] { "S3_02919.ogg" , "S3_02918.ogg" , "S3_02928.ogg" },
+              new string[] { "S3_03084.ogg" , "S3_03184.ogg" , "S3_03162.ogg" , "S3_18748.ogg" },
+              new string[] { "S3_02919.ogg" , "S3_02918.ogg" , "S3_02928.ogg" }
+              };
+              //停止時
+              public string[] sLoopVoice40YandereVibe = new string[] { "S3_02964.ogg" , "S3_02965.ogg" , "S3_02966.ogg" , "S3_02966.ogg" , "S3_02967.ogg" };
+
+
+
+            //性格別声テーブル　お姉ちゃん---------------------------------------------------------------
+              //弱バイブ　通常
+              public string[][] sLoopVoice20AnesanVibe = new string[][] {
+              new string[] { "s4_08211.ogg" , "s4_08212.ogg" , "s4_08213.ogg" , "s4_08214.ogg" },
+              new string[] { "S4_08127.ogg" , "S4_08128.ogg" , "S4_102930.ogg", "S4_102931.ogg"},
+              new string[] { "S4_08137.ogg" , "S4_08138.ogg" , "S4_08129.ogg" , "S4_08130.ogg" },
+              new string[] { "S4_08129.ogg" , "S4_08130.ogg" , "S4_102932.ogg", "S4_102933.ogg" },
+              new string[] { "S4_08187.ogg" , "S4_08188.ogg" , "S4_08195.ogg" , "S4_08196.ogg" }
+              };
+              //弱バイブ　フェラ
+              public string[][] sLoopVoice20AnesanFera = new string[][] {
+              new string[] { "S4_08241.ogg" , "S4_08258.ogg" , "S4_08243.ogg" , "S4_08259.ogg" },
+              new string[] { "S4_08241.ogg" , "S4_08258.ogg" , "S4_08243.ogg" , "S4_08259.ogg" },
+              new string[] { "S4_08241.ogg" , "S4_08258.ogg" , "S4_08243.ogg" , "S4_08259.ogg" },
+              new string[] { "S4_08241.ogg" , "S4_08258.ogg" , "S4_08243.ogg" , "S4_08259.ogg" },
+              new string[] { "S4_08241.ogg" , "S4_08258.ogg" , "S4_08243.ogg" , "S4_08259.ogg" }
+              };
+              //強バイブ　通常
+              public string[][] sLoopVoice30AnesanVibe = new string[][] {
+              new string[] { "S4_08139.ogg" , "S4_08140.ogg" , "S4_08131.ogg" , "S4_08132.ogg" },
+              new string[] { "S4_08131.ogg" , "S4_08132.ogg" , "S4_102934.ogg", "S4_102935.ogg", "s4_08140.ogg" , "s4_08141.ogg" },
+              new string[] { "S4_08141.ogg" , "S4_08142.ogg" , "S4_08133.ogg" , "S4_08134.ogg" , "s4_08142.ogg" , "s4_08145.ogg" },
+              new string[] { "S4_08133.ogg" , "S4_08134.ogg" , "S4_102936.ogg", "S4_102937.ogg" },
+              new string[] { "S4_08189.ogg" , "S4_08190.ogg" , "S4_08197.ogg" , "S4_08198.ogg" }
+              };
+              //強バイブ　フェラ
+              public string[][] sLoopVoice30AnesanFera = new string[][] {
+              new string[] { "S4_08244.ogg" , "S4_08245.ogg" , "S4_08262.ogg" , "S4_08246.ogg" },
+              new string[] { "S4_08244.ogg" , "S4_08245.ogg" , "S4_08262.ogg" , "S4_08246.ogg" },
+              new string[] { "S4_08244.ogg" , "S4_08245.ogg" , "S4_08262.ogg" , "S4_08246.ogg" },
+              new string[] { "S4_08244.ogg" , "S4_08245.ogg" , "S4_08262.ogg" , "S4_08246.ogg" },
+              new string[] { "S4_08241.ogg" , "S4_08258.ogg" , "S4_08243.ogg" , "S4_08259.ogg" }
+              };
+              //絶頂　通常
+              public string[][] sOrgasmVoice30AnesanVibe = new string[][] {
+              new string[] { "s4_08348.ogg" , "s4_08354.ogg" , "s4_08365.ogg" , "s4_08374.ogg" },
+              new string[] { "s4_08345.ogg" , "s4_08346.ogg" , "s4_08349.ogg" , "s4_08350.ogg" },
+              new string[] { "s4_08347.ogg" , "s4_08355.ogg" , "s4_08356.ogg" , "s4_11658.ogg" },
+              new string[] { "s4_11684.ogg" , "s4_11677.ogg" , "s4_11680.ogg" , "s4_11683.ogg" , "s4_11661.ogg" , "s4_11659.ogg" , "s4_11654.ogg" , "s4_11660.ogg" },
+              new string[] { "s4_08348.ogg" , "s4_08354.ogg" , "s4_08365.ogg" , "s4_08374.ogg" }
+              };
+              //絶頂　フェラ
+              public string[][] sOrgasmVoice30AnesanFera = new string[][] {
+              new string[] { "S4_08359.ogg" , "S4_08358.ogg" , "S4_08368.ogg" },
+              new string[] { "S4_08359.ogg" , "S4_08358.ogg" , "S4_08368.ogg" },
+              new string[] { "S4_08359.ogg" , "S4_08358.ogg" , "S4_08368.ogg" },
+              new string[] { "S4_05728.ogg" , "S4_05726.ogg" , "S4_05680.ogg" , "S4_05668.ogg" },
+              new string[] { "S4_08359.ogg" , "S4_08358.ogg" , "S4_08368.ogg" }
+              };
+              //停止時
+              public string[] sLoopVoice40AnesanVibe = new string[] { "s4_08424.ogg" , "s4_08426.ogg" , "s4_08427.ogg" , "s4_08428.ogg" , "s4_08428.ogg" };
+
+
+
+            //性格別声テーブル　ボクっ娘---------------------------------------------------------------
+              //弱バイブ　通常
+              public string[][] sLoopVoice20GenkiVibe = new string[][] {
+              new string[] { "S5_04055.ogg" , "S5_04056.ogg" , "S5_04047.ogg" , "S5_04048.ogg" , "s5_04127.ogg" , "s5_04129.ogg" , "s5_04130.ogg" , "s5_04131.ogg" },
+              new string[] { "S5_04047.ogg" , "S5_04048.ogg" , "S5_102337.ogg", "S5_102338.ogg" },
+              new string[] { "S5_04057.ogg" , "S5_04058.ogg" , "S5_04049.ogg" , "S5_04050.ogg" },
+              new string[] { "S5_04049.ogg" , "S5_04050.ogg" , "S5_102339.ogg", "S5_102340.ogg"},
+              new string[] { "S5_04105.ogg" , "S5_04106.ogg" , "S5_04107.ogg" , "S5_04108.ogg" } //ca001f(L2-L5)喪失
+              };
+              //弱バイブ　フェラ
+              public string[][] sLoopVoice20GenkiFera = new string[][] {
+              new string[] { "S5_04163.ogg" , "S5_04162.ogg" , "S5_04179.ogg" , "S5_04181.ogg" },
+              new string[] { "S5_04163.ogg" , "S5_04162.ogg" , "S5_04179.ogg" , "S5_04181.ogg" },
+              new string[] { "S5_04163.ogg" , "S5_04162.ogg" , "S5_04179.ogg" , "s5_04174.ogg" },
+              new string[] { "S5_04163.ogg" , "S5_04162.ogg" , "S5_04179.ogg" , "s5_04174.ogg" },
+              new string[] { "S5_04163.ogg" , "S5_04162.ogg" , "S5_04179.ogg" , "s5_04174.ogg" }
+              };
+              //強バイブ　通常
+              public string[][] sLoopVoice30GenkiVibe = new string[][] {
+              new string[] { "S5_04059.ogg" , "S5_04060.ogg" , "S5_04051.ogg" , "S5_04052.ogg" , "s5_04133.ogg" , "s5_04134.ogg" },
+              new string[] { "S5_04051.ogg" , "S5_04052.ogg" , "S5_102341.ogg", "S5_102342.ogg" },
+              new string[] { "S5_04061.ogg" , "S5_04062.ogg" , "S5_04053.ogg" , "S5_04054.ogg" },
+              new string[] { "S5_04053.ogg" , "S5_04054.ogg" , "S5_102343.ogg", "S5_102344.ogg" },
+              new string[] { "S5_04109.ogg" , "S5_04110.ogg" , "S5_04117.ogg" , "S5_04118.ogg" }
+              };
+              //強バイブ　フェラ
+              public string[][] sLoopVoice30GenkiFera = new string[][] {
+              new string[] { "S5_04093.ogg" , "S5_04094.ogg" , "S5_04102.ogg" , "S5_04100.ogg" },
+              new string[] { "S5_04093.ogg" , "S5_04094.ogg" , "S5_04102.ogg" , "S5_04100.ogg" },
+              new string[] { "S5_04093.ogg" , "S5_04094.ogg" , "S5_04102.ogg" , "S5_04100.ogg" },
+              new string[] { "S5_04093.ogg" , "S5_04094.ogg" , "S5_04102.ogg" , "S5_04100.ogg" },
+              new string[] { "S5_04163.ogg" , "S5_04162.ogg" , "S5_04179.ogg" , "s5_04174.ogg" }
+              };
+              //絶頂　通常
+              public string[][] sOrgasmVoice30GenkiVibe = new string[][] {
+              new string[] { "s5_04264.ogg" , "s5_04258.ogg" , "s5_04256.ogg" , "s5_04255.ogg" },
+              new string[] { "s5_04265.ogg" , "s5_04270.ogg" , "s5_04267.ogg" , "s5_04268.ogg" },
+              new string[] { "s5_04266.ogg" , "s5_18375.ogg" , "s5_18380.ogg" , "s5_18393.ogg" },
+              new string[] { "s5_18379.ogg" , "s5_18380.ogg" , "s5_18382.ogg" , "s5_18384.ogg" , "s5_18385.ogg" , "s5_18400.ogg" , "s5_18402.ogg" , "s5_18119.ogg" },
+              new string[] { "s5_04264.ogg" , "s5_04258.ogg" , "s5_04256.ogg" , "s5_04255.ogg" }
+              };
+              //絶頂　フェラ
+              public string[][] sOrgasmVoice30GenkiFera = new string[][] {
+              new string[] { "s5_04271.ogg" , "s5_04272.ogg" , "s5_04273.ogg" },
+              new string[] { "s5_04271.ogg" , "s5_04272.ogg" , "s5_04273.ogg" },
+              new string[] { "s5_04271.ogg" , "s5_04272.ogg" , "s5_04273.ogg" },
+              new string[] { "S5_07752.ogg" , "S5_07753.ogg" , "s5_04273.ogg" , "s5_04271.ogg" },
+              new string[] { "s5_04271.ogg" , "s5_04272.ogg" , "s5_04273.ogg" }
+              };
+              //停止時
+              public string[] sLoopVoice40GenkiVibe = new string[] { "s5_04127.ogg" , "s5_04129.ogg" , "s5_04131.ogg" , "s5_04134.ogg" , "s5_04134.ogg" };
+
+
+
+            //性格別声テーブル　ドＳ---------------------------------------------------------------
+              //弱バイブ　通常
+              public string[][] sLoopVoice20SadistVibe = new string[][] {
+              new string[] { "S6_02479.ogg" , "S6_02480.ogg" , "S6_02259.ogg" , "S6_02260.ogg" },
+              new string[] { "S6_02179.ogg" , "S6_02180.ogg" , "S6_102978.ogg", "S6_102979.ogg" },
+              new string[] { "S6_02481.ogg" , "S6_02482.ogg" , "S6_02261.ogg" , "S6_02262.ogg" },
+              new string[] { "S6_02184.ogg" , "S6_02254.ogg" , "S6_02255.ogg" , "S6_02247.ogg" }, //ca001a(L5) + ca001k(L3,L4)奉仕 + ca001g(L4)酔い
+              new string[] { "S6_02239.ogg" , "S6_02240.ogg" , "S6_02248.ogg" , "S6_02256.ogg" }  //ca001f(L4-L5)喪失 + ca001g(L5)酔い + ca001k(L5)奉仕
+              };
+              //弱バイブ　フェラ
+              public string[][] sLoopVoice20SadistFera = new string[][] {
+              new string[] { "S6_02219.ogg" , "S6_02220.ogg" , "S6_02221.ogg" , "S6_02222.ogg" },
+              new string[] { "S6_02219.ogg" , "S6_02220.ogg" , "S6_02221.ogg" , "S6_02222.ogg" },
+              new string[] { "S6_02219.ogg" , "S6_02220.ogg" , "S6_02221.ogg" , "S6_02222.ogg" },
+              new string[] { "S6_02219.ogg" , "S6_02220.ogg" , "S6_02221.ogg" , "S6_02222.ogg" },
+              new string[] { "S6_02219.ogg" , "S6_02220.ogg" , "S6_02221.ogg" , "S6_02222.ogg" }
+              };
+              //強バイブ　通常
+              public string[][] sLoopVoice30SadistVibe = new string[][] {
+              new string[] { "S6_02483.ogg" , "S6_02484.ogg" , "S6_02263.ogg" , "S6_02264.ogg" },
+              new string[] { "S6_02183.ogg" , "S6_02184.ogg" , "S6_102982.ogg", "S6_102983.ogg" },
+              new string[] { "S6_02485.ogg" , "S6_02486.ogg" , "S6_02265.ogg" , "S6_02266.ogg" },
+              new string[] { "S6_02185.ogg" , "S6_02186.ogg" , "S6_02241.ogg" , "S6_02242.ogg" }, //ca001a(L6,L7) + ca001f(L6-L7)喪失
+              new string[] { "S6_102984.ogg", "S6_102985.ogg", "S6_02250.ogg" , "S6_02256.ogg" }  //ca001j(L6,L7)発情 + ca001g(L7)酔い + ca001k(L7)奉仕
+              };
+              //強バイブ　フェラ
+              public string[][] sLoopVoice30SadistFera = new string[][] {
+              new string[] { "S6_02223.ogg" , "S6_02224.ogg" , "S6_02225.ogg" , "S6_02226.ogg" },
+              new string[] { "S6_02223.ogg" , "S6_02224.ogg" , "S6_02225.ogg" , "S6_02226.ogg" },
+              new string[] { "S6_02223.ogg" , "S6_02224.ogg" , "S6_02225.ogg" , "S6_02226.ogg" },
+              new string[] { "S6_02223.ogg" , "S6_02224.ogg" , "S6_02225.ogg" , "S6_02226.ogg" },
+              new string[] { "S6_02219.ogg" , "S6_02220.ogg" , "S6_02221.ogg" , "S6_02222.ogg" }
+              };
+              //絶頂　通常
+              public string[][] sOrgasmVoice30SadistVibe = new string[][] {
+              new string[] { "s6_01744.ogg" , "s6_02700.ogg" , "s6_02450.ogg" , "s6_02357.ogg" },
+              new string[] { "S6_28847.ogg" , "S6_28853.ogg" , "S6_28814.ogg" , "S6_02397.ogg" },
+              new string[] { "S6_28817.ogg" , "S6_02398.ogg" , "S6_02399.ogg" , "s6_02402.ogg" ,
+                             "S6_103866.ogg", "S6_103987.ogg", "S6_103721.ogg", "S6_102819.ogg", "S6_103720.ogg" },
+              new string[] { "S6_09048.ogg" , "S6_01984.ogg" , "S6_01988.ogg" , "S6_01991.ogg" , "S6_02000.ogg" , "S6_01996.ogg" , "S6_01997.ogg" , "S6_01998.ogg" ,
+                             "S6_01999.ogg" , "S6_02001.ogg" , "s6_05796.ogg" , "s6_05797.ogg" , "s6_05798.ogg" , "s6_05799.ogg" , "s6_05800.ogg" , "s6_05801.ogg",
+                             "S6_103866.ogg", "S6_103987.ogg", "S6_103721.ogg", "S6_102819.ogg", "S6_103720.ogg", //4行目と同じ
+                             "S6_103419.ogg", "S6_09230.ogg" , "S6_102809.ogg", "S6_102820.ogg" },
+              new string[] { "s6_01744.ogg" , "s6_02700.ogg" , "s6_02450.ogg" , "s6_02357.ogg" }
+              };
+              //絶頂　フェラ
+              public string[][] sOrgasmVoice30SadistFera = new string[][] {
+              new string[] { "S6_28832.ogg" , "s6_02403.ogg" , "S6_28835.ogg" },
+              new string[] { "S6_28835.ogg" , "s6_02403.ogg" , "s6_02404.ogg" },
+              new string[] { "S6_28838.ogg" , "s6_02404.ogg" , "s6_02405.ogg" },
+              new string[] { "S6_02420.ogg" , "S6_08109.ogg" , "S6_08112.ogg" , "S6_08114.ogg" , "s6_02404.ogg" , "s6_02405.ogg"  },
+              new string[] { "S6_28832.ogg" , "s6_02403.ogg" , "S6_28835.ogg" }
+              };
+              //停止時
+              public string[] sLoopVoice40SadistVibe = new string[] { "s6_02477.ogg" , "s6_02478.ogg" , "s6_02479.ogg" , "s6_02481.ogg" , "s6_02480.ogg" };
+
+
+
+            //性格別声テーブル　無垢---------------------------------------------------------------
+              //弱バイブ　通常
+              public string[][] sLoopVoice20MukuVibe = new string[][] {
+              new string[] { "H0_00053.ogg" , "H0_00054.ogg" , "H0_09210.ogg" , "H0_09211.ogg" },
+              new string[] { "H0_00069.ogg" , "H0_00070.ogg" , "H0_00229.ogg" , "H0_00230.ogg" },
+              new string[] { "H0_00055.ogg" , "H0_00056.ogg" , "H0_09212.ogg" , "H0_09213.ogg" },
+              new string[] { "H0_00071.ogg" , "H0_00072.ogg" , "H0_00231.ogg" , "H0_00232.ogg" },
+              new string[] { "H0_00085.ogg" , "H0_00086.ogg" , "H0_00087.ogg" , "H0_00088.ogg" }
+              //new string[] { "H0_00217.ogg" , "H0_00218.ogg" , "H0_00121.ogg" , "H0_00122.ogg" } //ca001h(L4,L5)初心 + ca001g(L4,L5)酔い
+              };
+              //弱バイブ　フェラ
+              public string[][] sLoopVoice20MukuFera = new string[][] {
+              new string[] { "H0_00093.ogg" , "H0_00094.ogg" , "H0_00101.ogg" , "H0_00102.ogg" },
+              new string[] { "H0_00093.ogg" , "H0_00094.ogg" , "H0_00101.ogg" , "H0_00102.ogg" },
+              new string[] { "H0_00095.ogg" , "H0_00096.ogg" , "H0_00103.ogg" , "H0_00104.ogg" },
+              new string[] { "H0_00095.ogg" , "H0_00096.ogg" , "H0_00103.ogg" , "H0_00104.ogg" },
+              new string[] { "H0_00093.ogg" , "H0_00094.ogg" , "H0_00101.ogg" , "H0_00102.ogg" }
+              };
+              //強バイブ　通常
+              public string[][] sLoopVoice30MukuVibe = new string[][] {
+              new string[] { "H0_00057.ogg" , "H0_00058.ogg" , "H0_09214.ogg" , "H0_09215.ogg" },
+              new string[] { "H0_00073.ogg" , "H0_00074.ogg" , "H0_00233.ogg" , "H0_00234.ogg" },
+              new string[] { "H0_00059.ogg" , "H0_00060.ogg" , "H0_09216.ogg" , "H0_09217.ogg" },
+              new string[] { "H0_00075.ogg" , "H0_00076.ogg" , "H0_00235.ogg" , "H0_00236.ogg" }, //H0_00252
+              new string[] { "H0_00089.ogg" , "H0_00090.ogg" , "H0_00087.ogg" , "H0_00088.ogg" }
+              //new string[] { "H0_00219.ogg" , "H0_00220.ogg" , "H0_00123.ogg" , "H0_00124.ogg" } //ca001h(L6,L7)初心 + ca001g(L6,L7)酔い
+              };
+              //強バイブ　フェラ
+              public string[][] sLoopVoice30MukuFera = new string[][] {
+              new string[] { "H0_00105.ogg" , "H0_00106.ogg" , "H0_00097.ogg" , "H0_00098.ogg" },
+              new string[] { "H0_00105.ogg" , "H0_00106.ogg" , "H0_00097.ogg" , "H0_00098.ogg" },
+              new string[] { "H0_00107.ogg" , "H0_00108.ogg" , "H0_00099.ogg" , "H0_00100.ogg" },
+              new string[] { "H0_00107.ogg" , "H0_00108.ogg" , "H0_00099.ogg" , "H0_00100.ogg" },
+              new string[] { "H0_00105.ogg" , "H0_00106.ogg" , "H0_00097.ogg" , "H0_00098.ogg" }
+              };
+              //絶頂　通常
+              public string[][] sOrgasmVoice30MukuVibe = new string[][] {
+              new string[] { "H0_00289.ogg" , "H0_00290.ogg" , "H0_00291.ogg" , "H0_00292.ogg" },
+              new string[] { "H0_07822.ogg" , "H0_07826.ogg" , "H0_10642.ogg" , "H0_10619.ogg" , "H0_07825.ogg" },
+              new string[] { "H0_10874.ogg" , "H0_10860.ogg" , "H0_10957.ogg" , "H0_10960.ogg" , "H0_10869.ogg" , "H0_09681.ogg" , "H0_09691.ogg" , "H0_09712.ogg" , "H0_09724.ogg"},
+              new string[] { "H0_06353.ogg" , "H0_06358.ogg" , "H0_10859.ogg" , "H0_10870.ogg" , "H0_10860.ogg" , "H0_10961.ogg" , "H0_10962.ogg" ,
+                             "H0_10963.ogg" , "H0_07695.ogg" , "H0_09708.ogg" , "H0_09713.ogg" , "H0_10470.ogg" , "H0_10471.ogg" , "H0_10476.ogg" ,
+                             "H0_10479.ogg" , "H0_10480.ogg" , "H0_13669.ogg" , "H0_00567.ogg" , "H0_05H_15068.ogg" , "H0_05H_15079.ogg" , "H0_05H_15080.ogg" ,
+                             "H0_05H_15081.ogg" , "H0_06062.ogg" , "H0_10473.ogg" , "H0_10474.ogg" , "H0_10475.ogg" , "H0_10477.ogg" , "H0_10478.ogg" , "H0_10926.ogg" ,
+                             "H0_11359.ogg" , "H0_12625.ogg" , "H0_FEB_20458.ogg" , "H0_09681.ogg" , "H0_09682.ogg" , "H0_09714.ogg" },
+              new string[] { "H0_07604.ogg" , "H0_07603.ogg" , "H0_07614.ogg" , "H0_07644.ogg" }
+              };
+              //絶頂　フェラ
+              public string[][] sOrgasmVoice30MukuFera = new string[][] {
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" }
+              };
+              //停止時
+              public string[] sLoopVoice40MukuVibe = new string[] { "H0_00134.ogg" , "H0_00136.ogg" , "H0_09239.ogg" , "H0_09240.ogg" , "H0_00142.ogg" };
+
+
+
+            //性格別声テーブル　真面目---------------------------------------------------------------
+              //弱バイブ　通常
+              public string[][] sLoopVoice20MajimeVibe = new string[][] {
+              new string[] { "H1_00225.ogg" , "H1_00226.ogg" , "H1_08952.ogg" , "H1_08953.ogg" },
+              new string[] { "H1_00241.ogg" , "H1_00242.ogg" , "H1_00401.ogg" , "H1_00402.ogg" },
+              new string[] { "H1_00227.ogg" , "H1_00228.ogg" , "H1_08954.ogg" , "H1_08955.ogg" },
+              new string[] { "H1_00243.ogg" , "H1_00244.ogg" , "H1_00403.ogg" , "H1_00404.ogg" },
+              new string[] { "H1_00257.ogg" , "H1_00258.ogg" , "H1_00259.ogg" , "H1_00260.ogg" }
+              };
+              //弱バイブ　フェラ
+              public string[][] sLoopVoice20MajimeFera = new string[][] {
+              new string[] { "H1_00265.ogg" , "H1_00266.ogg" , "H1_00273.ogg" , "H1_00274.ogg" },
+              new string[] { "H1_00265.ogg" , "H1_00266.ogg" , "H1_00273.ogg" , "H1_00274.ogg" },
+              new string[] { "H1_00267.ogg" , "H1_00268.ogg" , "H1_00275.ogg" , "H1_00276.ogg" },
+              new string[] { "H1_00267.ogg" , "H1_00268.ogg" , "H1_00275.ogg" , "H1_00276.ogg" },
+              new string[] { "H1_00265.ogg" , "H1_00266.ogg" , "H1_00273.ogg" , "H1_00274.ogg" }
+              };
+              //強バイブ　通常
+              public string[][] sLoopVoice30MajimeVibe = new string[][] {
+              new string[] { "H1_00229.ogg" , "H1_00230.ogg" , "H1_08956.ogg" , "H1_08957.ogg" },
+              new string[] { "H1_00245.ogg" , "H1_00246.ogg" , "H1_00405.ogg" , "H1_00406.ogg" },
+              new string[] { "H1_00231.ogg" , "H1_00232.ogg" , "H1_08958.ogg" , "H1_08959.ogg" },
+              new string[] { "H1_00247.ogg" , "H1_00248.ogg" , "H1_00407.ogg" , "H1_00408.ogg" },
+              new string[] { "H1_00262.ogg" , "H1_00263.ogg" , "H1_00264.ogg" , "H1_00261.ogg" }
+              };
+              //強バイブ　フェラ
+              public string[][] sLoopVoice30MajimeFera = new string[][] {
+              new string[] { "H1_00269.ogg" , "H1_00270.ogg" , "H1_00277.ogg" , "H1_00278.ogg" },
+              new string[] { "H1_00269.ogg" , "H1_00270.ogg" , "H1_00277.ogg" , "H1_00278.ogg" },
+              new string[] { "H1_00271.ogg" , "H1_00272.ogg" , "H1_00279.ogg" , "H1_00280.ogg" },
+              new string[] { "H1_00271.ogg" , "H1_00272.ogg" , "H1_00279.ogg" , "H1_00280.ogg" },
+              new string[] { "H1_00269.ogg" , "H1_00270.ogg" , "H1_00277.ogg" , "H1_00278.ogg" }
+              };
+              //絶頂　通常
+              public string[][] sOrgasmVoice30MajimeVibe = new string[][] {
+              new string[] { "H1_11482.ogg" , "H1_13858.ogg" , "H1_13879.ogg" , "H1_13918.ogg" },
+              new string[] { "H1_11492.ogg" , "H1_11514.ogg" , "H1_10519.ogg" , "H1_10516.ogg" },
+              new string[] { "H1_11427.ogg" , "H1_11513.ogg" , "H1_05640.ogg" , "H1_09232.ogg" },
+              new string[] { "H1_11425.ogg" , "H1_11424.ogg" , "H1_11427.ogg" , "H1_09232.ogg" , "H1_10397.ogg" , "H1_11645.ogg" , "H1_11654.ogg" , "H1_11747.ogg" , "H1_10313.ogg" , "H1_11254.ogg" , "H1_11402.ogg" , "H1_09829.ogg" , "H1_04547.ogg" , "H1_12675.ogg" , "H1_01477.ogg" , "H1_00739.ogg" , "H1_06987.ogg" , "H1_13138.ogg" , "H1_13372.ogg" , "H1_12929.ogg" , "H1_11404.ogg" , "H1_05638.ogg" , "H1_09837.ogg" , "H1_03615.ogg" , "H1_11513.ogg" , "H1_05640.ogg" },
+              new string[] { "H1_10493.ogg" , "H1_10482.ogg" , "H1_10523.ogg" , "H1_10732.ogg" }
+              };
+              //絶頂　フェラ
+              public string[][] sOrgasmVoice30MajimeFera = new string[][] {
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { "H1_09840.ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { "H1_12857.ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" }
+              };
+              //停止時
+              public string[] sLoopVoice40MajimeVibe = new string[] { "H1_00305.ogg" , "H1_08979.ogg" , "H1_08980.ogg" , "H1_08982.ogg" , "H1_00313.ogg" };
+
+
+
+            //性格別声テーブル　凛デレ---------------------------------------------------------------
+              //弱バイブ　通常
+              public string[][] sLoopVoice20RindereVibe = new string[][] {
+              new string[] { "H2_00027.ogg" , "H2_00028.ogg" , "H2_09827.ogg" , "H2_09828.ogg" },
+              new string[] { "H2_00043.ogg" , "H2_00044.ogg" , "H2_00203.ogg" , "H2_00204.ogg" },
+              new string[] { "H2_00029.ogg" , "H2_00030.ogg" , "H2_09829.ogg" , "H2_09830.ogg" },
+              new string[] { "H2_00045.ogg" , "H2_00046.ogg" , "H2_00205.ogg" , "H2_00206.ogg" },
+              new string[] { "H2_00059.ogg" , "H2_00060.ogg" , "H2_00061.ogg" , "H2_00062.ogg" }
+              };
+              //弱バイブ　フェラ
+              public string[][] sLoopVoice20RindereFera = new string[][] {
+              new string[] { "H2_00067.ogg" , "H2_00068.ogg" , "H2_00075.ogg" , "H2_00076.ogg" },
+              new string[] { "H2_00067.ogg" , "H2_00068.ogg" , "H2_00075.ogg" , "H2_00076.ogg" },
+              new string[] { "H2_00069.ogg" , "H2_00070.ogg" , "H2_00077.ogg" , "H2_00078.ogg" },
+              new string[] { "H2_00069.ogg" , "H2_00070.ogg" , "H2_00077.ogg" , "H2_00078.ogg" },
+              new string[] { "H2_00067.ogg" , "H2_00068.ogg" , "H2_00075.ogg" , "H2_00076.ogg" }
+              };
+              //強バイブ　通常
+              public string[][] sLoopVoice30RindereVibe = new string[][] {
+              new string[] { "H2_00031.ogg" , "H2_00032.ogg" , "H2_09831.ogg" , "H2_09832.ogg" },
+              new string[] { "H2_00047.ogg" , "H2_00048.ogg" , "H2_00207.ogg" , "H2_00208.ogg" },
+              new string[] { "H2_00033.ogg" , "H2_00034.ogg" , "H2_09833.ogg" , "H2_09834.ogg" },
+              new string[] { "H2_00049.ogg" , "H2_00050.ogg" , "H2_00209.ogg" , "H2_00210.ogg" },
+              new string[] { "H2_00063.ogg" , "H2_00064.ogg" , "H2_00061.ogg" , "H2_00062.ogg" }
+              };
+              //強バイブ　フェラ
+              public string[][] sLoopVoice30RindereFera = new string[][] {
+              new string[] { "H2_00071.ogg" , "H2_00072.ogg" , "H2_00079.ogg" , "H2_00080.ogg" },
+              new string[] { "H2_00071.ogg" , "H2_00072.ogg" , "H2_00079.ogg" , "H2_00080.ogg" },
+              new string[] { "H2_00073.ogg" , "H2_00074.ogg" , "H2_00081.ogg" , "H2_00082.ogg" },
+              new string[] { "H2_00073.ogg" , "H2_00074.ogg" , "H2_00081.ogg" , "H2_00082.ogg" },
+              new string[] { "H2_00071.ogg" , "H2_00072.ogg" , "H2_00079.ogg" , "H2_00080.ogg" }
+              };
+              //絶頂　通常
+              public string[][] sOrgasmVoice30RindereVibe = new string[][] {
+              new string[] { "H2_06092.ogg" , "H2_00252.ogg" , "H2_00285.ogg" , "H2_00277.ogg" },
+              new string[] { "H2_10293.ogg" , "H2_10381.ogg" , "H2_10444.ogg" , "H2_11040.ogg" , "H2_07976.ogg" },
+              new string[] { "H2_08156.ogg" , "H2_10980.ogg" , "H2_11120.ogg" , "H2_11141.ogg" , "H2_11143.ogg" , "H2_11229.ogg" },
+              new string[] { "H2_10580.ogg" , "H2_10581.ogg" , "H2_10584.ogg" , "H2_10585.ogg" , "H2_10586.ogg" , "H2_10587.ogg" , "H2_10064.ogg" , "H2_13912.ogg" , "H2_11118.ogg" , "H2_11119.ogg" , "H2_08338.ogg" , "H2_11371.ogg" , "H2_11464.ogg" , "H2_13449.ogg" , "H2_10971.ogg" , "H2_06130.ogg" , "H2_01902.ogg" , "H2_03017.ogg" , "H2_02782.ogg" , "H2_02861.ogg" , "H2_10573.ogg" , "H2_00865.ogg" , "H2_02550.ogg" , "H2_02603.ogg" , "H2_02606.ogg" , "H2_08156.ogg" , "H2_10980.ogg" , "H2_11120.ogg" , "H2_11141.ogg" , "H2_11143.ogg" , "H2_11229.ogg" },
+              new string[] { "H2_08095.ogg" , "H2_08116.ogg" , "H2_08121.ogg" , "H2_08126.ogg" }
+              };
+              //絶頂　フェラ
+              public string[][] sOrgasmVoice30RindereFera = new string[][] {
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" }
+              };
+              //停止時
+              public string[] sLoopVoice40RindereVibe = new string[] { "H2_00108.ogg" , "H2_00110.ogg" , "H2_00111.ogg" , "H2_00113.ogg" , "H2_00118.ogg" };
+
+
+
+            //性格別声テーブル　無口---------------------------------------------------------------
+              //弱バイブ　通常
+              public string[][] sLoopVoice20SilentVibe = new string[][] {
+              new string[] { "H3_00518.ogg" , "H3_00519.ogg" , "H3_00526.ogg" , "H3_00527.ogg" },
+              new string[] { "H3_00534.ogg" , "H3_00535.ogg" , "H3_00734.ogg" , "H3_00735.ogg" },
+              new string[] { "H3_00520.ogg" , "H3_00521.ogg" , "H3_00528.ogg" , "H3_00529.ogg" },
+              new string[] { "H3_00536.ogg" , "H3_00537.ogg" , "H3_00736.ogg" , "H3_00737.ogg" },
+              new string[] { "H3_00558.ogg" , "H3_00559.ogg" , "H3_00734.ogg" , "H3_00735.ogg" }
+              };
+              //弱バイブ　フェラ
+              public string[][] sLoopVoice20SilentFera = new string[][] {
+              new string[] { "H3_00566.ogg" , "H3_00567.ogg" , "H3_00702.ogg" , "H3_00703.ogg" },
+              new string[] { "H3_00566.ogg" , "H3_00567.ogg" , "H3_00702.ogg" , "H3_00703.ogg" },
+              new string[] { "H3_00568.ogg" , "H3_00569.ogg" , "H3_00704.ogg" , "H3_00705.ogg" },
+              new string[] { "H3_00568.ogg" , "H3_00569.ogg" , "H3_00704.ogg" , "H3_00705.ogg" },
+              new string[] { "H3_00566.ogg" , "H3_00567.ogg" , "H3_00568.ogg" , "H3_00569.ogg" }
+              };
+              //強バイブ　通常
+              public string[][] sLoopVoice30SilentVibe = new string[][] {
+              new string[] { "H3_00522.ogg" , "H3_00523.ogg" , "H3_00530.ogg" , "H3_00531.ogg" },
+              new string[] { "H3_00538.ogg" , "H3_00539.ogg" , "H3_00738.ogg" , "H3_00739.ogg" },
+              new string[] { "H3_00524.ogg" , "H3_00525.ogg" , "H3_00532.ogg" , "H3_00533.ogg" },
+              new string[] { "H3_00540.ogg" , "H3_00541.ogg" , "H3_00740.ogg" , "H3_00741.ogg" },
+              new string[] { "H3_00560.ogg" , "H3_00561.ogg" , "H3_00562.ogg" , "H3_00563.ogg" }
+              };
+              //強バイブ　フェラ
+              public string[][] sLoopVoice30SilentFera = new string[][] {
+              new string[] { "H3_00570.ogg" , "H3_00571.ogg" , "H3_00706.ogg" , "H3_00707.ogg" },
+              new string[] { "H3_00570.ogg" , "H3_00571.ogg" , "H3_00706.ogg" , "H3_00707.ogg" },
+              new string[] { "H3_00572.ogg" , "H3_00573.ogg" , "H3_00708.ogg" , "H3_00709.ogg" },
+              new string[] { "H3_00572.ogg" , "H3_00573.ogg" , "H3_00708.ogg" , "H3_00709.ogg" },
+              new string[] { "H3_00570.ogg" , "H3_00571.ogg" , "H3_00706.ogg" , "H3_00707.ogg" }
+              };
+              //絶頂　通常
+              public string[][] sOrgasmVoice30SilentVibe = new string[][] {
+              new string[] { "H3_00779.ogg" , "H3_00783.ogg" , "H3_00785.ogg" , "H3_00800.ogg" },
+              new string[] { "H3_08926.ogg" , "H3_08112.ogg" , "H3_04262.ogg" , "H3_05125.ogg" , "H3_08926.ogg" },
+              new string[] { "H3_02523.ogg" , "H3_04910.ogg" , "H3_07704.ogg" , "H3_04967.ogg" , "H3_04974.ogg" , "H3_05026.ogg" },
+              new string[] { "H3_07068.ogg" , "H3_02584.ogg" , "H3_01906.ogg" , "H3_07314.ogg" , "H3_07315.ogg" , "H3_07316.ogg" , "H3_06965.ogg" , "H3_01858.ogg" , "H3_01906.ogg" , "H3_01925.ogg" , "H3_04252.ogg" , "H3_04228.ogg" , "H3_04639.ogg" , "H3_07121.ogg" , "H3_03827.ogg" , "H3_01928.ogg" , "H3_02336.ogg" , "H3_07069.ogg" , "H3_07996.ogg" , "H3_08950.ogg" },
+              new string[] { "H3_00779.ogg" , "H3_00783.ogg" , "H3_00785.ogg" , "H3_00800.ogg" }
+              };
+              //絶頂　フェラ
+              public string[][] sOrgasmVoice30SilentFera = new string[][] {
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" }
+              };
+              //停止時
+              public string[] sLoopVoice40SilentVibe = new string[] { "H3_00622.ogg" , "H3_00625.ogg" , "H3_00627.ogg" , "H3_00628.ogg" , "H3_00641.ogg" };
+
+
+
+            //性格別声テーブル　小悪魔---------------------------------------------------------------
+              //弱バイブ　通常
+              public string[][] sLoopVoice20DevilishVibe = new string[][] {
+              new string[] { "H4_00853.ogg" , "H4_00854.ogg" , "H4_00861.ogg" , "H4_00862.ogg" },
+              new string[] { "H4_00869.ogg" , "H4_00870.ogg" , "H4_01069.ogg" , "H4_01070.ogg" },
+              new string[] { "H4_00855.ogg" , "H4_00856.ogg" , "H4_00863.ogg" , "H4_00864.ogg" },
+              new string[] { "H4_00871.ogg" , "H4_00872.ogg" , "H4_01071.ogg" , "H4_01072.ogg" },
+              new string[] { "H4_00893.ogg" , "H4_00894.ogg" , "H4_01069.ogg" , "H4_01070.ogg" }
+              };
+              //弱バイブ　フェラ
+              public string[][] sLoopVoice20DevilishFera = new string[][] {
+              new string[] { "H4_00901.ogg" , "H4_00902.ogg" , "H4_01037.ogg" , "H4_01038.ogg" },
+              new string[] { "H4_00901.ogg" , "H4_00902.ogg" , "H4_01037.ogg" , "H4_01038.ogg" },
+              new string[] { "H4_00903.ogg" , "H4_00904.ogg" , "H4_01039.ogg" , "H4_01040.ogg" },
+              new string[] { "H4_00903.ogg" , "H4_00904.ogg" , "H4_01039.ogg" , "H4_01040.ogg" },
+              new string[] { "H4_00901.ogg" , "H4_00902.ogg" , "H4_00903.ogg" , "H4_00904.ogg" }
+              };
+              //強バイブ　通常
+              public string[][] sLoopVoice30DevilishVibe = new string[][] {
+              new string[] { "H4_00857.ogg" , "H4_00858.ogg" , "H4_00865.ogg" , "H4_00866.ogg" },
+              new string[] { "H4_00873.ogg" , "H4_00874.ogg" , "H4_01073.ogg" , "H4_01074.ogg" },
+              new string[] { "H4_00859.ogg" , "H4_00860.ogg" , "H4_00867.ogg" , "H4_00868.ogg" },
+              new string[] { "H4_00875.ogg" , "H4_00876.ogg" , "H4_01075.ogg" , "H4_01076.ogg" },
+              new string[] { "H4_00895.ogg" , "H4_00896.ogg" , "H4_00897.ogg" , "H4_00898.ogg" }
+              };
+              //強バイブ　フェラ
+              public string[][] sLoopVoice30DevilishFera = new string[][] {
+              new string[] { "H4_00905.ogg" , "H4_00906.ogg" , "H4_01041.ogg" , "H4_01042.ogg" },
+              new string[] { "H4_00905.ogg" , "H4_00906.ogg" , "H4_01041.ogg" , "H4_01042.ogg" },
+              new string[] { "H4_00907.ogg" , "H4_00908.ogg" , "H4_01043.ogg" , "H4_01044.ogg" },
+              new string[] { "H4_00907.ogg" , "H4_00908.ogg" , "H4_01043.ogg" , "H4_01044.ogg" },
+              new string[] { "H4_00905.ogg" , "H4_00906.ogg" , "H4_01041.ogg" , "H4_01042.ogg" }
+              };
+              //絶頂　通常
+              public string[][] sOrgasmVoice30DevilishVibe = new string[][] {
+              new string[] { "H4_01200.ogg" , "H4_01204.ogg" , "H4_01209.ogg" , "H4_01208.ogg" },
+              new string[] { "H4_03190.ogg" , "H4_02024.ogg" , "H4_02026.ogg" , "H4_02030.ogg" , "H4_02018.ogg" },
+              new string[] { "H4_01907.ogg" , "H4_01908.ogg" , "H4_05097.ogg" , "H4_05098.ogg" , "H4_03190.ogg" , "H4_03290.ogg" ,"H4_02020.ogg" , "H4_00583.ogg" , "H4_08568.ogg" },
+              new string[] { "H4_03413.ogg" , "H4_08495.ogg" , "H4_08182.ogg" , "H4_02777.ogg" , "H4_03019.ogg" , "H4_06292.ogg" , "H4_06308.ogg" , "H4_06328.ogg" , "H4_08574.ogg" , "H4_08578.ogg" , "H4_08579.ogg" , "H4_08580.ogg" , "H4_08607.ogg" , "H4_08608.ogg" , "H4_08568.ogg" , "H4_08591.ogg" , "H4_04328.ogg" , "H4_03190.ogg" , "H4_06136.ogg" , "H4_00537.ogg" , "H4_00583.ogg" , "H4_08568.ogg" , "H4_02024.ogg" , "H4_02026.ogg" , "H4_02030.ogg" , "H4_02018.ogg" , "H4_04840.ogg" , "H4_05503.ogg" , "H4_08165.ogg" , "H4_08169.ogg" , "H4_PMD_14155.ogg" , "H4_PMD_14156.ogg" , "H4_PMD_14157.ogg" , "H4_Y_13333.ogg" , "H4_Y_13335.ogg" , "H4_Y_13336.ogg" , "H4_Y_13337.ogg" , "H4_Y_13338.ogg" , "H4_Y_13339.ogg" , "H4_Y_13340.ogg" , "H4_Y_13342.ogg" , "H4_Y_13343.ogg" , "H4_Y_13353.ogg" , "H4_Y_13355.ogg" , "H4_Y_13356.ogg" , "H4_Y_13360.ogg" , "H4_Y_13371.ogg", "H4_ADD_10717.ogg", "H4_ADD_10718.ogg", "H4_ADD_10721.ogg", "H4_ADD_10722.ogg", "H4_ADD_10723.ogg", "H4_ADD_11330.ogg", "H4_ADD_11331.ogg", "H4_ADD_11332.ogg", "H4_ADD_11333.ogg", "H4_ADD_11334.ogg", "H4_ADD_11344.ogg", "H4_ADD_11345.ogg", "H4_ADD_11346.ogg", "H4_ADD_11348.ogg", "H4_ADD_11349.ogg", "H4_ADD_11356.ogg", "H4_ADD_11359.ogg", "H4_ADD_11360.ogg", "H4_ADD_11361.ogg", "H4_ADD_11362.ogg" },
+              new string[] { "H4_01200.ogg" , "H4_01204.ogg" , "H4_01209.ogg" , "H4_01208.ogg" }
+              };
+              //絶頂　フェラ
+              public string[][] sOrgasmVoice30DevilishFera = new string[][] {
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" }
+              };
+              //停止時
+              public string[] sLoopVoice40DevilishVibe = new string[] { "H4_00959.ogg" , "H4_00962.ogg" , "H4_00963.ogg" , "H4_00977.ogg" , "H4_00980.ogg" };
+
+
+
+            //性格別声テーブル　おしとやか---------------------------------------------------------------
+              //弱バイブ　通常
+              public string[][] sLoopVoice20LadylikeVibe = new string[][] {
+              new string[] { "H5_00592.ogg" , "H5_00593.ogg" , "H5_00600.ogg" , "H5_00601.ogg" },
+              new string[] { "H5_00808.ogg" , "H5_00809.ogg" , "H5_00608.ogg" , "H5_00609.ogg" },
+              new string[] { "H5_00594.ogg" , "H5_00595.ogg" , "H5_00602.ogg" , "H5_00603.ogg" },
+              new string[] { "H5_00810.ogg" , "H5_00811.ogg" , "H5_00610.ogg" , "H5_00611.ogg" },
+              new string[] { "H5_00624.ogg" , "H5_00625.ogg" , "H5_00632.ogg" , "H5_00633.ogg" }
+              };
+              //弱バイブ　フェラ
+              public string[][] sLoopVoice20LadylikeFera = new string[][] {
+              new string[] { "H5_00640.ogg" , "H5_00641.ogg" , "H5_00648.ogg" , "H5_00649.ogg" },
+              new string[] { "H5_00640.ogg" , "H5_00641.ogg" , "H5_00648.ogg" , "H5_00649.ogg" },
+              new string[] { "H5_00642.ogg" , "H5_00643.ogg" , "H5_00650.ogg" , "H5_00651.ogg" },
+              new string[] { "H5_00642.ogg" , "H5_00643.ogg" , "H5_00650.ogg" , "H5_00651.ogg" },
+              new string[] { "H5_00640.ogg" , "H5_00641.ogg" , "H5_00642.ogg" , "H5_00643.ogg" }
+              };
+              //強バイブ　通常
+              public string[][] sLoopVoice30LadylikeVibe = new string[][] {
+              new string[] { "H5_00596.ogg" , "H5_00597.ogg" , "H5_00604.ogg" , "H5_00605.ogg" },
+              new string[] { "H5_00812.ogg" , "H5_00813.ogg" , "H5_00612.ogg" , "H5_00613.ogg" },
+              new string[] { "H5_00598.ogg" , "H5_00599.ogg" , "H5_00606.ogg" , "H5_00607.ogg" },
+              new string[] { "H5_00814.ogg" , "H5_00815.ogg" , "H5_00614.ogg" , "H5_00615.ogg" },
+              new string[] { "H5_00626.ogg" , "H5_00627.ogg" , "H5_00634.ogg" , "H5_00635.ogg" }
+              };
+              //強バイブ　フェラ
+              public string[][] sLoopVoice30LadylikeFera = new string[][] {
+              new string[] { "H5_00644.ogg" , "H5_00645.ogg" , "H5_00652.ogg" , "H5_00653.ogg" },
+              new string[] { "H5_00644.ogg" , "H5_00645.ogg" , "H5_00652.ogg" , "H5_00653.ogg" },
+              new string[] { "H5_00646.ogg" , "H5_00647.ogg" , "H5_00654.ogg" , "H5_00655.ogg" },
+              new string[] { "H5_00646.ogg" , "H5_00647.ogg" , "H5_00654.ogg" , "H5_00655.ogg" },
+              new string[] { "H5_00644.ogg" , "H5_00645.ogg" , "H5_00646.ogg" , "H5_00647.ogg" }
+              };
+              //絶頂　通常
+              public string[][] sOrgasmVoice30LadylikeVibe = new string[][] {
+              new string[] { "H5_00943.ogg" , "H5_00944.ogg" , "H5_00948.ogg" , "H5_00874.ogg" },
+              new string[] { "H5_00859.ogg" , "H5_00857.ogg" , "H5_00858.ogg" , "H5_00855.ogg" , "H5_02835.ogg" },
+              new string[] { "H5_08487.ogg" , "H5_00250.ogg" , "H5_00259.ogg" , "H5_00270.ogg" , "H5_00290.ogg" , "H5_00370.ogg" , "H5_02835.ogg" , "H5_03009.ogg" , "H5_00479.ogg" },
+              new string[] { "H5_08158.ogg" , "H5_08153.ogg" , "H5_08155.ogg" , "H5_08482.ogg" , "H5_08484.ogg" , "H5_08485.ogg" , "H5_08486.ogg" , "H5_08487.ogg" , "H5_08488.ogg" , "H5_03789.ogg" , "H5_02561.ogg" , "H5_00370.ogg" , "H5_00379.ogg" , "H5_00398.ogg" , "H5_00399.ogg" , "H5_03009.ogg" , "H5_00479.ogg" , "H5_03462.ogg" , "H5_03464.ogg" , "H5_03465.ogg" , "H5_03468.ogg" , "H5_04142.ogg" , "H5_04144.ogg" , "H5_01588.ogg" , "H5_01596.ogg" , "H5_01597.ogg" , "H5_01598.ogg" },
+              new string[] { "H5_00943.ogg" , "H5_00944.ogg" , "H5_00948.ogg" , "H5_00874.ogg" }
+              };
+              //絶頂　フェラ
+              public string[][] sOrgasmVoice30LadylikeFera = new string[][] {
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" }
+              };
+              //停止時
+              public string[] sLoopVoice40LadylikeVibe = new string[] { "H5_00922.ogg" , "H5_00923.ogg" , "H5_00916.ogg" , "H5_00917.ogg" , "H5_00920.ogg" };
+
+
+
+            //性格別声テーブル　メイド秘書---------------------------------------------------------------
+              //弱バイブ　通常
+              public string[][] sLoopVoice20SecretaryVibe = new string[][] {
+              new string[] { "H6_00158.ogg" , "H6_00159.ogg" , "H6_00166.ogg" , "H6_00167.ogg" },
+              new string[] { "H6_00374.ogg" , "H6_00375.ogg" , "H6_00174.ogg" , "H6_00175.ogg" },
+              new string[] { "H6_00160.ogg" , "H6_00161.ogg" , "H6_00168.ogg" , "H6_00169.ogg" },
+              new string[] { "H6_00376.ogg" , "H6_00377.ogg" , "H6_00176.ogg" , "H6_00177.ogg" },
+              new string[] { "H6_00190.ogg" , "H6_00191.ogg" , "H6_00192.ogg" , "H6_00193.ogg" }
+              };
+              //弱バイブ　フェラ
+              public string[][] sLoopVoice20SecretaryFera = new string[][] {
+              new string[] { "H6_00206.ogg" , "H6_00207.ogg" , "H6_00214.ogg" , "H6_00215.ogg" },
+              new string[] { "H6_00206.ogg" , "H6_00207.ogg" , "H6_00214.ogg" , "H6_00215.ogg" },
+              new string[] { "H6_00208.ogg" , "H6_00209.ogg" , "H6_00216.ogg" , "H6_00217.ogg" },
+              new string[] { "H6_00208.ogg" , "H6_00209.ogg" , "H6_00216.ogg" , "H6_00217.ogg" },
+              new string[] { "H6_00198.ogg" , "H6_00199.ogg" , "H6_00200.ogg" , "H6_00201.ogg" }
+              };
+              //強バイブ　通常
+              public string[][] sLoopVoice30SecretaryVibe = new string[][] {
+              new string[] { "H6_00162.ogg" , "H6_00163.ogg" , "H6_00170.ogg" , "H6_00171.ogg" },
+              new string[] { "H6_00378.ogg" , "H6_00379.ogg" , "H6_00178.ogg" , "H6_00179.ogg" },
+              new string[] { "H6_00164.ogg" , "H6_00165.ogg" , "H6_00172.ogg" , "H6_00173.ogg" },
+              new string[] { "H6_00380.ogg" , "H6_00381.ogg" , "H6_00180.ogg" , "H6_00181.ogg" },
+              new string[] { "H6_00194.ogg" , "H6_00195.ogg" , "H6_00196.ogg" , "H6_00197.ogg" }
+              };
+              //強バイブ　フェラ
+              public string[][] sLoopVoice30SecretaryFera = new string[][] {
+              new string[] { "H6_00210.ogg" , "H6_00211.ogg" , "H6_00218.ogg" , "H6_00219.ogg" },
+              new string[] { "H6_00210.ogg" , "H6_00211.ogg" , "H6_00218.ogg" , "H6_00219.ogg" },
+              new string[] { "H6_00212.ogg" , "H6_00213.ogg" , "H6_00220.ogg" , "H6_00221.ogg" },
+              new string[] { "H6_00212.ogg" , "H6_00213.ogg" , "H6_00220.ogg" , "H6_00221.ogg" },
+              new string[] { "H6_00202.ogg" , "H6_00203.ogg" , "H6_00204.ogg" , "H6_00205.ogg" }
+              };
+              //絶頂　通常
+              public string[][] sOrgasmVoice30SecretaryVibe = new string[][] {
+              new string[] { "H6_00421.ogg" , "H6_00429.ogg" , "H6_00448.ogg" , "H6_00409.ogg" },
+              new string[] { "H6_08956.ogg" , "H6_08721.ogg" , "H6_08731.ogg" , "H6_09052.ogg" , "H6_00413.ogg" },
+              new string[] { "H6_04166.ogg" , "H6_04305.ogg" , "H6_05273.ogg" , "H6_06550.ogg" , "H6_06555.ogg" , "H6_05185.ogg" , "H6_08956.ogg" , "H6_08721.ogg" , "H6_08731.ogg" , "H6_02949.ogg" , "H6_03938.ogg" , "H6_00936.ogg" , "H6_05653.ogg" },
+              new string[] { "H6_08869.ogg" , "H6_06946.ogg" , "H6_06610.ogg" , "H6_06615.ogg" , "H6_06627.ogg" , "H6_08868.ogg" , "H6_08948.ogg" , "H6_09026.ogg" , "H6_05578.ogg" , "H6_06985.ogg" , "H6_05688.ogg" , "H6_01064.ogg" , "H6_03986.ogg" , "H6_01165.ogg" , "H6_04233.ogg" , "H6_08717.ogg" , "H6_08718.ogg" , "H6_08719.ogg" , "H6_08721.ogg" , "H6_08867.ogg" , "H6_08953.ogg" , "H6_08956.ogg" , "H6_08958.ogg" , "H6_09001.ogg" , "H6_09002.ogg" , "H6_09008.ogg" , "H6_09023.ogg" , "H6_09025.ogg" , "H6_09028.ogg" , "H6_06006.ogg" , "H6_04130.ogg" },
+              new string[] { "H6_09028.ogg" , "H6_09023.ogg" , "H6_09002.ogg" , "H6_08956.ogg" , "H6_00421.ogg" , "H6_00429.ogg" , "H6_00448.ogg" , "H6_00409.ogg" }
+              };
+              //絶頂　フェラ
+              public string[][] sOrgasmVoice30SecretaryFera = new string[][] {
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" }
+              };
+              //停止時
+              public string[] sLoopVoice40SecretaryVibe = new string[] { "H6_00263.ogg" , "H6_00264.ogg" , "H6_00267.ogg" , "H6_00268.ogg" , "H6_00284.ogg" };
+
+
+
+            //性格別声テーブル　ふわふわ妹---------------------------------------------------------------
+              //弱バイブ　通常
+              public string[][] sLoopVoice20SisterVibe = new string[][] {
+              new string[] { "H7_02762.ogg" , "H7_02763.ogg" , "H7_02770.ogg" , "H7_02771.ogg" },
+              new string[] { "H7_02978.ogg" , "H7_02979.ogg" , "H7_02850.ogg" , "H7_02851.ogg" },
+              new string[] { "H7_02764.ogg" , "H7_02765.ogg" , "H7_02772.ogg" , "H7_02773.ogg" },
+              new string[] { "H7_02980.ogg" , "H7_02981.ogg" , "H7_02852.ogg" , "H7_02853.ogg" },
+              new string[] { "H7_02962.ogg" , "H7_02963.ogg" , "H7_02802.ogg" , "H7_02803.ogg" }
+              };
+              //弱バイブ　フェラ
+              public string[][] sLoopVoice20SisterFera = new string[][] {
+              new string[] { "H7_02810.ogg" , "H7_02811.ogg" , "H7_02818.ogg" , "H7_02819.ogg" },
+              new string[] { "H7_02810.ogg" , "H7_02811.ogg" , "H7_02818.ogg" , "H7_02819.ogg" },
+              new string[] { "H7_02812.ogg" , "H7_02813.ogg" , "H7_02820.ogg" , "H7_02821.ogg" },
+              new string[] { "H7_02812.ogg" , "H7_02813.ogg" , "H7_02820.ogg" , "H7_02821.ogg" },
+              new string[] { "H7_02810.ogg" , "H7_02811.ogg" , "H7_02818.ogg" , "H7_02819.ogg" }
+              };
+              //強バイブ　通常
+              public string[][] sLoopVoice30SisterVibe = new string[][] {
+              new string[] { "H7_02766.ogg" , "H7_02767.ogg" , "H7_02774.ogg" , "H7_02775.ogg" },
+              new string[] { "H7_02982.ogg" , "H7_02983.ogg" , "H7_02854.ogg" , "H7_02855.ogg" },
+              new string[] { "H7_02768.ogg" , "H7_02769.ogg" , "H7_02776.ogg" , "H7_02777.ogg" },
+              new string[] { "H7_02984.ogg" , "H7_02985.ogg" , "H7_02856.ogg" , "H7_02857.ogg" },
+              new string[] { "H7_02964.ogg" , "H7_02965.ogg" , "H7_02804.ogg" , "H7_02805.ogg" }
+              };
+              //強バイブ　フェラ
+              public string[][] sLoopVoice30SisterFera = new string[][] {
+              new string[] { "H7_02814.ogg" , "H7_02815.ogg" , "H7_02822.ogg" , "H7_02823.ogg" },
+              new string[] { "H7_02814.ogg" , "H7_02815.ogg" , "H7_02822.ogg" , "H7_02823.ogg" },
+              new string[] { "H7_02816.ogg" , "H7_02817.ogg" , "H7_02824.ogg" , "H7_02825.ogg" },
+              new string[] { "H7_02816.ogg" , "H7_02817.ogg" , "H7_02824.ogg" , "H7_02825.ogg" },
+              new string[] { "H7_02812.ogg" , "H7_02813.ogg" , "H7_02820.ogg" , "H7_02821.ogg" }
+              };
+              //絶頂　通常
+              public string[][] sOrgasmVoice30SisterVibe = new string[][] {
+              new string[] { "H7_03163.ogg" , "H7_03167.ogg" , "H7_03164.ogg" , "H7_03172.ogg" },
+              new string[] { "H7_08797.ogg" , "H7_07791.ogg" , "H7_02309.ogg" , "H7_02353.ogg" , "H7_01991.ogg" , "H7_02498.ogg" },
+              new string[] { "H7_05958.ogg" , "H7_02353.ogg" , "H7_02410.ogg" , "H7_04331.ogg" , "H7_01699.ogg" , "H7_02060.ogg" , "H7_05359.ogg" , "H7_02506.ogg" , "H7_01821.ogg" , "H7_02301.ogg" , "H7_01744.ogg" , "H7_02498.ogg" },
+              new string[] { "H7_04244.ogg" , "H7_00531.ogg" , "H7_01330.ogg" , "H7_01334.ogg" , "H7_02130.ogg" , "H7_02210.ogg" , "H7_01029.ogg" , "H7_05585.ogg" , "H7_01341.ogg" , "H7_01349.ogg" , "H7_04080.ogg" , "H7_01989.ogg" , "H7_07979.ogg" , "H7_05958.ogg" , "H7_02353.ogg" , "H7_04331.ogg" , "H7_02060.ogg" , "H7_02506.ogg" , "H7_01821.ogg" , "H7_02301.ogg" , "H7_01744.ogg" , "H7_02498.ogg" , "H7_08797.ogg" , "H7_07791.ogg" , "H7_02309.ogg" , "H7_02353.ogg" , "H7_01991.ogg" , "H7_02498.ogg" },
+              new string[] { "H7_03163.ogg" , "H7_03167.ogg" , "H7_03164.ogg" , "H7_03172.ogg" }
+              };
+              //絶頂　フェラ
+              public string[][] sOrgasmVoice30SisterFera = new string[][] {
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" }
+              };
+              //停止時
+              public string[] sLoopVoice40SisterVibe = new string[] { "H7_03086.ogg" , "H7_03087.ogg" , "H7_03102.ogg" , "H7_03103.ogg" , "H7_02889.ogg" };
+
+
+
+            
+            //性格別声テーブル　無愛想---------------------------------------------------------------
+              //弱バイブ　通常
+              public string[][] sLoopVoice20CurtnessVibe = new string[][] {
+              new string[] { "H8_01331.ogg" , "H8_01332.ogg" , "H8_01139.ogg" , "H8_01140.ogg" },
+              new string[] { "H8_01347.ogg" , "H8_01348.ogg" , "H8_01131.ogg" , "H8_01132.ogg" },
+              new string[] { "H8_01333.ogg" , "H8_01334.ogg" , "H8_01141.ogg" , "H8_01142.ogg" },
+              new string[] { "H8_01349.ogg" , "H8_01350.ogg" , "H8_01133.ogg" , "H8_01134.ogg" },
+              new string[] { "H8_01163.ogg" , "H8_01164.ogg" , "H8_01171.ogg" , "H8_01172.ogg" }
+              };
+              //弱バイブ　フェラ
+              public string[][] sLoopVoice20CurtnessFera = new string[][] {
+              new string[] { "H8_01179.ogg" , "H8_01180.ogg" , "H8_01187.ogg" , "H8_01188.ogg" },
+              new string[] { "H8_01179.ogg" , "H8_01180.ogg" , "H8_01187.ogg" , "H8_01188.ogg" },
+              new string[] { "H8_01181.ogg" , "H8_01182.ogg" , "H8_01189.ogg" , "H8_01190.ogg" },
+              new string[] { "H8_01181.ogg" , "H8_01182.ogg" , "H8_01189.ogg" , "H8_01190.ogg" },
+              new string[] { "H8_01179.ogg" , "H8_01180.ogg" , "H8_01187.ogg" , "H8_01188.ogg" }
+              };
+              //強バイブ　通常
+              public string[][] sLoopVoice30CurtnessVibe = new string[][] {
+              new string[] { "H8_01335.ogg" , "H8_01336.ogg" , "H8_01143.ogg" , "H8_01144.ogg" },
+              new string[] { "H8_01351.ogg" , "H8_01352.ogg" , "H8_01135.ogg" , "H8_01136.ogg" },
+              new string[] { "H8_01337.ogg" , "H8_01338.ogg" , "H8_01145.ogg" , "H8_01146.ogg" },
+              new string[] { "H8_01353.ogg" , "H8_01354.ogg" , "H8_01137.ogg" , "H8_01138.ogg" },
+              new string[] { "H8_01165.ogg" , "H8_01166.ogg" , "H8_01173.ogg" , "H8_01174.ogg" }
+              };
+              //強バイブ　フェラ
+              public string[][] sLoopVoice30CurtnessFera = new string[][] {
+              new string[] { "H8_01183.ogg" , "H8_01184.ogg" , "H8_01191.ogg" , "H8_01192.ogg" },
+              new string[] { "H8_01183.ogg" , "H8_01184.ogg" , "H8_01191.ogg" , "H8_01192.ogg" },
+              new string[] { "H8_01185.ogg" , "H8_01186.ogg" , "H8_01193.ogg" , "H8_01194.ogg" },
+              new string[] { "H8_01185.ogg" , "H8_01186.ogg" , "H8_01193.ogg" , "H8_01194.ogg" },
+              new string[] { "H8_01181.ogg" , "H8_01182.ogg" , "H8_01189.ogg" , "H8_01190.ogg" }
+              };
+              //絶頂　通常
+              public string[][] sOrgasmVoice30CurtnessVibe = new string[][] {
+              new string[] { "H8_08466.ogg" , "H8_01430.ogg" , "H8_01421.ogg" , "H8_01382.ogg" , "H8_01396.ogg" , "H8_01398.ogg" },
+              new string[] { "H8_08440.ogg" , "H8_08455.ogg" , "H8_08456.ogg" , "H8_08485.ogg" , "H8_08497.ogg" , "H8_08499.ogg" , "H8_02017.ogg" },
+              new string[] { "H8_08471.ogg" , "H8_08473.ogg" , "H8_08500.ogg" , "H8_05361.ogg" , "H8_01936.ogg" , "H8_00646.ogg" , "H8_00648.ogg" , "H8_00657.ogg" , "H8_02023.ogg" , "H8_02025.ogg" , "H8_00717.ogg" , "H8_05547.ogg" },
+              new string[] { "H8_08463.ogg" , "H8_08464.ogg" , "H8_08465.ogg" , "H8_08486.ogg" , "H8_08492.ogg" , "H8_08505.ogg" , "H8_07064.ogg" , "H8_09399.ogg" , "H8_09402.ogg" , "H8_09474.ogg" , "H8_02953.ogg" , "H8_05361.ogg" , "H8_02971.ogg" , "H8_01936.ogg" , "H8_03201.ogg" , "H8_03206.ogg" , "H8_00617.ogg" , "H8_00646.ogg" , "H8_00657.ogg" , "H8_02025.ogg" , "H8_00747.ogg" , "H8_00768.ogg" , "H8_01626.ogg" , "H8_00830.ogg" , "H8_07061.ogg" , "H8_07062.ogg" , "H8_00918.ogg" , "H8_05277.ogg" , "H8_04988.ogg" , "H8_05006.ogg" , "H8_05322.ogg" , "H8_05214.ogg" , "H8_05249.ogg" , "H8_05252.ogg" , "H8_09710.ogg" , "H8_09711.ogg" , "H8_09712.ogg" , "H8_01396.ogg" },
+              new string[] { "H8_01427.ogg" , "H8_01382.ogg" , "H8_01421.ogg" , "H8_01401.ogg" , "H8_01396.ogg" , "H8_01398.ogg" }
+              };
+              //絶頂　フェラ
+              public string[][] sOrgasmVoice30CurtnessFera = new string[][] {
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" }
+              };
+              //停止時
+              public string[] sLoopVoice40CurtnessVibe = new string[] { "H8_01455.ogg" , "H8_01456.ogg" , "H8_01457.ogg" , "H8_01472.ogg" , "H8_01459.ogg" };
+            
+
+
+
+            
+            //性格別声テーブル　お嬢様---------------------------------------------------------------
+              //弱バイブ　通常
+              public string[][] sLoopVoice20MissyVibe = new string[][] {
+              new string[] { "H9_00586.ogg" , "H9_00587.ogg" , "H9_00578.ogg" , "H9_00579.ogg" },
+              new string[] { "H9_00786.ogg" , "H9_00787.ogg" , "H9_00570.ogg" , "H9_00571.ogg" },//{ "H9_00788.ogg" , "H9_00789.ogg" , "H9_00805.ogg" , "H9_00806.ogg" },
+              new string[] { "H9_00588.ogg" , "H9_00589.ogg" , "H9_00580.ogg" , "H9_00581.ogg" },
+              new string[] { "H9_00788.ogg" , "H9_00789.ogg" , "H9_00572.ogg" , "H9_00573.ogg" },//{ "H9_00807.ogg" , "H9_00790.ogg" , "H9_00791.ogg" , "H9_00574.ogg" },
+              new string[] { "H9_00612.ogg" , "H9_00613.ogg" , "H9_00610.ogg" , "H9_00611.ogg" } //{ "H9_00637.ogg" , "H9_00638.ogg" , "H9_00773.ogg" , "H9_00774.ogg" } // ca001f(L3-L5)喪失 + ca001h(L3,L4)初心
+              };
+              //弱バイブ　フェラ
+              public string[][] sLoopVoice20MissyFera = new string[][] {
+              new string[] { "H9_00618.ogg" , "H9_00619.ogg" , "H9_00626.ogg" , "H9_00627.ogg" },
+              new string[] { "H9_00618.ogg" , "H9_00619.ogg" , "H9_00626.ogg" , "H9_00627.ogg" },
+              new string[] { "H9_00620.ogg" , "H9_00621.ogg" , "H9_00628.ogg" , "H9_00629.ogg" },
+              new string[] { "H9_00620.ogg" , "H9_00621.ogg" , "H9_00628.ogg" , "H9_00629.ogg" },
+              new string[] { "H9_00618.ogg" , "H9_00619.ogg" , "H9_00626.ogg" , "H9_00627.ogg" }
+              };
+              //強バイブ　通常
+              public string[][] sLoopVoice30MissyVibe = new string[][] {
+              new string[] { "H9_00590.ogg" , "H9_00591.ogg" , "H9_00582.ogg" , "H9_00583.ogg" },
+              new string[] { "H9_00790.ogg" , "H9_00791.ogg" , "H9_00574.ogg" , "H9_00575.ogg" },//{ "H9_00808.ogg" , "H9_00792.ogg" , "H9_00574.ogg" , "H9_00575.ogg" },
+              new string[] { "H9_00592.ogg" , "H9_00593.ogg" , "H9_00584.ogg" , "H9_00585.ogg" },
+              new string[] { "H9_00792.ogg" , "H9_00793.ogg" , "H9_00576.ogg" , "H9_00577.ogg" },//{ "H9_00809.ogg" , "H9_00793.ogg" , "H9_00576.ogg" , "H9_00577.ogg" },
+              new string[] { "H9_00614.ogg" , "H9_00615.ogg" , "H9_00617.ogg" , "H9_00616.ogg" } //{ "H9_00639.ogg" , "H9_00640.ogg" , "H9_00647.ogg" , "H9_00775.ogg" } // ca001f(L5-L76喪失 + ca001g(L5)酔い + ca001h(L5)初心 ※L6L7は音が小さい
+              };
+              //強バイブ　フェラ
+              public string[][] sLoopVoice30MissyFera = new string[][] {
+              new string[] { "H9_00622.ogg" , "H9_00623.ogg" , "H9_00630.ogg" , "H9_00631.ogg" },
+              new string[] { "H9_00622.ogg" , "H9_00623.ogg" , "H9_00630.ogg" , "H9_00631.ogg" },
+              new string[] { "H9_00624.ogg" , "H9_00625.ogg" , "H9_00632.ogg" , "H9_00633.ogg" },
+              new string[] { "H9_00624.ogg" , "H9_00625.ogg" , "H9_00632.ogg" , "H9_00633.ogg" },
+              new string[] { "H9_00622.ogg" , "H9_00623.ogg" , "H9_00630.ogg" , "H9_00631.ogg" }
+              };
+              //絶頂　通常
+              public string[][] sOrgasmVoice30MissyVibe = new string[][] {
+              new string[] { "H9_00825.ogg" , "H9_00833.ogg" , "H9_00841.ogg" , "H9_00824.ogg" , "H9_00966.ogg" , "H9_00860.ogg" , "H9_00987.ogg" },
+              new string[] { "H9_09425.ogg" , "H9_04328.ogg" , "H9_09398.ogg" , "H9_00837.ogg" , "H9_04410.ogg" , "H9_07850.ogg" , "H9_04310.ogg" , "H9_04320.ogg" , "H9_04391.ogg" , "H9_09446.ogg" , "H9_04408.ogg" },
+              new string[] { "H9_07848.ogg" , "H9_06388.ogg" , "H9_06428.ogg" , "H9_06468.ogg" , "H9_09446.ogg" , "H9_07851.ogg" , "H9_04310.ogg" , "H9_04287.ogg" , "H9_09438.ogg" , "H9_04187.ogg" , "H9_09303.ogg" , "H9_04114.ogg" , "H9_06929.ogg" , "H9_03989.ogg" },
+              new string[] { "H9_09304.ogg" , "H9_03822.ogg" , "H9_02024.ogg" , "H9_06487.ogg" , "H9_05299.ogg" , "H9_09423.ogg" , "H9_08378.ogg" , "H9_09362.ogg" , "H9_07836.ogg" , "H9_04325.ogg" , "H9_08215.ogg" , "H9_06562.ogg" , "H9_06426.ogg" , "H9_07096.ogg" , "H9_07848.ogg" , "H9_03812.ogg" , "H9_03439.ogg" , "H9_06428.ogg" , "H9_05297.ogg" , "H9_09440.ogg" , "H9_09433.ogg" , "H9_06589.ogg" , "H9_04054.ogg" , "H9_04328.ogg" , "H9_00333.ogg" , "H9_03821.ogg" , "H9_06407.ogg" , "H9_09439.ogg" , "H9_07837.ogg" , "H9_07851.ogg" , "H9_06586.ogg" , "H9_04049.ogg" , "H9_05794.ogg" , "H9_04310.ogg" , "H9_05711.ogg" , "H9_04324.ogg" , "H9_03491.ogg" , "H9_06573.ogg" , "H9_07826.ogg" , "H9_09430.ogg" , "H9_09353.ogg" , "H9_04287.ogg" , "H9_04326.ogg" , "H9_09303.ogg" , "H9_04187.ogg" , "H9_03571.ogg" , "H9_03842.ogg" , "H9_03834.ogg" , "H9_07847.ogg" , "H9_06553.ogg" , "H9_04327.ogg" , "H9_03506.ogg" },
+              new string[] { "H9_00825.ogg" , "H9_00833.ogg" , "H9_00841.ogg" , "H9_00824.ogg" , "H9_00966.ogg" , "H9_00860.ogg" , "H9_00987.ogg" }
+              };
+              //絶頂　フェラ
+              public string[][] sOrgasmVoice30MissyFera = new string[][] {
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" }
+              };
+              //停止時
+              public string[] sLoopVoice40MissyVibe = new string[] { "H9_00894.ogg" , "H9_00909.ogg" , "H9_00895.ogg" , "H9_00910.ogg" , "H9_04413.ogg" };
+            
+
+
+
+            
+            //性格別声テーブル　幼馴染---------------------------------------------------------------
+              //弱バイブ　通常
+              public string[][] sLoopVoice20ChildhoodVibe = new string[][] {
+              new string[] { "H10_03849.ogg" , "H10_03850.ogg" , "H10_03857.ogg" , "H10_03858.ogg" },
+              new string[] { "H10_03841.ogg" , "H10_03842.ogg" , "H10_04057.ogg" , "H10_04058.ogg" },
+              new string[] { "H10_03851.ogg" , "H10_03852.ogg" , "H10_03859.ogg" , "H10_03860.ogg" },
+              new string[] { "H10_03843.ogg" , "H10_03844.ogg" , "H10_04059.ogg" , "H10_04060.ogg" },
+              new string[] { "H10_03881.ogg" , "H10_03882.ogg" , "H10_03883.ogg" , "H10_03884.ogg" }
+              };
+              //弱バイブ　フェラ
+              public string[][] sLoopVoice20ChildhoodFera = new string[][] {
+              new string[] { "H10_03889.ogg" , "H10_03890.ogg" , "H10_03897.ogg" , "H10_03898.ogg" },
+              new string[] { "H10_03889.ogg" , "H10_03890.ogg" , "H10_03897.ogg" , "H10_03898.ogg" },
+              new string[] { "H10_03891.ogg" , "H10_03892.ogg" , "H10_03899.ogg" , "H10_03900.ogg" },
+              new string[] { "H10_03891.ogg" , "H10_03892.ogg" , "H10_03899.ogg" , "H10_03900.ogg" },
+              new string[] { "H10_03889.ogg" , "H10_03890.ogg" , "H10_03897.ogg" , "H10_03898.ogg" }
+              };
+              //強バイブ　通常
+              public string[][] sLoopVoice30ChildhoodVibe = new string[][] {
+              new string[] { "H10_03853.ogg" , "H10_03854.ogg" , "H10_03861.ogg" , "H10_03862.ogg" },
+              new string[] { "H10_03845.ogg" , "H10_03846.ogg" , "H10_04061.ogg" , "H10_04062.ogg" },
+              new string[] { "H10_03855.ogg" , "H10_03856.ogg" , "H10_03863.ogg" , "H10_03864.ogg" },
+              new string[] { "H10_03847.ogg" , "H10_03848.ogg" , "H10_04063.ogg" , "H10_04064.ogg" },
+              new string[] { "H10_03885.ogg" , "H10_03886.ogg" , "H10_03887.ogg" , "H10_03888.ogg" }
+              };
+              //強バイブ　フェラ
+              public string[][] sLoopVoice30ChildhoodFera = new string[][] {
+              new string[] { "H10_03893.ogg" , "H10_03894.ogg" , "H10_03901.ogg" , "H10_03902.ogg" },
+              new string[] { "H10_03893.ogg" , "H10_03894.ogg" , "H10_03901.ogg" , "H10_03902.ogg" },
+              new string[] { "H10_03895.ogg" , "H10_03896.ogg" , "H10_03903.ogg" , "H10_03904.ogg" },
+              new string[] { "H10_03895.ogg" , "H10_03896.ogg" , "H10_03903.ogg" , "H10_03904.ogg" },
+              new string[] { "H10_03893.ogg" , "H10_03894.ogg" , "H10_03901.ogg" , "H10_03902.ogg" }
+              };
+              //絶頂　通常
+              public string[][] sOrgasmVoice30ChildhoodVibe = new string[][] {
+              new string[] { "H10_04104.ogg" , "H10_04120.ogg" , "H10_04108.ogg" , "H10_04092.ogg" , "H10_04112.ogg" , "H10_04242.ogg" , "H10_04253.ogg" },
+              new string[] { "H10_08819.ogg" , "H10_09457.ogg" , "H10_09058.ogg" , "H10_07196.ogg" , "H10_07216.ogg" , "H10_08271.ogg" , "H10_09813.ogg" },
+              new string[] { "H10_09415.ogg" , "H10_09993.ogg" , "H10_08334.ogg" , "H10_01736.ogg" , "H10_01739.ogg" , "H10_03656.ogg" , "H10_03475.ogg" , "H10_03050.ogg" , "H10_03714.ogg" , "H10_03717.ogg" , "H10_03504.ogg" , "H10_03752.ogg" , "H10_04738.ogg" , "H10_08819.ogg" , "H10_09457.ogg" , "H10_09058.ogg" , "H10_07196.ogg" , "H10_07216.ogg" , "H10_08271.ogg" , "H10_09813.ogg" },
+              new string[] { "H10_09415.ogg" , "H10_09993.ogg" , "H10_08334.ogg" , "H10_01736.ogg" , "H10_01739.ogg" , "H10_03656.ogg" , "H10_03475.ogg" , "H10_03050.ogg" , "H10_03714.ogg" , "H10_03717.ogg" , "H10_03504.ogg" , "H10_03752.ogg" , "H10_04738.ogg" , "H10_08819.ogg" , "H10_09457.ogg" , "H10_09058.ogg" , "H10_07196.ogg" , "H10_07216.ogg" , "H10_08271.ogg" , "H10_09813.ogg" , "H10_07212.ogg" , "H10_09173.ogg" , "H10_01079.ogg" , "H10_01553.ogg" , "H10_00671.ogg" , "H10_03456.ogg" , "H10_09207.ogg" , "H10_05225.ogg" , "H10_05228.ogg" , "H10_05231.ogg" , "H10_05617.ogg" , "H10_05393.ogg" , "H10_06041.ogg" , "H10_06229.ogg" , "H10_06066.ogg" , "H10_07020.ogg" , "H10_07021.ogg" },
+              new string[] { "H10_04104.ogg" , "H10_04120.ogg" , "H10_04108.ogg" , "H10_04092.ogg" , "H10_04112.ogg" , "H10_04242.ogg" , "H10_04253.ogg" }
+              };
+              //絶頂　フェラ
+              public string[][] sOrgasmVoice30ChildhoodFera = new string[][] {
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" }
+              };
+              //停止時
+              public string[] sLoopVoice40ChildhoodVibe = new string[] { "H10_04171.ogg" , "H10_04165.ogg" , "H10_04166.ogg" , "H10_04168.ogg" , "H10_04170.ogg" };
+            
+
+
+
+            
+            //性格別声テーブル　ドＭ---------------------------------------------------------------
+              //弱バイブ　通常
+              public string[][] sLoopVoice20MasochistVibe = new string[][] {
+              new string[] { "H11_00673.ogg" , "H11_00674.ogg" , "H11_00681.ogg" , "H11_00682.ogg" },
+              new string[] { "H11_00865.ogg" , "H11_00866.ogg" , "H11_00689.ogg" , "H11_00690.ogg" },
+              new string[] { "H11_00675.ogg" , "H11_00676.ogg" , "H11_00683.ogg" , "H11_00684.ogg" },
+              new string[] { "H11_00867.ogg" , "H11_00868.ogg" , "H11_00691.ogg" , "H11_00692.ogg" },
+              new string[] { "H11_00705.ogg" , "H11_00706.ogg" , "H11_00729.ogg" , "H11_00730.ogg" }
+              };
+              //弱バイブ　フェラ
+              public string[][] sLoopVoice20MasochistFera = new string[][] {
+              new string[] { "H11_00713.ogg" , "H11_00714.ogg" , "H11_00721.ogg" , "H11_00722.ogg" },
+              new string[] { "H11_00713.ogg" , "H11_00714.ogg" , "H11_00721.ogg" , "H11_00722.ogg" },
+              new string[] { "H11_00715.ogg" , "H11_00716.ogg" , "H11_00723.ogg" , "H11_00724.ogg" },
+              new string[] { "H11_00715.ogg" , "H11_00716.ogg" , "H11_00723.ogg" , "H11_00724.ogg" },
+              new string[] { "H11_00713.ogg" , "H11_00714.ogg" , "H11_00721.ogg" , "H11_00722.ogg" }
+              };
+              //強バイブ　通常
+              public string[][] sLoopVoice30MasochistVibe = new string[][] {
+              new string[] { "H11_00677.ogg" , "H11_00678.ogg" , "H11_00685.ogg" , "H11_00686.ogg" },
+              new string[] { "H11_00869.ogg" , "H11_00870.ogg" , "H11_00693.ogg" , "H11_00694.ogg" },
+              new string[] { "H11_00679.ogg" , "H11_00680.ogg" , "H11_00687.ogg" , "H11_00688.ogg" },
+              new string[] { "H11_00871.ogg" , "H11_00872.ogg" , "H11_00695.ogg" , "H11_00696.ogg" },
+              new string[] { "H11_00708.ogg" , "H11_00707.ogg" , "H11_00731.ogg" , "H11_00732.ogg" }
+              };
+              //強バイブ　フェラ
+              public string[][] sLoopVoice30MasochistFera = new string[][] {
+              new string[] { "H11_00717.ogg" , "H11_00718.ogg" , "H11_00725.ogg" , "H11_00726.ogg" },
+              new string[] { "H11_00717.ogg" , "H11_00718.ogg" , "H11_00725.ogg" , "H11_00726.ogg" },
+              new string[] { "H11_00719.ogg" , "H11_00720.ogg" , "H11_00727.ogg" , "H11_00728.ogg" },
+              new string[] { "H11_00719.ogg" , "H11_00720.ogg" , "H11_00727.ogg" , "H11_00728.ogg" },
+              new string[] { "H11_00717.ogg" , "H11_00718.ogg" , "H11_00725.ogg" , "H11_00726.ogg" }
+              };
+              //絶頂　通常
+              public string[][] sOrgasmVoice30MasochistVibe = new string[][] {
+              new string[] { "H11_00902.ogg" , "H11_00905.ogg" , "H11_00923.ogg" , "H11_00924.ogg" },
+              new string[] { "H11_04914.ogg" , "H11_04738.ogg" , "H11_04915.ogg" , "H11_04983.ogg" ,"H11_05086.ogg" },
+              new string[] { "H11_01458.ogg" , "H11_02000.ogg" , "H11_01850.ogg" , "H11_01963.ogg" , "H11_04177.ogg" , "H11_04265.ogg" , "H11_01980.ogg" , "H11_01988.ogg" , "H11_02029.ogg" , "H11_04914.ogg" , "H11_04738.ogg" , "H11_04915.ogg" , "H11_04983.ogg" ,"H11_05086.ogg" },
+              new string[] { "H11_04902.ogg" , "H11_05069.ogg" , "H11_05104.ogg" , "H11_05150.ogg" , "H11_04450.ogg" , "H11_01875.ogg" , "H11_01880.ogg" , "H11_01883.ogg" , "H11_01885.ogg" , "H11_02204.ogg" , "H11_01945.ogg" , "H11_04253.ogg" , "H11_03646.ogg" , "H11_03545.ogg" , "H11_03414.ogg" , "H11_03548.ogg" , "H11_03596.ogg" , "H11_05093.ogg" , "H11_01988.ogg" , "H11_04914.ogg" , "H11_04738.ogg" , "H11_04915.ogg" , "H11_04983.ogg" ,"H11_05086.ogg" },
+              new string[] { "H11_00902.ogg" , "H11_00905.ogg" , "H11_00923.ogg" , "H11_00924.ogg" }
+              };
+              //絶頂　フェラ
+              public string[][] sOrgasmVoice30MasochistFera = new string[][] {
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" }
+              };
+              //停止時
+              public string[] sLoopVoice40MasochistVibe = new string[] { "H11_00957.ogg" , "H11_00969.ogg" , "H11_00958.ogg" , "H11_00970.ogg" , "H11_02817.ogg" };
+            
+
+
+
+            
+            //性格別声テーブル　腹黒---------------------------------------------------------------
+              //弱バイブ　通常
+              public string[][] sLoopVoice20CraftyVibe = new string[][] {
+              new string[] { "H12_01213.ogg" , "H12_01214.ogg" , "H12_01221.ogg" , "H12_01222.ogg" },
+              new string[] { "H12_01205.ogg" , "H12_01206.ogg" , "H12_01421.ogg" , "H12_01422.ogg" },
+              new string[] { "H12_01215.ogg" , "H12_01216.ogg" , "H12_01223.ogg" , "H12_01227.ogg" },
+              new string[] { "H12_01207.ogg" , "H12_01208.ogg" , "H12_01423.ogg" , "H12_01424.ogg" },
+              new string[] { "H12_01245.ogg" , "H12_01247.ogg" , "H12_01248.ogg" , "H12_01249.ogg" }
+              };
+              //弱バイブ　フェラ
+              public string[][] sLoopVoice20CraftyFera = new string[][] {
+              new string[] { "H12_01253.ogg" , "H12_01254.ogg" , "H12_01261.ogg" , "H12_01262.ogg" },
+              new string[] { "H12_01253.ogg" , "H12_01254.ogg" , "H12_01261.ogg" , "H12_01262.ogg" },
+              new string[] { "H12_01255.ogg" , "H12_01256.ogg" , "H12_01263.ogg" , "H12_01264.ogg" },
+              new string[] { "H12_01255.ogg" , "H12_01256.ogg" , "H12_01263.ogg" , "H12_01264.ogg" },
+              new string[] { "H12_01253.ogg" , "H12_01254.ogg" , "H12_01261.ogg" , "H12_01262.ogg" }
+              };
+              //強バイブ　通常
+              public string[][] sLoopVoice30CraftyVibe = new string[][] {
+              new string[] { "H12_01217.ogg" , "H12_01218.ogg" , "H12_01225.ogg" , "H12_01226.ogg" },
+              new string[] { "H12_01209.ogg" , "H12_01210.ogg" , "H12_01425.ogg" , "H12_01426.ogg" },
+              new string[] { "H12_01219.ogg" , "H12_01220.ogg" , "H12_01227.ogg" , "H12_01228.ogg" },
+              new string[] { "H12_01211.ogg" , "H12_01212.ogg" , "H12_01427.ogg" , "H12_01428.ogg" },
+              new string[] { "H12_01249.ogg" , "H12_01250.ogg" , "H12_01251.ogg" , "H12_01252.ogg" }
+              };
+              //強バイブ　フェラ
+              public string[][] sLoopVoice30CraftyFera = new string[][] {
+              new string[] { "H12_01257.ogg" , "H12_01258.ogg" , "H12_01265.ogg" , "H12_01266.ogg" },
+              new string[] { "H12_01257.ogg" , "H12_01258.ogg" , "H12_01265.ogg" , "H12_01266.ogg" },
+              new string[] { "H12_01259.ogg" , "H12_01260.ogg" , "H12_01267.ogg" , "H12_01268.ogg" },
+              new string[] { "H12_01259.ogg" , "H12_01260.ogg" , "H12_01267.ogg" , "H12_01268.ogg" },
+              new string[] { "H12_01257.ogg" , "H12_01258.ogg" , "H12_01265.ogg" , "H12_01266.ogg" }
+              };
+              //絶頂　通常
+              public string[][] sOrgasmVoice30CraftyVibe = new string[][] {
+              new string[] { "H12_01487.ogg" , "H12_01488.ogg" , "H12_01487.ogg" , "H12_01488.ogg" },
+              new string[] { "H12_01488.ogg" , "H12_01663.ogg" , "H12_03082.ogg" , "H12_03084.ogg" ,"H12_03115.ogg" },
+              new string[] { "H12_03082.ogg" , "H12_01725.ogg" , "H12_03082.ogg" , "H12_01870.ogg" , "H12_01799.ogg" , "H12_01787.ogg", "H12_01488.ogg" , "H12_01663.ogg" , "H12_03084.ogg" ,"H12_03115.ogg" },
+              new string[] { "H12_01487.ogg" , "H12_01665.ogg" , "H12_01870.ogg" , "H12_01799.ogg" , "H12_01725.ogg" , "H12_03084.ogg" , "H12_03096.ogg" , "H12_03115.ogg" , "H12_01663.ogg" , "H12_01787.ogg" , "H12_01666.ogg"  },
+              new string[] { "H12_01487.ogg" , "H12_01488.ogg" , "H12_01487.ogg" , "H12_01488.ogg" }
+              };
+              //絶頂　フェラ
+              public string[][] sOrgasmVoice30CraftyFera = new string[][] {
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" }
+              };
+              //停止時
+              public string[] sLoopVoice40CraftyVibe = new string[] { "H12_01529.ogg" , "H12_01544.ogg" , "H12_01530.ogg" , "H12_01545.ogg" , "H12_01534.ogg" };
+
+
+
+
+
+            //性格別声テーブル　気さく---------------------------------------------------------------
+              //弱バイブ　通常
+              public string[][] sLoopVoice20FriendlyVibe = new string[][] {
+              new string[] { "V1_00490.ogg" , "V1_00491.ogg" , "V1_00498.ogg" , "V1_00499.ogg" }, //ca001b(L0,L1) + ca001c(L0,L1)
+              new string[] { "V1_00482.ogg" , "V1_00483.ogg" , "V1_00698.ogg" , "V1_00699.ogg" }, //ca001a(L0,L1) + ca001j(L0,L1)発情
+              new string[] { "V1_00492.ogg" , "V1_00493.ogg" , "V1_00500.ogg" , "V1_00501.ogg" }, //1行目続き (L2,L3)
+              new string[] { "V1_00484.ogg" , "V1_00485.ogg" , "V1_00700.ogg" , "V1_00701.ogg" }, //2行目続き (L2,L3)
+              //new string[] { "V1_00522.ogg" , "V1_00523.ogg" , "V1_00524.ogg" , "V1_00525.ogg" }  //ca001e(L0-L3)首絞め
+              new string[] { "V1_00550.ogg" , "V1_00551.ogg" , "V1_00558.ogg" , "V1_00559.ogg" }  //ca001f(L4-L5)喪失 + ca001g(L4-L5)酔い
+              };
+              //弱バイブ　フェラ
+              public string[][] sLoopVoice20FriendlyFera = new string[][] {
+              new string[] { "V1_00530.ogg" , "V1_00531.ogg" , "V1_00538.ogg" , "V1_00539.ogg" }, //ca003a(L0,L1) + ca003b(L0,L1)
+              new string[] { "V1_00530.ogg" , "V1_00531.ogg" , "V1_00538.ogg" , "V1_00539.ogg" }, //↑と同じ
+              new string[] { "V1_00532.ogg" , "V1_00533.ogg" , "V1_00540.ogg" , "V1_00541.ogg" }, //1行目続き (L2,L3)
+              new string[] { "V1_00532.ogg" , "V1_00533.ogg" , "V1_00540.ogg" , "V1_00541.ogg" }, //↑と同じ
+              new string[] { "V1_00530.ogg" , "V1_00531.ogg" , "V1_00538.ogg" , "V1_00539.ogg" }  //1行目と同じ
+              };
+              //強バイブ　通常
+              public string[][] sLoopVoice30FriendlyVibe = new string[][] {
+              new string[] { "V1_00494.ogg" , "V1_00495.ogg" , "V1_00502.ogg" , "V1_00503.ogg" }, //ca001b(L4,L5) + ca001c(L4,L5)
+              new string[] { "V1_00486.ogg" , "V1_00487.ogg" , "V1_00702.ogg" , "V1_00703.ogg" }, //ca001a(L4,L5) + ca001j(L4,L5)発情
+              new string[] { "V1_00496.ogg" , "V1_00497.ogg" , "V1_00504.ogg" , "V1_00505.ogg" }, //1行目続き (L6,L7)
+              new string[] { "V1_00488.ogg" , "V1_00489.ogg" , "V1_00704.ogg" , "V1_00705.ogg" }, //2行目続き (L6,L7)
+              //new string[] { "V1_00526.ogg" , "V1_00527.ogg" , "V1_00528.ogg" , "V1_00529.ogg" }  //ca001e(L4-L7)首絞め
+              new string[] { "V1_00552.ogg" , "V1_00553.ogg" , "V1_00560.ogg" , "V1_00561.ogg" }  //ca001f(L6,L7)喪失 + ca001g(L6,L7)酔い
+              };
+              //強バイブ　フェラ
+              public string[][] sLoopVoice30FriendlyFera = new string[][] {
+              new string[] { "V1_00534.ogg" , "V1_00535.ogg" , "V1_00542.ogg" , "V1_00543.ogg" }, //ca003a(L4,L5) + ca003b(L4,L5)
+              new string[] { "V1_00534.ogg" , "V1_00535.ogg" , "V1_00542.ogg" , "V1_00543.ogg" }, //↑と同じ
+              new string[] { "V1_00536.ogg" , "V1_00537.ogg" , "V1_00544.ogg" , "V1_00545.ogg" }, //1行目続き (L6,L7)
+              new string[] { "V1_00536.ogg" , "V1_00537.ogg" , "V1_00544.ogg" , "V1_00545.ogg" }, //↑と同じ
+              new string[] { "V1_00534.ogg" , "V1_00535.ogg" , "V1_00542.ogg" , "V1_00543.ogg" }  //1行目と同じ
+              };
+              //絶頂　通常
+              public string[][] sOrgasmVoice30FriendlyVibe = new string[][] {
+              new string[] { "V1_00745.ogg" , "V1_00781.ogg" , "V1_00749.ogg" , "V1_00733.ogg" , "V1_00753.ogg" , "V1_00834.ogg" , "V1_00850.ogg" }, //sou_00001(L3), yam01_抜く(L3), sou06_アナル処女喪失挿入(L3),sou01_性器に挿入(L3),sou07_発情挿入(L3),sa_被虐ダメージ台詞_叩く(L7),sa_被虐ダメージ台詞_ロウ(L11)
+              new string[] { "V1_12062.ogg" , "V1_12234.ogg" , "V1_11722.ogg" , "V1_11768.ogg" , "V1_11769.ogg" }, //kashizuki初々しい,慣れ始め,VIP純愛 あたりから抽出
+              new string[] { "V1_12363.ogg" , "V1_12364.ogg" , "V1_12365.ogg" , "V1_12378.ogg" , "V1_12399.ogg" , "V1_12400.ogg" , "V1_11553.ogg" ,  //kashizuki慣れ,VIP NTR, 愛撫 あたりから抽出
+                             "V1_09218.ogg" , "V1_09219.ogg" , "V1_09302.ogg" , "V1_09312.ogg" , "V1_11618.ogg" , "V1_11624.ogg" , "V1_11896.ogg" ,"V1_11721.ogg" ,  //↑の続き
+                             "V1_12062.ogg" , "V1_12234.ogg" , "V1_11722.ogg" , "V1_11768.ogg" , "V1_11769.ogg" , //2行目と同じ
+                             "V1_09597.ogg" }, //3に入れないもの
+              new string[] { "V1_12363.ogg" , "V1_12364.ogg" , "V1_12365.ogg" , "V1_12378.ogg" , "V1_12399.ogg" , "V1_12400.ogg" , "V1_11553.ogg" ,  //3行目と同じ
+                             "V1_09218.ogg" , "V1_09219.ogg" , "V1_09302.ogg" , "V1_09312.ogg" , "V1_11618.ogg" , "V1_11624.ogg" , "V1_11896.ogg" ,"V1_11721.ogg" ,  //4行目と同じ
+                             "V1_12062.ogg" , "V1_12234.ogg" , "V1_11723.ogg" , "V1_11768.ogg" , "V1_11769.ogg" ,  //2行目と同じ 一部変更
+                             "V1_00111.ogg" , "V1_09594.ogg" , "V1_06544.ogg" , "V1_13386.ogg" , "V1_06966.ogg" , "V1_11743.ogg" }, //覚醒愛撫 他
+              new string[] { "V1_00745.ogg" , "V1_00781.ogg" , "V1_00749.ogg" , "V1_00733.ogg" , "V1_00753.ogg" , "V1_00834.ogg" , "V1_00850.ogg" }  //1行目と同じ
+              };
+              //絶頂　フェラ
+              public string[][] sOrgasmVoice30FriendlyFera = new string[][] {
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" }
+              };
+              //停止時
+              public string[] sLoopVoice40FriendlyVibe = new string[] { "V1_00806.ogg" , "V1_00812.ogg" , "V1_00807.ogg" , "V1_00810.ogg" , "V1_00811.ogg" }; //rr2_ca001c(L0), rr2_ca001a(L0,L1), rr2_ca001b(L0,L1)
+            
+
+
+
+            
+            //性格別声テーブル　淑女---------------------------------------------------------------
+              //弱バイブ　通常
+              public string[][] sLoopVoice20DameVibe = new string[][] {
+              new string[] { "V0_00488.ogg" , "V0_00489.ogg" , "V0_00496.ogg" , "V0_00497.ogg" }, //ca001b(L0,L1) + ca001c(L0,L1)
+              new string[] { "V0_00480.ogg" , "V0_00481.ogg" , "V0_00696.ogg" , "V0_00697.ogg" }, //ca001a(L0,L1) + ca001j(L0,L1)発情
+              new string[] { "V0_00490.ogg" , "V0_00491.ogg" , "V0_00498.ogg" , "V0_00499.ogg" }, //1行目続き (L2,L3)
+              new string[] { "V0_00482.ogg" , "V0_00483.ogg" , "V0_00698.ogg" , "V0_00699.ogg" }, //2行目続き (L2,L3)
+              //new string[] { "V0_00520.ogg" , "V0_00521.ogg" , "V0_00522.ogg" , "V0_00523.ogg" }  //ca001e(L0-L3)首絞め
+              new string[] { "V0_00546.ogg" , "V0_00547.ogg" , "V0_00548.ogg" , "V0_00549.ogg" }  //ca001f(L2-L5)喪失
+              };
+              //弱バイブ　フェラ
+              public string[][] sLoopVoice20DameFera = new string[][] {
+              new string[] { "V0_00528.ogg" , "V0_00529.ogg" , "V0_00536.ogg" , "V0_00537.ogg" }, //ca003a(L0,L1) + ca003b(L0,L1)
+              new string[] { "V0_00528.ogg" , "V0_00529.ogg" , "V0_00536.ogg" , "V0_00537.ogg" }, //↑と同じ
+              new string[] { "V0_00530.ogg" , "V0_00531.ogg" , "V0_00538.ogg" , "V0_00539.ogg" }, //1行目続き (L2,L3)
+              new string[] { "V0_00530.ogg" , "V0_00531.ogg" , "V0_00538.ogg" , "V0_00539.ogg" }, //↑と同じ
+              new string[] { "V0_00528.ogg" , "V0_00529.ogg" , "V0_00536.ogg" , "V0_00537.ogg" }  //1行目と同じ
+              };
+              //強バイブ　通常
+              public string[][] sLoopVoice30DameVibe = new string[][] {
+              new string[] { "V0_00492.ogg" , "V0_00493.ogg" , "V0_00501.ogg" , "V0_00502.ogg" }, //ca001b(L4,L5) + ca001c(L4,L5)
+              new string[] { "V0_00484.ogg" , "V0_00485.ogg" , "V0_00700.ogg" , "V0_00701.ogg" }, //ca001a(L4,L5) + ca001j(L4,L5)発情
+              new string[] { "V0_00494.ogg" , "V0_00495.ogg" , "V0_00503.ogg" , "V0_00504.ogg" }, //1行目続き (L6,L7)
+              new string[] { "V0_00486.ogg" , "V0_00487.ogg" , "V0_00702.ogg" , "V0_00703.ogg" }, //2行目続き (L6,L7)
+              //new string[] { "V0_00524.ogg" , "V0_00525.ogg" , "V0_00526.ogg" , "V0_00527.ogg" }  //ca001e(L4-L7)首絞め
+              new string[] { "V0_00550.ogg" , "V0_00551.ogg" , "V0_00558.ogg" , "V0_00559.ogg" }  //ca001f(L6,L7)喪失 + ca001g(L6,L7)酔い
+              };
+              //強バイブ　フェラ
+              public string[][] sLoopVoice30DameFera = new string[][] {
+              new string[] { "V0_00532.ogg" , "V0_00533.ogg" , "V0_00540.ogg" , "V0_00541.ogg" }, //ca003a(L4,L5) + ca003b(L4,L5)
+              new string[] { "V0_00532.ogg" , "V0_00533.ogg" , "V0_00540.ogg" , "V0_00541.ogg" }, //↑と同じ
+              new string[] { "V0_00534.ogg" , "V0_00535.ogg" , "V0_00542.ogg" , "V0_00543.ogg" }, //1行目続き (L6,L7)
+              new string[] { "V0_00534.ogg" , "V0_00535.ogg" , "V0_00542.ogg" , "V0_00543.ogg" }, //↑と同じ
+              new string[] { "V0_00532.ogg" , "V0_00533.ogg" , "V0_00540.ogg" , "V0_00541.ogg" }  //1行目と同じ
+              };
+              //絶頂　通常
+              public string[][] sOrgasmVoice30DameVibe = new string[][] {
+              new string[] { "V0_00743.ogg" , "V0_00763.ogg" , "V0_00747.ogg" , "V0_00731.ogg" , "V0_00751.ogg" , "V0_00832.ogg" , "V0_00848.ogg" , "V0_10704.ogg" , "V0_10750.ogg"}, //sou_00001(L3), yam01_抜く(L3), sou06_アナル処女喪失挿入(L3),sou01_性器に挿入(L3),sou07_発情挿入(L3),sa_被虐ダメージ台詞_叩く(L7),sa_被虐ダメージ台詞_ロウ(L11)
+              new string[] { "V0_09763.ogg" , "V0_09813.ogg" , "V0_09511.ogg" , "V0_10702.ogg" , "V0_10705.ogg" , "V0_10651.ogg"}, //kashizuki初々しい,慣れ始め,VIP純愛 あたりから抽出
+              new string[] { "V0_09912.ogg" , "V0_09913.ogg" , "V0_09976.ogg" , "V0_10604.ogg" , "V0_10651.ogg" , "V0_11154.ogg" ,  //kashizuki慣れ,VIP ntr, 愛撫 あたりから抽出
+                             "V0_11177.ogg" , "V0_11249.ogg" , "V0_11282.ogg" , "V0_11375.ogg" , "V0_11376.ogg" , "V0_09941.ogg",  //↑の続き
+                             "V0_09763.ogg" , "V0_09813.ogg" , "V0_09511.ogg" , "V0_10702.ogg" , "V0_10705.ogg" }, //2行目と同じ
+              new string[] { "V0_09912.ogg" , "V0_09913.ogg" , "V0_10604.ogg" , "V0_11154.ogg" ,                   //3行目と同じ 少し減らす
+                             "V0_11177.ogg" , "V0_11249.ogg" , "V0_11282.ogg" , "V0_11376.ogg" , "V0_09941.ogg" ,  //4行目と同じ 少し減らす
+                             "V0_09763.ogg" , "V0_09813.ogg" , "V0_09511.ogg" , "V0_10702.ogg" , "V0_10705.ogg" ,  //2行目と同じ
+                             "V0_06225.ogg" , "V0_05516.ogg" , "V0_06949.ogg" , "V0_07658.ogg" , "V0_10749.ogg"  }, 
+              new string[] { "V0_00743.ogg" , "V0_00763.ogg" , "V0_00747.ogg" , "V0_00731.ogg" , "V0_00751.ogg" , "V0_00832.ogg" , "V0_00848.ogg" , "V0_10704.ogg" , "V0_10750.ogg"}  //1行目と同じ
+              };
+              //絶頂　フェラ
+              public string[][] sOrgasmVoice30DameFera = new string[][] {
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" }
+              };
+              //停止時
+              public string[] sLoopVoice40DameVibe = new string[] { "V0_00810.ogg" , "V0_00804.ogg" , "V0_00805.ogg" , "V0_00807.ogg" , "V0_00808.ogg" }; //rr2_ca001c(L0), rr2_ca001a(L0,L1), rr2_ca001b(L0,L1)
+
+
+
+
+
+
+
+
+            //　性格別声テーブル　こっち来て
+            public string[] sCallVoice = new string[] { "S0_13972.ogg" , "S1_03893.ogg" , "s2_08163.ogg" , "S3_11386.ogg" , "s4_15255.ogg" , "s5_16924.ogg" , "s6_18089.ogg" , "" , "" };
+
+            #endregion
+
+
+          #region CustomVoice
+            //カスタム音声テーブル　弱バイブ版---------------------------------------------------------------
+              //カスタムボイス１
+              public string[][] sLoopVoice20Custom1 = new string[][] {
+              new string[] { "N0_00435.ogg" , "N0_00449.ogg" },
+              new string[] { "N0_00435.ogg" , "N0_00449.ogg" },
+              new string[] { "N0_00435.ogg" , "N0_00449.ogg" },
+              new string[] { "N0_00435.ogg" , "N0_00449.ogg" },
+              new string[] { "N0_00435.ogg" , "N0_00449.ogg" }
+              };
+              //カスタムボイス２
+              public string[][] sLoopVoice20Custom2 = new string[][] {
+              new string[] { "N7_00262.ogg" , "N7_00267.ogg" , "N7_00269.ogg" , "N7_00272.ogg" },
+              new string[] { "N7_00262.ogg" , "N7_00267.ogg" , "N7_00269.ogg" , "N7_00272.ogg" },
+              new string[] { "N7_00262.ogg" , "N7_00267.ogg" , "N7_00269.ogg" , "N7_00272.ogg" },
+              new string[] { "N7_00262.ogg" , "N7_00267.ogg" , "N7_00269.ogg" , "N7_00272.ogg" },
+              new string[] { "N7_00262.ogg" , "N7_00267.ogg" , "N7_00269.ogg" , "N7_00272.ogg" }
+              };
+              //カスタムボイス３
+              public string[][] sLoopVoice20Custom3 = new string[][] {
+              new string[] { "N1_00170.ogg" , "N1_00191.ogg" , "N1_00192.ogg" , "N1_00194.ogg" },
+              new string[] { "N1_00170.ogg" , "N1_00191.ogg" , "N1_00192.ogg" , "N1_00194.ogg" },
+              new string[] { "N1_00170.ogg" , "N1_00191.ogg" , "N1_00192.ogg" , "N1_00194.ogg" },
+              new string[] { "N1_00170.ogg" , "N1_00191.ogg" , "N1_00192.ogg" , "N1_00194.ogg" },
+              new string[] { "N1_00170.ogg" , "N1_00191.ogg" , "N1_00192.ogg" , "N1_00194.ogg" }
+              };
+              //カスタムボイス４
+              public string[][] sLoopVoice20Custom4 = new string[][] {
+              new string[] { "N3_00157.ogg" , "N3_00370.ogg" },
+              new string[] { "N3_00157.ogg" , "N3_00370.ogg" },
+              new string[] { "N3_00157.ogg" , "N3_00370.ogg" },
+              new string[] { "N3_00157.ogg" , "N3_00370.ogg" },
+              new string[] { "N3_00157.ogg" , "N3_00370.ogg" }
+              };
+
+            //カスタム音声テーブル　強バイブ版---------------------------------------------------------------
+              public string[][] sLoopVoice30Custom1 = new string[][] {
+              new string[] { "N0_00421.ogg" , "N0_00422.ogg" , "N0_00423.ogg" },
+              new string[] { "N0_00421.ogg" , "N0_00422.ogg" , "N0_00423.ogg" },
+              new string[] { "N0_00421.ogg" , "N0_00422.ogg" , "N0_00423.ogg" },
+              new string[] { "N0_00421.ogg" , "N0_00422.ogg" , "N0_00423.ogg" },
+              new string[] { "N0_00435.ogg" , "N0_00449.ogg" }
+              };
+              public string[][] sLoopVoice30Custom2 = new string[][] {
+              new string[] { "N7_00252.ogg" , "N7_00255.ogg" , "N7_00267.ogg" , "N7_00261.ogg" },
+              new string[] { "N7_00252.ogg" , "N7_00255.ogg" , "N7_00267.ogg" , "N7_00261.ogg" },
+              new string[] { "N7_00252.ogg" , "N7_00255.ogg" , "N7_00267.ogg" , "N7_00261.ogg" },
+              new string[] { "N7_00252.ogg" , "N7_00255.ogg" , "N7_00267.ogg" , "N7_00261.ogg" },
+              new string[] { "N7_00262.ogg" , "N7_00267.ogg" , "N7_00269.ogg" , "N7_00272.ogg" }
+              };
+              public string[][] sLoopVoice30Custom3 = new string[][] {
+              new string[] { "N1_00183.ogg" , "N1_00195.ogg" , "N1_00323.ogg" , "N1_00330.ogg" },
+              new string[] { "N1_00183.ogg" , "N1_00195.ogg" , "N1_00323.ogg" , "N1_00330.ogg" },
+              new string[] { "N1_00183.ogg" , "N1_00195.ogg" , "N1_00323.ogg" , "N1_00330.ogg" },
+              new string[] { "N1_00183.ogg" , "N1_00195.ogg" , "N1_00323.ogg" , "N1_00330.ogg" },
+              new string[] { "N1_00170.ogg" , "N1_00191.ogg" , "N1_00192.ogg" , "N1_00194.ogg" }
+              };
+              public string[][] sLoopVoice30Custom4 = new string[][] {
+              new string[] { "N3_00310.ogg" , "N3_00318.ogg" , "N3_00377.ogg" },
+              new string[] { "N3_00310.ogg" , "N3_00318.ogg" , "N3_00377.ogg" },
+              new string[] { "N3_00310.ogg" , "N3_00318.ogg" , "N3_00377.ogg" },
+              new string[] { "N3_00310.ogg" , "N3_00318.ogg" , "N3_00377.ogg" },
+              new string[] { "N3_00157.ogg" , "N3_00370.ogg" }
+              };
+
+            //カスタム音声テーブル　絶頂時---------------------------------------------------------------
+              public string[][] sOrgasmVoice30Custom1 = new string[][] {
+              new string[] { "N0_00424.ogg" , "N0_00459.ogg" , "N0_00503.ogg" , "N0_00508.ogg" , "N0_00534.ogg" },
+              new string[] { "N0_00424.ogg" , "N0_00459.ogg" , "N0_00503.ogg" , "N0_00508.ogg" , "N0_00534.ogg" },
+              new string[] { "N0_00424.ogg" , "N0_00457.ogg" , "N0_00503.ogg" , "N0_00508.ogg" , "N0_00534.ogg" },
+              new string[] { "N0_00456.ogg" , "N0_00457.ogg" , "N0_00458.ogg" , "N0_00534.ogg" , "N0_00288.ogg" , "N0_00292.ogg" , "N0_00293.ogg" },
+              new string[] { "N0_00424.ogg" , "N0_00459.ogg" , "N0_00503.ogg" , "N0_00508.ogg" , "N0_00534.ogg" }
+              };
+              public string[][] sOrgasmVoice30Custom2 = new string[][] {
+              new string[] { "N7_00251.ogg" , "N7_00267.ogg" , "N7_00275.ogg" , "N7_00276.ogg" , "N7_00280.ogg" },
+              new string[] { "N7_00251.ogg" , "N7_00267.ogg" , "N7_00275.ogg" , "N7_00276.ogg" , "N7_00280.ogg" },
+              new string[] { "N7_00251.ogg" , "N7_00267.ogg" , "N7_00275.ogg" , "N7_00276.ogg" , "N7_00280.ogg" },
+              new string[] { "N7_00284.ogg" , "N7_00291.ogg" , "N7_00293.ogg" , "N7_00294.ogg" , "N7_00295.ogg" , "N7_00275.ogg" , "n7_00295.ogg" },
+              new string[] { "N7_00251.ogg" , "N7_00267.ogg" , "N7_00275.ogg" , "N7_00276.ogg" , "N7_00280.ogg" }
+              };
+              public string[][] sOrgasmVoice30Custom3 = new string[][] {
+              new string[] { "N1_00179.ogg" , "N1_00180.ogg" , "N1_00200.ogg" , "N1_00204.ogg" , "N1_00209.ogg" },
+              new string[] { "N1_00179.ogg" , "N1_00180.ogg" , "N1_00200.ogg" , "N1_00204.ogg" , "N1_00209.ogg" },
+              new string[] { "N1_00179.ogg" , "N1_00180.ogg" , "N1_00200.ogg" , "N1_00204.ogg" , "N1_00209.ogg" },
+              new string[] { "N1_00179.ogg" , "N1_00180.ogg" , "N1_00198.ogg" , "N1_00199.ogg" , "N1_00205.ogg" , "N1_00217.ogg" , "N1_00333.ogg" },
+              new string[] { "N1_00179.ogg" , "N1_00180.ogg" , "N1_00200.ogg" , "N1_00204.ogg" , "N1_00209.ogg" }
+              };
+              public string[][] sOrgasmVoice30Custom4 = new string[][] {
+              new string[] { "N3_00193.ogg" , "N3_00194.ogg" , "N3_00195.ogg" , "N3_00330.ogg" , "N3_00378.ogg" },
+              new string[] { "N3_00193.ogg" , "N3_00194.ogg" , "N3_00195.ogg" , "N3_00330.ogg" , "N3_00378.ogg" },
+              new string[] { "N3_00193.ogg" , "N3_00194.ogg" , "N3_00195.ogg" , "N3_00330.ogg" , "N3_00378.ogg" },
+              new string[] { "N3_00376.ogg" , "N3_00194.ogg" , "N3_00195.ogg" , "N3_00197.ogg" , "N3_00203.ogg" , "N3_00328.ogg" , "N3_00330.ogg" , "N3_00379.ogg" },
+              new string[] { "N3_00193.ogg" , "N3_00194.ogg" , "N3_00195.ogg" , "N3_00330.ogg" , "N3_00378.ogg" }
+              };
+
+            //カスタム音声テーブル　停止時---------------------------------------------------------------
+              public string[] sLoopVoice40Custom1 = new string[] { "N0_00460.ogg" , "N0_00460.ogg" , "N0_00460.ogg" , "N0_00460.ogg" , "N0_00460.ogg" };
+              public string[] sLoopVoice40Custom2 = new string[] { "N7_00277.ogg" , "N7_00277.ogg" , "N7_00277.ogg" , "N7_00277.ogg" , "N7_00277.ogg" };
+              public string[] sLoopVoice40Custom3 = new string[] { "N1_00382.ogg" , "N1_00382.ogg" , "N1_00382.ogg" , "N1_00382.ogg" , "N1_00382.ogg" };
+              public string[] sLoopVoice40Custom4 = new string[] { "N3_00205.ogg" , "N3_00205.ogg" , "N3_00205.ogg" , "N3_00205.ogg" , "N3_00205.ogg" };
+
+            //改変終了---------------------------------------
+          #endregion
+
+
+
+        //GUIで設定保存したい変数はここ
+        public class VibeYourMaidCfgWriting {  //@API実装//→API用にpublicに変更
+        
+          public VibeYourMaidCfgWriting(){
+            //　表情テーブル　（バイブ）
+            sFaceAnime20Vibe = new string[][] {
+            new string[] { "困った" , "ダンス困り顔" , "恥ずかしい" , "苦笑い" , "エロ羞恥１" , "まぶたギュ" },
+            new string[] { "困った" , "ダンス困り顔" , "恥ずかしい" , "苦笑い" , "エロ羞恥１" , "まぶたギュ" },
+            new string[] { "怒り" , "興奮射精後１" , "発情" , "エロ痛み２" , "エロ羞恥２" , "エロ我慢３" },
+            new string[] { "怒り" , "興奮射精後１" , "発情" , "エロ痛み２" , "エロ羞恥２" , "エロ我慢３" }
+            };
+            sFaceAnime30Vibe = new string[][] {
+            new string[] { "エロ痛み１" , "エロ痛み２" , "エロ我慢１" , "エロ我慢２" , "泣き" , "怒り" },
+            new string[] { "エロ痛み１" , "エロ痛み２" , "エロ我慢１" , "エロ我慢２" , "泣き" , "怒り" },
+            new string[] { "エロ痛み我慢" , "エロ痛み我慢２" , "エロ痛み我慢３" , "エロメソ泣き" , "エロ羞恥３" , "エロ我慢３" },
+            new string[] { "エロ痛み我慢" , "エロ痛み我慢２" , "エロ痛み我慢３" , "エロメソ泣き" , "エロ羞恥３" , "エロ我慢３" }
+            };
+            sFaceAnime40Vibe = new string[] { "少し怒り" , "思案伏せ目" , "まぶたギュ" , "エロメソ泣き" };
+            
+            sFaceAnimeStun = new string[] { "絶頂射精後１" , "興奮射精後１" , "エロメソ泣き" , "エロ痛み２" , "エロ我慢３" , "引きつり笑顔" , "エロ通常３" , "泣き" };
+
+
+            //　シェイプキーアニメリスト
+            ShapeListR = new string[] { "randamX" , "randamY" };
+            ShapeListW = new string[] { "X1" , "Y1" , "waveX" , "waveY" };
+            ShapeListW2 = new string[] { "逆反復" };
+            ShapeListI = new string[] { "シェイプキーを記述" };
+
+            // 一般設定
+            keyPluginToggleV0 = KeyCode.I;        //　本プラグインの有効無効の切替キー（Ｉキー）
+            keyPluginToggleV1 = KeyCode.O;        //　GUI表示切り替えキー（Ｏキー）
+            keyPluginToggleV2 = KeyCode.J;        //　バイブ停止キー（Ｊキー）
+            keyPluginToggleV3 = KeyCode.K;        //　バイブ弱キー（Ｋキー）
+            keyPluginToggleV4 = KeyCode.L;        //　バイブ強キー（Ｌキー）
+            keyPluginToggleV5 = KeyCode.P;        //　メイド切替（Ｐキー）
+            keyPluginToggleV6 = KeyCode.N;        //　男表示切替（Ｎキー）
+            keyPluginToggleV7 = KeyCode.Keypad1;        //　一人称視点切替（テンキー１）
+            keyPluginToggleV8 = KeyCode.Keypad2;        //　快感値ロック（テンキー２）
+            keyPluginToggleV9 = KeyCode.Keypad3;        //　絶頂値ロック（テンキー３）
+            keyPluginToggleV10 = KeyCode.Keypad4;        //　オートモード切り替え
+            keyPluginToggleV11 = KeyCode.Keypad9;        //　エンパイアズライフスタート
+
+            bPluginEnabledV = true;                 //　本プラグインの有効状態（下記キーでON/OFFトグル）
+            mainGuiFlag = 1;                            //　GUIの表示フラグ（0：非表示、1：表示、2：最小化）
+            subGuiFlag = 1;                            //　サブキャラ操作画面の表示フラグ
+            configGuiFlag = false;                      //　設定画面の表示フラグ
+            unzipGuiFlag = false;                      //　命令画面の表示フラグ
+
+            guiOffsetX = 0;   //表示位置調整 横
+            guiOffsetY = 0;   //表示位置調整 縦
+
+            guiHoverColor = new int[]{48, 48, 48, 224}; //マウスオーバー時のGUI背景色と不透明度 RGBA 0～255
+
+            bVoiceOverrideEnabledV = true;          //　キス時の音声オーバライド（上書き）機能を使う
+            iYodareAppearLevelV = 3;                 //　所定の興奮レベル以上でよだれをつける（１～４のどれかを入れる、０で無効） 
+            vExciteLevelThresholdV1 = 100;           //　興奮レベル１→２閾値
+            vExciteLevelThresholdV2 = 180;           //　興奮レベル２→３閾値
+            vExciteLevelThresholdV3 = 250;           //　興奮レベル３→４閾値
+            
+            //改変　表情管理（バイブ）
+            vStateAltTimeVBase = 180;                 //　フェイスアニメの変化時間（秒）
+            vStateAltTimeVRandomExtend = 240;         //　変化時間へのランダム加算（秒）
+            fAnimeFadeTimeV = 1.0f;                //　バイブモードのフェイスアニメ等のフェード時間（秒）
+            
+            voiceHoldTimeBase = 240;
+            voiceHoldTimeRandomExtend = 360;
+
+            //　バイブ弱時のアニメーション設定
+            RandamMin1 = 0f;
+            RandamMax1 = 30f;
+
+            WaveMin1 = 0f;
+            WaveMax1 = 100f;
+            WaveSpead1 = 12f;
+
+            IncreaseMax1 = 100f;
+            IncreaseSpead1 = 5f;
+
+            //　バイブ強時のアニメーション設定
+            RandamMin2 = 0f;
+            RandamMax2 = 60f;
+
+            WaveMin2 = 0f;
+            WaveMax2 = 100f;
+            WaveSpead2 = 20f;
+
+            IncreaseMax2 = 100f;
+            IncreaseSpead2 = 10f;
+
+
+            //　痙攣幅の設定
+            orgasmValue1 = 15f;
+            orgasmValue2 = 30f;
+            orgasmValue3 = 40f;
+            
+            //　クリトリス勃起上限
+            clitorisMax = 100; 
+            
+            //　ちんぽ勃起設定
+            ChinpoMax = 100f;
+            ChinpoMin = 50f;
+            SoriMax = 100f;
+            SoriMin = 50f;
+            TamaValue = 0f;
+            
+            //有効シーン設定
+            SceneList = new int[] { 3,20,22,5,4,15,26,24,28,27,30,31,32,34,35,36,37,43 };
+
+
+            //演出有効フラグ
+            NamidaEnabled = true;
+            HohoEnabled = true;
+            YodareEnabled = true;
+            CliAnimeEnabled = true;
+            OrgsmAnimeEnabled = false;
+            SioEnabled = true;
+            NyoEnabled = true;
+            AheEnabled = true;
+            aseAnimeEnabled = true;
+            aseSwet = 0.5f;     //汗シェイプキー最大値
+            aseSwetTare = 1.0f; //汗シェイプキー最大値
+            aseSwetBig = 0.1f;  //汗シェイプキー最大値
+            zViceWaitEnabled = true;
+            
+            MouthNomalEnabled = true;
+            MouthKissEnabled = true;
+            MouthFeraEnabled = true;
+            MouthZeccyouEnabled = true;
+
+            hibuAnime1Enabled = true;
+            kupaWave = 5f;
+
+            hibuAnime2Enabled = true;
+            
+            uDatsuEnabled = false;
+            osawariEnabled = true;
+            osawariAlways = false;
+            osawariMoveRate = 1.0f;
+
+            ClearEnabled = false;
+            TaikiEnabled = true;
+            CamChangeEnabled = true;
+            
+            camCheckEnabled = true;
+            camCheckRange = 0.4f;
+            
+            autoManEnabled = true;
+            autoMoveEnabled = true;
+            
+            andKeyEnabled = new bool[]{ false , false , false };
+
+            SelectSE = 2;
+            
+            ntrBlock = true;
+            
+            majEnabled = true;
+            majItemClear = true;
+            majKupaEnabled = true;
+
+            yotogiExciteLink = true; //絶頂値と夜伽スライダーを連動
+            yotogiExciteLinkValue = new int[]{0, 100, 150, 200, 300}; //連動時のレベルに対応する興奮値
+
+            maidFollowLookPoint = 0; //メイド固定のデフォルトの注視点
+
+            osawariButton = "AX"; //VRお触りボタン (AX,BY,Tigger,Grip)
+            osawariRelease = 0.25f; //VRのおさわり解除距離
+            osawariHandRadius = 0.015f; //手の当たり判定の球半径
+            osawariHSliderMin = 20f; //お触り挿入時のスライダ最小値 前
+            osawariASliderMin = 15f; //お触り挿入時のスライダ最小値 後
+          }
+            public string[][] sFaceAnime20Vibe;
+            public string[][] sFaceAnime30Vibe;
+            public string[] sFaceAnime40Vibe;
+            public string[] sFaceAnimeStun;
+            public string[] ShapeListR;
+            public string[] ShapeListW;
+            public string[] ShapeListW2;
+            public string[] ShapeListI;
+            public KeyCode keyPluginToggleV0;
+            public KeyCode keyPluginToggleV1;
+            public KeyCode keyPluginToggleV2;
+            public KeyCode keyPluginToggleV3;
+            public KeyCode keyPluginToggleV4;
+            public KeyCode keyPluginToggleV5;
+            public KeyCode keyPluginToggleV6;
+            public KeyCode keyPluginToggleV7;
+            public KeyCode keyPluginToggleV8;
+            public KeyCode keyPluginToggleV9;
+            public KeyCode keyPluginToggleV10;
+            public KeyCode keyPluginToggleV11;
+            public bool bPluginEnabledV;
+            public int mainGuiFlag;
+            public int subGuiFlag;
+            public bool configGuiFlag;
+            public bool unzipGuiFlag;
+            public int guiOffsetX;
+            public int guiOffsetY;
+            public int[] guiHoverColor;
+            public bool bVoiceOverrideEnabledV;
+            public int iYodareAppearLevelV;
+            public int vExciteLevelThresholdV1;
+            public int vExciteLevelThresholdV2;
+            public int vExciteLevelThresholdV3;
+            public float vStateAltTimeVBase;
+            public float vStateAltTimeVRandomExtend;
+            public float fAnimeFadeTimeV;
+            public float voiceHoldTimeBase;
+            public float voiceHoldTimeRandomExtend;
+            public float RandamMin1;
+            public float RandamMax1;
+            public float WaveMin1;
+            public float WaveMax1;
+            public float WaveSpead1;
+            public float IncreaseMax1;
+            public float IncreaseSpead1;
+            public float RandamMin2;
+            public float RandamMax2;
+            public float WaveMin2;
+            public float WaveMax2;
+            public float WaveSpead2;
+            public float IncreaseMax2;
+            public float IncreaseSpead2;
+            public float orgasmValue1;
+            public float orgasmValue2;
+            public float orgasmValue3;
+            public int clitorisMax;
+            public float ChinpoMax;
+            public float ChinpoMin;
+            public float SoriMax;
+            public float SoriMin;
+            public float TamaValue;
+            public int[] SceneList;
+            public bool NamidaEnabled;
+            public bool HohoEnabled;
+            public bool YodareEnabled;
+            public bool CliAnimeEnabled;
+            public bool OrgsmAnimeEnabled;
+            public bool SioEnabled;
+            public bool NyoEnabled;
+            public bool AheEnabled;
+            public bool aseAnimeEnabled;
+            public float aseSwet;
+            public float aseSwetTare;
+            public float aseSwetBig;
+            public bool zViceWaitEnabled;
+            public bool MouthNomalEnabled;
+            public bool MouthKissEnabled;
+            public bool MouthFeraEnabled;
+            public bool MouthZeccyouEnabled;
+            public bool hibuAnime1Enabled;
+            public float kupaWave;
+            public bool hibuAnime2Enabled;
+            public bool ClearEnabled;
+            public bool TaikiEnabled;
+            public bool CamChangeEnabled;
+            public bool camCheckEnabled;
+            public float camCheckRange;
+            public bool autoManEnabled;
+            public bool autoMoveEnabled;
+            public bool[] andKeyEnabled;
+            public int SelectSE;
+            public bool ntrBlock;
+            public bool majEnabled;
+            public bool majItemClear;
+            public bool majKupaEnabled;
+            public bool uDatsuEnabled;
+            public bool osawariEnabled;
+            public bool osawariAlways;
+            public float osawariMoveRate;
+
+            public bool yotogiExciteLink;
+            public int[] yotogiExciteLinkValue;
+
+            public int maidFollowLookPoint;
+
+            public string osawariButton;
+            public float osawariRelease;
+            public float osawariHandRadius;
+            public float osawariHSliderMin;
+            public float osawariASliderMin;
+        }
 
         private GameObject gameObject_ui;
 
@@ -55,24 +1732,48 @@ namespace CM3D2.VibeYourMaid.Plugin
         private Maid man;
         private Maid[] SubMans = new Maid[5];
         private int[] MansTg = new int[5];
-        private string[] SubMansName = new string[] { "ご主人様", "モブ男Ａ", "モブ男Ｂ", "モブ男Ｃ", "モブ男Ｄ" };
-        private float[] syaseiValue = new float[] { 0f, 0f, 0f, 0f, 0f };
-        private int[] mansLevel = new int[] { 0, 0, 0, 0, 0 };
-        private bool[] syaseiLock = new bool[] { false, false, false, false, false };
+        private string[] SubMansName = new string[]{ "ご主人様" , "モブ男Ａ" , "モブ男Ｂ" , "モブ男Ｃ" , "モブ男Ｄ" };
+        private float[] syaseiValue = new float[]{ 0f , 0f , 0f , 0f , 0f };
+        private int[] mansLevel = new int[]{ 0 , 0 , 0 , 0 , 0 };
+        private bool[] syaseiLock = new bool[]{ false , false , false , false , false };
         private int MansFGet = 0;
 
         //　音声・表情のモード切り替え用
-        private string[] ModeSelectList = new string[] { "通常固定", "フェラ固定", "カスタム１", "カスタム２", "カスタム３", "カスタム４" };
+        private string[] ModeSelectList = new string[]{ "通常固定" , "フェラ固定" , "カスタム１" , "カスタム２" , "カスタム３" , "カスタム４" };
 
         private string[][] ModeSelectList2 = new string[][] { //性格追加時に更新
-          new string[]{ "デフォルト" , "ツンデレ" , "クーデレ" , "純真" , "ヤンデレ" , "姉ちゃん" , "僕っ娘" , "ドＳ" , "無垢" , "真面目" , "凛デレ" , "無口" , "小悪魔" , "おしとやか" , "メイド秘書" , "ふわふわ妹" , "無愛想" , "お嬢様" , "幼馴染" , "ドＭ" , "腹黒" },
-          new string[]{ "" , "Pride" , "Cool" , "Pure" , "Yandere" , "Anesan" , "Genki" , "Sadist" , "Muku" , "Majime" , "Rindere" , "Silent" , "Devilish" , "Ladylike" , "Secretary" , "Sister" , "Curtness" , "Missy" , "Masochist" , "Crafty" }
+          new string[]{ "デフォルト" , "ツンデレ" , "クーデレ" , "純真" , "ヤンデレ" , "姉ちゃん" , "僕っ娘" , "ドＳ" , "無垢" , "真面目" , "凛デレ" , "無口" , "小悪魔" , "おしとやか" , "メイド秘書" , "ふわふわ妹" , "無愛想" , "お嬢様" , "幼馴染" , "ドＭ" , "腹黒" , "気さく" , "淑女" },
+          new string[]{ "" , "Pride" , "Cool" , "Pure" , "Yandere" , "Anesan" , "Genki" , "Sadist" , "Muku" , "Majime" , "Rindere" , "Silent" , "Devilish" , "Ladylike" , "Secretary" , "Sister" , "Curtness" , "Missy" , "Masochist" , "Crafty" , "Friendly" , "Dame" }
         };
         private string[][] personalList = new string[][] { //性格追加時に更新
-          new string[]{ "ツンデレ" , "クーデレ" , "純真" , "ヤンデレ" , "姉ちゃん" , "僕っ娘" , "ドＳ" , "無垢" , "真面目" , "凛デレ" , "無口" , "小悪魔" , "お淑やか" , "ﾒｲﾄﾞ秘書" , "ふわ妹" , "無愛想" , "お嬢様" , "幼馴染" , "ドＭ" , "腹黒" , "指定無" },
-          new string[]{ "Pride" , "Cool" , "Pure" , "Yandere" , "Anesan" , "Genki" , "Sadist" , "Muku" , "Majime" , "Rindere" , "Silent" , "Devilish" , "Ladylike" , "Secretary" , "Sister" , "Curtness" , "Missy" , "Childhood" , "Masochist" , "Crafty" }
+          new string[]{ "ツンデレ" , "クーデレ" , "純真" , "ヤンデレ" , "姉ちゃん" , "僕っ娘" , "ドＳ" , "無垢" , "真面目" , "凛デレ" , "無口" , "小悪魔" , "お淑やか" , "ﾒｲﾄﾞ秘書" , "ふわ妹" , "無愛想" , "お嬢様" , "幼馴染" , "ドＭ" , "腹黒" , "気さく" , "淑女" , "指定無" },
+          new string[]{ "Pride" , "Cool" , "Pure" , "Yandere" , "Anesan" , "Genki" , "Sadist" , "Muku" , "Majime" , "Rindere" , "Silent" , "Devilish" , "Ladylike" , "Secretary" , "Sister" , "Curtness" , "Missy" , "Childhood" , "Masochist" , "Crafty" , "Friendly" , "Dame" }
         };
 
+        public string[][] reactionVoice = new string[][] { //性格追加時に更新
+          new string[] { "s0_01898.ogg" , "s0_01899.ogg" , "s0_01902.ogg" , "s0_01900.ogg" },
+          new string[] { "s1_03223.ogg" , "s1_03246.ogg" , "s1_03247.ogg" , "s1_03210.ogg" },
+          new string[] { "s2_01478.ogg" , "s2_01477.ogg" , "s2_01476.ogg" , "s2_01475.ogg" },
+          new string[] { "s3_02908.ogg" , "s3_02950.ogg" , "s3_02923.ogg" , "s3_02932.ogg" },
+          new string[] { "s4_08348.ogg" , "s4_08354.ogg" , "s4_08365.ogg" , "s4_08374.ogg" },
+          new string[] { "s5_04264.ogg" , "s5_04258.ogg" , "s5_04256.ogg" , "s5_04255.ogg" },
+          new string[] { "s6_01744.ogg" , "s6_02700.ogg" , "s6_02450.ogg" , "s6_02357.ogg" },
+          new string[] { "H0_00289.ogg" , "H0_00290.ogg" , "H0_00291.ogg" , "H0_00292.ogg" },
+          new string[] { "H1_11482.ogg" , "H1_13858.ogg" , "H1_13879.ogg" , "H1_13918.ogg" },
+          new string[] { "H2_06092.ogg" , "H2_00252.ogg" , "H2_00285.ogg" , "H2_00277.ogg" },
+          new string[] { "H3_00779.ogg" , "H3_00783.ogg" , "H3_00785.ogg" , "H3_00800.ogg" },
+          new string[] { "H4_01200.ogg" , "H4_01204.ogg" , "H4_01209.ogg" , "H4_01208.ogg" },
+          new string[] { "H5_00943.ogg" , "H5_00944.ogg" , "H5_00948.ogg" , "H5_00874.ogg" },
+          new string[] { "H6_00421.ogg" , "H6_00429.ogg" , "H6_00448.ogg" , "H6_00409.ogg" },
+          new string[] { "H7_03163.ogg" , "H7_03167.ogg" , "H7_03164.ogg" , "H7_03172.ogg" },
+          new string[] { "H8_08466.ogg" , "H8_01430.ogg" , "H8_01421.ogg" , "H8_01382.ogg" , "H8_01396.ogg" , "H8_01398.ogg" },
+          new string[] { "H9_00825.ogg" , "H9_00833.ogg" , "H9_00841.ogg" , "H9_00824.ogg" , "H9_00966.ogg" , "H9_00860.ogg" , "H9_00987.ogg" },
+          new string[] { "H10_04104.ogg" , "H10_04120.ogg" , "H10_04108.ogg" , "H10_04092.ogg" , "H10_04112.ogg" , "H10_04242.ogg" , "H10_04253.ogg" },
+          new string[] { "H11_00902.ogg" , "H11_00905.ogg" , "H11_00923.ogg" , "H11_00924.ogg" },
+          new string[] { "H12_01467.ogg" , "H12_01468.ogg" , "H12_01475.ogg" , "H12_01460.ogg" },
+          new string[] { "V1_00744.ogg" , "V1_00745.ogg" , "V1_00751.ogg" , "V1_00737.ogg" }, //w1_sou05_処女挿入喪失.ks(L2,L3), w1_sou07_発情挿入.ks(L1) w1_sou03_酔い挿入.ks(L3)
+          new string[] { "V0_00742.ogg" , "V0_00743.ogg" , "V0_00749.ogg" , "V0_00735.ogg" }  //v1_sou05_処女挿入喪失.ks(L2,L3), v1_sou07_発情挿入.ks(L1) v1_sou03_酔い挿入.ks(L3)
+        };
 
 
         //SE切替関連
@@ -127,7 +1828,7 @@ namespace CM3D2.VibeYourMaid.Plugin
 
         //　Chu-B Lip / VR
         private bool bChuBLip;
-        private bool bOculusVR;
+        private bool bVR;
         private bool installed = false;
 
 
@@ -137,9 +1838,9 @@ namespace CM3D2.VibeYourMaid.Plugin
 
 
         //ステータス表示用
-        private string[] SucoreText1 = new string[] { "☆ ☆ ☆", "★ ☆ ☆", "★ ★ ☆", "★ ★ ★" };
-        private string[] SucoreText2 = new string[] { "☆ ☆ ☆", "★ ☆ ☆", "★ ★ ☆", "★ ★ ★" };
-        private string[] SucoreText3 = new string[] { "☆ ☆ ☆", "★ ☆ ☆", "★ ★ ☆", "★ ★ ★" };
+        private string[] SucoreText1 = new string[] { "☆ ☆ ☆" , "★ ☆ ☆" , "★ ★ ☆" , "★ ★ ★" };
+        private string[] SucoreText2 = new string[] { "☆ ☆ ☆" , "★ ☆ ☆" , "★ ★ ☆" , "★ ★ ★" };
+        private string[] SucoreText3 = new string[] { "☆ ☆ ☆" , "★ ☆ ☆" , "★ ★ ☆" , "★ ★ ★" };
 		
 		
 		//子宫脱按钮用
@@ -195,8 +1896,8 @@ namespace CM3D2.VibeYourMaid.Plugin
             // ChuBLip判別
             bChuBLip = path.Contains("COM3D2OHx64") || path.Contains("COM3D2OHx86") || path.Contains("COM3D2OHVRx64");
             // VR判別
-            bOculusVR = path.Contains("COM3D2OHVRx64") || path.Contains("COM3D2VRx64") || Environment.CommandLine.ToLower().Contains("/vr");
-
+            bVR = path.Contains("COM3D2OHVRx64") || path.Contains("COM3D2VRx64") || Environment.CommandLine.ToLower().Contains("/vr");
+          
 
             //UNZIP用モーションリスト作成
             MajFileLoad();
@@ -206,7 +1907,28 @@ namespace CM3D2.VibeYourMaid.Plugin
             ItazuraMotionLoad();
 
             //性格追加時に更新
-            BasicVoiceSetup.setup(bvs);
+          bvs[0] = new BasicVoiceSet(sLoopVoice20PrideVibe, sLoopVoice20PrideFera, sLoopVoice30PrideVibe, sLoopVoice30PrideFera, sOrgasmVoice30PrideVibe, sOrgasmVoice30PrideFera, sLoopVoice40PrideVibe);
+          bvs[1] = new BasicVoiceSet(sLoopVoice20CoolVibe, sLoopVoice20CoolFera, sLoopVoice30CoolVibe, sLoopVoice30CoolFera, sOrgasmVoice30CoolVibe, sOrgasmVoice30CoolFera, sLoopVoice40CoolVibe);
+          bvs[2] = new BasicVoiceSet(sLoopVoice20PureVibe, sLoopVoice20PureFera, sLoopVoice30PureVibe, sLoopVoice30PureFera, sOrgasmVoice30PureVibe, sOrgasmVoice30PureFera, sLoopVoice40PureVibe);
+          bvs[3] = new BasicVoiceSet(sLoopVoice20YandereVibe, sLoopVoice20YandereFera, sLoopVoice30YandereVibe, sLoopVoice30YandereFera, sOrgasmVoice30YandereVibe, sOrgasmVoice30YandereFera, sLoopVoice40YandereVibe);
+          bvs[4] = new BasicVoiceSet(sLoopVoice20AnesanVibe, sLoopVoice20AnesanFera, sLoopVoice30AnesanVibe, sLoopVoice30AnesanFera, sOrgasmVoice30AnesanVibe, sOrgasmVoice30AnesanFera, sLoopVoice40AnesanVibe);
+          bvs[5] = new BasicVoiceSet(sLoopVoice20GenkiVibe, sLoopVoice20GenkiFera, sLoopVoice30GenkiVibe, sLoopVoice30GenkiFera, sOrgasmVoice30GenkiVibe, sOrgasmVoice30GenkiFera, sLoopVoice40GenkiVibe);
+          bvs[6] = new BasicVoiceSet(sLoopVoice20SadistVibe, sLoopVoice20SadistFera, sLoopVoice30SadistVibe, sLoopVoice30SadistFera, sOrgasmVoice30SadistVibe, sOrgasmVoice30SadistFera, sLoopVoice40SadistVibe);
+          bvs[7] = new BasicVoiceSet(sLoopVoice20MukuVibe, sLoopVoice20MukuFera, sLoopVoice30MukuVibe, sLoopVoice30MukuFera, sOrgasmVoice30MukuVibe, sOrgasmVoice30MukuFera, sLoopVoice40MukuVibe);
+          bvs[8] = new BasicVoiceSet(sLoopVoice20MajimeVibe, sLoopVoice20MajimeFera, sLoopVoice30MajimeVibe, sLoopVoice30MajimeFera, sOrgasmVoice30MajimeVibe, sOrgasmVoice30MajimeFera, sLoopVoice40MajimeVibe);
+          bvs[9] = new BasicVoiceSet(sLoopVoice20RindereVibe, sLoopVoice20RindereFera, sLoopVoice30RindereVibe, sLoopVoice30RindereFera, sOrgasmVoice30RindereVibe, sOrgasmVoice30RindereFera, sLoopVoice40RindereVibe);
+          bvs[10] = new BasicVoiceSet(sLoopVoice20SilentVibe, sLoopVoice20SilentFera, sLoopVoice30SilentVibe, sLoopVoice30SilentFera, sOrgasmVoice30SilentVibe, sOrgasmVoice30SilentFera, sLoopVoice40SilentVibe);
+          bvs[11] = new BasicVoiceSet(sLoopVoice20DevilishVibe, sLoopVoice20DevilishFera, sLoopVoice30DevilishVibe, sLoopVoice30DevilishFera, sOrgasmVoice30DevilishVibe, sOrgasmVoice30DevilishFera, sLoopVoice40DevilishVibe);
+          bvs[12] = new BasicVoiceSet(sLoopVoice20LadylikeVibe, sLoopVoice20LadylikeFera, sLoopVoice30LadylikeVibe, sLoopVoice30LadylikeFera, sOrgasmVoice30LadylikeVibe, sOrgasmVoice30LadylikeFera, sLoopVoice40LadylikeVibe);
+          bvs[13] = new BasicVoiceSet(sLoopVoice20SecretaryVibe, sLoopVoice20SecretaryFera, sLoopVoice30SecretaryVibe, sLoopVoice30SecretaryFera, sOrgasmVoice30SecretaryVibe, sOrgasmVoice30SecretaryFera, sLoopVoice40SecretaryVibe);
+          bvs[14] = new BasicVoiceSet(sLoopVoice20SisterVibe, sLoopVoice20SisterFera, sLoopVoice30SisterVibe, sLoopVoice30SisterFera, sOrgasmVoice30SisterVibe, sOrgasmVoice30SisterFera, sLoopVoice40SisterVibe);
+          bvs[15] = new BasicVoiceSet(sLoopVoice20CurtnessVibe, sLoopVoice20CurtnessFera, sLoopVoice30CurtnessVibe, sLoopVoice30CurtnessFera, sOrgasmVoice30CurtnessVibe, sOrgasmVoice30CurtnessFera, sLoopVoice40CurtnessVibe);
+          bvs[16] = new BasicVoiceSet(sLoopVoice20MissyVibe, sLoopVoice20MissyFera, sLoopVoice30MissyVibe, sLoopVoice30MissyFera, sOrgasmVoice30MissyVibe, sOrgasmVoice30MissyFera, sLoopVoice40MissyVibe);
+          bvs[17] = new BasicVoiceSet(sLoopVoice20ChildhoodVibe, sLoopVoice20ChildhoodFera, sLoopVoice30ChildhoodVibe, sLoopVoice30ChildhoodFera, sOrgasmVoice30ChildhoodVibe, sOrgasmVoice30ChildhoodFera, sLoopVoice40ChildhoodVibe);
+          bvs[18] = new BasicVoiceSet(sLoopVoice20MasochistVibe, sLoopVoice20MasochistFera, sLoopVoice30MasochistVibe, sLoopVoice30MasochistFera, sOrgasmVoice30MasochistVibe, sOrgasmVoice30MasochistFera, sLoopVoice40MasochistVibe);
+          bvs[19] = new BasicVoiceSet(sLoopVoice20CraftyVibe, sLoopVoice20CraftyFera, sLoopVoice30CraftyVibe, sLoopVoice30CraftyFera, sOrgasmVoice30CraftyVibe, sOrgasmVoice30CraftyFera, sLoopVoice40CraftyVibe);
+          bvs[20] = new BasicVoiceSet(sLoopVoice20FriendlyVibe, sLoopVoice20FriendlyFera, sLoopVoice30FriendlyVibe, sLoopVoice30FriendlyFera, sOrgasmVoice30FriendlyVibe, sOrgasmVoice30FriendlyFera, sLoopVoice40FriendlyVibe);
+          bvs[21] = new BasicVoiceSet(sLoopVoice20DameVibe, sLoopVoice20DameFera, sLoopVoice30DameVibe, sLoopVoice30DameFera, sOrgasmVoice30DameVibe, sOrgasmVoice30DameFera, sLoopVoice40DameVibe);
 
             BvsFileLoad();
             BvsFileSave();
@@ -214,68 +1936,97 @@ namespace CM3D2.VibeYourMaid.Plugin
 
             XmlFilesCheck();
 
+          //configからデフォルト値を設定
+          lookPoint = cfgw.maidFollowLookPoint; //メイド固定の注視点
+          if (lookPoint != 1 && lookPoint != 2) lookPoint = 0; //1と2以外は無効
+          if (cfgw.yotogiExciteLinkValue == null || cfgw.yotogiExciteLinkValue.Length < 5) {
+            cfgw.yotogiExciteLinkValue = new int[]{0, 100, 150, 200, 300}; //配列チェック
+          }
+
+          //GUIサイズ
+          int orgX = Math.Max(620, UnityEngine.Screen.width - Math.Max(220, 250-cfgw.guiOffsetX));
+          int orgY = Math.Max(450, UnityEngine.Screen.height - Math.Max(220, 370-cfgw.guiOffsetY));
+          node = new Rect( orgX , orgY , 220 , 220 );
+          node2 = new Rect( orgX , orgY - 450 , 220 , 450 );
+          node3 = new Rect( orgX - 620 , orgY - 450 , 620 , 450 );
+          node4 = new Rect( orgX - 620 , orgY , 620 , 220 );
+          //node4a = new Rect( orgX - 840 , orgY , 220 , 220 );
+          node5 = new Rect( orgX - 620 , orgY - 620 , 840 , 170 );
+
+          //GUI背景テクスチャ
+          Color[] pixels = new Color[]{new Color32(48, 48, 48, 224)};
+          try {
+            pixels = new Color[]{new Color32((byte)cfgw.guiHoverColor[0], (byte)cfgw.guiHoverColor[1], (byte)cfgw.guiHoverColor[2], (byte)cfgw.guiHoverColor[3])};
+          } catch {
+            UnityEngine.Debug.LogError("[VibeYourMaid] config.xml Error : guiHoverColor");
+          }
+          guiBgTexture = new Texture2D(1, 1);
+          guiBgTexture.SetPixels(pixels);
+          guiBgTexture.Apply();
         }
-        //--------------------------------------------
+      //--------------------------------------------
 
-        /*
-        public void Start()
-        {
+
+
+
+
+        public void Start() {
+
+          UnityEngine.Debug.Log("[VibeYourMaid] bChuBLip="+bChuBLip);
+          UnityEngine.Debug.Log("[VibeYourMaid] bVR="+bVR);
+          
+          //お触り機能初期化
+          initOsawari();
+        }
+
+        public void OnDestroy (){
 
         }
 
-        public void OnDestroy()
-        {
 
-        }
-        */
+      //--------------------------------------------
+      //シーン開始時の処理--------------------------
+        void OnLevelWasLoaded(int level) {
 
-        //--------------------------------------------
-        //シーン開始時の処理--------------------------
-        void OnLevelWasLoaded(int level)
-        {
+          //レベルの取得
+          vSceneLevel = level;
+          
+          //有効シーンにある場合プラグインを有効化（現在は基本的に、メイドさんがいれば全てのシーンで有効）
+          SceneLevelEnable = true;
+          
+          //SEの再生をストップ
+          GameMain.Instance.SoundMgr.StopSe();
 
-            //レベルの取得
-            vSceneLevel = level;
+          //メインカメラの取得
+          mainCamera = GameMain.Instance.MainCamera;
 
-            //有効シーンにある場合プラグインを有効化（現在は基本的に、メイドさんがいれば全てのシーンで有効）
-            SceneLevelEnable = true;
+          //メイドさんの取得
+          GetStockMaids();
+          
+          //アクティブなメイドさんのIDを取得
+          VisibleMaidCheck(false);
 
-            //SEの再生をストップ
-            GameMain.Instance.SoundMgr.StopSe();
-
-            //メインカメラの取得
-            mainCamera = GameMain.Instance.MainCamera;
-
-            //メイドさんの取得
-            GetStockMaids();
-
-            //アクティブなメイドさんのIDを取得
-            VisibleMaidCheck();
-
-            //エンパイアズライフのフラグ初期化
-            lifeStart = 0;
-            if (vSceneLevel == 3) gameObject_ui = GameObject.Find("UI Root"); //UIオブジェクトの取得
+          //エンパイアズライフのフラグ初期化
+          lifeStart = 0;
+          if(vSceneLevel == 3)gameObject_ui = GameObject.Find("UI Root"); //UIオブジェクトの取得
 
 
-            //男モデル取得
-            for (int i = 0; i < SubMans.Length; i++)
-            {
-                SubMans[i] = GameMain.Instance.CharacterMgr.GetMan(i);
+          //男モデル取得
+          for (int i = 0; i < SubMans.Length; i++){
+            SubMans[i] = GameMain.Instance.CharacterMgr.GetMan(i);
+          }
+          //男Body取得のため、一度呼び出しておく
+          if(vSceneLevel == 15 && MansFGet < 2){
+            ++MansFGet;
+            foreach(Maid m in SubMans){
+              m.Visible = true;
+              m.transform.position = new Vector3(0f, -10f, 0f);
             }
-            //男Body取得のため、一度呼び出しておく
-            if (vSceneLevel == 15 && MansFGet < 2)
-            {
-                ++MansFGet;
-                foreach (Maid m in SubMans)
-                {
-                    m.Visible = true;
-                    m.transform.position = new Vector3(0f, -10f, 0f);
-                }
-            }
-
-            man = SubMans[0];
+          }
+          
+          man = SubMans[0];
         }
-        //--------------------------------------------
+      //--------------------------------------------
 
 
 
@@ -283,21 +2034,30 @@ namespace CM3D2.VibeYourMaid.Plugin
 
         //--------------------------------------------
         //GUI表示処理---------------------------------
-        Rect node = new Rect(UnityEngine.Screen.width - 250, UnityEngine.Screen.height - 370, 220, 220);
-        Rect node2 = new Rect(UnityEngine.Screen.width - 250, UnityEngine.Screen.height - 820, 220, 450);
-        Rect node3 = new Rect(UnityEngine.Screen.width - 870, UnityEngine.Screen.height - 820, 620, 450);
-        Rect node4 = new Rect(UnityEngine.Screen.width - 870, UnityEngine.Screen.height - 370, 620, 220);
-        Rect node4a = new Rect(UnityEngine.Screen.width - 1090, UnityEngine.Screen.height - 370, 220, 220);
-        Rect node5 = new Rect(UnityEngine.Screen.width - 870, UnityEngine.Screen.height - 990, 840, 170);
+        //Rect node = new Rect(UnityEngine.Screen.width - 250, UnityEngine.Screen.height - 370, 220, 220);
+        //Rect node2 = new Rect(UnityEngine.Screen.width - 250, UnityEngine.Screen.height - 820, 220, 450);
+        //Rect node3 = new Rect(UnityEngine.Screen.width - 870, UnityEngine.Screen.height - 820, 620, 450);
+        //Rect node4 = new Rect(UnityEngine.Screen.width - 870, UnityEngine.Screen.height - 370, 620, 220);
+        //Rect node4a = new Rect(UnityEngine.Screen.width - 1090, UnityEngine.Screen.height - 370, 220, 220);
+        //Rect node5 = new Rect(UnityEngine.Screen.width - 870, UnityEngine.Screen.height - 990, 840, 170);
+        Rect node;
+        Rect node2;
+        Rect node3;
+        Rect node4;
+        Rect node4a;
+        Rect node5;
+
+        Texture2D guiBgTexture; //背景色
 
         void OnGUI()
         {
+            if (!cfgw.bPluginEnabledV || cfgw.mainGuiFlag == 0) return;
+
             GUIStyle gsWin = new GUIStyle("box");
             gsWin.fontSize = 12;
             gsWin.alignment = TextAnchor.UpperLeft;
 
-            if (cfgw.bPluginEnabledV && cfgw.mainGuiFlag > 0 && tgID != -1)
-            {
+            if (tgID != -1 && !reGetMaid){ //フェードアウト中はGUIを更新しない
 
                 if (SceneLevelEnable)
                 {
@@ -310,6 +2070,17 @@ namespace CM3D2.VibeYourMaid.Plugin
                     }
                     else
                     {
+                        //背景色設定
+                        gsWin.onHover.background = guiBgTexture;
+                        gsWin.hover.background = guiBgTexture;
+                        gsWin.onFocused.background = guiBgTexture;
+                        gsWin.focused.background = guiBgTexture;
+                        gsWin.onHover.textColor = Color.white;
+                        gsWin.hover.textColor = Color.white;
+                        gsWin.onFocused.textColor = Color.white;
+                        gsWin.focused.textColor = Color.white;
+
+                        node = GUI.Window(324101, node, WindowCallback, "VibeYourMaid  Ver" + VerNum, gsWin);
 
                         if (cfgw.mainGuiFlag == 1)
                         {
@@ -320,7 +2091,7 @@ namespace CM3D2.VibeYourMaid.Plugin
                             node.height = 20;
                         }
 
-                        node = GUI.Window(324101, node, WindowCallback, "VibeYourMaid  Ver" + VerNum, gsWin);
+                        node = GUI.Window(324103, node, WindowCallback, "VibeYourMaid  Ver" + VerNum, gsWin);
 
                         if (cfgw.configGuiFlag) node3 = GUI.Window(324103, node3, WindowCallback3, "VibeYourMaid 設定画面", gsWin);
 
@@ -336,6 +2107,9 @@ namespace CM3D2.VibeYourMaid.Plugin
 
                         }
 
+                        }else if (cfgw.mainGuiFlag == 2){
+                            node.height = 20;
+                        }
                     }
                 }
             }
@@ -367,48 +2141,50 @@ namespace CM3D2.VibeYourMaid.Plugin
         {
 
             timerRate = Time.deltaTime * 60;
+            //無効化時の処理を軽量化 有効化時に再取得を行う
+            if(cfgw.bPluginEnabledV){
 
             //画面がフェードアウトするたびに、メイド情報の再取得フラグを立てる
-            if (FadeMgr.GetFadeIn() && !reGetMaid) reGetMaid = true;
+          if(FadeMgr.GetFadeIn()) {
+            //おさわり中なら終了させる
+            osawari.endOsawari();
 
+            if (!reGetMaid)reGetMaid = true;
+          } else {
             //フェードイン後、再取得フラグが立っていたらメイド情報取得
-            if (reGetMaid && !FadeMgr.GetFadeIn())
-            {
-                GetStockMaids(); //メイドさんの取得
-                VisibleMaidCheck(); //アクティブなメイドさんのIDを取得
-                reGetMaid = false;
+            if(reGetMaid){
+              GetStockMaids(); //メイドさんの取得
+              VisibleMaidCheck(true); //アクティブなメイドさんのIDを取得
+              reGetMaid = false;
             }
+          }
 
 
 
-            //メイン処理---
-            if (tgID != -1 && SceneLevelEnable && cfgw.bPluginEnabledV)
-            {
+          //メイン処理---
+          if(tgID != -1 && SceneLevelEnable && !reGetMaid){
+          
+            foreach(int maidID in vmId){
 
-                foreach (int maidID in vmId)
-                {
-
-                    //非表示のメイドがいたらアクティブメイドをチェックし直す
-                    if (!stockMaids[maidID].mem.Visible)
-                    {
-                        VisibleMaidCheck();
-                        if (tgID == -1) GameMain.Instance.SoundMgr.StopSe();
-                        continue;
-                    }
-
-                    Maid maid = stockMaids[maidID].mem;
-
-                    //オートモード処理
-                    PowerAutoChange(maidID);
-
-                    //モーションアジャスト アイテムセット（双頭バイブのみ）
-                    if (maidsState[maidID].sVibeFlag)
-                    {
-                        maid.SetProp("handitem", "HandItemH_SoutouVibe_I_.menu", 0, true, false);
-                        maid.body0.SetMask(TBody.SlotID.HandItemR, true);
-                        maid.AllProcPropSeqStart();
-                        maidsState[maidID].sVibeFlag = false;
-                    }
+              //非表示のメイドがいたらアクティブメイドをチェックし直す
+              if(!stockMaids[maidID].mem.Visible || !maidsState[maidID].maidHead){
+                VisibleMaidCheck(true); //vmIdがずれるので処理は終了
+                if(tgID == -1)GameMain.Instance.SoundMgr.StopSe();
+                return; //このフレームの処理は終了
+              }
+              
+              Maid maid = stockMaids[maidID].mem;
+              
+              //オートモード処理
+              PowerAutoChange(maidID);
+              
+              //モーションアジャスト アイテムセット（双頭バイブのみ）
+              if(maidsState[maidID].sVibeFlag){
+                maid.SetProp("handitem" , "HandItemH_SoutouVibe_I_.menu", 0, true, false);
+                maid.body0.SetMask(TBody.SlotID.HandItemR, true);
+                maid.AllProcPropSeqStart();
+                maidsState[maidID].sVibeFlag = false;
+              }
 
                     StateMajorCheck(maidID);  //バイブステート変更処理実行
 
@@ -417,12 +2193,11 @@ namespace CM3D2.VibeYourMaid.Plugin
                     StatusFluctuation(maidID);  //メイドのステータス変更処理実行
 
                     //絶頂音声が終わった時の処理
-                    if (maidsState[maidID].orgasmVoice == 2 && !stockMaids[maidID].mem.AudioMan.audiosource.isPlaying)
-                    {
+                    if (maidsState[maidID].orgasmVoice == 2 && !stockMaids[maidID].mem.AudioMan.audiosource.isPlaying ){
                         maidsState[maidID].orgasmVoice = 0;          //絶頂時音声フラグOFF
                         maidsState[maidID].voiceHoldTime = 0;       //音声をすぐ再生するため、タイマーリセット
                         maidsState[maidID].faceHoldTime = 0;
-                        if (maidsState[maidID].vStateMajor == 40) maidsState[maidID].vStateMajorOld = 30;  //再生中にバイブ停止していた場合に、余韻状態に移行させるため
+                        if(maidsState[maidID].vStateMajor == 40)maidsState[maidID].vStateMajorOld = 30;  //再生中にバイブ停止していた場合に、余韻状態に移行させるため
                     }
 
                     //ボイスセット再生処理
@@ -435,32 +2210,32 @@ namespace CM3D2.VibeYourMaid.Plugin
                     EyeAutoChange(maidID);
 
                     //お触り位置取得
-                    if (cfgw.osawariEnabled) targetInstallation(maidID);
+                    if(cfgw.osawariEnabled)targetInstallation(maidID);
 
                     //乳首設定処理
-                    if (maidsState[maidID].chikubiEnabled)
+                    if(maidsState[maidID].chikubiEnabled)
                     {
                         int cv = ChikubiCheck(maidID);
-                        if (maidsState[maidID].chikubi_View != cv || maidsState[maidID].vStateMajor != 10)
+                        if(maidsState[maidID].chikubi_View != cv || maidsState[maidID].vStateMajor != 10)
                         {
-                            ChikubiSet(maidID, cv);
-                            maidsState[maidID].chikubi_View = cv;
+                        ChikubiSet(maidID, cv);
+                        maidsState[maidID].chikubi_View = cv;
                         }
                     }
-
+                    
                     //ステート10が継続している場合はここで処理終了
-                    if (maidsState[maidID].vStateMajor == 10 && maidsState[maidID].vStateMajorOld == 10) continue;
-
+                    if(maidsState[maidID].vStateMajor == 10 && maidsState[maidID].vStateMajorOld == 10)continue;
+                    
                     //絶頂スタートフラグのチェック
-                    if (!maidsState[maidID].orgasmStart)
+                    if(!maidsState[maidID].orgasmStart)
                     {
-                        if (OrgasmCheck(maidID))
+                        if(OrgasmCheck(maidID))
                         {
-                            foreach (int ID in vmId)
-                            {
-                                if (ID != maidID && !LinkMaidCheck(maidID, ID)) continue;
-                                maidsState[ID].orgasmStart = true;
-                            }
+                        foreach(int ID in vmId)
+                        {
+                            if(ID != maidID && !LinkMaidCheck(maidID, ID))continue;
+                            maidsState[ID].orgasmStart = true;
+                        }
                         }
                     }
 
@@ -469,7 +2244,7 @@ namespace CM3D2.VibeYourMaid.Plugin
 
 
                     //射精値MAX時の処理
-                    if (maidsState[maidID].syaseiMotion != "Non" && SyaseiCheck(maidID, 100f) && maidsState[maidID].orgasmCmb <= 3)
+                    if(maidsState[maidID].syaseiMotion != "Non" && SyaseiCheck(maidID, 100f) && maidsState[maidID].orgasmCmb <= 3)
                     {
                         string lastMotion = stockMaids[maidID].mem.body0.LastAnimeFN;  //現在のモーションを取得
 
@@ -486,7 +2261,7 @@ namespace CM3D2.VibeYourMaid.Plugin
                     StunCheck(maidID);  //メイドの放心判定
 
                     //カメラと顔の位置チェック
-                    if (mainCamera && Camera.main) CameraPosCheck(maidID);
+                    if (mainCamera && Camera.main)CameraPosCheck(maidID);
 
                     //演出関係
                     maidsState[maidID].kaikanLevel = kaikanLevelCheck(maidID);  //フェイスブレンドレベルチェック
@@ -592,25 +2367,28 @@ namespace CM3D2.VibeYourMaid.Plugin
                     if (syaseiValue[im] > 100f) syaseiValue[im] = 100f;
                 }
 
-                //一人称視点処理
-                FpsModeChange();
 
-                //カメラのメイド追従処理
-                MaidFollowingCamera(tgID);
-
-
+                if (Input.anyKey) {
                 //ダブルクリック判定
                 DClicCheck();
 
                 //ショートカットキー
                 ShortCutKey();
+                }
 
                 //お触り処理
                 if (cfgw.osawariEnabled) osawariHand();
+                
+                //一人称視点処理
+                FpsModeChange();
+
+                //カメラのメイド追従処理
+                MaidFollowingCamera(tgID);
 				
             }
             //メイン処理終了---
 
+          } //無効化チェック
 
 			//子宮脱按钮
 			if (manualTriggeredUterusDatsu)
@@ -634,6 +2412,8 @@ namespace CM3D2.VibeYourMaid.Plugin
                 if (cfgw.bPluginEnabledV)
                 {
                     Console.WriteLine("VibeYourMaid Plugin 有効化");
+                reGetMaid = true; //再取得
+                VisibleMaidCheck(true); //再チェック
                 }
                 else
                 {
@@ -667,8 +2447,8 @@ namespace CM3D2.VibeYourMaid.Plugin
 
                         ElStart();
 
-                        if (!flagN) StartCoroutine("ElChange", 0);
-                        if (flagN) StartCoroutine("ElChange", 1);
+                        if (!flagN) StartCoroutine ("ElChange", 0);
+                        if (flagN) StartCoroutine ("ElChange", 1);
                     }
                     else
                     {
@@ -815,7 +2595,503 @@ namespace CM3D2.VibeYourMaid.Plugin
         public int tgIDBack = -1;
         public int maidCount = 0;
 
+        public class MaidInfo{
+          public MaidInfo(Maid m, int n, string fn, string ln, string ps, string con){
+            mem = m;
+            id = n;
+            fName = fn;
+            lName = ln;
+            personal = ps;
+            contract = con;
+          }
 
+          public Maid mem = null;
+          public int id = 0;
+          public string fName = "";
+          public string lName = "";
+          public string personal = ""; //性格
+          public string contract = ""; //契約
+        }
+
+        public class MaidState{
+          
+          public MaidState(){
+            maidHead = null;
+            maidMune = null;
+            maidHara = null;
+            maidXxx = null;
+            vStateMajor = 10;
+            vStateMajorOld = 10;
+            vLevel = 0;
+            linkEnabled = false;
+            linkID = -1;
+            visibleBack = false;
+            sVibeFlag = false;
+            voiceMode = 0;
+            voiceMode2 = 0;
+            pAutoSelect = 0;
+            pAutoTime = 0f;
+            eAutoSelect = false;
+            eAutoTime = 0f;
+            mAutoTimeL = 0f;
+            mAutoTimeS = 0f;
+            iRandomVoiceBackup = 0;
+            voiceHoldTime = 0f;
+            faceHoldTime = 0f;
+            yoinHoldTime = 0f;
+            stateAltTime1 = 0;
+            stateAltTime2 = 0;
+            faceAnimeBackup = "";
+            faceBlendBackup = "";
+            sekimenValue = 0f;
+            kaikanLevel = 0;
+            editVoiceSetName = "";
+            editVoiceSet = new List<string[]>();
+            vsTime = 0f;
+            vsFlag = 0;
+            vsInterval = 1000f;
+            aheValue = 0;
+            aheValue2 = 0;
+            fAheDefEyeL = -9999f;
+            fAheDefEyeR = -9999f;
+            aheResetFlag = false;
+            exciteLevel = 1;
+            exciteValue = 0f;
+            resistBase = 10f;
+            resistBonus = 0f;
+            resistValue = 0f;
+            boostBase = 0.5f;
+            boostBonus = 0f;
+            boostValue = 0f;
+            jirashi = 0f;
+            maidStamina = 3000f;
+            stunFlag = false;
+            orgasmValue = 0f;
+            orgasmLevel = 0;
+            orgasmCount = 0;
+            orgasmCmb = 0;
+            orgasmHoldTime = 0f;
+            orgasmVoice = 0;
+            orgasmStart = false;
+            continuationTime = 0f;
+            bIsBlowjobing = 0;
+            zAnimeFileName = "";
+            motionHoldTime = 0f;
+            motionAltTime = 0;
+            mcFlag = -1;
+            maidMotionBackup = "";
+            motionID = -1;
+            baceMotion = "";
+            inMotion = "Non";
+            outMotion = "Non";
+            syaseiMotion = "Non";
+            analMotion = "Non";
+            motionSissinMove = "Non";
+            motionSissinTaiki = "Non";
+            senyouTokusyuMotion = new List<string>();
+            analMode = false;
+            majHiBack = 0f;
+            majFwBack = 0f;
+            majRollBack = 0f;
+            majMaidRollBack = 0;
+            majManRollBack = 0;
+            syaseiMarks = new int[]{0, 0, 0, 0, 0};
+            giveSexual = new bool[]{true, false, false, false, false, false, false, false, false, false};
+            elItazuraFlag = false;
+            editMotionSetName = "";
+            editMotionSet = new List<List<string>>();
+            msTime1 = 0f;
+            msTime2 = 0f;
+            msCategory = 0;
+            mOnceFlag = false;
+            mOnceBack = "";
+            bokkiValue1 = 0f;
+            cliMode = 0;
+            uDatsu = 0;
+            bokkiResetFlag = false;
+            labiaValue = 0;
+            pikuFlag = false;
+            pikuTime = 0;
+            pikuTime2 = 0;
+            hibuValue = 0;
+            analValue = 0;
+            uDatsuValue1 = 0;
+            uDatsuValue2 = 0;
+            uDatsuStock = 0;
+            uDatsuWait = 90f;
+            hibuSlider1Value = 10f;
+            analSlider1Value = 10f;
+            hibuSlider2Value = 3f;
+            analSlider2Value = 3f;
+            gakupikuResetFlag= false;
+            gakupikuTime = 0;
+            gakupikuFlag = true;
+            gakupikuOn = false;
+            gakupikuValue = 0f;
+            chinpoValue1 = 0f;
+            soriValue1 = 0f;
+            aseResetFlag = false;
+            aseTime = 0f;
+            cameraCheck = false;
+            eyeToCamOld = false;
+            headToCamOld = false;
+            MouthHoldTime = 0f;
+            MouthMode = 0;
+            OldMode = 0;
+            MaValue = 0f;
+            MiValue = 0f;
+            MdwValue = 0f;
+            TupValue = 0f;
+            ToutValue = 0f;
+            TopenValue = 0f;
+            TupValue2 = 0.3f;
+            ToutValue2 = 0.3f;
+            TopenValue2 = 0.4f;
+            maVBack = 1f;
+            miVBack = 1f;
+            mdwVBack = 1f;
+            fToiki1 = false;
+            fToiki2 = false;
+            fAieki1 = false;
+            fAieki2 = false;
+            fAieki3 = false;
+            fSio = false;
+            fSio2 = false;
+            sioTime = 0f;
+            sioTime2 = 0f;
+            sioVolume = 0f;
+            nyoVolume = 0f;
+            kupaWaveValue = 0f;
+            kupaWaveRe = 1f;
+            shapeKeyWaveValue = 0f;
+            shapeKeyWaveRe = 1f;
+            shapeKeyIncreaseValue = 0f;
+            shapeKeyRandomInterval = 0.01f;
+            shapeKeyRandomDelta = 0f;
+            itemV = "";
+            itemA = "";
+            cliHidai = 0f;
+            chikubiHidai = 0.2f;
+            orgTotal = 0;
+            orgMax = 0;
+            orgTotalChitsu = 0;
+            orgTotalAnal = 0;
+            orgTotalEtc = 0;
+            syaseiTotal1 = new int[]{0, 0, 0, 0};
+            syaseiTotal2 = new float[]{0f, 0f, 0f, 0f};
+            sioTotal1 = 0;
+            nyoTotal1 = 0;
+            sioTotal2 = 0f;
+            nyoTotal2 = 0f;
+            stanTotal = 0;
+            uDatsuTotal = 0;
+            bodyName = "";
+            targetSphere_mouth = null;
+            targetSphere_muneR = null;
+            targetSphere_muneL = null;
+            targetSphere_vagina = null;
+            targetSphere_hipL = null;
+            targetSphere_hipR = null;
+            targetSphere_anal = null;
+            IK_mouth = null;
+            IK_muneR = null;
+            IK_muneL = null;
+            IK_vagina = null;
+            IK_hipL = null;
+            Hip_L = null;
+            IK_hipR = null;
+            Hip_R = null;
+            IK_anal = null;
+            chikubi_View = -1;
+            chikubiEnabled = false;
+            chikubiBokkiEnabled = true;
+            tits_chikubi_def = new float[]{0f, 0f};
+            tits_chikubi_perky = new float[]{0f, 0f};
+            tits_chikubi_cow = new float[]{0f, 0f};
+            tits_chikubi_observe = new float[]{0f, 0f};
+            tits_chikubi_wide = new float[]{0f, 0f}; 
+            tits_chikubi_ultralong = new float[]{0f, 0f};
+            tits_chikubi_ultrawide = new float[]{0f, 0f};
+            tits_chikubi_ultratare = new float[]{0f, 0f};
+            tits_chikubi_kanbotsu_n = new float[]{0f, 0f};
+            tits_chikubi_kanbotsu_s = new float[]{0f, 0f};
+            tits_chikubi_kanbotsu_p = new float[]{0f, 0f};
+            tits_nipple_def = new float[]{0f, 0f};
+            tits_nipple_perky1 = new float[]{0f, 0f};
+            tits_nipple_perky2 = new float[]{0f, 0f};
+            tits_nipple_long1 = new float[]{0f, 0f};
+            tits_nipple_long2 = new float[]{0f, 0f};
+            tits_nipple_wide = new float[]{0f, 0f};
+            tits_nipple_puffy = new float[]{0f, 0f};
+            tits_nipple_kupa = new float[]{0f, 0f};
+            tits_munel_chippai = new float[]{0f, 0f};
+          }
+          
+          public Transform maidHead = null;  //メイドの頭位置取得用
+          public Transform maidMune = null;  //メイドの胸位置取得用
+          public Transform maidHara = null;  //メイドの股間位置取得用
+          public Transform maidXxx = null;  //メイドの股間位置取得用
+
+          public int vStateMajor = 10;        //強弱によるステート
+          public int vStateMajorOld = 10;     //強弱によるステート（前回値）
+          public int vLevel = 0;                //バイブ状態
+          public bool linkEnabled = false;  //メインメイドとリンクさせるかどうか
+          public int linkID = -1;  //リンクメイドのID
+          public bool visibleBack = false;  //メイドがもともと表示されていたかのチェック
+          
+          public bool sVibeFlag = false;
+          
+          //ボイスモードのセレクト用
+          public int voiceMode = 0;
+          public int voiceMode2 = 0;
+          public bool autoVoiceEnabled = true;
+          public int iRandomVoiceBackup = 0;
+          
+          //オートモード用
+          public int pAutoSelect = 0;
+          public float pAutoTime = 0f;  //責めのオート変更時間
+          public bool eAutoSelect = false;
+          public float eAutoTime = 0f;  //目線のオート変更時間
+          public float mAutoTimeL = 0f;  //大カテゴリモーションのオート変更時間
+          public float mAutoTimeS = 0f;  //小カテゴリモーションのオート変更時間
+
+          //表情・音声管理
+          public float voiceHoldTime;
+          public float faceHoldTime;
+          public float yoinHoldTime;
+          public int stateAltTime1;
+          public int stateAltTime2;
+          public string faceAnimeBackup = "";
+          public string faceBlendBackup = "";
+          public float sekimenValue = 0f;
+          public int kaikanLevel;
+          
+          //ボイスセット用
+          public string editVoiceSetName = "";
+          public List<string[]> editVoiceSet = new List<string[]>();
+          public float vsTime = 0f;
+          public int vsFlag = 0;
+          public float vsInterval = 1000f;
+
+          //瞳操作関連
+          public float aheValue = 0f; 
+          public float aheValue2 = 0f; 
+          public float fAheDefEyeL = -9999f;
+          public float fAheDefEyeR = -9999f;
+          public bool aheResetFlag = false;
+          
+          
+          //興奮度管理
+          public int exciteLevel = 1;            //0～300の興奮度を、1～4の興奮レベルに変換した値
+          public float exciteValue = 0f;       //現在興奮値
+
+          public float resistBase = 0f;          //抵抗値のベース値
+          public float resistBonus = 0f;          //抵抗の特別加算値
+          public float resistValue = 0f;          //現在抵抗値
+
+          public float boostBase = 0.5f;            //感度のベース値
+          public float boostBonus = 0f;           //感度の特別加算値
+          public float boostValue = 0f;           //現在感度
+          public float jirashi = 0;            //焦らし度
+          
+          public float maidStamina = 3000f;        //スタミナ
+          public bool stunFlag = false;
+
+          public float orgasmValue = 0f;            //現在絶頂値　100になると絶頂
+          public int orgasmLevel  = 0;              //夜伽スライダー反映に利用
+          public int orgasmCount = 0;               //絶頂回数
+          public int orgasmCmb = 0;                 //連続絶頂回数
+          public float orgasmHoldTime = 0f;          //絶頂後のボーナスタイム
+          public int orgasmVoice = 0;               //絶頂時音声フラグ
+          public bool orgasmStart = false;          //絶頂開始フラグ
+          public float continuationTime;             //バイブ責めの継続時間
+          
+          //フェラ状態チェック
+          public int bIsBlowjobing = 0;
+          public string zAnimeFileName = "";
+          
+          //モーション変更関連
+          public float motionHoldTime = 0f;
+          public int motionAltTime = 0;
+          public int mcFlag = -1;
+          public string maidMotionBackup = "";
+          public int motionID = -1;
+          public string baceMotion = "";
+          public string inMotion = "Non";
+          public string outMotion = "Non";
+          public string syaseiMotion = "Non";
+          public string analMotion = "Non";
+          public string motionSissinMove = "Non";
+          public string motionSissinTaiki = "Non";
+          public List<string> senyouTokusyuMotion = new List<string>();
+          public bool analMode = false;
+          public float majHiBack = 0f;
+          public float majFwBack = 0f;
+          public float majRollBack = 0f;
+          public int majMaidRollBack = 0;
+          public int majManRollBack = 0;
+          public int[] syaseiMarks = new int[]{0, 0, 0, 0, 0};
+          public bool[] giveSexual = new bool[]{true, false, false, false, false, false, false, false, false, false};
+          public bool elItazuraFlag = false;
+          
+          //モーションセット関連
+          public string editMotionSetName = "";
+          public List<List<string>> editMotionSet = new List<List<string>>();
+          public float msTime1 = 0f;
+          public float msTime2 = 0f;
+          public int msCategory = 0;
+          public bool mOnceFlag = false;
+          public string mOnceBack = "";
+
+          //秘部操作関連
+          public float bokkiValue1 = 0f;              //　クリ勃起値
+          public int cliMode = 0;                     //クリモード(1:通常、2:巨クリ、3:ふたなり)
+          public int uDatsu = 0;  //子宮脱フラグ
+          public bool bokkiResetFlag = false;
+          public float labiaValue = 0;
+          public bool pikuFlag = false;
+          public float pikuTime = 0;
+          public float pikuTime2 = 0;
+          public float hibuValue = 0;
+          public float analValue = 0;
+          public float uDatsuValue1 = 0;
+          public float uDatsuValue2 = 0;
+          public float uDatsuStock = 0;
+          public float uDatsuWait = 90f;
+          public float hibuSlider1Value = 12f;
+          public float analSlider1Value = 12f;
+          public float hibuSlider2Value = 3f;
+          public float analSlider2Value = 3f;
+          
+          //痙攣関係
+          public bool gakupikuResetFlag= false;
+          public float gakupikuTime = 0;                          //痙攣時間判定
+          public bool gakupikuFlag = true;                        //痙攣動作フラグ
+          public bool gakupikuOn = false;  
+          public float gakupikuValue = 0f;
+          
+          //ちんぽ操作関連
+          public float chinpoValue1 = 0f;              //　ちんぽ勃起値
+          public float soriValue1 = 0f;                //　ちんぽ反り値
+          
+          //汗関連
+          public bool aseResetFlag = false;
+          public float aseTime = 0f; //汗変更タイミング調整に利用
+          
+          //カメラが顔に近づいているかどうか
+          public bool cameraCheck = false;
+          public bool eyeToCamOld = false;
+          public bool headToCamOld = false;
+          
+          //メイドの口元変更
+          public float MouthHoldTime = 0f;
+          public int MouthMode = 0;
+          public int OldMode = 0;
+          public float MaValue = 0f;
+          public float MiValue = 0f;
+          public float MdwValue = 0f;
+          public float TupValue = 0f;
+          public float ToutValue = 0f;
+          public float TopenValue = 0f;
+          public float TupValue2 = 0.3f;
+          public float ToutValue2 = 0.3f;
+          public float TopenValue2 = 0.4f;
+          public float maVBack = 1f;
+          public float miVBack = 1f;
+          public float mdwVBack = 1f;
+          
+          //演出関係
+          public bool fToiki1 = false;
+          public bool fToiki2 = false;
+          public bool fAieki1 = false;
+          public bool fAieki2 = false;
+          public bool fAieki3 = false;
+          public bool fSio = false;
+          public bool fSio2 = false;
+          public float sioTime = 0f;
+          public float sioTime2 = 0f;
+          public float sioVolume = 0f;
+          public float nyoVolume = 0f;
+          
+          //シェイプキー関連
+          public float kupaWaveValue = 0f;
+          public float kupaWaveRe = 1f;
+          public float shapeKeyWaveValue = 0f;
+          public float shapeKeyWaveRe = 1f;
+          public float shapeKeyIncreaseValue = 0f;
+          public float shapeKeyRandomInterval = 0.01f; // 動作間隔(秒)
+          public float shapeKeyRandomDelta = 0f;       // 前回動作からの経過時間
+          
+          //アイテム関連
+          public string itemV = "";
+          public string itemA = "";
+          
+          //エロステータス・経験値関連
+          public float cliHidai = 0f; //クリトリス肥大度
+          public float chikubiHidai = 0.2f; //乳首肥大度
+          
+          public int orgTotal = 0; //トータル絶頂数
+          public int orgMax = 0; //最大連続絶頂数
+          
+          public int orgTotalChitsu = 0; //トータル絶頂数（膣）
+          public int orgTotalAnal = 0; //トータル絶頂数（アナル）
+          public int orgTotalEtc = 0; //トータル絶頂数（その他）
+          
+          public int[] syaseiTotal1 = new int[]{0, 0, 0, 0}; //射精回数（膣、アナル、口、外）
+          public float[] syaseiTotal2 = new float[]{0f, 0f, 0f, 0f}; //射精量（膣、アナル、口、外）
+          
+          public int sioTotal1 = 0; //潮吹き回数
+          public int nyoTotal1 = 0; //放尿回数
+          public float sioTotal2 = 0f; //潮吹き量
+          public float nyoTotal2 = 0f; //放尿量
+          
+          public int stanTotal = 0; //失神回数
+          public int uDatsuTotal = 0; //子宮脱回数
+          
+          //お触り関連
+          public string bodyName = "";
+          public GameObject targetSphere_mouth = null;
+          public GameObject targetSphere_muneR = null;
+          public GameObject targetSphere_muneL = null;
+          public GameObject targetSphere_vagina = null;
+          public GameObject targetSphere_hipL = null;
+          public GameObject targetSphere_hipR = null;
+          public GameObject targetSphere_anal = null;
+          public Transform IK_mouth = null;
+          public Transform IK_muneR = null;
+          public Transform IK_muneL = null;
+          public Transform IK_vagina = null;
+          public Transform IK_hipL = null;
+          public Transform Hip_L = null;
+          public Transform IK_hipR = null;
+          public Transform Hip_R = null;
+          public Transform IK_anal = null;
+          
+          //乳首関連
+          public int chikubi_View = -1;
+          public bool chikubiEnabled = false;
+          public bool chikubiBokkiEnabled = true;
+          public float[] tits_chikubi_def = new float[]{0f, 0f};  //デフォルト乳首と同じような形。先端だけ。
+          public float[] tits_chikubi_perky = new float[]{0f, 0f};  //乳首が少し長くなる。ツンツン乳首
+          public float[] tits_chikubi_cow = new float[]{0f, 0f};  //乳首が伸びる、うしちちっぽく。
+          public float[] tits_chikubi_observe = new float[]{0f, 0f};  //乳首周囲がへこむ。服と胸との隙間を作るキー。
+          public float[] tits_chikubi_wide = new float[]{0f, 0f};  //乳首が少し広がる。
+          public float[] tits_chikubi_ultralong = new float[]{0f, 0f};  //乳首がすごく長くなるキー。
+          public float[] tits_chikubi_ultrawide = new float[]{0f, 0f};  //乳首がすごく膨らむキー。
+          public float[] tits_chikubi_ultratare = new float[]{0f, 0f};  //乳首がすごく垂れるキー。
+          public float[] tits_chikubi_kanbotsu_n = new float[]{0f, 0f};  //陥没乳首ノーマル。
+          public float[] tits_chikubi_kanbotsu_s = new float[]{0f, 0f};  //陥没乳首、少し。
+          public float[] tits_chikubi_kanbotsu_p = new float[]{0f, 0f};  //陥没乳首、ポンカン型、perkyキーですこし乳首が伸ばせるタイプ。
+          public float[] tits_nipple_def = new float[]{0f, 0f};  //デフォルト乳首と同じような形を再現するキー。乳輪あたりも。
+          public float[] tits_nipple_perky1 = new float[]{0f, 0f};  //ツンツン乳輪、乳首も少し出ます。
+          public float[] tits_nipple_perky2 = new float[]{0f, 0f};  //ツンツン乳輪、乳首は出ないタイプ。
+          public float[] tits_nipple_long1 = new float[]{0f, 0f};  //乳首周辺が伸びる。
+          public float[] tits_nipple_long2 = new float[]{0f, 0f};  //乳首周辺が伸びる2。
+          public float[] tits_nipple_wide = new float[]{0f, 0f};  //乳輪が広がる。
+          public float[] tits_nipple_puffy = new float[]{0f, 0f};  //ぷっくり乳首。
+          public float[] tits_nipple_kupa = new float[]{0f, 0f};  //乳首くぱ。
+          public float[] tits_munel_chippai = new float[]{0f, 0f};  //ちっぱい
+        }
 
 
         //メイドデータをストック
@@ -847,7 +3123,7 @@ namespace CM3D2.VibeYourMaid.Plugin
                 {
                     vmId.Add(sm.id); //メイドIDをリストに追加
 
-                    if (!maidsState[sm.id].visibleBack)
+                    if (forceCheck || !maidsState[sm.id].visibleBack)
                     { //新たにメイドが表示されていた場合の処理
                       //メイドさんの顔と胸を取得する
                         Transform[] objList = sm.mem.transform.GetComponentsInChildren<Transform>();
@@ -1703,7 +3979,61 @@ namespace CM3D2.VibeYourMaid.Plugin
             }
 
         }
+//夜伽シーンの興奮値と官能値を絶頂度にあわせて変更  100→150→200で上昇 絶頂時に300 
+        private void ChangeYotogiParamSlider(int maidID)
+        {
+          if (!cfgw.yotogiExciteLink) return;
 
+          int oLevel = 0;
+
+          //絶頂にあわせて絶頂レベルを変更 0～4
+          if (maidsState[maidID].orgasmValue >= 95 || maidsState[maidID].orgasmHoldTime > 0) { //絶頂動作中も4
+            oLevel = 4;
+          } else if (maidsState[maidID].orgasmValue >= 75) {
+            oLevel = 3;
+          } else if (maidsState[maidID].orgasmValue >= 50) {
+            oLevel = 2;
+          } else if (maidsState[maidID].orgasmValue >= 25) {
+            oLevel = 1;
+          }
+
+          //kaikanLevel (1～12+1)/3 の方が大きければそちらのレベルに設定
+          oLevel = (int)Math.Min(4, Math.Max(oLevel, (maidsState[maidID].kaikanLevel+1)/3));
+
+          //興奮値を設定し、夜伽ならスライダーを変更
+          if (maidsState[maidID].orgasmLevel != oLevel) { //レベルが変わったときのみ
+            #if DEBUG
+            Console.WriteLine("orgasmValue="+maidsState[maidID].orgasmValue+" oLevel="+oLevel+" currentExcite="+cfgw.yotogiExciteLinkValue[oLevel]);
+            #endif
+            setExcite(maidID, cfgw.yotogiExciteLinkValue[oLevel]);
+          }
+          maidsState[maidID].orgasmLevel = oLevel;
+        }
+
+        /** メイドの興奮値を設定 夜伽スライダーがあればそれも変更する */
+        private void setExcite(int maidID, int excite)
+        {
+          excite = Math.Max(-100, Math.Min(300, excite));
+
+          //興奮値バーを変更 メインメイドのみ
+          if (tgID == maidID) {
+            YotogiParamBasicBar yotogiParamBasicBar = null;
+            if (vSceneLevel == 14) { //夜伽
+              yotogiParamBasicBar = UnityEngine.Object.FindObjectOfType(typeof(YotogiParamBasicBar)) as YotogiParamBasicBar;
+            }
+            else if (vSceneLevel == 24) { //回想
+              yotogiParamBasicBar = UnityEngine.Object.FindObjectOfType(typeof(YotogiParamBasicBarPlusSlider)) as YotogiParamBasicBarPlusSlider;
+            }
+            if (yotogiParamBasicBar) {
+              yotogiParamBasicBar.SetCurrentExcite(excite, true);
+              yotogiParamBasicBar.SetCurrentSensual(excite, true);
+            }
+          }
+
+          //メイドステータスの興奮値を変更
+          stockMaids[maidID].mem.status.currentExcite = excite;
+          stockMaids[maidID].mem.status.currentSensual = excite;
+        }
 
         //絶頂スタートのチェック
         private bool OrgasmCheck(int maidID)
@@ -2254,45 +4584,55 @@ namespace CM3D2.VibeYourMaid.Plugin
                 else
                 {  //絶頂時音声
 
-                    if (maidsState[maidID].stunFlag)
-                    {
-                        vi = 4;
-                    }
-                    else if (maidsState[maidID].orgasmCmb < 4)
-                    {
-                        vi = maidsState[maidID].exciteLevel - 2;
-                        if (vi < 0) vi = 0;
-                    }
-                    else
-                    {
-                        vi = 3;
+                    // if (maidsState[maidID].stunFlag)
+                    // {
+                    //     vi = 4;
+                    // }
+                    // else if (maidsState[maidID].orgasmCmb < 4)
+                    // {
+                    //     vi = maidsState[maidID].exciteLevel - 2;
+                    //     if (vi < 0) vi = 0;
+                    // }
+                    // else
+                    // {
+                    //     vi = 3;
+                    // }
+
+                    #if DEBUG
+                    Console.WriteLine("exciteLevel="+maidsState[maidID].exciteLevel+" kaikanLevel="+maidsState[maidID].kaikanLevel+" orgasmCmb="+maidsState[maidID].orgasmCmb+" orgasmCount="+maidsState[maidID].orgasmCount);
+                    #endif
+
+                    if (maidsState[maidID].stunFlag) {
+                      //放心状態 0と同じ喘ぎ声
+                      vi = 4;
+                    } else {
+                      //連続絶頂3回以上 か 絶頂6回以上 0～3
+                      if (maidsState[maidID].kaikanLevel >= 5 && (maidsState[maidID].orgasmCmb >= 3 || maidsState[maidID].orgasmCount >= 6)) vi = maidsState[maidID].exciteLevel - 1;
+                      //0～2
+                      else vi = maidsState[maidID].exciteLevel - 2;
+                      if (vi < 0) vi = 0;
                     }
 
                     if (maidsState[maidID].voiceMode == 0)
                     { //通常音声
                         VoiceList = bvs[iPersonal].sOrgasmVoice30Vibe[vi];
 
-                    }
-                    else if (maidsState[maidID].voiceMode == 1)
+                    }else if (maidsState[maidID].voiceMode == 1)
                     { //フェラ音声
-                        VoiceList = bvs[iPersonal].sOrgasmVoice30Fera[vi];
+                      VoiceList = bvs[iPersonal].sOrgasmVoice30Fera[vi];
 
-                    }
-                    else if (maidsState[maidID].voiceMode == 2)
+                    }else if (maidsState[maidID].voiceMode == 2)
                     { //カスタム音声１
-                        VoiceList = BasicVoiceSetup.sOrgasmVoice30Custom1[vi];
-                    }
-                    else if (maidsState[maidID].voiceMode == 3)
+                        VoiceList = sOrgasmVoice30Custom1[vi];
+                    }else if (maidsState[maidID].voiceMode == 3)
                     { //カスタム音声２
-                        VoiceList = BasicVoiceSetup.sOrgasmVoice30Custom2[vi];
-                    }
-                    else if (maidsState[maidID].voiceMode == 4)
+                        VoiceList = sOrgasmVoice30Custom2[vi];
+                    }else if (maidsState[maidID].voiceMode == 4)
                     { //カスタム音声３
-                        VoiceList = BasicVoiceSetup.sOrgasmVoice30Custom3[vi];
-                    }
-                    else if (maidsState[maidID].voiceMode == 5)
+                        VoiceList = sOrgasmVoice30Custom3[vi];
+                    }else if (maidsState[maidID].voiceMode == 5)
                     { //カスタム音声４
-                        VoiceList = BasicVoiceSetup.sOrgasmVoice30Custom4[vi];
+                        VoiceList = sOrgasmVoice30Custom4[vi];
                     }
                 }
             }
@@ -2343,34 +4683,37 @@ namespace CM3D2.VibeYourMaid.Plugin
                 if (maidsState[maidID].orgasmCmb > 0)
                 {
                     VoiceValue = 3 + vi;
+                }else{
+                    //VoiceValue = maidsState[maidID].exciteLevel - 1 + vi;
+                    //kaikanLevel 1～12 1以下になったらボイス終了
+                    int kaikan = maidsState[maidID].kaikanLevel;
+                    if (kaikan >= 6) {
+                      if (kaikan <= 8) kaikan = 4; //6-8
+                      else if (kaikan <= 10)  kaikan = 5; //9-10
+                      else kaikan = 6; //11-12
                 }
                 else
                 {
-                    VoiceValue = maidsState[maidID].exciteLevel - 1 + vi;
+                    VoiceValue = Math.Min(4, Math.Max(maidsState[maidID].exciteLevel, kaikan-1) - 1 + vi);
+                    #if DEBUG
+                    Console.WriteLine("exciteLevel="+maidsState[maidID].exciteLevel+" kaikanLevel="+maidsState[maidID].kaikanLevel+" motionHoldTime="+maidsState[maidID].motionHoldTime);
+                    #endif
                 }
 
-                if (maidsState[maidID].voiceMode == 2)
-                {
-                    maid.AudioMan.LoadPlay(BasicVoiceSetup.sLoopVoice40Custom1[VoiceValue], 0f, false, true);
+                if (maidsState[maidID].voiceMode == 2){
+                    VoiceList = sLoopVoice40Custom1;
+                }else if (maidsState[maidID].voiceMode == 3){
+                    VoiceList = sLoopVoice40Custom2;
+                }else if (maidsState[maidID].voiceMode == 4){
+                    VoiceList = sLoopVoice40Custom3;
+                }else if (maidsState[maidID].voiceMode == 5){
+                    VoiceList = sLoopVoice40Custom4;
+                }else{
+                    VoiceList = bvs[iPersonal].sLoopVoice40Vibe;
                 }
-                else if (maidsState[maidID].voiceMode == 3)
-                {
-                    maid.AudioMan.LoadPlay(BasicVoiceSetup.sLoopVoice40Custom2[VoiceValue], 0f, false, true);
+                maid.AudioMan.LoadPlay(VoiceList[VoiceValue], 0f, false, true);
+                Console.WriteLine(stockMaids[maidID].personal +" ["+maidsState[maidID].vStateMajor+":"+VoiceValue+"] "+VoiceList[VoiceValue]);
                 }
-                else if (maidsState[maidID].voiceMode == 4)
-                {
-                    maid.AudioMan.LoadPlay(BasicVoiceSetup.sLoopVoice40Custom3[VoiceValue], 0f, false, true);
-                }
-                else if (maidsState[maidID].voiceMode == 5)
-                {
-                    maid.AudioMan.LoadPlay(BasicVoiceSetup.sLoopVoice40Custom4[VoiceValue], 0f, false, true);
-                }
-                else
-                {
-                    maid.AudioMan.LoadPlay(bvs[iPersonal].sLoopVoice40Vibe[VoiceValue], 0f, false, true);
-                }
-            }
-
 
             //余韻終了時
             if (maidsState[maidID].vStateMajor == 10 && maidsState[maidID].vStateMajorOld == 50)
@@ -2408,7 +4751,12 @@ namespace CM3D2.VibeYourMaid.Plugin
 
             int iSE1 = maidsState[maidID].vLevel;
             int iSE2 = maidsState[maidID].vLevel;
-            if (maidID == osawariID && iSE1 < osawariLevel) iSE1 = osawariLevel;
+            if(osawari.isOsawari(maidID)) {
+            int osawariLevel = osawari.getOsawariLevel(maidID);
+            //胸のおさわりのみの場合はSEなし
+            if (iSE1 == 0 && osawari.isMuneOsawari(maidID)) iSE1 = 0;
+            else if (iSE1 < osawariLevel) iSE1 = osawariLevel;
+          }
 
             if (iSE1 != 0)
             {
@@ -2474,23 +4822,22 @@ namespace CM3D2.VibeYourMaid.Plugin
             Console.WriteLine("モーションファイル読み込み開始");
 
             //全ファイルの中から.anmファイルの抜き出す
-            string[] Files = GameUty.FileSystem.GetList("motion", AFileSystemBase.ListType.AllFile);
-            string[] FilesOld = GameUty.FileSystemOld.GetList("motion", AFileSystemBase.ListType.AllFile);
-
-            string[] FilesMod = GameUty.FileSystemMod.GetList("", AFileSystemBase.ListType.AllFile);
-
-            foreach (string file in Files)
-            {
-                if (Path.GetExtension(file) == ".anm") allFiles.Add(Path.GetFileNameWithoutExtension(file));
-            }
-            foreach (string file in FilesOld)
-            {
-                if (Path.GetExtension(file) == ".anm") allFilesOld.Add(Path.GetFileNameWithoutExtension(file));
-            }
-            foreach (string file in FilesMod)
-            {
-                if (Path.GetExtension(file) == ".anm") allFiles.Add(Path.GetFileNameWithoutExtension(file));
-            }
+          string[] Files = GameUty.FileSystem.GetList("motion", AFileSystemBase.ListType.AllFile);
+          string[] FilesOld = GameUty.FileSystemOld.GetList("motion", AFileSystemBase.ListType.AllFile);
+          
+          foreach (string file in Files){
+            if( Path.GetExtension( file ) == ".anm" )allFiles.Add(Path.GetFileNameWithoutExtension(file));
+          }
+          foreach (string file in FilesOld){
+            if( Path.GetExtension( file ) == ".anm" )allFilesOld.Add(Path.GetFileNameWithoutExtension(file));
+          }
+          try {
+          string[] FilesMod= GameUty.FileSystemMod.GetList("", AFileSystemBase.ListType.AllFile);
+          foreach (string file in FilesMod){
+            if( Path.GetExtension( file ) == ".anm" )allFiles.Add(Path.GetFileNameWithoutExtension(file));
+          }
+          } catch { UnityEngine.Debug.LogError("'Mod' folder not exist"); }
+          //ファイル名でソート
             //ファイル名でソート
             allFiles.Sort();
             allFilesOld.Sort();
@@ -2960,6 +5307,63 @@ namespace CM3D2.VibeYourMaid.Plugin
         private float[] prefabAdjust = new float[] { 0f, 0f, 0f, 0f, 0.0011f, 0f, 0f, 0f, 0.0008f, 0.00105f, 0.00105f, 0.00185f };
 
         public MotionAdjust maj = new MotionAdjust();
+        public class MotionAdjust{
+          public MotionAdjust(){
+            motionName = new List<string>();
+            baceMotion = new List<string>();
+            basicHeight = new List<float>();
+            basicRoll = new List<float>();
+            maidRoll = new List<int>();
+            manRoll = new List<int>();
+            rollSettei = new List<int>();
+            basicForward = new List<float>();
+            mansHeight = new List<float>();
+            mansForward = new List<float>();
+            mansRight = new List<float>();
+            hkupa1 = new List<float>();
+            akupa1 = new List<float>();
+            hkupa2 = new List<float>();
+            akupa2 = new List<float>();
+            mVoiceSet = new List<string>();
+            iTargetLH = new List<int>();
+            iTargetRH = new List<int>();
+            syaseiMarks = new List<int[]>();
+            giveSexual = new List<bool[]>();
+            itemSet = new List<bool[]>();
+            prefabSet = new List<int>();
+            analEnabled = new List<bool>();
+            analHeight = new List<float>();
+            analForward = new List<float>();
+            analRight = new List<float>();
+          }
+
+          public List<string> motionName;
+          public List<string> baceMotion;
+          public List<float> basicHeight;
+          public List<float> basicRoll;
+          public List<int> maidRoll;
+          public List<int> manRoll;
+          public List<int> rollSettei;
+          public List<float> basicForward;
+          public List<float> mansHeight;
+          public List<float> mansForward;
+          public List<float> mansRight;
+          public List<float> hkupa1;
+          public List<float> akupa1;
+          public List<float> hkupa2;
+          public List<float> akupa2;
+          public List<string> mVoiceSet;
+          public List<int> iTargetLH;
+          public List<int> iTargetRH;
+          public List<int[]> syaseiMarks;
+          public List<bool[]> giveSexual;
+          public List<bool[]> itemSet;
+          public List<int> prefabSet;
+          public List<bool> analEnabled;
+          public List<float> analHeight;
+          public List<float> analForward;
+          public List<float> analRight;
+        }
 
         private bool[] GiveSexualSet(string motion)
         {
@@ -3195,33 +5599,29 @@ namespace CM3D2.VibeYourMaid.Plugin
             }
 
             //kupa値適用
-            if (cfgw.majKupaEnabled)
-            {
-                if (!maidsState[maidID].analMode)
-                {
-                    if (maj.hkupa1[mid] >= 0) maidsState[maidID].hibuSlider1Value = maj.hkupa1[mid];
-                    if (maj.akupa1[mid] >= 0) maidsState[maidID].analSlider1Value = maj.akupa1[mid];
-                    if (maj.hkupa2[mid] >= 0) maidsState[maidID].hibuSlider2Value = maj.hkupa2[mid];
-                    if (maj.akupa2[mid] >= 0) maidsState[maidID].analSlider2Value = maj.akupa2[mid];
-                }
-                else
-                {
-                    if (maj.hkupa1[mid] >= 0) maidsState[maidID].hibuSlider1Value = maj.akupa1[mid];
-                    if (maj.akupa1[mid] >= 0) maidsState[maidID].analSlider1Value = maj.hkupa1[mid] + 10f;
-                    if (maj.hkupa2[mid] >= 0) maidsState[maidID].hibuSlider2Value = maj.akupa2[mid];
-                    if (maj.akupa2[mid] >= 0) maidsState[maidID].analSlider2Value = maj.hkupa2[mid] + 10f;
-                }
-                if (maid.GetProp(MPN.accvag).strTempFileName == "accVag_VibePink_I_.menu" || maid.GetProp(MPN.handitem).strTempFileName == "HandItemH_SoutouVibe_I_.menu")
-                {
-                    if (maidsState[tgID].hibuSlider1Value < 60f) maidsState[tgID].hibuSlider1Value = 60f;
-                    if (maidsState[tgID].hibuSlider2Value < 60f) maidsState[tgID].hibuSlider2Value = 60f;
-                }
-                if (maid.GetProp(MPN.accanl).strTempFileName == "accAnl_AnalVibe_I_.menu")
-                {
-                    if (maidsState[maidID].analSlider1Value < 30f) maidsState[maidID].analSlider1Value = 30f;
-                    if (maidsState[maidID].analSlider2Value < 30f) maidsState[maidID].analSlider2Value = 30f;
-                }
+          if(cfgw.majKupaEnabled){
+            if (!osawari.isOsawari(maidID)) {
+            if(!maidsState[maidID].analMode){
+              if(maj.hkupa1[mid] >= 0)maidsState[maidID].hibuSlider1Value = maj.hkupa1[mid];
+              if(maj.akupa1[mid] >= 0)maidsState[maidID].analSlider1Value = maj.akupa1[mid];
+              if(maj.hkupa2[mid] >= 0)maidsState[maidID].hibuSlider2Value = maj.hkupa2[mid];
+              if(maj.akupa2[mid] >= 0)maidsState[maidID].analSlider2Value = maj.akupa2[mid];
+            }else{
+              if(maj.hkupa1[mid] >= 0)maidsState[maidID].hibuSlider1Value = maj.akupa1[mid];
+              if(maj.akupa1[mid] >= 0)maidsState[maidID].analSlider1Value = maj.hkupa1[mid] + 10f;
+              if(maj.hkupa2[mid] >= 0)maidsState[maidID].hibuSlider2Value = maj.akupa2[mid];
+              if(maj.akupa2[mid] >= 0)maidsState[maidID].analSlider2Value = maj.hkupa2[mid] + 10f;
             }
+            }
+            if(maid.GetProp(MPN.accvag).strTempFileName == "accVag_VibePink_I_.menu" || maid.GetProp(MPN.handitem).strTempFileName == "HandItemH_SoutouVibe_I_.menu"){
+              if(maidsState[tgID].hibuSlider1Value < 60f)maidsState[tgID].hibuSlider1Value = 60f;
+              if(maidsState[tgID].hibuSlider2Value < 60f)maidsState[tgID].hibuSlider2Value = 60f;
+            }
+            if(maid.GetProp(MPN.accanl).strTempFileName == "accAnl_AnalVibe_I_.menu"){
+              if(maidsState[maidID].analSlider1Value < 30f)maidsState[maidID].analSlider1Value = 30f;
+              if(maidsState[maidID].analSlider2Value < 30f)maidsState[maidID].analSlider2Value = 30f;
+            }
+          }
 
 
             //ボイスセット適用
@@ -3358,32 +5758,28 @@ namespace CM3D2.VibeYourMaid.Plugin
 
             if (!cfgw.majEnabled) return;
 
-            //kupa値適用
-            if (!maidsState[maidID].analMode)
-            {
-                if (maj.hkupa1[mid] >= 0) maidsState[maidID].hibuSlider1Value = maj.hkupa1[mid];
-                if (maj.akupa1[mid] >= 0) maidsState[maidID].analSlider1Value = maj.akupa1[mid];
-                if (maj.hkupa2[mid] >= 0) maidsState[maidID].hibuSlider2Value = maj.hkupa2[mid];
-                if (maj.akupa2[mid] >= 0) maidsState[maidID].analSlider2Value = maj.akupa2[mid];
-            }
-            else
-            {
-                if (maj.hkupa1[mid] >= 0) maidsState[maidID].hibuSlider1Value = maj.akupa1[mid];
-                if (maj.akupa1[mid] >= 0) maidsState[maidID].analSlider1Value = maj.hkupa1[mid] + 10f;
-                if (maj.hkupa2[mid] >= 0) maidsState[maidID].hibuSlider2Value = maj.akupa2[mid];
-                if (maj.akupa2[mid] >= 0) maidsState[maidID].analSlider2Value = maj.hkupa2[mid] + 10f;
-            }
-            if (maid.GetProp(MPN.accvag).strTempFileName == "accVag_VibePink_I_.menu" || maid.GetProp(MPN.handitem).strTempFileName == "HandItemH_SoutouVibe_I_.menu")
-            {
-                if (maidsState[tgID].hibuSlider1Value < 60f) maidsState[tgID].hibuSlider1Value = 60f;
-                if (maidsState[tgID].hibuSlider2Value < 60f) maidsState[tgID].hibuSlider2Value = 60f;
-            }
-            if (maid.GetProp(MPN.accanl).strTempFileName == "accAnl_AnalVibe_I_.menu")
-            {
-                if (maidsState[maidID].analSlider1Value < 30f) maidsState[maidID].analSlider1Value = 30f;
-                if (maidsState[maidID].analSlider2Value < 30f) maidsState[maidID].analSlider2Value = 30f;
-            }
-
+          //kupa値適用
+          if (!osawari.isOsawari(maidID)) {
+          if(!maidsState[maidID].analMode){
+            if(maj.hkupa1[mid] >= 0)maidsState[maidID].hibuSlider1Value = maj.hkupa1[mid];
+            if(maj.akupa1[mid] >= 0)maidsState[maidID].analSlider1Value = maj.akupa1[mid];
+            if(maj.hkupa2[mid] >= 0)maidsState[maidID].hibuSlider2Value = maj.hkupa2[mid];
+            if(maj.akupa2[mid] >= 0)maidsState[maidID].analSlider2Value = maj.akupa2[mid];
+          }else{
+            if(maj.hkupa1[mid] >= 0)maidsState[maidID].hibuSlider1Value = maj.akupa1[mid];
+            if(maj.akupa1[mid] >= 0)maidsState[maidID].analSlider1Value = maj.hkupa1[mid] + 10f;
+            if(maj.hkupa2[mid] >= 0)maidsState[maidID].hibuSlider2Value = maj.akupa2[mid];
+            if(maj.akupa2[mid] >= 0)maidsState[maidID].analSlider2Value = maj.hkupa2[mid] + 10f;
+          }
+          }
+          if(maid.GetProp(MPN.accvag).strTempFileName == "accVag_VibePink_I_.menu" || maid.GetProp(MPN.handitem).strTempFileName == "HandItemH_SoutouVibe_I_.menu"){
+            if(maidsState[tgID].hibuSlider1Value < 60f)maidsState[tgID].hibuSlider1Value = 60f;
+            if(maidsState[tgID].hibuSlider2Value < 60f)maidsState[tgID].hibuSlider2Value = 60f;
+          }
+          if(maid.GetProp(MPN.accanl).strTempFileName == "accAnl_AnalVibe_I_.menu"){
+            if(maidsState[maidID].analSlider1Value < 30f)maidsState[maidID].analSlider1Value = 30f;
+            if(maidsState[maidID].analSlider2Value < 30f)maidsState[maidID].analSlider2Value = 30f;
+          }
         }
 
         //モーションファイルの読み込み関係終了-----------------
@@ -3882,6 +6278,10 @@ namespace CM3D2.VibeYourMaid.Plugin
                 }
 
             }
+                      #if DEBUG
+          Console.WriteLine("    newMotion="+t);
+          Console.WriteLine("    maidMotionBackup="+maidsState[maidID].maidMotionBackup);
+          #endif
 
             return t;
 
@@ -3905,6 +6305,9 @@ namespace CM3D2.VibeYourMaid.Plugin
             Maid maid = stockMaids[maidID].mem;
             string t = motion;
 
+atch match = regZeccyou.Match(t);
+          string sHighExciteMotionBackup = regZeccyouBackup.Match(t).Groups[1].Value;  // 「 - Que…」を除く
+          
             //連続絶頂中の場合、専用モーション（_hatu_3）があるかどうか調べて変更する
             if (Regex.IsMatch(t, "_hatu_3"))
             {
@@ -3926,9 +6329,11 @@ namespace CM3D2.VibeYourMaid.Plugin
                 if (MotionOldCheck(t.Replace("_3", "_hatu_3")) != -1)
                 {
                     t = Regex.Replace(t, "_3", "_hatu_3");
-                    MotionChange(maid, t, true, 0.5f, 1f);
+  //MotionChange(maid, t, true, 0.5f, 1f);
+              MotionChange(maid, t, false, 0.5f, 1f); //ループせさないように修正
+              MotionChangeAf(maid, sHighExciteMotionBackup, true, 0.5f, 1f); // 終わったら絶頂前モーションを再生する
 
-                    maidsState[maidID].zAnimeFileName = t + ".anm";
+              maidsState[maidID].zAnimeFileName = t;
 
                     ManMotionChange(t, maidID, true, 0.5f, 1f);
 
@@ -4686,6 +7091,7 @@ namespace CM3D2.VibeYourMaid.Plugin
         //吐息
         private void EffectToiki(int maidID)
         {
+                      if (vSceneLevel == 14) return; //夜伽では無効
 
             Maid maid = stockMaids[maidID].mem;
 
@@ -4719,6 +7125,7 @@ namespace CM3D2.VibeYourMaid.Plugin
         //愛液
         private void EffectAieki(int maidID)
         {
+                      if (vSceneLevel == 14) return; //夜伽では無効
 
             Maid maid = stockMaids[maidID].mem;
 
@@ -4779,7 +7186,9 @@ namespace CM3D2.VibeYourMaid.Plugin
         //おしっこ
         private void EffectNyo(int maidID, float volume)
         {
-            if (!cfgw.NyoEnabled) return;
+
+          if(!cfgw.NyoEnabled )return;
+          if (vSceneLevel == 14) return; //夜伽では無効
             Maid maid = stockMaids[maidID].mem;
             maid.AddPrefab("Particle/pNyou_cm3D2", "pNyou_cm3D2", "_IK_vagina", new Vector3(0f, -0.047f, 0.011f), new Vector3(20.0f, -180.0f, 180.0f));
             GameMain.Instance.SoundMgr.PlaySe("SE011.ogg", false);
@@ -4798,6 +7207,7 @@ namespace CM3D2.VibeYourMaid.Plugin
 
             if (!cfgw.SioEnabled || !maidsState[maidID].fSio) return;
 
+                if (vSceneLevel != 14) { //夜伽では無効
             if (!maidsState[maidID].fSio2)
             {
                 maidsState[maidID].fSio2 = true;
@@ -4810,7 +7220,8 @@ namespace CM3D2.VibeYourMaid.Plugin
                 //GameMain.Instance.SoundMgr.PlaySe("se061.ogg", false);
 
                 maidsState[maidID].sioTotal2 += UnityEngine.Random.Range(3f, 5f);
-            }
+          }            
+          }
 
             float value = 60f;
             try
@@ -4980,6 +7391,309 @@ namespace CM3D2.VibeYourMaid.Plugin
             return false;
         }
 
+
+public class SeiekiInfo{
+        
+          private String slotName;
+          private int matNo;
+          private int layer;
+          private String res;
+          private int minX;
+          private int maxX;
+          private int minY;
+          private int maxY;
+          private float minRot;
+          private float maxRot;
+          private float minScale;
+          private float maxScale;
+
+          public SeiekiInfo(String slotName, int matNo, int layer, String res, int minX, int maxX, int minY, int maxY, float minRot, float maxRot, float minScale, float maxScale){
+            this.slotName = slotName;
+            this.matNo = matNo;
+            this.layer = layer;
+            this.res = res;
+            this.minX = minX;
+            this.maxX = maxX;
+            this.minY = minY;
+            this.maxY = maxY;
+            this.minRot = minRot;
+            this.maxRot = maxRot;
+            this.minScale = minScale;
+            this.maxScale = maxScale;
+          }
+
+          
+          public String SlotName{
+            get { return this.slotName; }
+          }
+          public int MatNo{
+            get { return this.matNo; }
+          }
+          public int Layer{
+            get { return this.layer; }
+          }
+          public String Res{
+            get { return this.res; }
+          }
+          
+          public String GetFilName(){
+            string[] strArray = this.res.Split(':');
+            return "res:" + strArray[UnityEngine.Random.Range(0, strArray.Length)];
+          }
+
+          public int MinX{
+            get { return this.minX; }
+          }
+
+          public int MaxX{
+            get { return this.maxX; }
+          }
+
+          public int GetX(){
+            return UnityEngine.Random.Range(this.minX, this.maxX);
+          }
+
+          public int MinY{
+            get { return this.minY; }
+          }
+
+          public int MaxY{
+            get { return this.maxY; }
+          }
+
+          public int GetY(){
+            return (int)UnityEngine.Random.Range(this.minY, this.maxY);
+          }
+
+          public float MinRot{
+            get { return this.minRot; }
+          }
+
+          public float MaxRot{
+            get { return this.maxRot; }
+          }
+
+          public float GetRot(){
+            return UnityEngine.Random.Range(this.minRot, this.maxRot);
+          }
+
+          public float MinScale{
+            get { return this.minScale; }
+          }
+
+          public float MaxScale{
+            get { return this.maxScale; }
+          }
+
+          public float GetScale(){
+            return UnityEngine.Random.Range(this.minScale, this.maxScale);
+          }
+        }
+
+        private static readonly List<SeiekiInfo> KaoMarks = new List<SeiekiInfo>(){
+            new SeiekiInfo("head", 5, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe003", 378, 452, 628, 820, 330, 360, 1.5f, 1.5f),
+            new SeiekiInfo("head", 5, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe003r", 572, 646, 628, 820, 0, 30, 1.5f, 1.5f),
+            new SeiekiInfo("head", 5, 18, "Seieki/spe004:Seieki/spe005", 429, 593, 575, 672, 340, 380, 1.5f, 1.5f),
+            new SeiekiInfo("head", 5, 18, "Seieki/spe006:Seieki/spe007", 452, 572, 414, 566, 340, 380, 1.5f, 1.5f),
+            new SeiekiInfo("head", 5, 18, "Seieki/spe001:Seieki/spe001r:Seieki/spe002:Seieki/spe002R:Seieki/spe004", 469, 558, 706, 864, 340, 380, 1.5f, 1.5f),
+            new SeiekiInfo("head", 5, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe003", 378, 452, 628, 820, 315, 405, 1.5f, 1.5f),
+            new SeiekiInfo("head", 5, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe003r", 572, 646, 628, 820, 315, 405, 1.5f, 1.5f),
+        };
+
+        private static readonly List<SeiekiInfo> MuneMarks = new List<SeiekiInfo>(){
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe007:Seieki/spe008:Seieki/spe009", 412, 449, 428, 470, 10, 20, 0.5f, 0.5f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe007:Seieki/spe008:Seieki/spe009", 397, 404, 444, 487, 340, 350, 0.5f, 0.5f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe007r:Seieki/spe008r:Seieki/spe009r", 455, 492, 428, 470, 340, 350, 0.5f, 0.5f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe007:Seieki/spe008:Seieki/spe009", 532, 569, 428, 470, 10, 20, 0.5f, 0.5f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe007r:Seieki/spe008r:Seieki/spe009r", 575, 612, 428, 470, 340, 350, 0.5f, 0.5f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe007:Seieki/spe008:Seieki/spe009", 620, 627, 444, 487, 340, 350, 0.5f, 0.5f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe004:Seieki/spe005:Seieki/spe008:Seieki/spe008r:Seieki/spe010:Seieki/spe012:Seieki/spe012r", 509, 515, 420, 479, 350, 370, 0.5f, 0.5f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe004:Seieki/spe011:Seieki/spe014", 415, 443, 492, 517, 350, 360, 0.5f, 0.5f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe004r:Seieki/spe011r:Seieki/spe014r", 461, 500, 492, 517, 0, 10, 0.5f, 0.5f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe004:Seieki/spe011:Seieki/spe014", 524, 563, 492, 517, 350, 360, 0.5f, 0.5f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe004r:Seieki/spe011r:Seieki/spe014r", 581, 609, 492, 517, 0, 10, 0.5f, 0.5f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe007:Seieki/spe008:Seieki/spe009", 412, 449, 428, 470, 10, 20, 0.5f, 0.5f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe007r:Seieki/spe008r:Seieki/spe009r", 455, 492, 428, 470, 340, 350, 0.5f, 0.5f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe007:Seieki/spe008:Seieki/spe009", 532, 569, 428, 470, 10, 20, 0.5f, 0.5f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe007r:Seieki/spe008r:Seieki/spe009r", 575, 612, 428, 470, 340, 350, 0.5f, 0.5f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe004:Seieki/spe005:Seieki/spe008:Seieki/spe008r:Seieki/spe010:Seieki/spe012:Seieki/spe012r", 509, 515, 420, 479, 350, 370, 0.5f, 0.5f),
+        };
+
+        private static readonly List<SeiekiInfo> KuchimotoMarks = new List<SeiekiInfo>(){
+            new SeiekiInfo("head", 5, 18, "Seieki/spe001:Seieki/spe008:Seieki/spe009", 438, 483, 742, 857, 350, 360, 1.5f, 1.5f),
+            new SeiekiInfo("head", 5, 18, "Seieki/spe001:Seieki/spe008:Seieki/spe009", 398, 442, 768, 876, 350, 360, 1.5f, 1.5f),
+            new SeiekiInfo("head", 5, 18, "Seieki/spe001r:Seieki/spe008r:Seieki/spe009r", 541, 586, 742, 857, 0, 10, 1.5f, 1.5f),
+            new SeiekiInfo("head", 5, 18, "Seieki/spe001r:Seieki/spe008r:Seieki/spe009r", 582, 626, 768, 876, 0, 10, 1.5f, 1.5f),
+            new SeiekiInfo("head", 5, 18, "Seieki/spe006:Seieki/spe007", 473, 550, 826, 861, 0, 0, 1.5f, 1.5f),
+        };
+
+        private static readonly List<SeiekiInfo> SenakaMarks = new List<SeiekiInfo>(){
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe003r:Seieki/spe006r:Seieki/spe007r:Seieki/spe008r:Seieki/spe009r:Seieki/spe014r", 424, 479, 183, 236, 170, 210, 0.7f, 0.7f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe003r:Seieki/spe006r:Seieki/spe007r:Seieki/spe008r:Seieki/spe009r:Seieki/spe014r", 414, 469, 256, 314, 170, 210, 0.7f, 0.7f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe003r:Seieki/spe006r:Seieki/spe007r:Seieki/spe008r:Seieki/spe009r:Seieki/spe014r", 483, 503, 248, 318, 170, 190, 0.7f, 0.7f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe003r:Seieki/spe006r:Seieki/spe007r:Seieki/spe008r:Seieki/spe009r:Seieki/spe014r", 429, 458, 77, 169, 170, 190, 0.7f, 0.7f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe003r:Seieki/spe006r:Seieki/spe007r:Seieki/spe008r:Seieki/spe009r:Seieki/spe014r", 470, 499, 77, 169, 170, 190, 0.7f, 0.7f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe003:Seieki/spe006:Seieki/spe007:Seieki/spe008:Seieki/spe009:Seieki/spe014", 521, 541, 248, 318, 170, 190, 0.7f, 0.7f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe003:Seieki/spe006:Seieki/spe007:Seieki/spe008:Seieki/spe009:Seieki/spe014", 555, 610, 256, 314, 150, 190, 0.7f, 0.7f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe003:Seieki/spe006:Seieki/spe007:Seieki/spe008:Seieki/spe009:Seieki/spe014", 545, 600, 183, 236, 150, 190, 0.7f, 0.7f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe003:Seieki/spe006:Seieki/spe007:Seieki/spe008:Seieki/spe009:Seieki/spe014", 525, 554, 77, 169, 170, 190, 0.7f, 0.7f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe003:Seieki/spe006:Seieki/spe007:Seieki/spe008:Seieki/spe009:Seieki/spe014", 566, 595, 77, 169, 170, 190, 0.7f, 0.7f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe004:Seieki/spe004r:Seieki/spe013:Seieki/spe013r:Seieki/spe014:Seieki/spe014r", 498, 525, 174, 241, 180, 180, 0.7f, 0.7f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe003r:Seieki/spe006r:Seieki/spe007r:Seieki/spe008r:Seieki/spe009r:Seieki/spe014r", 483, 503, 248, 318, 170, 190, 0.7f, 0.7f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe003:Seieki/spe006:Seieki/spe007:Seieki/spe008:Seieki/spe009:Seieki/spe014", 521, 541, 248, 318, 170, 190, 0.7f, 0.7f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe004:Seieki/spe004r:Seieki/spe013:Seieki/spe013r:Seieki/spe014:Seieki/spe014r", 498, 525, 174, 241, 180, 180, 0.7f, 0.7f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe003r:Seieki/spe006r:Seieki/spe007r:Seieki/spe008r:Seieki/spe009r:Seieki/spe014r", 470, 499, 77, 169, 170, 190, 0.7f, 0.7f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe003:Seieki/spe006:Seieki/spe007:Seieki/spe008:Seieki/spe009:Seieki/spe014", 525, 554, 77, 169, 170, 190, 0.7f, 0.7f),
+        };
+
+        private static readonly List<SeiekiInfo> SiriMarks = new List<SeiekiInfo>(){
+            new SeiekiInfo("body", 0, 18, "Seieki/spe004:Seieki/spe005:Seieki/spe010:Seieki/spe012:Seieki/spe013", 229, 240, 870, 877, 325, 345, 0.6f, 0.6f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe004:Seieki/spe005r:Seieki/spe010r:Seieki/spe012:Seieki/spe013:Seieki/spe014", 215, 243, 836, 847, 0, 30, 0.4f, 0.4f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe004r:Seieki/spe005r:Seieki/spe010r:Seieki/spe012r:Seieki/spe013r:Seieki/spe014r", 257, 285, 828, 839, 330, 360, 0.4f, 0.4f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe003r:Seieki/spe006r:Seieki/spe007r:Seieki/spe008r:Seieki/spe009r:Seieki/spe011r:Seieki/spe014r", 218, 254, 778, 823, 330, 360, 0.5f, 0.5f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe007r:Seieki/spe013r:Seieki/spe015:Seieki/spe015:Seieki/spe015:Seieki/spe015:Seieki/spe015:Seieki/spe015:Seieki/spe015", 232, 258, 760, 768, 330, 360, 0.4f, 0.4f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe004r:Seieki/spe005r:Seieki/spe010r:Seieki/spe012r:Seieki/spe013r", 784, 795, 870, 877, 15, 35, 0.6f, 0.6f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe004r:Seieki/spe005:Seieki/spe010:Seieki/spe012r:Seieki/spe013r:Seieki/spe014r", 781, 809, 836, 847, 360, 330, 0.4f, 0.4f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe004:Seieki/spe005:Seieki/spe010:Seieki/spe012:Seieki/spe013:Seieki/spe014", 739, 767, 828, 839, 0, 30, 0.4f, 0.4f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe003:Seieki/spe006:Seieki/spe007:Seieki/spe008:Seieki/spe009:Seieki/spe011:Seieki/spe014r", 733, 769, 778, 817, 0, 30, 0.5f, 0.5f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe007:Seieki/spe013:Seieki/spe015:Seieki/spe015:Seieki/spe015:Seieki/spe015:Seieki/spe015:Seieki/spe015:Seieki/spe015", 766, 792, 760, 768, 0, 30, 0.4f, 0.4f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe003r:Seieki/spe006r:Seieki/spe007r:Seieki/spe008r:Seieki/spe009r:Seieki/spe011r:Seieki/spe014r", 255, 291, 778, 817, 330, 360, 0.5f, 0.5f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe003:Seieki/spe006:Seieki/spe007:Seieki/spe008:Seieki/spe009:Seieki/spe011:Seieki/spe014r", 771, 806, 778, 823, 0, 30, 0.5f, 0.5f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe003r:Seieki/spe006r:Seieki/spe007r:Seieki/spe008r:Seieki/spe009r:Seieki/spe011r:Seieki/spe014r", 263, 275, 850, 860, 330, 360, 0.4f, 0.4f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe003:Seieki/spe006:Seieki/spe007:Seieki/spe008:Seieki/spe009:Seieki/spe011:Seieki/spe014r", 749, 761, 850, 860, 0, 30, 0.4f, 0.4f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe004:Seieki/spe005r:Seieki/spe010r:Seieki/spe012:Seieki/spe013:Seieki/spe014", 215, 243, 836, 847, 0, 30, 0.4f, 0.4f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe004r:Seieki/spe005r:Seieki/spe010r:Seieki/spe012r:Seieki/spe013r:Seieki/spe014r", 257, 285, 828, 839, 330, 360, 0.4f, 0.4f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe003r:Seieki/spe006r:Seieki/spe007r:Seieki/spe008r:Seieki/spe009r:Seieki/spe011r:Seieki/spe014r", 218, 254, 778, 823, 330, 360, 0.5f, 0.5f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe007r:Seieki/spe013r:Seieki/spe015:Seieki/spe015:Seieki/spe015:Seieki/spe015:Seieki/spe015:Seieki/spe015:Seieki/spe015", 232, 258, 760, 768, 330, 360, 0.4f, 0.4f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe004r:Seieki/spe005:Seieki/spe010:Seieki/spe012r:Seieki/spe013r:Seieki/spe014r", 781, 809, 836, 847, 360, 330, 0.4f, 0.4f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe004:Seieki/spe005:Seieki/spe010:Seieki/spe012:Seieki/spe013:Seieki/spe014", 739, 767, 828, 839, 0, 30, 0.4f, 0.4f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe003:Seieki/spe006:Seieki/spe007:Seieki/spe008:Seieki/spe009:Seieki/spe011:Seieki/spe014r", 733, 769, 778, 817, 0, 30, 0.5f, 0.5f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe007:Seieki/spe013:Seieki/spe015:Seieki/spe015:Seieki/spe015:Seieki/spe015:Seieki/spe015:Seieki/spe015:Seieki/spe015", 766, 792, 760, 768, 0, 30, 0.4f, 0.4f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe003r:Seieki/spe006r:Seieki/spe007r:Seieki/spe008r:Seieki/spe009r:Seieki/spe011r:Seieki/spe014r", 255, 291, 778, 817, 330, 360, 0.5f, 0.5f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe003:Seieki/spe006:Seieki/spe007:Seieki/spe008:Seieki/spe009:Seieki/spe011:Seieki/spe014r", 771, 806, 778, 823, 0, 30, 0.5f, 0.5f),
+        };
+
+        private static readonly List<SeiekiInfo> HaraMarks = new List<SeiekiInfo>(){
+            new SeiekiInfo("body", 0, 18, "Seieki/spe004:Seieki/spe004r:Seieki/spe005:Seieki/spe005r:Seieki/spe010:Seieki/spe010r:Seieki/spe012:Seieki/spe012r:Seieki/spe013:Seieki/spe013r", 466, 558, 712, 774, 350, 370, 1.0f, 1.0f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe007:Seieki/spe008:Seieki/spe009:Seieki/spe011:Seieki/spe014", 458, 489, 735, 801, 350, 370, 0.7f, 0.7f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe007:Seieki/spe008:Seieki/spe009:Seieki/spe011:Seieki/spe014", 412, 441, 722, 774, 350, 370, 0.7f, 0.7f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe007:Seieki/spe008:Seieki/spe009:Seieki/spe011:Seieki/spe014", 455, 482, 663, 705, 350, 370, 0.7f, 0.7f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe002:Seieki/spe002r:Seieki/spe007:Seieki/spe007r:Seieki/spe013:Seieki/spe013r", 466, 558, 808, 821, 350, 370, 0.6f, 0.6f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe007r:Seieki/spe008r:Seieki/spe009r:Seieki/spe011r:Seieki/spe014r", 535, 566, 735, 801, 350, 370, 0.7f, 0.7f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe007r:Seieki/spe008r:Seieki/spe009r:Seieki/spe011r:Seieki/spe014r", 583, 612, 722, 774, 350, 370, 0.7f, 0.7f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe007r:Seieki/spe008r:Seieki/spe009r:Seieki/spe011r:Seieki/spe014r", 542, 569, 663, 705, 350, 370, 0.7f, 0.7f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe001r:Seieki/spe002:Seieki/spe002r:Seieki/spe007:Seieki/spe007r:Seieki/spe008:Seieki/spe008r:Seieki/spe009:Seieki/spe009r:Seieki/spe011:Seieki/spe011r:Seieki/spe014:Seieki/spe014r", 501, 523, 655, 694, 350, 370, 0.7f, 0.7f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe007:Seieki/spe008:Seieki/spe009:Seieki/spe011:Seieki/spe014", 472, 494, 609, 648, 350, 370, 0.7f, 0.7f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe007r:Seieki/spe008r:Seieki/spe009r:Seieki/spe011r:Seieki/spe014r", 530, 552, 609, 648, 350, 370, 0.7f, 0.7f),
+        };
+
+        private static readonly List<SeiekiInfo> HutomomoMarks = new List<SeiekiInfo>(){
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe003:Seieki/spe007:Seieki/spe009:Seieki/spe014", 97, 110, 73, 124, 0, 10, 0.6f, 0.6f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe003:Seieki/spe006:Seieki/spe007:Seieki/spe008:Seieki/spe009:Seieki/spe011:Seieki/spe013:Seieki/spe014", 117, 130, 68, 119, 350, 360, 0.6f, 0.6f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe003r:Seieki/spe006r:Seieki/spe007r:Seieki/spe008r:Seieki/spe009r:Seieki/spe011r:Seieki/spe013r:Seieki/spe014r", 137, 150, 68, 119, 350, 370, 0.6f, 0.6f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe003r:Seieki/spe006r:Seieki/spe007r:Seieki/spe008r:Seieki/spe009r:Seieki/spe011r:Seieki/spe013r:Seieki/spe014r", 159, 172, 75, 126, 0, 10, 0.6f, 0.6f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe003r:Seieki/spe007r:Seieki/spe009r:Seieki/spe014r", 179, 192, 65, 116, 0, 10, 0.6f, 0.6f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe003:Seieki/spe007:Seieki/spe009:Seieki/spe014", 114, 127, 127, 178, 0, 10, 0.6f, 0.6f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe003:Seieki/spe006:Seieki/spe007:Seieki/spe008:Seieki/spe009:Seieki/spe014", 137, 150, 136, 187, 355, 360, 0.7f, 0.7f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe003r:Seieki/spe006r:Seieki/spe007r:Seieki/spe008r:Seieki/spe009r:Seieki/spe011r:Seieki/spe013r:Seieki/spe014r", 157, 170, 134, 182, 0, 10, 0.6f, 0.6f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe003:Seieki/spe007:Seieki/spe009:Seieki/spe014", 121, 134, 184, 235, 10, 25, 0.6f, 0.6f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe003:Seieki/spe006:Seieki/spe007:Seieki/spe008:Seieki/spe009:Seieki/spe014", 148, 161, 190, 241, 10, 20, 0.6f, 0.6f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe003r:Seieki/spe006r:Seieki/spe007r:Seieki/spe008r:Seieki/spe009r:Seieki/spe011r:Seieki/spe013r:Seieki/spe014r", 173, 186, 178, 229, 10, 20, 0.6f, 0.6f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe003:Seieki/spe007:Seieki/spe009:Seieki/spe014", 134, 147, 249, 287, 350, 360, 0.5f, 0.5f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe003r:Seieki/spe006r:Seieki/spe007r:Seieki/spe008r:Seieki/spe009r:Seieki/spe014r", 163, 176, 249, 287, 10, 20, 0.5f, 0.5f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe003r:Seieki/spe007r:Seieki/spe009r:Seieki/spe014r", 190, 201, 129, 170, 0, 10, 0.6f, 0.6f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe003:Seieki/spe007:Seieki/spe008:Seieki/spe009:Seieki/spe014", 230, 243, 44, 95, 350, 370, 0.5f, 0.5f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe007:Seieki/spe008:Seieki/spe014", 258, 277, 34, 74, 340, 360, 0.5f, 0.5f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe007:Seieki/spe008:Seieki/spe014", 255, 268, 80, 122, 350, 370, 0.5f, 0.5f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe007:Seieki/spe008:Seieki/spe014", 267, 280, 125, 152, 350, 370, 0.5f, 0.5f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe003:Seieki/spe007:Seieki/spe008:Seieki/spe009:Seieki/spe014", 239, 248, 113, 142, 350, 370, 0.5f, 0.5f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe003:Seieki/spe008:Seieki/spe009:Seieki/spe014", 253, 261, 151, 181, 350, 370, 0.5f, 0.5f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe003:Seieki/spe007:Seieki/spe008:Seieki/spe009:Seieki/spe014", 225, 231, 125, 147, 350, 370, 0.5f, 0.5f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe008:Seieki/spe014", 266, 285, 175, 213, 350, 370, 0.5f, 0.5f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe007:Seieki/spe008:Seieki/spe014", 246, 259, 211, 247, 350, 370, 0.5f, 0.5f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe007:Seieki/spe008:Seieki/spe014", 22, 29, 66, 122, 340, 360, 0.5f, 0.5f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe003r:Seieki/spe007r:Seieki/spe009r:Seieki/spe014r", 914, 927, 73, 124, 350, 360, 0.6f, 0.6f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe003r:Seieki/spe006r:Seieki/spe007r:Seieki/spe008r:Seieki/spe009r:Seieki/spe011r:Seieki/spe013r:Seieki/spe014r", 894, 907, 68, 119, 0, 10, 0.6f, 0.6f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe003:Seieki/spe006:Seieki/spe007:Seieki/spe008:Seieki/spe009:Seieki/spe011:Seieki/spe013r:Seieki/spe014", 874, 887, 68, 119, 350, 370, 0.6f, 0.6f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe003:Seieki/spe006:Seieki/spe007:Seieki/spe008:Seieki/spe009:Seieki/spe011:Seieki/spe013:Seieki/spe014", 852, 865, 75, 126, 350, 360, 0.6f, 0.6f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe003:Seieki/spe007:Seieki/spe009:Seieki/spe014", 832, 845, 65, 116, 350, 360, 0.6f, 0.6f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe003r:Seieki/spe007r:Seieki/spe009r:Seieki/spe014r", 897, 910, 127, 178, 350, 360, 0.6f, 0.6f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe003r:Seieki/spe006r:Seieki/spe007r:Seieki/spe008r:Seieki/spe009r:Seieki/spe014r", 874, 887, 136, 187, 0, 5, 0.7f, 0.7f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe003:Seieki/spe006:Seieki/spe007:Seieki/spe008:Seieki/spe009:Seieki/spe011:Seieki/spe013:Seieki/spe014", 854, 867, 134, 182, 350, 360, 0.6f, 0.6f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe003r:Seieki/spe007r:Seieki/spe009r:Seieki/spe014r", 890, 903, 184, 235, 335, 350, 0.6f, 0.6f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe003r:Seieki/spe006r:Seieki/spe007r:Seieki/spe008r:Seieki/spe009r:Seieki/spe014r", 863, 876, 190, 241, 340, 350, 0.6f, 0.6f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe003:Seieki/spe006:Seieki/spe007:Seieki/spe008:Seieki/spe009:Seieki/spe011:Seieki/spe013:Seieki/spe014", 838, 851, 178, 229, 340, 350, 0.6f, 0.6f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe003r:Seieki/spe007r:Seieki/spe009r:Seieki/spe014r", 877, 890, 249, 287, 0, 10, 0.5f, 0.5f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe003:Seieki/spe006:Seieki/spe007:Seieki/spe008:Seieki/spe009:Seieki/spe014", 848, 861, 249, 287, 340, 350, 0.5f, 0.5f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe003:Seieki/spe007:Seieki/spe009:Seieki/spe014", 823, 834, 129, 170, 350, 360, 0.6f, 0.6f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe003r:Seieki/spe007r:Seieki/spe008r:Seieki/spe009r:Seieki/spe014r", 781, 794, 44, 95, 350, 370, 0.5f, 0.5f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe007r:Seieki/spe008r:Seieki/spe014r", 747, 766, 34, 74, 0, 20, 0.5f, 0.5f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe007r:Seieki/spe008r:Seieki/spe014r", 756, 769, 80, 122, 350, 370, 0.5f, 0.5f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe007r:Seieki/spe008r:Seieki/spe014r", 744, 757, 125, 152, 350, 370, 0.5f, 0.5f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe003r:Seieki/spe007r:Seieki/spe008r:Seieki/spe009r:Seieki/spe014r", 776, 785, 113, 142, 350, 370, 0.5f, 0.5f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe003r:Seieki/spe008r:Seieki/spe009r:Seieki/spe014r", 763, 771, 151, 181, 350, 370, 0.5f, 0.5f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe003r:Seieki/spe007r:Seieki/spe008r:Seieki/spe009r:Seieki/spe014r", 793, 799, 125, 147, 350, 370, 0.5f, 0.5f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe008r:Seieki/spe014r", 739, 785, 175, 213, 350, 370, 0.5f, 0.5f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe007r:Seieki/spe008r:Seieki/spe014r", 765, 778, 211, 247, 350, 370, 0.5f, 0.5f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe007r:Seieki/spe008r:Seieki/spe014r", 995, 1002, 66, 122, 0, 20, 0.5f, 0.5f),
+        };
+
+        private static readonly List<SeiekiInfo> HibuMarks = new List<SeiekiInfo>(){
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe009:Seieki/spe014", 472, 497, 874, 921, 355, 365, 0.5f, 0.5f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe009r:Seieki/spe014r", 527, 552, 874, 921, 355, 365, 0.5f, 0.5f),
+            new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe001r:Seieki/spe002:Seieki/spe002r:Seieki/spe009:Seieki/spe009r:Seieki/spe014:Seieki/spe014r", 503, 520, 866, 906, 355, 365, 0.5f, 0.5f),
+        };
+        
+        private void EffectSeieki(int maidID, string marks){
+          
+          int random;
+          SeiekiInfo info = null;
+          Maid maid = stockMaids[maidID].mem;
+          
+          switch(marks){
+              case "顔":
+                   random = UnityEngine.Random.Range(0, KaoMarks.Count);
+                   info = KaoMarks[random];
+                   break;
+
+              case "胸":
+                   random = UnityEngine.Random.Range(0, MuneMarks.Count);
+                   info = MuneMarks[random];
+                   break;
+
+              case "口元":
+                   random = UnityEngine.Random.Range(0, KuchimotoMarks.Count);
+                   info = KuchimotoMarks[random];
+                   break;
+
+              case "背中":
+                   random = UnityEngine.Random.Range(0, SenakaMarks.Count);
+                   info = SenakaMarks[random];
+                   break;
+
+              case "尻":
+                   random = UnityEngine.Random.Range(0, SiriMarks.Count);
+                   info = SiriMarks[random];
+                   break;
+
+              case "腹":
+                   random = UnityEngine.Random.Range(0, HaraMarks.Count);
+                   info = HaraMarks[random];
+                   break;
+
+              case "太股":
+                   random = UnityEngine.Random.Range(0, HutomomoMarks.Count);
+                   info = HutomomoMarks[random];
+                   break;
+
+              case "秘部":
+                   random = UnityEngine.Random.Range(0, HibuMarks.Count);
+                   info = HibuMarks[random];
+                   break;
+                   
+              default:
+                   return;
+          }
 
 
         private void EffectSeieki(int maidID, string marks)
@@ -5292,42 +8006,48 @@ namespace CM3D2.VibeYourMaid.Plugin
         }
 
 
-        //汗かき処理
-        private void EffectAse(int maidID)
-        {
+
+        //汗かき処理 0.5秒ごとに実行
+        private void EffectAse(int maidID){
+
+                      if (maidsState[maidID].aseTime >= Time.time) return;
+          maidsState[maidID].aseTime = Time.time + 0.5f; //0.5秒後
 
             Maid maid = stockMaids[maidID].mem;
 
-            if (!cfgw.aseAnimeEnabled)
-            {
-                if (maidsState[maidID].aseResetFlag)
-                {
-                    try { VertexMorph_FromProcItem(maid.body0, "dry", 0f); } catch { /*LogError(ex);*/ }
-                    try { VertexMorph_FromProcItem(maid.body0, "swet", 0f); } catch { /*LogError(ex);*/ }
-                    try { VertexMorph_FromProcItem(maid.body0, "swet_tare", 0f); } catch { /*LogError(ex);*/ }
-                    maidsState[maidID].aseResetFlag = false;
-                }
-                return;
+          if (!cfgw.aseAnimeEnabled){
+            if(maidsState[maidID].aseResetFlag){
+              try { VertexMorph_FromProcItem(maid.body0, "dry", 1f); } catch { /*LogError(ex);*/ }
+              try { VertexMorph_FromProcItem(maid.body0, "swet", 0f); } catch { /*LogError(ex);*/ }
+              try { VertexMorph_FromProcItem(maid.body0, "swet_small", 0f); } catch { /*LogError(ex);*/ }
+              try { VertexMorph_FromProcItem(maid.body0, "swet_tare", 0f); } catch { /*LogError(ex);*/ }
+              try { VertexMorph_FromProcItem(maid.body0, "swet_big", 0f); } catch { /*LogError(ex);*/ }
+              maidsState[maidID].aseResetFlag = false;
             }
-            //if(maidsState[maidID].vStateMajor == 10)return;
-
-            float aseValue1;
-            float aseValue2;
-            float aseValue3;
-
-            aseValue1 = (float)Math.Floor(110 - ((maidsState[maidID].boostValue * 2) + (maidsState[maidID].exciteValue / 360)));
-            aseValue2 = (float)Math.Floor((3000 - maidsState[maidID].maidStamina) / 100);
-            aseValue3 = (float)Math.Floor(maidsState[maidID].orgasmValue / 3);
-            if (lifeStart > 0 && (bgID == 11 || bgID == 22 || bgID == 23) && aseValue1 > 20) aseValue1 = 20;
-            if (aseValue1 < 0) aseValue1 = 0;
-            if (aseValue1 > 100) aseValue1 = 100;
-
-            try { VertexMorph_FromProcItem(maid.body0, "dry", aseValue1 / 100f); } catch { /*LogError(ex);*/ }
-            try { VertexMorph_FromProcItem(maid.body0, "swet", aseValue2 / 100f); } catch { /*LogError(ex);*/ }
-            try { VertexMorph_FromProcItem(maid.body0, "swet_tare", aseValue3 / 100f); } catch { /*LogError(ex);*/ }
-
-            if (!maidsState[maidID].aseResetFlag) maidsState[maidID].aseResetFlag = true;
-            //maidsState[maidID].aseTime = UnityEngine.Random.Range(5, 10);
+            return;
+          }
+          //if(maidsState[maidID].vStateMajor == 10)return;
+          
+          //aseValue1 = (float)Math.Floor(110 - ((maidsState[maidID].boostValue * 2) + (maidsState[maidID].exciteValue / 360)));
+          //dryが0だと大きすぎるので30程度になるように調整 boostValue:0～50 exciteValue:0～18000
+          float aseValue1 = (float)Math.Floor(101 - ((maidsState[maidID].boostValue * 0.6f) + (maidsState[maidID].exciteValue / 450)));
+          float aseValue2 = (float)Math.Floor(Math.Sqrt((3000 - maidsState[maidID].maidStamina) / 30f)*10f); //低い時の上昇量を上げる
+          float aseValue3 = (float)Math.Floor(maidsState[maidID].orgasmValue);
+          if(lifeStart > 0 && (bgID == 11 || bgID == 22 || bgID == 23) && aseValue1 > 20)aseValue1 = 20;
+          aseValue1 = Math.Min(100, Math.Max(30, aseValue1)); //最小30に制限
+          aseValue2 = Math.Min(100, Math.Max(0, aseValue2));
+          aseValue3 = Math.Min(100, Math.Max(0, aseValue3));
+          //#if DEBUG
+          //Console.WriteLine("["+maidID+"] aseValue1="+aseValue1+" aseValue2="+aseValue2+" aseValue3="+aseValue3);
+          //#endif
+          try { VertexMorph_FromProcItem(maid.body0, "dry", aseValue1/100f); } catch { /*LogError(ex);*/ }
+          try { VertexMorph_FromProcItem(maid.body0, "swet", aseValue2/100f * cfgw.aseSwet); } catch { /*LogError(ex);*/ }
+          try { VertexMorph_FromProcItem(maid.body0, "swet_small", aseValue2/100f * cfgw.aseSwet); } catch { /*LogError(ex);*/ } //swetに連動させる
+          try { VertexMorph_FromProcItem(maid.body0, "swet_tare", aseValue3/100f * cfgw.aseSwetTare); } catch { /*LogError(ex);*/ }
+          try { VertexMorph_FromProcItem(maid.body0, "swet_big", aseValue3/100f * cfgw.aseSwetBig); } catch { /*LogError(ex);*/ }
+          
+          if(!maidsState[maidID].aseResetFlag)maidsState[maidID].aseResetFlag = true;
+          //maidsState[maidID].aseTime = UnityEngine.Random.Range(5, 10);
         }
 
 
@@ -5402,20 +8122,21 @@ namespace CM3D2.VibeYourMaid.Plugin
                     if (maidsState[maidID].hibuValue < 0) maidsState[maidID].hibuValue = 0;
                 }
                 hValue = maidsState[maidID].hibuValue + maidsState[maidID].kupaWaveValue / 100f * cfgw.kupaWave;
-                if (maidID == osawariID && osawariPoint == "vagina") hValue = maidsState[maidID].hibuValue + Move_atp_y * 20f; //お触り時の処理
+            hValue = maidsState[maidID].hibuValue + Math.Max(0, osawari.getMoveAtpY(maidID, "VA_")) * 20f; //お触り時の処理
 
                 if (maidsState[maidID].analValue < analSlider1Value)
                 {
                     maidsState[maidID].analValue += 2f * sp;
                     if (maidsState[maidID].analValue > analSlider1Value) maidsState[maidID].analValue = analSlider1Value;
                 }
+                            if (!osawari.isOsawari(maidID, "AN_")) { //お触り時はスライダーに併せて縮めない
                 if (maidsState[maidID].analValue > analSlider1Value)
                 {
                     maidsState[maidID].analValue -= 0.7f * sp;
                     if (maidsState[maidID].analValue < analSlider1Value) maidsState[maidID].analValue = analSlider1Value;
                 }
                 aValue = maidsState[maidID].analValue + maidsState[maidID].kupaWaveValue / 100f * cfgw.kupaWave;
-                if (maidID == osawariID && osawariPoint == "anal") aValue = maidsState[maidID].analValue + Move_atp_y * 15f; //お触り時の処理
+                aValue = maidsState[maidID].analValue + Math.Max(0, osawari.getMoveAtpY(maidID, "AN_")) * 30f; //お触り時の処理 初期値-15f分を加算
 
                 if (maidsState[maidID].pikuFlag) pikuValue2 = UnityEngine.Random.Range(0, 20);
                 uValue = maidsState[maidID].hibuValue / 2 + maidsState[maidID].kupaWaveValue / 100f * cfgw.kupaWave + pikuValue2;
@@ -5436,18 +8157,16 @@ namespace CM3D2.VibeYourMaid.Plugin
                         maidsState[maidID].hibuValue += 2f * sp;
                         if (maidsState[maidID].hibuValue > hibuSlider2Value) maidsState[maidID].hibuValue = hibuSlider2Value;
                     }
-                }
-                else
-                {
-                    if (maidsState[maidID].hibuValue > 0f) maidsState[maidID].hibuValue -= 0.7f * sp;
-                    if (maidsState[maidID].hibuValue < 0f) maidsState[maidID].hibuValue = 0f;
-                }
-
-                if (maidsState[maidID].analValue > analSlider2Value)
-                {
-                    maidsState[maidID].analValue -= 0.7f * sp;
-                    if (maidsState[maidID].analValue < analSlider2Value) maidsState[maidID].analValue = analSlider2Value;
-                }
+                                }else{
+              if(maidsState[maidID].hibuValue > 0f)maidsState[maidID].hibuValue -= 0.7f * sp;
+              if(maidsState[maidID].hibuValue < 0f)maidsState[maidID].hibuValue = 0f;
+            }
+            if (!osawari.isOsawari(maidID, "AN_")) { //お触り時はスライダーに併せて縮めない
+            if(maidsState[maidID].analValue > analSlider2Value){
+                              maidsState[maidID].analValue -= 0.7f * sp;
+              if(maidsState[maidID].analValue < analSlider2Value)maidsState[maidID].analValue = analSlider2Value;
+            }
+            }
                 if (maidsState[maidID].analValue < analSlider2Value)
                 {
                     maidsState[maidID].analValue += 2f * sp;
@@ -5459,21 +8178,21 @@ namespace CM3D2.VibeYourMaid.Plugin
                     pikuValue = UnityEngine.Random.Range(0, 5);
                     pikuValue2 = UnityEngine.Random.Range(0, 20);
                 }
-                hValue = maidsState[maidID].hibuValue + pikuValue;
-                if (maidID == osawariID && osawariPoint == "vagina") hValue = maidsState[maidID].hibuValue + Move_atp_y * 20f; //お触り時の処理
-
-                aValue = maidsState[maidID].analValue + pikuValue;
-                if (maidID == osawariID && osawariPoint == "anal") aValue = maidsState[maidID].analValue + Move_atp_y * 15f; //お触り時の処理
-                uValue = maidsState[maidID].hibuValue / 2 + pikuValue2;
-
-            }
-
-            try { VertexMorph_FromProcItem(maid.body0, "kupa", hValue / 100f); } catch { /*LogError(ex);*/ }
-            try { VertexMorph_FromProcItem(maid.body0, "analkupa", aValue / 100f); } catch { /*LogError(ex);*/ }
-            try { VertexMorph_FromProcItem(maid.body0, "pussy_uterus_piku", uValue / 100f); } catch { /*LogError(ex);*/ }
-
+            hValue = maidsState[maidID].hibuValue + pikuValue;
+            hValue = maidsState[maidID].hibuValue + Math.Max(0, osawari.getMoveAtpY(maidID, "VA_")) * 20f; //お触り時の処理
+            
+            aValue = maidsState[maidID].analValue + pikuValue;
+            aValue = maidsState[maidID].analValue + Math.Max(0, osawari.getMoveAtpY(maidID, "AN_")) * 30f; //お触り時の処理 初期値-15f分を加算
+            
+            uValue = maidsState[maidID].hibuValue / 2 + pikuValue2;
+            
+          }
+          
+          try { VertexMorph_FromProcItem(maid.body0, "kupa", hValue/100f); } catch { /*LogError(ex);*/ }
+          try { VertexMorph_FromProcItem(maid.body0, "analkupa", aValue/100f); } catch { /*LogError(ex);*/ }
+          try { VertexMorph_FromProcItem(maid.body0, "pussy_uterus_piku", uValue/100f); } catch { /*LogError(ex);*/ }
+          
         }
-
 
         //子宮脱アニメ処理
         private void EffectUterusDatsu(int maidID)
@@ -5879,27 +8598,27 @@ namespace CM3D2.VibeYourMaid.Plugin
                 ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "chikubiEnabled", "0", true);
             }
 
-            ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "tits_chikubi_def[" + cv + "]", maidsState[maidID].tits_chikubi_def[cv].ToString(), true);
-            ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "tits_chikubi_perky[" + cv + "]", maidsState[maidID].tits_chikubi_perky[cv].ToString(), true);
-            ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "tits_chikubi_cow[" + cv + "]", maidsState[maidID].tits_chikubi_cow[cv].ToString(), true);
-            ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "tits_chikubi_observe[" + cv + "]", maidsState[maidID].tits_chikubi_observe[cv].ToString(), true);
-            ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "tits_chikubi_wide[" + cv + "]", maidsState[maidID].tits_chikubi_wide[cv].ToString(), true);
-            ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "tits_chikubi_ultralong[" + cv + "]", maidsState[maidID].tits_chikubi_ultralong[cv].ToString(), true);
-            ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "tits_chikubi_ultrawide[" + cv + "]", maidsState[maidID].tits_chikubi_ultrawide[cv].ToString(), true);
-            ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "tits_chikubi_ultratare[" + cv + "]", maidsState[maidID].tits_chikubi_ultratare[cv].ToString(), true);
-            ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "tits_chikubi_kanbotsu_n[" + cv + "]", maidsState[maidID].tits_chikubi_kanbotsu_n[cv].ToString(), true);
-            ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "tits_chikubi_kanbotsu_s[" + cv + "]", maidsState[maidID].tits_chikubi_kanbotsu_s[cv].ToString(), true);
-            ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "tits_chikubi_kanbotsu_p[" + cv + "]", maidsState[maidID].tits_chikubi_kanbotsu_p[cv].ToString(), true);
-            ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "tits_nipple_def[" + cv + "]", maidsState[maidID].tits_nipple_def[cv].ToString(), true);
-            ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "tits_nipple_perky1[" + cv + "]", maidsState[maidID].tits_nipple_perky1[cv].ToString(), true);
-            ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "tits_nipple_perky2[" + cv + "]", maidsState[maidID].tits_nipple_perky2[cv].ToString(), true);
-            ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "tits_nipple_long1[" + cv + "]", maidsState[maidID].tits_nipple_long1[cv].ToString(), true);
-            ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "tits_nipple_long2[" + cv + "]", maidsState[maidID].tits_nipple_long2[cv].ToString(), true);
-            ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "tits_nipple_wide[" + cv + "]", maidsState[maidID].tits_nipple_wide[cv].ToString(), true);
-            ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "tits_nipple_puffy[" + cv + "]", maidsState[maidID].tits_nipple_puffy[cv].ToString(), true);
-            ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "tits_nipple_kupa[" + cv + "]", maidsState[maidID].tits_nipple_kupa[cv].ToString(), true);
-            ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "tits_munel_chippai[" + cv + "]", maidsState[maidID].tits_munel_chippai[cv].ToString(), true);
-
+          ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "tits_chikubi_def[" + cv + "]" , maidsState[maidID].tits_chikubi_def[cv].ToString(), true);
+          ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "tits_chikubi_perky[" + cv + "]" , maidsState[maidID].tits_chikubi_perky[cv].ToString(), true);
+          ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "tits_chikubi_cow[" + cv + "]" , maidsState[maidID].tits_chikubi_cow[cv].ToString(), true);
+          ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "tits_chikubi_observe[" + cv + "]" , maidsState[maidID].tits_chikubi_observe[cv].ToString(), true);
+          ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "tits_chikubi_wide[" + cv + "]" , maidsState[maidID].tits_chikubi_wide[cv].ToString(), true);
+          ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "tits_chikubi_ultralong[" + cv + "]" , maidsState[maidID].tits_chikubi_ultralong[cv].ToString(), true);
+          ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "tits_chikubi_ultrawide[" + cv + "]" , maidsState[maidID].tits_chikubi_ultrawide[cv].ToString(), true);
+          ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "tits_chikubi_ultratare[" + cv + "]" , maidsState[maidID].tits_chikubi_ultratare[cv].ToString(), true);
+          ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "tits_chikubi_kanbotsu_n[" + cv + "]" , maidsState[maidID].tits_chikubi_kanbotsu_n[cv].ToString(), true);
+          ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "tits_chikubi_kanbotsu_s[" + cv + "]" , maidsState[maidID].tits_chikubi_kanbotsu_s[cv].ToString(), true);
+          ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "tits_chikubi_kanbotsu_p[" + cv + "]" , maidsState[maidID].tits_chikubi_kanbotsu_p[cv].ToString(), true);
+          ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "tits_nipple_def[" + cv + "]" , maidsState[maidID].tits_nipple_def[cv].ToString(), true);
+          ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "tits_nipple_perky1[" + cv + "]" , maidsState[maidID].tits_nipple_perky1[cv].ToString(), true);
+          ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "tits_nipple_perky2[" + cv + "]" , maidsState[maidID].tits_nipple_perky2[cv].ToString(), true);
+          ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "tits_nipple_long1[" + cv + "]" , maidsState[maidID].tits_nipple_long1[cv].ToString(), true);
+          ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "tits_nipple_long2[" + cv + "]" , maidsState[maidID].tits_nipple_long2[cv].ToString(), true);
+          ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "tits_nipple_wide[" + cv + "]" , maidsState[maidID].tits_nipple_wide[cv].ToString(), true);
+          ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "tits_nipple_puffy[" + cv + "]" , maidsState[maidID].tits_nipple_puffy[cv].ToString(), true);
+          ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "tits_nipple_kupa[" + cv + "]" , maidsState[maidID].tits_nipple_kupa[cv].ToString(), true);
+          ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "tits_munel_chippai[" + cv + "]" , maidsState[maidID].tits_munel_chippai[cv].ToString(), true);
+        
         }
 
         // 乳首設定の読込
@@ -6432,12 +9151,15 @@ namespace CM3D2.VibeYourMaid.Plugin
 
 
         //基本ボイスセットの保存・読み込み
+                //画面からの変更はないのでファイルが存在しない場合のみ保存
         private void BvsFileSave()
         {
 
             for (int i = 0; i < personalList[1].Length; i++)
             {
                 string fileName = @"Sybaris\UnityInjector\Config\VibeYourMaid\BasicVoiseSet\bvs_" + i.ToString("d2") + personalList[1][i] + ".xml";  //保存先のファイル名
+                            //ファイルが存在したら書き込みしない
+            if (System.IO.File.Exists(fileName)) continue;
 
                 System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(BasicVoiceSet));  //XmlSerializerオブジェクトを作成。オブジェクトの型を指定する
 
@@ -6774,54 +9496,54 @@ namespace CM3D2.VibeYourMaid.Plugin
             }
 
             //現在の衣装データを読み込み
-            if (setAcchat) cds.acchat = maid.GetProp(MPN.acchat).strFileName;
-            if (setHeadset) cds.headset = maid.GetProp(MPN.headset).strFileName;
-            if (setWear) cds.wear = maid.GetProp(MPN.wear).strFileName;
-            if (setSkirt) cds.skirt = maid.GetProp(MPN.skirt).strFileName;
-            if (setOnepiece) cds.onepiece = maid.GetProp(MPN.onepiece).strFileName;
-            if (setMizugi) cds.mizugi = maid.GetProp(MPN.mizugi).strFileName;
-            if (setBra) cds.bra = maid.GetProp(MPN.bra).strFileName;
-            if (setPanz) cds.panz = maid.GetProp(MPN.panz).strFileName;
-            if (setStkg) cds.stkg = maid.GetProp(MPN.stkg).strFileName;
-            if (setShoes) cds.shoes = maid.GetProp(MPN.shoes).strFileName;
-            if (setMegane) cds.megane = maid.GetProp(MPN.megane).strFileName;
-            if (setAcchead) cds.acchead = maid.GetProp(MPN.acchead).strFileName;
-            if (setGlove) cds.glove = maid.GetProp(MPN.glove).strFileName;
-            if (setAccude) cds.accude = maid.GetProp(MPN.accude).strFileName;
-            if (setAcchana) cds.acchana = maid.GetProp(MPN.acchana).strFileName;
-            if (setAccmimi) cds.accmimi = maid.GetProp(MPN.accmimi).strFileName;
-            if (setAccnip) cds.accnip = maid.GetProp(MPN.accnip).strFileName;
-            if (setAcckubi) cds.acckubi = maid.GetProp(MPN.acckubi).strFileName;
-            if (setAcckubiwa) cds.acckubiwa = maid.GetProp(MPN.acckubiwa).strFileName;
-            if (setAccheso) cds.accheso = maid.GetProp(MPN.accheso).strFileName;
-            if (setAccashi) cds.accashi = maid.GetProp(MPN.accashi).strFileName;
-            if (setAccsenaka) cds.accsenaka = maid.GetProp(MPN.accsenaka).strFileName;
-            if (setAccshippo) cds.accshippo = maid.GetProp(MPN.accshippo).strFileName;
-            if (setAccxxx) cds.accxxx = maid.GetProp(MPN.accxxx).strFileName;
-            if (!setAcchat) cds.acchat = "";
-            if (!setHeadset) cds.headset = "";
-            if (!setWear) cds.wear = "";
-            if (!setSkirt) cds.skirt = "";
-            if (!setOnepiece) cds.onepiece = "";
-            if (!setMizugi) cds.mizugi = "";
-            if (!setBra) cds.bra = "";
-            if (!setPanz) cds.panz = "";
-            if (!setStkg) cds.stkg = "";
-            if (!setShoes) cds.shoes = "";
-            if (!setMegane) cds.megane = "";
-            if (!setAcchead) cds.acchead = "";
-            if (!setGlove) cds.glove = "";
-            if (!setAccude) cds.accude = "";
-            if (!setAcchana) cds.acchana = "";
-            if (!setAccmimi) cds.accmimi = "";
-            if (!setAccnip) cds.accnip = "";
-            if (!setAcckubi) cds.acckubi = "";
-            if (!setAcckubiwa) cds.acckubiwa = "";
-            if (!setAccheso) cds.accheso = "";
-            if (!setAccashi) cds.accashi = "";
-            if (!setAccsenaka) cds.accsenaka = "";
-            if (!setAccshippo) cds.accshippo = "";
-            if (!setAccxxx) cds.accxxx = "";
+            if(setAcchat)cds.acchat = maid.GetProp(MPN.acchat).strFileName;
+            if(setHeadset)cds.headset = maid.GetProp(MPN.headset).strFileName;
+            if(setWear)cds.wear = maid.GetProp(MPN.wear).strFileName;
+            if(setSkirt)cds.skirt = maid.GetProp(MPN.skirt).strFileName;
+            if(setOnepiece)cds.onepiece = maid.GetProp(MPN.onepiece).strFileName;
+            if(setMizugi)cds.mizugi = maid.GetProp(MPN.mizugi).strFileName;
+            if(setBra)cds.bra = maid.GetProp(MPN.bra).strFileName;
+            if(setPanz)cds.panz = maid.GetProp(MPN.panz).strFileName;
+            if(setStkg)cds.stkg = maid.GetProp(MPN.stkg).strFileName;
+            if(setShoes)cds.shoes = maid.GetProp(MPN.shoes).strFileName;
+            if(setMegane)cds.megane = maid.GetProp(MPN.megane).strFileName;
+            if(setAcchead)cds.acchead = maid.GetProp(MPN.acchead).strFileName;
+            if(setGlove)cds.glove = maid.GetProp(MPN.glove).strFileName;
+            if(setAccude)cds.accude = maid.GetProp(MPN.accude).strFileName;
+            if(setAcchana)cds.acchana = maid.GetProp(MPN.acchana).strFileName;
+            if(setAccmimi)cds.accmimi = maid.GetProp(MPN.accmimi).strFileName;
+            if(setAccnip)cds.accnip = maid.GetProp(MPN.accnip).strFileName;
+            if(setAcckubi)cds.acckubi = maid.GetProp(MPN.acckubi).strFileName;
+            if(setAcckubiwa)cds.acckubiwa = maid.GetProp(MPN.acckubiwa).strFileName;
+            if(setAccheso)cds.accheso = maid.GetProp(MPN.accheso).strFileName;
+            if(setAccashi)cds.accashi = maid.GetProp(MPN.accashi).strFileName;
+            if(setAccsenaka)cds.accsenaka = maid.GetProp(MPN.accsenaka).strFileName;
+            if(setAccshippo)cds.accshippo = maid.GetProp(MPN.accshippo).strFileName;
+            if(setAccxxx)cds.accxxx = maid.GetProp(MPN.accxxx).strFileName;
+            if(!setAcchat)cds.acchat = "";
+            if(!setHeadset)cds.headset = "";
+            if(!setWear)cds.wear = "";
+            if(!setSkirt)cds.skirt = "";
+            if(!setOnepiece)cds.onepiece = "";
+            if(!setMizugi)cds.mizugi = "";
+            if(!setBra)cds.bra = "";
+            if(!setPanz)cds.panz = "";
+            if(!setStkg)cds.stkg = "";
+            if(!setShoes)cds.shoes = "";
+            if(!setMegane)cds.megane = "";
+            if(!setAcchead)cds.acchead = "";
+            if(!setGlove)cds.glove = "";
+            if(!setAccude)cds.accude = "";
+            if(!setAcchana)cds.acchana = "";
+            if(!setAccmimi)cds.accmimi = "";
+            if(!setAccnip)cds.accnip = "";
+            if(!setAcckubi)cds.acckubi = "";
+            if(!setAcckubiwa)cds.acckubiwa = "";
+            if(!setAccheso)cds.accheso = "";
+            if(!setAccashi)cds.accashi = "";
+            if(!setAccsenaka)cds.accsenaka = "";
+            if(!setAccshippo)cds.accshippo = "";
+            if(!setAccxxx)cds.accxxx = "";
 
             System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(CommonDressSet));  //XmlSerializerオブジェクトを作成。オブジェクトの型を指定する
 
@@ -6849,30 +9571,30 @@ namespace CM3D2.VibeYourMaid.Plugin
 
             //衣装データを適用
             Maid maid = stockMaids[tgID].mem;
-            if (cds.acchat != "") maid.SetProp(MPN.acchat, cds.acchat, 0, true, false);
-            if (cds.headset != "") maid.SetProp(MPN.headset, cds.headset, 0, true, false);
-            if (cds.wear != "") maid.SetProp(MPN.wear, cds.wear, 0, true, false);
-            if (cds.skirt != "") maid.SetProp(MPN.skirt, cds.skirt, 0, true, false);
-            if (cds.onepiece != "") maid.SetProp(MPN.onepiece, cds.onepiece, 0, true, false);
-            if (cds.mizugi != "") maid.SetProp(MPN.mizugi, cds.mizugi, 0, true, false);
-            if (cds.bra != "") maid.SetProp(MPN.bra, cds.bra, 0, true, false);
-            if (cds.panz != "") maid.SetProp(MPN.panz, cds.panz, 0, true, false);
-            if (cds.stkg != "") maid.SetProp(MPN.stkg, cds.stkg, 0, true, false);
-            if (cds.shoes != "") maid.SetProp(MPN.shoes, cds.shoes, 0, true, false);
-            if (cds.megane != "") maid.SetProp(MPN.megane, cds.megane, 0, true, false);
-            if (cds.acchead != "") maid.SetProp(MPN.acchead, cds.acchead, 0, true, false);
-            if (cds.glove != "") maid.SetProp(MPN.glove, cds.glove, 0, true, false);
-            if (cds.accude != "") maid.SetProp(MPN.accude, cds.accude, 0, true, false);
-            if (cds.acchana != "") maid.SetProp(MPN.acchana, cds.acchana, 0, true, false);
-            if (cds.accmimi != "") maid.SetProp(MPN.accmimi, cds.accmimi, 0, true, false);
-            if (cds.accnip != "") maid.SetProp(MPN.accnip, cds.accnip, 0, true, false);
-            if (cds.acckubi != "") maid.SetProp(MPN.acckubi, cds.acckubi, 0, true, false);
-            if (cds.acckubiwa != "") maid.SetProp(MPN.acckubiwa, cds.acckubiwa, 0, true, false);
-            if (cds.accheso != "") maid.SetProp(MPN.accheso, cds.accheso, 0, true, false);
-            if (cds.accashi != "") maid.SetProp(MPN.accashi, cds.accashi, 0, true, false);
-            if (cds.accsenaka != "") maid.SetProp(MPN.accsenaka, cds.accsenaka, 0, true, false);
-            if (cds.accshippo != "") maid.SetProp(MPN.accshippo, cds.accshippo, 0, true, false);
-            if (cds.accxxx != "") maid.SetProp(MPN.accxxx, cds.accxxx, 0, true, false);
+            if(cds.acchat != "")maid.SetProp(MPN.acchat, cds.acchat, 0, true, false);
+            if(cds.headset != "")maid.SetProp(MPN.headset, cds.headset, 0, true, false);
+            if(cds.wear != "")maid.SetProp(MPN.wear, cds.wear, 0, true, false);
+            if(cds.skirt != "")maid.SetProp(MPN.skirt, cds.skirt, 0, true, false);
+            if(cds.onepiece != "")maid.SetProp(MPN.onepiece, cds.onepiece, 0, true, false);
+            if(cds.mizugi != "")maid.SetProp(MPN.mizugi, cds.mizugi, 0, true, false);
+            if(cds.bra != "")maid.SetProp(MPN.bra, cds.bra, 0, true, false);
+            if(cds.panz != "")maid.SetProp(MPN.panz, cds.panz, 0, true, false);
+            if(cds.stkg != "")maid.SetProp(MPN.stkg, cds.stkg, 0, true, false);
+            if(cds.shoes != "")maid.SetProp(MPN.shoes, cds.shoes, 0, true, false);
+            if(cds.megane != "")maid.SetProp(MPN.megane, cds.megane, 0, true, false);
+            if(cds.acchead != "")maid.SetProp(MPN.acchead, cds.acchead, 0, true, false);
+            if(cds.glove != "")maid.SetProp(MPN.glove, cds.glove, 0, true, false);
+            if(cds.accude != "")maid.SetProp(MPN.accude, cds.accude, 0, true, false);
+            if(cds.acchana != "")maid.SetProp(MPN.acchana, cds.acchana, 0, true, false);
+            if(cds.accmimi != "")maid.SetProp(MPN.accmimi, cds.accmimi, 0, true, false);
+            if(cds.accnip != "")maid.SetProp(MPN.accnip, cds.accnip, 0, true, false);
+            if(cds.acckubi != "")maid.SetProp(MPN.acckubi, cds.acckubi, 0, true, false);
+            if(cds.acckubiwa != "")maid.SetProp(MPN.acckubiwa, cds.acckubiwa, 0, true, false);
+            if(cds.accheso != "")maid.SetProp(MPN.accheso, cds.accheso, 0, true, false);
+            if(cds.accashi != "")maid.SetProp(MPN.accashi, cds.accashi, 0, true, false);
+            if(cds.accsenaka != "")maid.SetProp(MPN.accsenaka, cds.accsenaka, 0, true, false);
+            if(cds.accshippo != "")maid.SetProp(MPN.accshippo, cds.accshippo, 0, true, false);
+            if(cds.accxxx != "")maid.SetProp(MPN.accxxx, cds.accxxx, 0, true, false);
 
             AllDressVisible(tgID, true);
             maid.AllProcPropSeqStart();
@@ -7329,13 +10051,26 @@ namespace CM3D2.VibeYourMaid.Plugin
                 }
 
 
-                //　感度全開（デバッグ用）
-                if (Input.GetKeyDown(KeyCode.Z))
-                {
-                    maidsState[tgID].orgasmCount = 50;
-                    maidsState[tgID].boostValue = 50;
-                    Console.WriteLine("感度全開");
-                }
+                // //　感度全開（デバッグ用）
+                // if (Input.GetKeyDown(KeyCode.Z))
+                // {
+                //     maidsState[tgID].orgasmCount = 50;
+                //     maidsState[tgID].boostValue = 50;
+                //     Console.WriteLine("感度全開");
+                // }
+            //　感度全開（デバッグ用）
+            if(Input.GetKeyDown(KeyCode.Z)) {
+              if (maidsState[tgID].exciteValue < 12000) maidsState[tgID].exciteValue = 12000;
+              if (maidsState[tgID].orgasmValue < 80) maidsState[tgID].orgasmValue = 80;
+              maidsState[tgID].boostValue = 50;
+              maidsState[tgID].maidStamina = Math.Max(0, maidsState[tgID].maidStamina-500);
+              #if DEBUG
+              maidsState[tgID].orgasmCount += 1;
+              maidsState[tgID].orgasmCmb += 1;
+              maidsState[tgID].orgasmHoldTime = 600;
+              #endif
+              Console.WriteLine("感度全開 : スタミナ="+maidsState[tgID].maidStamina);
+            }
 
 
                 //　GUI表示の切り替え
@@ -7618,10 +10353,15 @@ namespace CM3D2.VibeYourMaid.Plugin
                     lookTime -= timerRate;
                 }
             }
-            var maidTm = maidsState[maidID].maidMune.transform;
-            if (lookPoint == 1) maidTm = maidsState[maidID].maidHead.transform;
-            if (lookPoint == 2) maidTm = maidsState[maidID].maidXxx.transform;
 
+
+          var maidObj = maidsState[maidID].maidMune;
+          if(lookPoint == 1)maidObj = maidsState[maidID].maidHead;
+          if(lookPoint == 2)maidObj = maidsState[maidID].maidXxx;
+
+          if (maidObj == null) return; //エラー対策
+
+          Transform maidTm = maidObj.transform;
 
             //ターゲットメイドのオート変更
             if (aoutTarget)
@@ -7766,6 +10506,9 @@ namespace CM3D2.VibeYourMaid.Plugin
             gsButton2.fontSize = 10;
             gsButton2.alignment = TextAnchor.MiddleCenter;
 
+            GUIStyle gsToggle = new GUIStyle("toggle");
+            gsToggle.fontSize = 12;
+            gsToggle.alignment = TextAnchor.MiddleLeft;
 
 
             //現在ステータス表示
@@ -8056,9 +10799,12 @@ namespace CM3D2.VibeYourMaid.Plugin
                 }
 
 
-                GUI.Label(new Rect(5, 165, 210, 20), " ﾌﾟﾗｸﾞｲﾝ無効： [ " + cfgw.keyPluginToggleV0 + " ]", gsLabel);
-                GUI.Label(new Rect(5, 185, 210, 20), " GUI表示切替： [ " + cfgw.keyPluginToggleV1 + " ]", gsLabel);
-
+                  //GUI.Label (new Rect (5, 165, 210, 20), " ﾌﾟﾗｸﾞｲﾝ無効： [ " + cfgw.keyPluginToggleV0 + " ]", gsLabel);
+                  //GUI.Label (new Rect (5, 185, 210, 20), " GUI表示切替： [ " + cfgw.keyPluginToggleV1 + " ]", gsLabel);
+                  
+                  maidFollowEnabled = GUI.Toggle(new Rect (5, 165, 120, 20), maidFollowEnabled, "メイド固定" , gsToggle );
+                  cfgw.osawariEnabled = GUI.Toggle(new Rect (5, 190, 120, 20), cfgw.osawariEnabled, "お触り有効" , gsToggle );
+                  
 
 
             }
@@ -8588,6 +11334,10 @@ namespace CM3D2.VibeYourMaid.Plugin
             gsLabel.fontSize = 12;
             gsLabel.alignment = TextAnchor.MiddleLeft;
 
+            GUIStyle gsLabelR = new GUIStyle("label");
+            gsLabelR.fontSize = 12;
+            gsLabelR.alignment = TextAnchor.MiddleRight;
+
             GUIStyle gsLabel2 = new GUIStyle("label");
             gsLabel2.fontSize = 12;
             gsLabel2.alignment = TextAnchor.MiddleCenter;
@@ -8989,12 +11739,28 @@ namespace CM3D2.VibeYourMaid.Plugin
                 maidsState[tgID].eAutoSelect = GUI.Toggle(new Rect(520, 145, 90, 20), maidsState[tgID].eAutoSelect, "自動変更", gsToggle);
 
 
-                GUI.Label(new Rect(310, 170, 95, 20), "移動距離：" + Math.Floor(moveValue * 100), gsLabel);
-                moveValue = GUI.HorizontalSlider(new Rect(410, 175, 180, 20), moveValue, 0.01f, 0.3F);
+                  GUI.Label (new Rect (5, 195, 90, 20), "移動距離：" + Math.Round(moveValue * 100) , gsLabel);
+                  moveValue = GUI.HorizontalSlider(new Rect(95, 200, 90, 20), moveValue, 0.01f, 0.3F);
 
-                GUI.Label(new Rect(310, 195, 95, 20), "地面判定：" + Math.Floor(maid.body0.BoneHitHeightY * 100), gsLabel);
-                maid.body0.BoneHitHeightY = GUI.HorizontalSlider(new Rect(410, 200, 180, 20), maid.body0.BoneHitHeightY, -2f, 2F);
+                //GUI.Label(new Rect(310, 195, 95, 20), "地面判定：" + Math.Floor(maid.body0.BoneHitHeightY * 100), gsLabel);
+                //maid.body0.BoneHitHeightY = GUI.HorizontalSlider(new Rect(410, 200, 180, 20), maid.body0.BoneHitHeightY, -2f, 2F);
 
+                  try {
+                    if (maid.body0.BoneHitHeightY < -999f) maid.body0.BoneHitHeightY = 0f;
+                    if(GUI.Button(new Rect (310, 185, 25, 20), "<<", gsButton)) maid.body0.BoneHitHeightY = Math.Max(-2f, maid.body0.BoneHitHeightY-0.01f);
+                    if(GUI.Button(new Rect (335, 185, 25, 20), "<", gsButton)) maid.body0.BoneHitHeightY = Math.Max(-2f, maid.body0.BoneHitHeightY-0.001f);
+                    if(GUI.Button(new Rect (365, 185, 25, 20), ">", gsButton)) maid.body0.BoneHitHeightY = Math.Min(2f, maid.body0.BoneHitHeightY+0.001f);
+                    if(GUI.Button(new Rect (390, 185, 25, 20), ">>", gsButton)) maid.body0.BoneHitHeightY = Math.Min(2f, maid.body0.BoneHitHeightY+0.01f);
+                    if(GUI.Button(new Rect (420, 185, 25, 20), "0", gsButton)) maid.body0.BoneHitHeightY = 0;
+                    if(GUI.Button(new Rect (450, 185, 25, 20), "55", gsButton)) maid.body0.BoneHitHeightY = 0.55f;
+                    if(GUI.Button(new Rect (480, 185, 25, 20), "65", gsButton)) maid.body0.BoneHitHeightY = 0.65f;
+                    if(GUI.Button(new Rect (510, 185, 25, 20), "85", gsButton)) maid.body0.BoneHitHeightY = 0.85f;
+                  maid.body0.BoneHitHeightY = GUI.HorizontalSlider(new Rect(420, 165, 180, 15), maid.body0.BoneHitHeightY, -2f, 2F);
+                  maid.body0.BoneHitHeightY = (float)Math.Round(maid.body0.BoneHitHeightY * 1000)/1000;
+                  GUI.Label (new Rect (315, 195, 95, 20), "地面判定：" + (maid.body0.BoneHitHeightY * 100) , gsLabel);
+                  } catch {
+                    // NullReferenceException 揉み消し
+                  }
 
 
                 //一列目
@@ -9099,6 +11865,15 @@ namespace CM3D2.VibeYourMaid.Plugin
 
 
                 //二列目
+                                  GUI.Label (new Rect (205, 210, 60, 20), "【興奮値】", gsLabel);
+                  GUI.Label (new Rect (210, 230, 30, 20), ""+stockMaids[tgID].mem.status.currentExcite, gsLabelR);
+                  int excite = stockMaids[tgID].mem.status.currentExcite;
+                  if (GUI.Button(new Rect (350, 230, 20, 20), "-", gsButton)) excite -= 50;
+                  if (GUI.Button(new Rect (375, 230, 20, 20), "+", gsButton)) excite += 50;
+                  excite = (int)Math.Round(GUI.HorizontalSlider(new Rect(245, 235, 100, 20), excite, -100, 300)/10)*10;
+                  if (excite != stockMaids[tgID].mem.status.currentExcite) setExcite(tgID, excite);
+                  cfgw.yotogiExciteLink = GUI.Toggle(new Rect (265, 210, 100, 20), cfgw.yotogiExciteLink, "絶頂値に連動", gsToggle);
+
                 GUI.Label(new Rect(205, 220, 200, 20), "【Hアイテム装着】", gsLabel);
 
                 if (GUI.Button(new Rect(210, 245, 80, 20), "バイブ", gsButton))
@@ -9709,8 +12484,11 @@ namespace CM3D2.VibeYourMaid.Plugin
 
 
                 GUI.Label(new Rect(205, 355, 190, 20), "【お触り設定】", gsLabel);
-                cfgw.osawariEnabled = GUI.Toggle(new Rect(205, 375, 190, 20), cfgw.osawariEnabled, "お触り機能を有効", gsToggle);
-
+                  cfgw.osawariEnabled = GUI.Toggle(new Rect (205, 375, 190, 20), cfgw.osawariEnabled, "お触り機能を有効" , gsToggle );
+                  cfgw.osawariAlways = GUI.Toggle(new Rect (205, 395, 190, 20), cfgw.osawariAlways, "常時お触り判定" , gsToggle );
+                  GUI.Label (new Rect (205, 415, 90, 20), "移動倍率：" + Math.Floor(cfgw.osawariMoveRate*10)/10 , gsLabel);
+                  cfgw.osawariMoveRate = GUI.HorizontalSlider(new Rect(295, 420, 100, 20), cfgw.osawariMoveRate, 0.1f, 5.0f);
+                  cfgw.osawariMoveRate = (float)Math.Floor(cfgw.osawariMoveRate*10)/10;
 
 
 
@@ -9771,7 +12549,7 @@ namespace CM3D2.VibeYourMaid.Plugin
                     }
                 }
 				
-				
+				//子宫脱按钮
 				if (GUI.Button(new Rect(420, 355, 190, 20), "に押します子宮脱", gsButton))
                 {
                         manualTriggeredUterusDatsu = true;
@@ -11849,6 +14627,11 @@ namespace CM3D2.VibeYourMaid.Plugin
             }
 
             if (maidsState[tgID].uDatsu == 3) maidsState[tgID].uDatsu = 0;
+
+                                  //2.5のunzipエラー対策
+                      try {
+                        maidIKTargetToBone(maid);
+                      } catch (Exception e) { UnityEngine.Debug.Log(e); }
 
             maid.IKTargetToBone("左手", null, "無し", Vector3.zero, IKCtrlData.IKAttachType.Point, false, false, IKCtrlData.IKExecTiming.Normal);
             maid.IKTargetToBone("右手", null, "無し", Vector3.zero, IKCtrlData.IKAttachType.Point, false, false, IKCtrlData.IKExecTiming.Normal);
@@ -15176,454 +17959,1445 @@ namespace CM3D2.VibeYourMaid.Plugin
 
 
 
-        //おさわり処理関係-----------------------
+      //おさわり処理関係-----------------------
 
         //おさわり用ターゲット配置
-        private void targetSet(int maidID)
+  private void targetSet(int maidID){
+          if (reGetMaid) return; //単独でも呼ばれるのでここでチェック
+
+        	Maid maid = stockMaids[maidID].mem;
+          if (maid.body0.m_Bones == null) return;
+
+        	maidsState[maidID].bodyName = maid.GetProp(MPN.body).strFileName;
+        	Console.WriteLine("お触りボディ:" + maidsState[maidID].bodyName);
+          try {
+                //口
+		maidsState[maidID].targetSphere_mouth = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+    maidsState[maidID].targetSphere_mouth.layer = 8;
+		maidsState[maidID].targetSphere_mouth.name = "MO_" + maidID;
+		maidsState[maidID].targetSphere_mouth.transform.localScale = new Vector3(0.06f, 0.06f, 0.06f);
+		maidsState[maidID].targetSphere_mouth.GetComponent<Renderer>().enabled = false;
+		//BoxCollider boxCollider0 = maidsState[maidID].targetSphere_mouth.AddComponent<BoxCollider>();
+		maidsState[maidID].targetSphere_mouth.GetComponent<Collider>().isTrigger = true;
+		maidsState[maidID].IK_mouth = CMT.SearchObjName(maid.body0.m_Bones.transform, "Bip01 Head", true);
+
+		//むね
+		maidsState[maidID].targetSphere_muneR = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+    maidsState[maidID].targetSphere_muneR.layer = 8;
+		maidsState[maidID].targetSphere_muneR.name = "MR_" + maidID;
+		maidsState[maidID].targetSphere_muneR.transform.localScale = bVR ? new Vector3(0.12f, 0.12f, 0.12f) : new Vector3(0.15f, 0.15f, 0.15f); //VRとマウスで大きさ調整
+		maidsState[maidID].targetSphere_muneR.GetComponent<Renderer>().enabled = false;
+		//BoxCollider boxCollider1 = maidsState[maidID].targetSphere_muneR.AddComponent<BoxCollider>();
+		maidsState[maidID].targetSphere_muneR.GetComponent<Collider>().isTrigger = true;
+		maidsState[maidID].IK_muneR = CMT.SearchObjName(maid.body0.m_Bones.transform, "_IK_muneR", true);
+
+		maidsState[maidID].targetSphere_muneL = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+    maidsState[maidID].targetSphere_muneL.layer = 8;
+		maidsState[maidID].targetSphere_muneL.name = "ML_" + maidID;
+		maidsState[maidID].targetSphere_muneL.transform.localScale = bVR ? new Vector3(0.12f, 0.12f, 0.12f) : new Vector3(0.15f, 0.15f, 0.15f); //VRとマウスで大きさ調整
+		maidsState[maidID].targetSphere_muneL.GetComponent<Renderer>().enabled = false;
+		//BoxCollider boxCollider2 = maidsState[maidID].targetSphere_muneL.AddComponent<BoxCollider>();
+		maidsState[maidID].targetSphere_muneL.GetComponent<Collider>().isTrigger = true;
+		maidsState[maidID].IK_muneL = CMT.SearchObjName(maid.body0.m_Bones.transform, "_IK_muneL", true);
+
+                //おしり
+		maidsState[maidID].targetSphere_hipL = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+    maidsState[maidID].targetSphere_hipL.layer = 8;
+		maidsState[maidID].targetSphere_hipL.name = "HL_" + maidID;
+		maidsState[maidID].targetSphere_hipL.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f); //VR用に変更
+		maidsState[maidID].targetSphere_hipL.GetComponent<Renderer>().enabled = false;
+		//BoxCollider boxCollider3 = maidsState[maidID].targetSphere_hipL.AddComponent<BoxCollider>();
+		maidsState[maidID].targetSphere_hipL.GetComponent<Collider>().isTrigger = true;
+		maidsState[maidID].IK_hipL = CMT.SearchObjName(maid.body0.m_Bones.transform, "_IK_hipL", true);
+		maidsState[maidID].Hip_L = CMT.SearchObjName(maid.body0.m_Bones.transform, "Hip_L", true);
+
+		maidsState[maidID].targetSphere_hipR = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+    maidsState[maidID].targetSphere_hipR.layer = 8;
+		maidsState[maidID].targetSphere_hipR.name = "HR_" + maidID;
+		maidsState[maidID].targetSphere_hipR.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f); //VR用に変更
+		maidsState[maidID].targetSphere_hipR.GetComponent<Renderer>().enabled = false;
+		//BoxCollider boxCollider4 = maidsState[maidID].targetSphere_hipR.AddComponent<BoxCollider>();
+		maidsState[maidID].targetSphere_hipR.GetComponent<Collider>().isTrigger = true;
+		maidsState[maidID].IK_hipR = CMT.SearchObjName(maid.body0.m_Bones.transform, "_IK_hipR", true);
+		maidsState[maidID].Hip_R = CMT.SearchObjName(maid.body0.m_Bones.transform, "Hip_R", true);
+
+                //大事なとこ
+		maidsState[maidID].targetSphere_vagina = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+    maidsState[maidID].targetSphere_vagina.layer = 8;
+		maidsState[maidID].targetSphere_vagina.name = "VA_" + maidID;
+		maidsState[maidID].targetSphere_vagina.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+		maidsState[maidID].targetSphere_vagina.GetComponent<Renderer>().enabled = false;
+		//BoxCollider boxCollider5 = maidsState[maidID].targetSphere_vagina.AddComponent<BoxCollider>();
+		maidsState[maidID].targetSphere_vagina.GetComponent<Collider>().isTrigger = true;
+		maidsState[maidID].IK_vagina = CMT.SearchObjName(maid.body0.m_Bones.transform, "Bip01 Pelvis", true);
+
+                //アナル
+		maidsState[maidID].targetSphere_anal = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+    maidsState[maidID].targetSphere_anal.layer = 8;
+		maidsState[maidID].targetSphere_anal.name = "AN_" + maidID;
+		maidsState[maidID].targetSphere_anal.transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
+		maidsState[maidID].targetSphere_anal.GetComponent<Renderer>().enabled = false;
+		//BoxCollider boxCollider6 = maidsState[maidID].targetSphere_anal.AddComponent<BoxCollider>();
+		maidsState[maidID].targetSphere_anal.GetComponent<Collider>().isTrigger = true;
+		maidsState[maidID].IK_anal = CMT.SearchObjName(maid.body0.m_Bones.transform, "_IK_anal", true);
+
+          } catch { //(Exception e) {
+            UnityEngine.Debug.LogError("targetSet Error : "+stockMaids[maidID].mem);
+            targetDestroy(maidID);
+            maidsState[maidID].visibleBack = false;
+          }
+  }
+	
+	
+	//お触りターゲット消去
+	private void targetDestroy(int maidID){
+	  if (maidsState[maidID].targetSphere_mouth) UnityEngine.Object.Destroy(maidsState[maidID].targetSphere_mouth);
+	  if (maidsState[maidID].targetSphere_muneR) UnityEngine.Object.Destroy(maidsState[maidID].targetSphere_muneR);
+	  if (maidsState[maidID].targetSphere_muneL) UnityEngine.Object.Destroy(maidsState[maidID].targetSphere_muneL);
+	  if (maidsState[maidID].targetSphere_hipL) UnityEngine.Object.Destroy(maidsState[maidID].targetSphere_hipL);
+	  if (maidsState[maidID].targetSphere_hipR) UnityEngine.Object.Destroy(maidsState[maidID].targetSphere_hipR);
+	  if (maidsState[maidID].targetSphere_vagina) UnityEngine.Object.Destroy(maidsState[maidID].targetSphere_vagina);
+	  if (maidsState[maidID].targetSphere_anal) UnityEngine.Object.Destroy(maidsState[maidID].targetSphere_anal);
+	}
+	
+	
+	//ターゲット位置の更新
+	private void targetInstallation(int maidID){
+    try {
+
+	  if(maidsState[maidID].bodyName != stockMaids[maidID].mem.GetProp(MPN.body).strFileName)targetDestroy(maidID);
+	  if(!maidsState[maidID].targetSphere_mouth)targetSet(maidID);
+    
+	  maidsState[maidID].targetSphere_mouth.transform.position = maidsState[maidID].IK_mouth.transform.position;
+	  
+	  maidsState[maidID].targetSphere_muneR.transform.position = maidsState[maidID].IK_muneR.transform.position;
+	  maidsState[maidID].targetSphere_muneL.transform.position = maidsState[maidID].IK_muneL.transform.position;
+
+	  float x = (maidsState[maidID].IK_hipL.transform.position.x + maidsState[maidID].Hip_L.transform.position.x) / 2f;
+	  float y = (maidsState[maidID].IK_hipL.transform.position.y + maidsState[maidID].Hip_L.transform.position.y) / 2f;
+	  float z = (maidsState[maidID].IK_hipL.transform.position.z + maidsState[maidID].Hip_L.transform.position.z) / 2f;
+	  maidsState[maidID].targetSphere_hipL.transform.position = new Vector3(x, y, z);
+
+	  x = (maidsState[maidID].IK_hipR.transform.position.x + maidsState[maidID].Hip_R.transform.position.x) / 2f;
+	  y = (maidsState[maidID].IK_hipR.transform.position.y + maidsState[maidID].Hip_R.transform.position.y) / 2f;
+	  z = (maidsState[maidID].IK_hipR.transform.position.z + maidsState[maidID].Hip_R.transform.position.z) / 2f;
+	  maidsState[maidID].targetSphere_hipR.transform.position = new Vector3(x, y, z);
+
+	  maidsState[maidID].targetSphere_vagina.transform.position = maidsState[maidID].IK_vagina.transform.position;
+	  
+	  maidsState[maidID].targetSphere_anal.transform.position = maidsState[maidID].IK_anal.transform.position;
+
+    } catch { //(Exception e) {
+      //スタジオで同じメイドをロードした場合にIK_mouthが取得できずにエラーになる
+      UnityEngine.Debug.LogError("targetInstallation Error : "+stockMaids[maidID].mem);
+      targetDestroy(maidID);
+      maidsState[maidID].visibleBack = false; //再読み込みさせる
+    }
+	}
+	
+  //お触り管理クラス初期化
+  Osawari osawari = null;
+
+  //お触り時の処理 Update()から呼ばれる
+  private void osawariHand()
+  {
+    //お触り処理実行
+    osawari.osawariHand(vmId);
+
+  }
+      
+      //お触りクラス初期化
+      private void initOsawari()
+      {
+        try {
+        if (bVR) {
+          osawari = new Osawari(2, stockMaids, maidsState, cfgw, true);
+          if (GameObject.Find("TrackingSpace") != null) {
+            //Quest
+            UnityEngine.Debug.Log("[VibeYourMaid] initOsawari for Quest");
+            OVRInput.RawButton LButton = OVRInput.RawButton.X;
+            OVRInput.RawButton RButton = OVRInput.RawButton.A;
+            if (cfgw.osawariButton != null) {
+              string button = cfgw.osawariButton.ToUpper();
+              if (button.StartsWith("BY")) {
+                LButton = OVRInput.RawButton.Y;
+                RButton = OVRInput.RawButton.B;
+              } else if (button.StartsWith("T")) {
+                LButton = OVRInput.RawButton.LIndexTrigger;
+                RButton = OVRInput.RawButton.RIndexTrigger;
+              } else if (button.StartsWith("G")) {
+                LButton = OVRInput.RawButton.LHandTrigger;
+                RButton = OVRInput.RawButton.RHandTrigger;
+              }
+            }
+            OvrMgr OvrMgr = GameMain.Instance.OvrMgr;
+            osawari.setOsawariInput(0, true, new OsawariQuestController(LButton, OVRInput.Controller.LTouch, OVRInput.RawButton.Y, OvrMgr.ovr_obj.left_controller.controller.transform));
+            osawari.setOsawariInput(1, false, new OsawariQuestController(RButton, OVRInput.Controller.RTouch, OVRInput.RawButton.X, OvrMgr.ovr_obj.right_controller.controller.transform));
+            //初期化ログ
+            UnityEngine.Debug.Log("[VibeYourMaid] initOsawari LButton="+LButton);
+            UnityEngine.Debug.Log("[VibeYourMaid] initOsawari RButton="+RButton);
+          } else {
+            //SteamVR
+            UnityEngine.Debug.Log("[VibeYourMaid] initOsawari for SteamVR");
+            OvrMgr OvrMgr = GameMain.Instance.OvrMgr;
+            //ボタンは固定
+            AVRControllerButtons.BTN LButton = AVRControllerButtons.BTN.STICK_PAD;
+            AVRControllerButtons.BTN RButton = AVRControllerButtons.BTN.STICK_PAD;
+            if (cfgw.osawariButton != null) {
+              string button = cfgw.osawariButton.ToUpper();
+              if (button.StartsWith("LR")) {
+                LButton = AVRControllerButtons.BTN.VIRTUAL_L_CLICK;
+                RButton = AVRControllerButtons.BTN.VIRTUAL_R_CLICK;
+              } else if (button.StartsWith("RL")) {
+                LButton = AVRControllerButtons.BTN.VIRTUAL_R_CLICK;
+                RButton = AVRControllerButtons.BTN.VIRTUAL_L_CLICK;
+              } else if (button.StartsWith("T")) {
+                LButton = AVRControllerButtons.BTN.TRIGGER;
+                RButton = AVRControllerButtons.BTN.TRIGGER;
+              } else if (button.StartsWith("G")) {
+                LButton = AVRControllerButtons.BTN.GRIP;
+                RButton = AVRControllerButtons.BTN.GRIP;
+              }
+            }
+            osawari.setOsawariInput(0, true, new OsawariViveController(LButton, OvrMgr.ovr_obj.left_controller, AVRControllerButtons.BTN.VIRTUAL_MENU));
+            osawari.setOsawariInput(1, false, new OsawariViveController(RButton, OvrMgr.ovr_obj.right_controller, AVRControllerButtons.BTN.VIRTUAL_MENU));
+            //初期化ログ
+            UnityEngine.Debug.Log("[VibeYourMaid] initOsawari LButton="+LButton);
+            UnityEngine.Debug.Log("[VibeYourMaid] initOsawari RButton="+RButton);
+          }
+        } else {
+          //その他
+          osawari = new Osawari(2, stockMaids, maidsState, cfgw, false);
+          osawari.setOsawariInput(0);
+          //マルチタッチは Input.touches[] の順番が入れ替わる
+          osawari.setOsawariInput(1); //マルチタッチ用
+        }
+        } catch (Exception e) {
+          UnityEngine.Debug.Log("[VibeYourMaid] initOsawari Failed : "+e);
+          if (osawari != null ) osawari.initFailed();
+        }
+      }
+      /**
+      * お触り用メインクラス
+      * 複数のOsawariクラスとMuneOsawariクラスを管理する
+      */
+      public class Osawari
+      {
+        //お触りクラス
+        private OsawariInput[] osawariInput;
+
+        //VYM側の値を格納
+        public List<MaidInfo> stockMaids;
+        public List<MaidState> maidsState;
+        public VibeYourMaidCfgWriting cfgw;
+        bool bVR = false;
+        
+        //胸揺れを制御するクラス
+        private List<OsawariRelease> listMuneRelease;
+        private float muneMoveX = 50f;
+        private float muneMoveY = 60f;
+
+
+        //コンストラクタ
+        public Osawari(int size, List<MaidInfo> stockMaids, List<MaidState> maidsState, VibeYourMaidCfgWriting cfgw, bool bVR)
         {
-            Maid maid = stockMaids[maidID].mem;
-            maidsState[maidID].bodyName = maid.GetProp(MPN.body).strFileName;
-            Console.WriteLine("お触りボディ:" + maidsState[maidID].bodyName);
+          //リスト初期化 メイド最大数を設定
+          int maidCount = GameMain.Instance.CharacterMgr.GetStockMaidCount();
+          listMuneRelease = new List<OsawariRelease>(maidCount); //x2までは必要なさそう
 
-            //口
-            maidsState[maidID].targetSphere_mouth = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            maidsState[maidID].targetSphere_mouth.name = "MO_" + maidID;
-            maidsState[maidID].targetSphere_mouth.transform.localScale = new Vector3(0.06f, 0.06f, 0.06f);
-            maidsState[maidID].targetSphere_mouth.GetComponent<Renderer>().enabled = false;
-            BoxCollider boxCollider0 = maidsState[maidID].targetSphere_mouth.gameObject.AddComponent<BoxCollider>();
-            boxCollider0.isTrigger = true;
-            maidsState[maidID].IK_mouth = CMT.SearchObjName(maid.body0.m_Bones.transform, "Bip01 Head", true);
+          this.stockMaids = stockMaids;
+          this.maidsState = maidsState;
+          this.cfgw = cfgw;
+          this.bVR = bVR;
 
-            //むね
-            maidsState[maidID].targetSphere_muneR = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            maidsState[maidID].targetSphere_muneR.name = "MR_" + maidID;
-            maidsState[maidID].targetSphere_muneR.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
-            maidsState[maidID].targetSphere_muneR.GetComponent<Renderer>().enabled = false;
-            BoxCollider boxCollider1 = maidsState[maidID].targetSphere_muneR.gameObject.AddComponent<BoxCollider>();
-            boxCollider1.isTrigger = true;
-            maidsState[maidID].IK_muneR = CMT.SearchObjName(maid.body0.m_Bones.transform, "_IK_muneR", true);
+          osawariInput = new OsawariInput[size];
+        }
 
-            maidsState[maidID].targetSphere_muneL = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            maidsState[maidID].targetSphere_muneL.name = "ML_" + maidID;
-            maidsState[maidID].targetSphere_muneL.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
-            maidsState[maidID].targetSphere_muneL.GetComponent<Renderer>().enabled = false;
-            BoxCollider boxCollider2 = maidsState[maidID].targetSphere_muneL.gameObject.AddComponent<BoxCollider>();
-            boxCollider2.isTrigger = true;
-            maidsState[maidID].IK_muneL = CMT.SearchObjName(maid.body0.m_Bones.transform, "_IK_muneL", true);
+        /** 初期化失敗時の処理 */
+        public void initFailed()
+        {
+          osawariInput = new OsawariInput[0];
+        }
 
-            //おしり
-            maidsState[maidID].targetSphere_hipL = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            maidsState[maidID].targetSphere_hipL.name = "HL_" + maidID;
-            maidsState[maidID].targetSphere_hipL.transform.localScale = new Vector3(0.12f, 0.12f, 0.12f);
-            maidsState[maidID].targetSphere_hipL.GetComponent<Renderer>().enabled = false;
-            BoxCollider boxCollider3 = maidsState[maidID].targetSphere_hipL.gameObject.AddComponent<BoxCollider>();
-            boxCollider3.isTrigger = true;
-            maidsState[maidID].IK_hipL = CMT.SearchObjName(maid.body0.m_Bones.transform, "_IK_hipL", true);
-            maidsState[maidID].Hip_L = CMT.SearchObjName(maid.body0.m_Bones.transform, "Hip_L", true);
+        public void endOsawari()
+        {
+          for (int i=osawariInput.Length-1; i>=0; i--) {
+            osawariInput[i].endOsawari();
+          }
+        }
 
-            maidsState[maidID].targetSphere_hipR = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            maidsState[maidID].targetSphere_hipR.name = "HR_" + maidID;
-            maidsState[maidID].targetSphere_hipR.transform.localScale = new Vector3(0.12f, 0.12f, 0.12f);
-            maidsState[maidID].targetSphere_hipR.GetComponent<Renderer>().enabled = false;
-            BoxCollider boxCollider4 = maidsState[maidID].targetSphere_hipR.gameObject.AddComponent<BoxCollider>();
-            boxCollider4.isTrigger = true;
-            maidsState[maidID].IK_hipR = CMT.SearchObjName(maid.body0.m_Bones.transform, "_IK_hipR", true);
-            maidsState[maidID].Hip_R = CMT.SearchObjName(maid.body0.m_Bones.transform, "Hip_R", true);
+        public void setOsawariInput(int idx)
+        {
+          osawariInput[idx] = new OsawariInput(idx, this);
+        }
+        /** Quest用のOsawariInput追加
+         * @param modeButton コントローラーの形状を変えるボタン X/Y */
+        public void setOsawariInput(int idx, bool bLeft, OsawariQuestController osawariController)
+        {
+          osawariInput[idx] = new OsawariInput(idx, this, bLeft, osawariController);
+        }
+        /** Vibe用のOsawariInput追加
+         * @param modeButton コントローラーの形状を変えるボタン */
+        public void setOsawariInput(int idx, bool bLeft, OsawariViveController osawariController)
+        {
+          osawariInput[idx] = new OsawariInput(idx, this, bLeft, osawariController);
+        }
 
-            //大事なとこ
-            maidsState[maidID].targetSphere_vagina = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            maidsState[maidID].targetSphere_vagina.name = "VA_" + maidID;
-            maidsState[maidID].targetSphere_vagina.transform.localScale = new Vector3(0.08f, 0.08f, 0.08f);
-            maidsState[maidID].targetSphere_vagina.GetComponent<Renderer>().enabled = false;
-            BoxCollider boxCollider5 = maidsState[maidID].targetSphere_vagina.gameObject.AddComponent<BoxCollider>();
-            boxCollider5.isTrigger = true;
-            maidsState[maidID].IK_vagina = CMT.SearchObjName(maid.body0.m_Bones.transform, "Bip01 Pelvis", true);
+        //メイドがお触り状態か
+        public bool isOsawari(int maidID)
+        {
+          for (int i=osawariInput.Length-1; i>=0; i--) {
+            if (maidID == osawariInput[i].osawariID) {
+              return true;
+            }
+          }
+          return false;
+        }
+        //メイドの指定したポイントがお触り状態か
+        //OsawariInfoから呼ぶ場合は自分もチェックされるので注意
+        public bool isOsawari(int maidID, string osawariPoint)
+        {
+          for (int i=osawariInput.Length-1; i>=0; i--) {
+            if (maidID == osawariInput[i].osawariID) {
+              if (osawariPoint == osawariInput[i].osawariPoint) return true;
+            }
+          }
+          return false;
+        }
+        //胸を触っていたらtrue
+        public bool isMuneOsawari(int maidID)
+        {
+          for (int i=osawariInput.Length-1; i>=0; i--) {
+            if (maidID == osawariInput[i].osawariID) {
+              if ("ML_" == osawariInput[i].osawariPoint) return true;
+              if ("MR_" == osawariInput[i].osawariPoint) return true;
+            }
+          }
+          return false;
+        }
+        public float getMouseMove(int maidID) {
+          float mouse_move = 0f;
+          for (int i=osawariInput.Length-1; i>=0; i--) {
+            if (maidID == osawariInput[i].osawariID) mouse_move += osawariInput[i].mouse_move;
+          }
+          return mouse_move;
+        }
+        //対応するメイドのお触りレベルを取得
+        public int getOsawariLevel(int maidID)
+        {
+          //同じメイドなら高い方を返す
+          int osawariLevel = 0;
+          for (int i=osawariInput.Length-1; i>=0; i--) {
+            if (maidID == osawariInput[i].osawariID) osawariLevel = Math.Max(osawariLevel, osawariInput[i].osawariLevel);
+          }
+          return osawariLevel;
+        }
+        //VYM側から利用 基本は-1～1に制限した値 形状に応じて値変更
+        public float getMoveAtpY(int maidID, string osawariPoint)
+        {
+          for (int i=osawariInput.Length-1; i>=0; i--) {
+            OsawariInput input = osawariInput[i];
+            if (maidID == input.osawariID && osawariPoint == input.osawariPoint) {
+              if (osawariPoint == "VA_") {
+                if (input.handType != 10 & input.handType != 11) {
+                  return Math.Max(-1f, Math.Min(0.4f, input.Move_atp.y)); //Vibeは以外は小さく
+                }
+              } else if (osawariPoint == "AN_") {
+                if (input.handType == 11) return Math.Max(-1f, Math.Min(1.5f, input.Move_atp.y)); //Vibeなら1.5倍まで広げる
+                if (input.handType == 12) {
+                  //AnalVibe形状に合わせて変動 -1～0.3の正弦波を反転して-0.69～1.2で可変
+                  return Math.Max(-1f, Math.Min(1f, input.Move_atp.y)) - (float)Math.Min(0.3, Math.Sin(2 * Math.PI * input.Move_atp.y * 1.8f)) * 0.3f - 0.1f;
+                }
+              }
+              return Math.Max(-1f, Math.Min(1f, input.Move_atp.y));
+            }
+          }
+          return 0f;
+        }
+        //VYM側から利用
+        public bool LinkMaidCheck(int maidID)
+        {
+          if (osawariInput == null) return false;
 
-            //アナル
-            maidsState[maidID].targetSphere_anal = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            maidsState[maidID].targetSphere_anal.name = "AN_" + maidID;
-            maidsState[maidID].targetSphere_anal.transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
-            maidsState[maidID].targetSphere_anal.GetComponent<Renderer>().enabled = false;
-            BoxCollider boxCollider6 = maidsState[maidID].targetSphere_anal.gameObject.AddComponent<BoxCollider>();
-            boxCollider6.isTrigger = true;
-            maidsState[maidID].IK_anal = CMT.SearchObjName(maid.body0.m_Bones.transform, "_IK_anal", true);
+          for (int i=osawariInput.Length-1; i>=0; i--) {
+            if (LinkMaidCheck(maidID, osawariInput[i].osawariID)) return true;
+          }
+          return false;
+        }
+        //VYMからコピー
+        private bool LinkMaidCheck(int maidID, int checkID){
+          if(checkID < 0)return false;
+          if(maidsState[maidID].linkID == -1 && maidsState[checkID].linkID == -1)return false;
+          if(maidID != maidsState[checkID].linkID && maidsState[maidID].linkID != checkID && maidsState[checkID].linkID != maidsState[maidID].linkID)return false;
+          return true;
+        }
+
+        //メイドの左右の胸揺れを取得
+        public OsawariRelease getMuneRelease(bool bLeft, int osawariID)
+        {
+          foreach (OsawariRelease osawariRelease in listMuneRelease) {
+            if (osawariRelease.bLeft == bLeft && osawariRelease.osawariID == osawariID) {
+              return osawariRelease;
+            }
+          }
+          return null;
+        }
+        //胸リリース時に胸揺れ処理を追加
+        public void addMuneRelease(OsawariRelease osawariRelease)
+        {
+          listMuneRelease.Add(osawariRelease);
+        }
+
+        //胸変形処理 お触り時と胸揺れ時に利用 可動範囲が円形になるように調整
+        //bornmorph.Blend() は不要
+        public void muneMorph(bool bLeft, int osawariID, OsawariRelease.MuneValue muneValue, Vector3 Mune_atp)
+        {
+          Maid maid = stockMaids[osawariID].mem;
+          jiggleBone jbMune = bLeft ? maid.body0.jbMuneL : maid.body0.jbMuneR;
+
+          if (!jbMune) return;
+
+          float x = bLeft ? Mune_atp.x : -Mune_atp.x; //左右は反転
+          float y = Mune_atp.y;
+          //円の中に収める
+          double theta = Math.Atan2(y, x);
+          //x *= Math.Abs((float)Math.Cos(theta));
+          y *= Math.Abs((float)Math.Sin(theta));
+          if (y < 0) y *= 0.7f; //下側は70%に制限
+
+          //中心部の移動量を2倍に
+          if (x > 0) x = x * (2f-x); else x = x * (2f+x);
+          if (y > 0) y = y * (2f-y); else y = y * (2f+y);
+
+          //胸が小さい場合は移動量を増やす
+          float muneSize = Math.Max(0, Math.Min(150, (float)maid.GetProp(MPN.MuneL).value)); //0～150に制限
+          if (muneSize < 50) {
+            muneSize = 1.5f - muneSize*0.01f;  //0=1.5 50=1.0
+          } else {
+            muneSize = 50f / muneSize;  //50=1.0 100=0.5 150=0.33
+          }
+
+          jbMune.MuneUpDown = muneValue.MuneUpDown + y * muneMoveY * muneSize;
+          //jbMune.BlendValue2 = muneValue.MuneBlend + y; //先端の動きがおかしい Blend()していないから？ 左右の胸で先端の動きが逆？
+          jbMune.MuneUpDown_f = muneValue.MuneUpDown_f + Math.Abs(y) * 2f;
+          
+          jbMune.MuneYori = muneValue.MuneYori + x * muneMoveX * muneSize;
+          jbMune.MuneYori_f = muneValue.MuneYori_f + Math.Abs(x) * 2f;
+
+          //bonemorph.Blend()は不要
+        }
+
+        //お触り処理を実行
+        public void osawariHand(List<int> vmId)
+        {
+          //マルチタッチの入れ替え処理 とりあえず2つのみ
+          if (Input.touchCount == 1) {
+            if (osawariInput.Length >= 2 && !osawariInput[0].touchActive && osawariInput[1].touchActive) {
+              OsawariInput tmp = osawariInput[0];
+              osawariInput[0] = osawariInput[1];
+              osawariInput[1] = tmp;
+              osawariInput[0].idx = 0;
+              osawariInput[1].idx = 1;
+            }
+          }
+
+          //前のフレームでリリースされていたら胸揺れ処理 osawariInput[i].osawariHand(); でキャンセルが入るので先に実行
+          for (int i=listMuneRelease.Count-1; i>=0; i--) { //逆順で実行 RemoveAtしているため
+            OsawariRelease osawariRelease = listMuneRelease[i];
+            osawariRelease.muneRelease();
+            if (!osawariRelease.bActive) listMuneRelease.RemoveAt(i); //揺れが終わっていたら解放
+          }
+
+          //各osawariInputのお触り処理を逆順で実行
+      		for (int i=osawariInput.Length-1; i>=0; i--) { //逆順で実行 タッチ入れ替えのため
+            osawariInput[i].osawariHand(vmId);
+          }
 
         }
 
+      } //class Osawari
 
-        //お触りターゲット消去
-        private void targetDestroy(int maidID)
-        {
-            UnityEngine.Object.Destroy(maidsState[maidID].targetSphere_mouth);
-            UnityEngine.Object.Destroy(maidsState[maidID].targetSphere_muneR);
-            UnityEngine.Object.Destroy(maidsState[maidID].targetSphere_muneL);
-            UnityEngine.Object.Destroy(maidsState[maidID].targetSphere_hipL);
-            UnityEngine.Object.Destroy(maidsState[maidID].targetSphere_hipR);
-            UnityEngine.Object.Destroy(maidsState[maidID].targetSphere_vagina);
-            UnityEngine.Object.Destroy(maidsState[maidID].targetSphere_anal);
+      /**
+       * 胸揺れクラス
+       * お触り処理とは非同期で実行 同じメイドの同じ胸を再び触ったらキャンセルする
+      */
+      public class OsawariRelease
+      {
+        public bool bActive = true;
+
+        Osawari osawari;
+        
+        public bool bLeft;
+        public int osawariID;
+
+        //変更前の胸の値
+        public struct MuneValue {
+          public float MuneUpDown;
+          public float MuneBlend;
+          public float MuneUpDown_f;
+          public float MuneYori;
+          public float MuneYori_f;
+          public MuneValue(jiggleBone jbMune)
+          {
+            MuneUpDown = jbMune.MuneUpDown;
+            MuneBlend = jbMune.BlendValue2;
+            MuneUpDown_f = jbMune.MuneUpDown_f;
+            MuneYori = jbMune.MuneYori;
+            MuneYori_f = jbMune.MuneYori_f;
+          }
         }
+        public MuneValue muneValue;
 
+        //胸の変更量 キャンセル時の復元で使う
+        public Vector3 Mune_atp;
 
-        //ターゲット位置の更新
-        private void targetInstallation(int maidID)
-        {
-
-            if (maidsState[maidID].bodyName != stockMaids[maidID].mem.GetProp(MPN.body).strFileName) targetDestroy(maidID);
-            if (!maidsState[maidID].targetSphere_mouth) targetSet(maidID);
-
-            maidsState[maidID].targetSphere_mouth.transform.position = maidsState[maidID].IK_mouth.transform.position;
-
-            maidsState[maidID].targetSphere_muneR.transform.position = maidsState[maidID].IK_muneR.transform.position;
-            maidsState[maidID].targetSphere_muneL.transform.position = maidsState[maidID].IK_muneL.transform.position;
-
-            float x = (maidsState[maidID].IK_hipL.transform.position.x + maidsState[maidID].Hip_L.transform.position.x) / 2f;
-            float y = (maidsState[maidID].IK_hipL.transform.position.y + maidsState[maidID].Hip_L.transform.position.y) / 2f;
-            float z = (maidsState[maidID].IK_hipL.transform.position.z + maidsState[maidID].Hip_L.transform.position.z) / 2f;
-            maidsState[maidID].targetSphere_hipL.transform.position = new Vector3(x, y, z);
-
-            x = (maidsState[maidID].IK_hipR.transform.position.x + maidsState[maidID].Hip_R.transform.position.x) / 2f;
-            y = (maidsState[maidID].IK_hipR.transform.position.y + maidsState[maidID].Hip_R.transform.position.y) / 2f;
-            z = (maidsState[maidID].IK_hipR.transform.position.z + maidsState[maidID].Hip_R.transform.position.z) / 2f;
-            maidsState[maidID].targetSphere_hipR.transform.position = new Vector3(x, y, z);
-
-            maidsState[maidID].targetSphere_vagina.transform.position = maidsState[maidID].IK_vagina.transform.position;
-
-            maidsState[maidID].targetSphere_anal.transform.position = maidsState[maidID].IK_anal.transform.position;
-        }
-
-        private int osawariLock = 0;
-        private int osawariID = -1;
-        private int osawariLevel = 0;
-        private string osawariPoint = "";
-        private float sensitivity = 0.1f; // マウス感度
-        private float mouse_move = 0f;
-        private float move_x = 0f;
-        private float move_y = 0f;
-        private float moveCheck = 20f;
-        private float Move_atp_x = 0f;
-        private float Move_atp_y = 0f;
-        private Vector3 back_IK_Pos;
-        private string hitName = "";
-
-        private float MuneUpDown = 0f;
-        private float MuneBlend = 0f;
-        private float MuneUpDown_f = 0f;
-        private float MuneYori = 0f;
-        private float MuneYori_f = 0f;
-
+        //反覆運動計算用
         private float MuneX = 0f;
         private float MuneY = 0f;
-        private float timeX = 0f;
-        private float timeY = 0f;
+        private float Mune_time = 0f;
+        private float delta_x = 1.0f;
+        private float delta_y = 1.0f;
+        private float delta_time = 1.0f;
 
-
-        //お触り時の処理
-        private void osawariHand()
+        public OsawariRelease(Osawari osawari, bool bLeft, int osawariID, MuneValue muneValue, Vector2 Mune_atp)
         {
+          this.osawari = osawari;
+          this.bLeft = bLeft;
+          this.osawariID = osawariID;
 
-            if (osawariID != -1 && vmId.IndexOf(osawariID) == -1) osawariLock = 9;
+          this.muneValue = muneValue;
 
-            if (osawariLock == 0)
-            {
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                RaycastHit hit;
-                hitName = "";
+          this.Mune_atp.x = Mune_atp.x;
+          this.Mune_atp.y = Mune_atp.y;
 
-                if (Physics.Raycast(ray, out hit))
-                {
+          //初期化
+          MuneX = Mune_atp.x;
+          MuneY = Mune_atp.y;
+          Mune_time = 0f;
 
-                    hitName = hit.collider.gameObject.name;
-                    if (Regex.IsMatch(hitName, @"^[a-zA-Z][a-zA-Z]_"))
-                    {
-                        if (Input.GetMouseButtonDown(0))
-                        {
-                            osawariLock = 1;
-                            osawariID = intCnv(Regex.Replace(hitName, @"^[a-zA-Z][a-zA-Z]_", ""));
-                            Maid maid = stockMaids[osawariID].mem;
+          //胸の大きさスライダの値 0～100 範囲拡張あり 50が通常 胸が小さい場合はほぼ揺れないのであまり変動させない
+          //timerRate / (60f + (float)maid.GetProp(MPN.MuneL).value * 0.5f);
+          Maid maid = osawari.stockMaids[osawariID].mem;
+          float muneSize = Math.Max(0, Math.Min(100, (float)maid.GetProp(MPN.MuneL).value)); //0～100に制限
+          muneSize = (float)Math.Sqrt(1f + (50f-muneSize)*0.01f);  //10=1.18 50=1.0 100=0.7
 
-                            if (Regex.IsMatch(hitName, @"^MO_")) osawariPoint = "mouth";
-                            if (Regex.IsMatch(hitName, @"^ML_"))
-                            {
-                                osawariPoint = "muneL";
-                                MuneUpDown = maid.body0.jbMuneL.MuneUpDown;
-                                MuneBlend = maid.body0.jbMuneL.BlendValue2;
-                                MuneUpDown_f = maid.body0.jbMuneL.MuneUpDown_f;
-                                MuneYori = maid.body0.jbMuneL.MuneYori;
-                                MuneYori_f = maid.body0.jbMuneL.MuneYori_f;
-                            }
-                            if (Regex.IsMatch(hitName, @"^MR_"))
-                            {
-                                osawariPoint = "muneR";
-                                MuneUpDown = maid.body0.jbMuneR.MuneUpDown;
-                                MuneBlend = maid.body0.jbMuneR.BlendValue2;
-                                MuneUpDown_f = maid.body0.jbMuneR.MuneUpDown_f;
-                                MuneYori = maid.body0.jbMuneR.MuneYori;
-                                MuneYori_f = maid.body0.jbMuneR.MuneYori_f;
-                            }
-                            if (Regex.IsMatch(hitName, @"^HL_")) osawariPoint = "hipL";
-                            if (Regex.IsMatch(hitName, @"^HR_")) osawariPoint = "hipR";
-                            if (Regex.IsMatch(hitName, @"^VA_")) osawariPoint = "vagina";
-                            if (Regex.IsMatch(hitName, @"^AN_")) osawariPoint = "anal";
+          //減少量係数 0～ 胸位置が1fなら1秒 ループ内でTime.deltaTimeと乗算
+          delta_x = muneSize * (1f+Math.Abs(MuneX))/2f;
+          delta_y = muneSize * (1f+Math.Abs(MuneY))/2f;
+          delta_time = muneSize;
 
-                            //checkBlowjobing(osawariID);
-                            if (!maidsState[osawariID].stunFlag && maidsState[osawariID].bIsBlowjobing != 2) stockMaids[osawariID].mem.EyeToCamera((Maid.EyeMoveType)5, 0.8f);
-                            //if(maidsState[osawariID].vStateMajor == 10)ReactionPlay(osawariID);
-                        }
-                    }
-                }
-
-            }
-            else if (osawariLock == 1)
-            {
-
-                Maid maid = stockMaids[osawariID].mem;
-
-                if (Input.GetMouseButtonUp(0))
-                { //マウスリリース時の処理
-                    if (osawariPoint == "muneL" || osawariPoint == "muneR")
-                    {
-                        MuneX = Move_atp_x;
-                        MuneY = Move_atp_y;
-                        timeX = 0f;
-                        timeY = 0f;
-                    }
-                }
-
-                //マウスドラッグ時の処理
-                if (Input.GetMouseButton(0))
-                {
-                    //マウスの移動値取得
-                    if (moveCheck > 0f)
-                    {
-                        move_x += System.Math.Abs(Input.GetAxis("Mouse X")) * sensitivity;
-                        move_y += System.Math.Abs(Input.GetAxis("Mouse Y")) * sensitivity;
-
-                        moveCheck -= timerRate;
-                    }
-                    else
-                    {
-                        if (move_x >= move_y) mouse_move = (mouse_move + move_x) * 0.5f;
-                        if (move_x < move_y) mouse_move = (mouse_move + move_y) * 0.5f;
-                        move_x = 0f;
-                        move_y = 0f;
-                        moveCheck = 20f;
-                    }
-
-                    //お触りレベル判定
-                    if (osawariLevel == 0)
-                    {
-                        if (mouse_move > 2f) osawariLevel = 1;
-                    }
-                    else if (osawariLevel == 1)
-                    {
-                        if (mouse_move < 0.5f) osawariLevel = 0;
-                        if (mouse_move > 4f) osawariLevel = 2;
-                    }
-                    else if (osawariLevel == 2)
-                    {
-                        if (mouse_move < 2f) osawariLevel = 1;
-                    }
-
-                    //シェイプキー操作用の値
-                    Move_atp_x += Input.GetAxis("Mouse X") * sensitivity * 0.7f;
-                    if (Move_atp_x > 1f) Move_atp_x = 1f;
-                    if (Move_atp_x < -1f) Move_atp_x = -1f;
-                    Move_atp_y += Input.GetAxis("Mouse Y") * sensitivity * 0.7f;
-                    if (Move_atp_y > 1f) Move_atp_y = 1f;
-                    if (Move_atp_y < -1f) Move_atp_y = -1f;
-
-
-
-                }
-                else
-                {
-                    //マウスリリースしたあとの処理
-                    if (osawariPoint == "muneL" || osawariPoint == "muneR")
-                    {
-
-                        float sinX = -Mathf.Sin(2 * Mathf.PI * 3 * timeX);
-                        float sinY = -Mathf.Sin(2 * Mathf.PI * 3 * timeY);
-
-                        if (MuneX > 0)
-                        {
-                            MuneX -= timerRate / (60f + (float)maid.GetProp(MPN.MuneL).value * 0.5f);
-                            if (MuneX < 0) MuneX = 0f;
-                        }
-                        else if (MuneX < 0)
-                        {
-                            MuneX += timerRate / (60f + (float)maid.GetProp(MPN.MuneL).value * 0.5f);
-                            if (MuneX > 0) MuneX = 0f;
-                        }
-                        if (MuneY > 0)
-                        {
-                            MuneY -= timerRate / (60f + (float)maid.GetProp(MPN.MuneL).value * 0.5f);
-                            if (MuneY < 0) MuneY = 0f;
-                        }
-                        else if (MuneY < 0)
-                        {
-                            MuneY += timerRate / (60f + (float)maid.GetProp(MPN.MuneL).value * 0.5f);
-                            if (MuneY > 0) MuneY = 0f;
-                        }
-
-                        timeX += timerRate / (60f + (float)maid.GetProp(MPN.MuneL).value * 0.5f);
-                        timeY += timerRate / (60f + (float)maid.GetProp(MPN.MuneL).value * 0.5f);
-
-                        Move_atp_x = sinX * MuneX;
-                        Move_atp_y = sinY * MuneY;
-
-                        if (MuneX == 0 && MuneY == 0) osawariLock = 2;
-
-                    }
-                    else
-                    {
-                        osawariLock = 2;
-                    }
-                }
-
-
-
-                //お触りポイント別の処理
-                float hipX = 0f;
-                if (osawariPoint == "vagina")
-                {
-                    try { VertexMorph_FromProcItem(maid.body0, "atp_vagina", (Move_atp_y - 1f) * -0.5f); } catch { /*LogError(ex);*/ }
-                    try { VertexMorph_FromProcItem(maid.body0, "labiakupa_dia", System.Math.Abs(Move_atp_x) * 0.5f); } catch { /*LogError(ex);*/ }
-                }
-
-                if (osawariPoint == "muneL")
-                {
-                    maid.body0.jbMuneL.MuneUpDown = MuneUpDown + Move_atp_y * 60f;
-                    maid.body0.jbMuneL.BlendValue2 = MuneBlend + Move_atp_y;
-                    maid.body0.jbMuneL.MuneUpDown_f = MuneUpDown_f + Mathf.Abs(Move_atp_y) * 2f;
-
-                    maid.body0.jbMuneL.MuneYori = MuneYori + Move_atp_x * 25f;
-                    maid.body0.jbMuneL.MuneYori_f = MuneYori_f + Mathf.Abs(Move_atp_x) * 2f;
-
-                    maid.body0.bonemorph.Blend();
-                }
-
-                if (osawariPoint == "muneR")
-                {
-                    maid.body0.jbMuneR.MuneUpDown = MuneUpDown + Move_atp_y * 60f;
-                    maid.body0.jbMuneR.BlendValue2 = MuneBlend - Move_atp_y;
-                    maid.body0.jbMuneR.MuneUpDown_f = MuneUpDown_f + Mathf.Abs(Move_atp_y) * 2f;
-
-                    maid.body0.jbMuneR.MuneYori = MuneYori - Move_atp_x * 25f;
-                    maid.body0.jbMuneR.MuneYori_f = MuneYori_f + Mathf.Abs(Move_atp_x) * 2f;
-
-                    maid.body0.bonemorph.Blend();
-                }
-
-                if (osawariPoint == "hipR")
-                {
-                    hipX = Move_atp_x;
-                }
-
-                if (osawariPoint == "hipL")
-                {
-                    hipX = Move_atp_x * -1;
-                }
-
-                if (osawariPoint == "hipL" || osawariPoint == "hipR")
-                {
-                    try { VertexMorph_FromProcItem(maid.body0, "hip_type_A", Move_atp_y); } catch { /*LogError(ex);*/ }
-                    try { VertexMorph_FromProcItem(maid.body0, "slim_hip1", Move_atp_y); } catch { /*LogError(ex);*/ }
-                    try { VertexMorph_FromProcItem(maid.body0, "debu_pelvis_x", hipX); } catch { /*LogError(ex);*/ }
-                    try { VertexMorph_FromProcItem(maid.body0, "debu_pelvis_y", Move_atp_y); } catch { /*LogError(ex);*/ }
-
-                    try { VertexMorph_FromProcItem(maid.body0, "hip_type_V", 0.3f); } catch { /*LogError(ex);*/ }
-                    try { VertexMorph_FromProcItem(maid.body0, "slim_oshiri", System.Math.Abs(Move_atp_y + Move_atp_x) * 0.2f); } catch { /*LogError(ex);*/ }
-                }
-
-                if (osawariPoint == "anal")
-                {
-                    try { VertexMorph_FromProcItem(maid.body0, "anal_swell2", (Move_atp_y) * -0.5f); } catch { /*LogError(ex);*/ }
-                    try { VertexMorph_FromProcItem(maid.body0, "anal_swell3", (Move_atp_y - 1f) * -0.5f); } catch { /*LogError(ex);*/ }
-                }
-
-
-
-            }
-            else if (osawariLock == 2)
-            {
-
-                Maid maid = stockMaids[osawariID].mem;
-
-                if (osawariPoint == "vagina")
-                {
-                    try { VertexMorph_FromProcItem(maid.body0, "atp_vagina", 0f); } catch { /*LogError(ex);*/ }
-                    try { VertexMorph_FromProcItem(maid.body0, "labiakupa_dia", 0f); } catch { /*LogError(ex);*/ }
-
-                }
-                else if (osawariPoint == "anal")
-                {
-                    try { VertexMorph_FromProcItem(maid.body0, "anal_swell2", 0f); } catch { /*LogError(ex);*/ }
-                    try { VertexMorph_FromProcItem(maid.body0, "anal_swell3", 0f); } catch { /*LogError(ex);*/ }
-
-                }
-                else if (osawariPoint == "hipL" || osawariPoint == "hipR")
-                {
-                    try { VertexMorph_FromProcItem(maid.body0, "hip_type_A", 0f); } catch { /*LogError(ex);*/ }
-                    try { VertexMorph_FromProcItem(maid.body0, "slim_hip1", 0f); } catch { /*LogError(ex);*/ }
-                    try { VertexMorph_FromProcItem(maid.body0, "debu_pelvis_x", 0f); } catch { /*LogError(ex);*/ }
-                    try { VertexMorph_FromProcItem(maid.body0, "debu_pelvis_y", 0f); } catch { /*LogError(ex);*/ }
-                    try { VertexMorph_FromProcItem(maid.body0, "hip_type_V", 0f); } catch { /*LogError(ex);*/ }
-                    try { VertexMorph_FromProcItem(maid.body0, "slim_oshiri", 0f); } catch { /*LogError(ex);*/ }
-
-                }
-                else if (osawariPoint == "muneL")
-                {
-                    maid.body0.jbMuneL.MuneUpDown = MuneUpDown;
-                    maid.body0.jbMuneL.BlendValue2 = MuneBlend;
-                    maid.body0.jbMuneL.MuneUpDown_f = MuneUpDown_f;
-                    maid.body0.jbMuneL.MuneYori = MuneYori;
-                    maid.body0.jbMuneL.MuneYori_f = MuneYori_f;
-                    maid.body0.bonemorph.Blend();
-
-                }
-                else if (osawariPoint == "muneR")
-                {
-                    maid.body0.jbMuneR.MuneUpDown = MuneUpDown;
-                    maid.body0.jbMuneR.BlendValue2 = MuneBlend;
-                    maid.body0.jbMuneR.MuneUpDown_f = MuneUpDown_f;
-                    maid.body0.jbMuneR.MuneYori = MuneYori;
-                    maid.body0.jbMuneR.MuneYori_f = MuneYori_f;
-                    maid.body0.bonemorph.Blend();
-                }
-
-                osawariLock = 9;
-
-
-            }
-            else if (osawariLock == 9)
-            {
-                osawariLock = 0;
-                osawariID = -1;
-                osawariLevel = 0;
-                osawariPoint = "";
-                mouse_move = 0f;
-                Move_atp_x = 0f;
-                Move_atp_y = 0f;
-                MuneX = 0f;
-                MuneY = 0f;
-                timeX = 0f;
-                timeY = 0f;
-            }
-
-
+          this.bActive = true;
         }
 
+        //お触り開始されていたら非活性化して後で破棄
+        public void muneRelease()
+        {
+          if (!bActive) return;
+
+          //入れ替えの場合は開始時にキャンセルしているので不要
+          /*if (osawari.isOsawari(osawariID, bLeft ? "ML_" : "MR_")) {
+            bActive = false; return;
+          }*/
+          //胸揺れ処理 胸のサイズに連動
+          if (MuneX > 0) MuneX = Math.Max(0f, MuneX - Time.deltaTime * delta_x);
+          else if (MuneX < 0) MuneX = Math.Min(0f, MuneX + Time.deltaTime * delta_x);
+          if (MuneY > 0) MuneY = Math.Max(0f, MuneY - Time.deltaTime * delta_y);
+          else if (MuneY < 0) MuneY = Math.Min(0f, MuneY + Time.deltaTime * delta_y);
+          
+          float sin = (float)-Math.Sin(2 * Math.PI * 3 * Mune_time); //1秒に3周期
+          Mune_time += Time.deltaTime * delta_time;
+          
+          Mune_atp.x = sin * MuneX;
+          Mune_atp.y = sin * MuneY;
+          
+          //胸変形 共通関数利用
+          osawari.muneMorph(bLeft, osawariID, muneValue, Mune_atp);
+
+          if (MuneX == 0 && MuneY == 0) bActive = false;
+        }
+
+        public void cancel()
+        {
+          this.bActive = false;
+        }
+
+      } //class OsawariRelease
+
+      /** コントローラーのWrapper */
+      public interface OsawariController
+      {
+        /** 種別 1:Quest, 2:Vive */
+        int getType();
+        bool GetDown();
+        bool Get();
+        bool GetUp();
+        bool GetModeUp();
+        /** コントローラーの移動量を取得 */
+        Vector3 GetLocalControllerVelocity();
+        /** おさわり開始時に呼び出す GetLocalControllerVelocityの前のフレームで実行 */
+        void setStartHandPosition();
+        /** handAnchor取得 */
+        Transform getHandAnchor();
+      }
+
+      //Quest用
+      public class OsawariQuestController : OsawariController
+      {
+        private OVRInput.RawButton dragButton;
+        private OVRInput.Controller dragController;
+        private OVRInput.RawButton modeButton;
+        private Transform handAnchor;
+
+        public OsawariQuestController(OVRInput.RawButton dragButton, OVRInput.Controller dragController, OVRInput.RawButton modeButton, Transform handAnchor)
+        {
+          this.dragButton = dragButton;
+          this.dragController = dragController;
+          this.modeButton = modeButton;
+          this.handAnchor = handAnchor;
+        }
+        public int getType() { return 1; }
+        public bool GetDown() { return OVRInput.GetDown(dragButton, dragController); }
+        public bool Get() { return OVRInput.Get(dragButton, dragController); }
+        public bool GetUp() { return OVRInput.GetUp(dragButton, dragController); }
+        public bool GetModeUp() { return OVRInput.GetUp(modeButton, dragController); }
+        /** 右手座標でXが逆 */
+        public Vector3 GetLocalControllerVelocity() { return OVRInput.GetLocalControllerVelocity(dragController); }
+        public void setStartHandPosition() { }
+        /** handAnchor取得 */
+        public Transform getHandAnchor() { return this.handAnchor; }
+      }
+
+      //SteamVR用
+      public class OsawariViveController : OsawariController
+      {
+        private AVRControllerButtons.BTN viveButton;
+        private OvrMgr.OvrObject.Controller viveController;
+        private AVRControllerButtons.BTN viveModeButton;
+        private Transform handAnchor;
+
+        private Vector3 preHandPos;
+        private Vector3 velocity;
+
+        public OsawariViveController(AVRControllerButtons.BTN viveButton, OvrMgr.OvrObject.Controller viveController, AVRControllerButtons.BTN viveModeButton)
+        {
+          this.viveButton = viveButton;
+          this.viveController = viveController;
+          this.viveModeButton = viveModeButton;
+          this.handAnchor = viveController.controller.transform;
+          preHandPos = new Vector3(0,0,0);
+          velocity = new Vector3(0,0,0);
+
+        }
+        public int getType() { return 2; }
+        public bool GetDown() { return viveController.controller_buttons.GetPressDown(viveButton); }
+        public bool Get() { return viveController.controller_buttons.GetPress(viveButton); }
+        public bool GetUp() { return viveController.controller_buttons.GetPressUp(viveButton); }
+        public bool GetModeUp() { return viveController.controller_buttons.GetPressUp(viveModeButton); }
+        /** 前のフレームからの移動量 Questとyが逆で単位も1/100 同一フレームで複数回呼ばないこと */
+        public Vector3 GetLocalControllerVelocity() {
+          velocity.x = preHandPos.x - handAnchor.position.x;
+          velocity.y = handAnchor.position.y - preHandPos.y;
+          velocity.z = preHandPos.z - handAnchor.position.z;
+          preHandPos.x = handAnchor.position.x;
+          preHandPos.y = handAnchor.position.y;
+          preHandPos.z = handAnchor.position.z;
+          return velocity * 100f; //Quest側の単位に合わせる
+        }
+        public void setStartHandPosition() {
+          preHandPos.x = handAnchor.position.x;
+          preHandPos.y = handAnchor.position.y;
+          preHandPos.z = handAnchor.position.z;
+        }
+        /** handAnchor取得 */
+        public Transform getHandAnchor() { return this.handAnchor; }
+      }
+
+      /**
+       * お触り操作と変形を処理するクラス
+       * マウス、タッチパネル、Questコントローラーに対応
+       */
+      public class OsawariInput
+      {
+        //コントローラーidx
+        public int idx = 0;
+        Osawari osawari;
+
+        //VYM本体側にあわせる
+        private bool bVR = false;
+
+        //VRお触り中のボタンとコントローラー
+        OsawariController osawariController;
+
+        bool bLeft = false; //左手かどうか
+
+        //外から参照される値
+        public int osawariID = -1;
+        public int osawariLevel = 0;
+        public string osawariPoint = "";
+        public int osawariLock = 0;
+
+        //レベル計算用移動量
+        public float mouse_move = 0f;
+
+        //タッチパネル用
+        public bool touchActive = false;
+
+        //内部で利用する変数
+        private float sensitivity = 0.1f; // マウス感度
+        private Vector3 move = new Vector3(0f, 0f, 0f);
+        private float moveCheck = 20f;
+        //マウス位置への変形量 0f～1f
+        public Vector3 Move_atp = new Vector3(0f, 0f, 0f);
+        //胸の変形量 遅延変形用 0f～1f
+        private Vector3 Mune_atp = new Vector3(0f, 0f, 0f);
+
+        //private Vector3 back_IK_Pos;
+        //private string hitName = "";
+        
+        //胸初期位置 左右入れ替え処理で上書きされないように左右別で保存
+        private OsawariRelease.MuneValue muneValueL;
+        private OsawariRelease.MuneValue muneValueR;
+
+        private float vrSensitive = 0.2f; //VR動作感度 胸の動きに合わせる
+        private float holeSensitive = 5.0f; //感度増幅 前後の穴のみ
+        
+        public float releaseDistance = 0.25f; //VR時 対象からこの距離離れたらマウスリリース扱い
+        private float overlapRadius = 0.015f; //コントローラーの当たり判定半径
+        public float osawariHandRadius = 0.015f; //手の当たり判定半径
+
+        public float osawariHSliderMin = 20f; //終了時のスライダ最小値
+        public float osawariASliderMin = 10f; //終了時のスライダ最小値
+
+        //ターゲット名判別正規表現
+        private Regex osawariReg = new Regex("^(MO|ML|MR|HL|HR|VA|AN)_", RegexOptions.Compiled);
+
+        //お触りしている対象
+        private GameObject dragObject;
+
+        //HMDの座標取得用transform
+        Transform trackingSpaceTransform;
+        Transform handAnchor;
+        Transform handItem;
+
+        //ボタンを押した時点のコントローラーの種類
+        public int handType;
+        //bool checkHandType = false;
+        float checkHandTime = float.PositiveInfinity;
+        
+        //VR標準の胸変形コライダー 胸お触り時は無効にする
+        Collider touchCollider = null;
+
+        //お触りポイントの向き Bodyからの差分
+        Quaternion rotMune = Quaternion.Inverse(new Quaternion(0.4f, -0.6f, -0.4f, 0.6f));
+        Quaternion rotHead = Quaternion.Inverse(new Quaternion(-0.1f, 0.7f, 0.0f, 0.7f));
+        Quaternion rotXxx = Quaternion.Inverse(new Quaternion(0.5f, -0.5f, -0.5f, 0.5f));
+
+        //NonAllocの当たり判定返却用
+        Collider[] collider = new Collider[5];
+
+        #if DEBUG
+        GameObject controller1;
+        GameObject controller2;
+        #endif
+
+
+        /** コンストラクタ マウス・タッチ用
+         * <param name="osawari">各OsawariInputクラスを管理するクラス</param>
+         */
+        public OsawariInput(int idx, Osawari osawari)
+        {
+          this.idx = idx;
+          this.osawari = osawari;
+        }
+        /** コンストラクタ Questコントローラー用
+         * <param name="osawari">各OsawariInputクラスを管理するクラス</param>
+         * <param name="OsawariQuestController">左右のコントローラー</param>
+         */
+        public OsawariInput(int idx, Osawari osawari, bool bLeft, OsawariQuestController osawariController)
+        {
+          this.bVR = true;
+
+          this.idx = idx;
+          this.osawari = osawari;
+          this.bLeft = bLeft;
+          this.osawariController = osawariController;
+
+          //VRのHMDとコントローラーのtransformをメンバ変数に保存 初回のみ
+          //trackingSpaceTransform = GameMain.Instance.OvrMgr.OvrCamera.GetBaseHeadTransform(); → GripMoveの回転は取れない
+          trackingSpaceTransform = GameObject.Find("TrackingSpace").transform;
+
+          //handAnchor = trackingSpaceTransform.Find(bLeft ? "LeftHandAnchor": "RightHandAnchor");
+          handAnchor = osawariController.getHandAnchor();
+
+          //VR胸変形コライダー キャンセル用
+          Transform touchSphere = handAnchor.Find("TouchSphere");
+          if (touchSphere) touchCollider = touchSphere.gameObject.GetComponent<Collider>();
+
+          initVR();
+        }
+
+        /** コンストラクタ Viveコントローラー用
+         * <param name="osawari">各OsawariInputクラスを管理するクラス</param>
+         * <param name="OsawariQuestController">左右のコントローラー</param>
+         */
+        public OsawariInput(int idx, Osawari osawari, bool bLeft, OsawariViveController osawariController)
+        {
+          this.bVR = true;
+
+          this.idx = idx;
+          this.osawari = osawari;
+          this.bLeft = bLeft;
+          this.osawariController = osawariController;
+
+          //VRのHMDとコントローラーのtransformをメンバ変数に保存 初回のみ
+          //trackingSpaceTransform = GameMain.Instance.OvrMgr.OvrCamera.GetBaseHeadTransform();
+          trackingSpaceTransform = GameObject.Find("ViveCamBaseHead").transform;
+
+          handAnchor = osawariController.getHandAnchor();
+
+          //VR胸変形コライダー キャンセル用
+          GameObject touchSphere = GameObject.Find("Controller (" + (bLeft ?  "left" : "right") + ")/TouchSphere");
+          if (touchSphere) touchCollider = touchSphere.GetComponent<Collider>();
+
+          initVR();
+        }
+
+        private void initVR()
+        {
+          //手の種別取得用
+          handItem = handAnchor.Find("HandItem");
+
+          //設定値を格納
+          releaseDistance = osawari.cfgw.osawariRelease;
+          osawariHandRadius = osawari.cfgw.osawariHandRadius;
+          osawariHSliderMin = osawari.cfgw.osawariHSliderMin;
+          osawariASliderMin = osawari.cfgw.osawariASliderMin;;
+        }
+
+        /** おさわり中のシーン切り替え等があったら呼ぶ */
+        public void endOsawari()
+        {
+          //リリース処理
+          if (osawariLock == 1 || osawariLock == 2 || osawariLock == 3) {
+            Move_atp.x = 0f;
+            Move_atp.y = 0f;
+            Move_atp.z = 0f;
+            Mune_atp.x = 0f;
+            Mune_atp.y = 0f;
+            Mune_atp.z = 0f;
+            //胸の変形を初期化
+            if (osawariPoint == "ML_") {
+              OsawariRelease osawariRelease = osawari.getMuneRelease(true, osawariID);
+              if (osawariRelease != null) osawariRelease.cancel();
+              osawari.muneMorph(true, osawariID, muneValueL, Move_atp);
+              if (touchCollider != null) touchCollider.enabled = true; //VR用コライダー有効
+              osawariPoint = "";
+            } else if (osawariPoint == "MR_") {
+              OsawariRelease osawariRelease = osawari.getMuneRelease(false, osawariID);
+              if (osawariRelease != null) osawariRelease.cancel();
+              osawari.muneMorph(false, osawariID, muneValueR, Move_atp);
+              if (touchCollider != null) touchCollider.enabled = true; //VR用コライダー有効
+              osawariPoint = "";
+            }
+            osawariLock = 3; //胸以外の変形初期化
+          } else {
+            osawariLock = 9;
+          }
+        }
+
+        //コントローラーの種別を取得 0=Hand, 10=Light 11=Vibe 12=AnalVibe 20=Camera
+        //毎フレーム実行しない
+        private int getHandType()
+        {
+          //通常の手 "RightHandAnchor/HandPlayer"
+          int handType = 0;
+          Transform hand = handItem.Find("Sticklight");
+          if (hand && hand.gameObject.activeInHierarchy) return 10;
+          hand = handItem.Find("VR_HandItemR_VibePink");
+          if (hand && hand.gameObject.activeInHierarchy) return 11;
+          hand = handItem.Find("VR_HandItemR_AnalVibe");
+          if (hand && hand.gameObject.activeInHierarchy) return 12;
+          hand = handAnchor.Find("HandCamera");
+          if (hand && hand.gameObject.activeInHierarchy) return 20;
+          return handType;
+        }
+
+        //当たり判定カプセル用の相対位置 毎回newせずに使いまわす
+        Vector3 vibePosL1 = new Vector3(-0.0005f, 0.0165f, 0.0125f); //バイブ付け根 左
+        Vector3 vibePosR1 = new Vector3(-0.0015f, 0.017f, 0f); //バイブ付け根 右
+        Vector3 vibePos2 = new Vector3(0f, -0.015f, -0.02f); //バイブ付け根 SteamVR用
+        Vector3 cameraPosL = new Vector3( 0.025f, 0f, 0f); //カメラ画面中央 左
+        Vector3 cameraPosR = new Vector3(-0.015f, 0f, 0f); //カメラ画面中央 右
+        Vector3 handPosL = new Vector3(-0.02f, -0.01f, 0f); //親指付け根 左
+        Vector3 handPosR = new Vector3( 0.02f, -0.01f, 0f); //親指付け根 右
+        Vector3 vibeDirection = new Vector3(0f, 0f, 0.13f);
+        Vector3 cameraDirection = new Vector3(0.03f, -0.15f, 0.04f);
+        Vector3 handDirection = new Vector3(0f, -0.03f, 0.01f);
+
+        /** コントローラー座標のカプセル形状内のColliderをすべて取得 
+         * @param result 判定結果を格納する固定長の配列 */
+        private int getOverlapSphereCollider(Collider[] result)
+        {
+          //Vector3 controllerPos = OVRInput.GetLocalControllerPosition(controller); //HMDからの相対位置
+          //controllerPos = trackingSpaceTransform.TransformPoint(controllerPos); //ワールド座標の位置に変換
+          //Quaternion controllerRot = OVRInput.GetLocalControllerRotation(controller); //HMDからの相対回転
+          Vector3 controllerPos = handAnchor.position;
+          Quaternion controllerRot = handAnchor.rotation;
+
+          //int handType = getHandType(); //開始時だけ取得
+          float radius = overlapRadius;
+          //判定位置調整
+          Vector3 direction;
+          switch (handType) {
+          case 10: case 11: case 12://バイブ
+            if (bLeft) {
+              controllerPos += controllerRot * (osawariController.getType() == 1 ? vibePosL1 : vibePos2); //バイブ付け根 左
+              direction = controllerRot * (handItem.localRotation * vibeDirection); //バイブ先端 左
+            } else {
+              controllerPos += controllerRot * (osawariController.getType() == 1 ? vibePosR1 : vibePos2); //バイブ付け根 右
+              direction = controllerRot * (handItem.localRotation * vibeDirection); //バイブ先端 右
+            }
+            if (handType == 12) radius *= 0.5f; //AnalVibeは半分の細さにする
+            break;
+          case 20 : //Camera カメラ画面中央に移動
+            if (osawariController.getType() == 1) {
+              controllerPos += controllerRot * (bLeft ? cameraPosL : cameraPosR);
+            } else {
+              controllerPos -= controllerRot * (bLeft ? cameraPosL : cameraPosR);;
+            }
+            direction = controllerRot * cameraDirection; //カメラ先端
+            break;
+          default:
+            if (osawariController.getType() == 1) {
+              controllerPos += controllerRot * (bLeft ? handPosL : handPosR); //手のひら原点を調整
+            } else {
+              controllerPos -= controllerRot * (bLeft ? handPosL : handPosR); //手のひら原点を調整
+            }
+            direction = controllerRot * handDirection; //中指付け根
+            radius = osawariHandRadius;
+            break;
+          }
+          Vector3 controllerPos2 = controllerPos + direction;
+
+          #if DEBUG
+          if (controller1 == null) {
+            controller1 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            controller1.transform.localScale = new Vector3(overlapRadius*2, overlapRadius*2, overlapRadius*2);
+            controller2 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            controller2.transform.localScale = new Vector3(overlapRadius*2, overlapRadius*2, overlapRadius*2);
+          }
+          controller1.transform.position = controllerPos;
+          controller2.transform.position = controllerPos2;
+          controller1.transform.localScale = new Vector3(radius*2, radius*2, radius*2);
+          controller2.transform.localScale = new Vector3(radius*2, radius*2, radius*2);
+          #endif
+
+          //カプセル形状内のColliderをすべて取得 LayeMaskはレイヤ番号分ビットシフトした値 8=256 9=512
+          return Physics.OverlapCapsuleNonAlloc(controllerPos, controllerPos2, radius, result, 256, QueryTriggerInteraction.Collide);
+        }
+
+        string getHitPoint(string hitName)
+        {
+          if (hitName.Length > 3) return hitName.Substring(0, 3);
+          return "";
+        }
+
+        void startMuneL(Maid maid)
+        {
+          OsawariRelease osawariRelease = osawari.getMuneRelease(true, osawariID);
+          if (osawariRelease != null) {
+            //胸揺れ中なら値を取得してキャンセル
+            muneValueL = osawariRelease.muneValue;
+            this.Mune_atp.x = osawariRelease.Mune_atp.x;
+            this.Mune_atp.y = osawariRelease.Mune_atp.y;
+            osawariRelease.cancel();
+          } else {
+            muneValueL = new OsawariRelease.MuneValue(maid.body0.jbMuneL);
+            Mune_atp.x = 0f; Mune_atp.y = 0f; Mune_atp.z = 0f;
+          }
+          Move_atp.x = 0f; Move_atp.y = 0f; Move_atp.z = 0f;
+        }
+
+        void startMuneR(Maid maid)
+        {
+          OsawariRelease osawariRelease = osawari.getMuneRelease(false, osawariID);
+          if (osawariRelease != null) {
+            //胸揺れ中なら値を取得してキャンセル
+            muneValueR = osawariRelease.muneValue;
+            this.Mune_atp.x = osawariRelease.Mune_atp.x;
+            this.Mune_atp.y = osawariRelease.Mune_atp.y;
+            osawariRelease.cancel();
+          } else {
+            muneValueR = new OsawariRelease.MuneValue(maid.body0.jbMuneR);
+            Mune_atp.x = 0f; Mune_atp.y = 0f; Mune_atp.z = 0f;
+          }
+          Move_atp.x = 0f; Move_atp.y = 0f; Move_atp.z = 0f;
+        }
+
+        /**
+         * おさわり処理 (オリジナルの osawariHand() の処理)
+         */
+        public void osawariHand(List<int> vmId)
+        {
+
+          if(osawariLock == 0){
+
+            int hitMaidID = -1;
+            string hitPoint = "";
+            
+            if (bVR) {
+              if (osawariController.GetDown()) {
+                handType = getHandType(); //コントローラーの種類を取得
+              }
+              if (osawari.cfgw.osawariAlways) {
+                if (checkHandTime > Time.time) {
+                  handType = getHandType(); //コントローラーの種類を取得
+                } else if (osawariController.GetModeUp()) {
+                  //モードチェンジ後に取得
+                  checkHandTime = Time.time+1; //1秒後
+                }
+              }
+              //VRコントローラーのボタンが押されている、または常時お触り
+              if (osawari.cfgw.osawariAlways || osawariController.Get()) {
+                int length = getOverlapSphereCollider(collider);
+                for (int i=0; i<length; i++) {
+                  string name = collider[i].gameObject.name;
+                  if (osawariReg.IsMatch(name)) {
+                    hitMaidID = intCnv(osawariReg.Replace(name, ""));
+                    hitPoint = getHitPoint(name);
+                    //他のコントローラで選択中なら無視する
+                    if (osawari.isOsawari(hitMaidID, hitPoint)) {
+                      hitPoint = "";
+                    } else {
+                      dragObject = collider[i].gameObject;
+                      osawariController.setStartHandPosition();
+                      break;
+                    }
+                  }
+                }
+              }
+            } else {
+              bool mousedown = false;
+              Vector3 mosuePosition = Vector3.zero;
+              if (Input.touchCount > idx) {
+                Touch touch = Input.GetTouch(idx);
+                //感度が悪いのでBegan以外も取得
+                if (touch.phase == TouchPhase.Began || touch.phase == TouchPhase.Moved || touch.phase == TouchPhase.Stationary) {
+                  mousedown = true;
+                  mosuePosition = touch.position;
+                }
+              } else if (idx == 0 && Input.GetMouseButtonDown(0)) {
+                mousedown = true;
+                mosuePosition = Input.mousePosition;
+              }
+              if (mousedown) {
+                Ray ray = Camera.main.ScreenPointToRay(mosuePosition);
+                RaycastHit hit;
+                if (Physics.Raycast(ray, out hit)) {
+                  string name = hit.collider.gameObject.name;
+                  if (osawariReg.IsMatch(name)) {
+                    hitMaidID = intCnv(osawariReg.Replace(name, ""));
+                    hitPoint = getHitPoint(name);
+                    if (Input.touchCount > idx) { //マルチタッチの場合は排他
+                      if (osawari.isOsawari(hitMaidID, hitPoint)) {
+                        hitPoint = "";
+                      } else {
+                        touchActive = true;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            if (hitPoint != "") {
+               
+                osawariID = hitMaidID;
+                osawariPoint = hitPoint;
+
+                //if(isMouseDown){
+                  osawariLock = 1;
+                  //osawariID = intCnv(osawariReg.Replace(hitName, ""));
+                  Maid maid = osawari.stockMaids[osawariID].mem;
+
+                  if(hitPoint.StartsWith("ML_")){
+                    startMuneL(maid);
+                    if (touchCollider != null) touchCollider.enabled = false; //VR用コライダー無効
+                  }
+                  else if(hitPoint.StartsWith("MR_")){
+                    startMuneR(maid);
+                    if (touchCollider != null) touchCollider.enabled = false; //VR用コライダー無効
+                  }
+
+                  //checkBlowjobing(osawariID);
+                  if(!osawari.maidsState[osawariID].stunFlag && osawari.maidsState[osawariID].bIsBlowjobing != 2)osawari.stockMaids[osawariID].mem.EyeToCamera((Maid.EyeMoveType)5, 0.8f);
+                  //if(maidsState[osawariID].vStateMajor == 10)ReactionPlay(osawariID);
+                //}
+            }
+            
+          } else if (osawariLock == 1) {
+          
+            //マウスリリース判定
+            bool bUp = false;
+            //マウスドラッグ判定
+            bool bDrag = false;
+
+            if (bVR) {
+              if (osawariController.GetUp() && !osawari.cfgw.osawariAlways) {
+                bUp = true;
+              } else if (osawari.cfgw.osawariAlways || osawariController.Get()) {
+                bDrag = true;
+                //対象から離れたらマウスリリース扱いにする
+                if (releaseDistance < Vector3.Distance(dragObject.transform.position, handAnchor.position)) {
+                  bDrag = false;
+                  bUp = true;
+                } else {
+                  bool muneLtoR = false;
+                  bool muneRtoL = false;
+                  bool onMuneL = false;
+                  bool onMuneR = false;
+                  //別のメイドのお触りポイントにヒットでマウスリリース扱いにする 胸の左右は入れ替える
+                  int length = getOverlapSphereCollider(collider);
+                  for (int i=0; i<length; i++) {
+                    string name = collider[i].gameObject.name;
+                    if (osawariReg.IsMatch(name)) {
+                      //他のメイド
+                      if (osawariID != intCnv(osawariReg.Replace(name, ""))) {
+                        bDrag = false;
+                        bUp = true;
+                        muneRtoL = false;
+                        muneLtoR = false;
+                        break;
+                      }
+                      //胸 左右入れ替えチェック（重なっているかもチェック）
+                      if (name.StartsWith("ML_")) {
+                        onMuneL = true;
+                        if (osawariPoint == "MR_" && !osawari.isOsawari(osawariID, "ML_")) muneRtoL = true;
+                      }
+                      if (name.StartsWith("MR_")) {
+                        onMuneR = true;
+                        if (osawariPoint == "ML_" && !osawari.isOsawari(osawariID, "MR_")) muneLtoR = true;
+                      }
+                    }
+                  }
+                  //胸入れ替え実行 重なっていたら入れ替えない
+                  if (muneLtoR && !onMuneL) {
+                    bDrag = false;
+                    //左リリース
+                    osawari.addMuneRelease(new OsawariRelease(osawari, true, osawariID, muneValueL, Mune_atp));
+                    osawariPoint = "MR_";
+                    dragObject = osawari.maidsState[osawariID].targetSphere_muneR; //VRの距離判定用
+                    startMuneR(osawari.stockMaids[osawariID].mem);
+                  } else if (muneRtoL && !onMuneR) {
+                    bDrag = false;
+                    //右リリース
+                    osawari.addMuneRelease(new OsawariRelease(osawari, false, osawariID, muneValueR, Mune_atp));
+                    osawariPoint = "ML_";
+                    dragObject = osawari.maidsState[osawariID].targetSphere_muneL; //VRの距離判定用
+                    startMuneL(osawari.stockMaids[osawariID].mem);
+                  }
+                }
+              } else {
+                bUp = true;
+              }
+            } else {
+              if (Input.touchCount > idx) {
+                Touch touch = Input.GetTouch(idx);
+                if (touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled) {
+                  bUp = true;
+                  touchActive = false;
+                } else {
+                  if (touch.phase == TouchPhase.Moved || touch.phase == TouchPhase.Stationary) {
+                    bDrag = true;
+
+                    Ray ray = Camera.main.ScreenPointToRay(touch.position);
+                    RaycastHit hit;
+                    if (Physics.Raycast(ray, out hit)) {
+                      string name = hit.collider.gameObject.name;
+                      //他のメイド
+                      if (osawariID != intCnv(osawariReg.Replace(name, ""))) {
+                        bDrag = false;
+                        bUp = true;
+                      }
+                      //胸 左右入れ替え
+                      else if (osawariPoint == "ML_" && name.StartsWith("MR_") && !osawari.isOsawari(osawariID, "MR_")) {
+                        bDrag = false;
+                        //左リリース
+                        osawari.addMuneRelease(new OsawariRelease(osawari, true, osawariID, muneValueL, Mune_atp));
+                        osawariPoint = "MR_";
+                        startMuneR(osawari.stockMaids[osawariID].mem);
+                      }
+                      else if (osawariPoint == "MR_" && name.StartsWith("ML_") && !osawari.isOsawari(osawariID, "ML_")) {
+                        bDrag = false;
+                        //右リリース
+                        osawari.addMuneRelease(new OsawariRelease(osawari, false, osawariID, muneValueR, Mune_atp));
+                        osawariPoint = "ML_";
+                        startMuneL(osawari.stockMaids[osawariID].mem);
+                      }
+                    }
+                  }
+                }
+              } else {
+                if (Input.GetMouseButtonUp(0)) {
+                  bUp = true;
+                } else {
+                  bDrag = Input.GetMouseButton(0);
+                }
+              }
+            }
+
+            //マウスリリース時の処理
+            if (bUp) {
+              //胸の戻りをメイドの各胸ごとに登録する
+              if (osawariPoint == "ML_") {
+                osawariPoint = "";
+                osawari.addMuneRelease(new OsawariRelease(osawari, true, osawariID, muneValueL, Mune_atp));
+                if (touchCollider != null) touchCollider.enabled = true; //VR用コライダー有効
+              } else if (osawariPoint == "MR_") {
+                osawariPoint = "";
+                osawari.addMuneRelease(new OsawariRelease(osawari, false, osawariID, muneValueR, Mune_atp));
+                if (touchCollider != null) touchCollider.enabled = true; //VR用コライダー有効
+              }
+              osawariLock = 3; //ドラッグ終了
+            }
+            //マウスドラッグ時の処理
+            else if (bDrag) {
+              //マウスの移動値取得
+              if(moveCheck > 0f){
+                float moveRate = osawari.cfgw.osawariMoveRate;
+                Quaternion bodyRot; //体の回転
+                if (osawariPoint == "ML_" || osawariPoint == "MR_") {
+                  bodyRot = osawari.maidsState[osawariID].maidMune.rotation * rotMune;
+                  moveRate *= 0.5f; //胸の移動量は半分に調整
+                } else if (osawariPoint == "MO_") {
+                  bodyRot = osawari.maidsState[osawariID].maidHead.rotation * rotHead;
+                } else { //"VA_", "AN_"
+                  bodyRot = osawari.maidsState[osawariID].maidXxx.rotation * rotXxx;
+                }
+                if (bVR) {
+                  Vector3 vec = osawariController.GetLocalControllerVelocity();
+
+                  //お触りポイントの向き成分のXYに変換 基本立ちのrotationのInverseをかけてBodyと同じ(0,0,0,0)にする
+                  vec = trackingSpaceTransform.rotation * vec; //HMD向き
+                  vec = Quaternion.Inverse(bodyRot) * vec;
+
+                  moveRate *= vrSensitive;
+                  //シェイプキー操作用の値
+                  if (osawariController.getType() == 1) Move_atp.x = Move_atp.x - vec.x * moveRate; //Xは逆に 左手でも逆
+                  else Move_atp.x = Move_atp.x + vec.x * moveRate;
+                  Move_atp.y = Move_atp.y + vec.y * moveRate;
+                  //Move_atp.z = Move_atp.z + vec.z * moveRate;
+
+                  move.x += System.Math.Abs(vec.x * moveRate);
+                  move.y += System.Math.Abs(vec.y * moveRate);
+                  move.z += System.Math.Abs(vec.z * moveRate);
+                } else {
+                  float mouseX = 0, mouseY = 0;
+                  if (Input.touchCount > idx) {
+                    //マウスより感度は下げる
+                    mouseX = Input.touches[idx].deltaPosition.x * 0.2f;
+                    mouseY = Input.touches[idx].deltaPosition.y * 0.2f;
+                  } else {
+                    mouseX = Input.GetAxis("Mouse X");
+                    mouseY = Input.GetAxis("Mouse Y");
+                  }
+                  //メイドの向きにあわせたXY成分を取得
+                  Vector3 vec = Quaternion.Inverse(bodyRot) * Camera.main.transform.rotation * new Vector3(mouseX, mouseY, 0);
+                  mouseX = -vec.x; //Xは逆
+                  if (osawariPoint == "VA_" || osawariPoint == "AN_") {
+                    Vector3 vec2 = Quaternion.Inverse(bodyRot) * Camera.main.transform.rotation * new Vector3(mouseX, 0, mouseY); //Z軸のほうが大きければ入れ替え
+                    if (Math.Abs(vec.y) < Math.Abs(vec2.y)) mouseY = vec2.y;
+                    else mouseY = vec.y;
+                  } else {
+                    mouseY = vec.y;
+                  }
+                  moveRate *= sensitivity;
+                  //シェイプキー操作用の値
+                  Move_atp.x = Move_atp.x + mouseX * moveRate;
+                  Move_atp.y = Move_atp.y + mouseY * moveRate;
+                  //Move_atp.z = Move_atp.z + vec.z * moveRate;
+
+                  move.x += System.Math.Abs(mouseX * moveRate);
+                  move.y += System.Math.Abs(mouseY * moveRate);
+                }
+                
+                moveCheck -= Time.deltaTime * 60;
+
+              }else{
+                mouse_move = (mouse_move + Math.Max(Math.Max(move.x, move.y) ,move.z)) * 0.5f;
+                move.x = 0f;
+                move.y = 0f;
+                move.z = 0f;
+                moveCheck = 20f;
+
+                //VRのお触りレベル上昇感度調整
+                if (bVR) {
+                  //mouse_move *= 2f;
+                  //感度増幅 VRのみ
+                  if (osawariPoint == "VA_" || osawariPoint == "AN_") {
+                    mouse_move *= holeSensitive;
+                  }
+                }
+                //お触りレベル判定 メイドの合計を取得
+                float mm = osawari.getMouseMove(osawariID);
+                if(osawariLevel == 0){
+                  if(mm > 2f)osawariLevel = 1;
+                }else if(osawariLevel == 1){
+                  if(mm < 0.5f)osawariLevel = 0;
+                  if(mm > 4f)osawariLevel = 2;
+                }else if(osawariLevel == 2){
+                  if(mm < 2f)osawariLevel = 1;
+                }
+              }
+            }
+
+          }
+          
+          if (osawariLock == 1) { //変形処理
+
+            Maid maid = osawari.stockMaids[osawariID].mem;
+            
+            //お触りポイント別の変形処理
+            if(osawariPoint == "VA_"){
+              float x = Move_atp.x = Math.Max(-1f, Math.Min(1f, Move_atp.x)); //xは-1～1に毎回置き換え
+              float y = Math.Max(-1f, Math.Min(1f, Move_atp.y*0.5f)); //Y方向は移動量を調整 -1～1以上も保持する
+              //float z = Move_atp.z = Math.Max(-1f, Math.Min(1f, Move_atp.z)); //zは-1～1に毎回置き換え
+              
+              //try { VertexMorph_FromProcItem(maid.body0, "atp_vagina", (y - 1f) * -0.5f); } catch { /*LogError(ex);*/ }
+              //"kupa"がhibuValueで広がっているのでY方向の最大値は調整
+              float kupa = 0.60f;
+              if (osawari.maidsState[osawariID].vStateMajor != 10) { kupa = Math.Max(0f, kupa - osawari.maidsState[osawariID].hibuValue / 100f); }
+              try { VertexMorph_FromProcItem(maid.body0, "vaginakupa", (y - 0.2f) * kupa / 0.8f); } catch { /*LogError(ex);*/ } //20%入るまで広げない
+              try { VertexMorph_FromProcItem(maid.body0, "labiakupa_dia", (x*x)*0.2f + y * kupa ); } catch { /*LogError(ex);*/ }
+              //左右kupa Yにあわせて狭める 1～1/2
+              kupa = 0.4f / (1f+Math.Max(0, y)*2f);
+              if (x >= 0) try { VertexMorph_FromProcItem(maid.body0, "labiakupa_dia_L", (x*x) * kupa); } catch { /*LogError(ex);*/ }
+              if (x < 0)  try { VertexMorph_FromProcItem(maid.body0, "labiakupa_dia_R", (x*x) * kupa); } catch { /*LogError(ex);*/ }
+
+              //スライダ最小値調整 Yに応じて設定
+              if (osawari.maidsState[osawariID].hibuSlider1Value < osawariHSliderMin * y) osawari.maidsState[osawariID].hibuSlider1Value = osawariHSliderMin * y;
+              if (osawari.maidsState[osawariID].hibuSlider2Value < osawariHSliderMin * y) osawari.maidsState[osawariID].hibuSlider2Value = osawariHSliderMin * y;
+
+              //骨盤の前後 XZ 親のBoneの向き Bip01 L Thigh Bip01 R Thigh も一緒に動いてしまう
+              //osawari.maidsState[osawariID].maidXxx.transform.localPosition = Quaternion.Inverse(rotXxx) * new Vector3(
+              //  (float)(x > 0 ? -Math.Sqrt(x) : Math.Sqrt(-x)) *0.001f, 0f, (float)(z > 0 ? Math.Sqrt(z) : -Math.Sqrt(-z))*0.003f
+              //);
+            }
+            
+            else if(osawariPoint == "ML_"){
+              Move_atp.x = Math.Max(-1f, Math.Min(1f, Move_atp.x));
+              Move_atp.y = Math.Max(-1f, Math.Min(1f, Move_atp.y));
+              //毎フレーム1/5だけ移動
+              if (Math.Abs(Move_atp.x - Mune_atp.x) > 0.001) Mune_atp.x += Math.Min(0.05f, (Move_atp.x - Mune_atp.x) * 0.2f) * Time.deltaTime * 120f;
+              if (Math.Abs(Move_atp.y - Mune_atp.y) > 0.001) Mune_atp.y += Math.Min(0.05f, (Move_atp.y - Mune_atp.y) * 0.2f) * Time.deltaTime * 120f;
+              //胸変形 共通関数利用
+              osawari.muneMorph(true, osawariID, muneValueL, Mune_atp);
+            }
+            
+            else if(osawariPoint == "MR_"){
+              Move_atp.x = Math.Max(-1f, Math.Min(1f, Move_atp.x));
+              Move_atp.y = Math.Max(-1f, Math.Min(1f, Move_atp.y));
+              //毎フレーム1/5だけ移動
+              if (Math.Abs(Move_atp.x - Mune_atp.x) > 0.001) Mune_atp.x += Math.Min(0.05f, (Move_atp.x - Mune_atp.x) * 0.2f) * Time.deltaTime * 120f;
+              if (Math.Abs(Move_atp.y - Mune_atp.y) > 0.001) Mune_atp.y += Math.Min(0.05f, (Move_atp.y - Mune_atp.y) * 0.2f) * Time.deltaTime * 120f;
+              //胸変形 共通関数利用
+              osawari.muneMorph(false, osawariID, muneValueR, Mune_atp);
+            }
+            
+            else if(osawariPoint == "HL_" || osawariPoint == "HR_"){
+              Move_atp.x = Math.Max(-1f, Math.Min(1f, Move_atp.x));
+              Move_atp.y = Math.Max(-1f, Math.Min(1f, Move_atp.y));
+              float hipX = osawariPoint == "HL_" ? Move_atp.x : -Move_atp.x;
+
+              try { VertexMorph_FromProcItem(maid.body0, "hip_type_A", Move_atp.y *0.3f); } catch { /*LogError(ex);*/ }
+              try { VertexMorph_FromProcItem(maid.body0, "hip_type_V", -hipX *0.3f); } catch { /*LogError(ex);*/ }
+              try { VertexMorph_FromProcItem(maid.body0, "slim_hip1", Move_atp.y *0.3f); } catch { /*LogError(ex);*/ }
+              try { VertexMorph_FromProcItem(maid.body0, "slim_hip2", Move_atp.y *0.3f); } catch { /*LogError(ex);*/ }
+              try { VertexMorph_FromProcItem(maid.body0, "slim_oshiri", (float)Math.Sqrt(Move_atp.y*Move_atp.y + Move_atp.x*Move_atp.x) *0.2f); } catch { /*LogError(ex);*/ }
+              try { VertexMorph_FromProcItem(maid.body0, "debu_pelvis_x", hipX * 0.3f); } catch { /*LogError(ex);*/ }
+            }
+            
+            else if(osawariPoint == "AN_"){
+              Move_atp.x = Math.Max(-1f, Math.Min(1f, Move_atp.x)); //xは-1～1に毎回置き換え
+              float y = Math.Max(-1f, Math.Min(1f, Move_atp.y*0.5f)); //Y方向は移動量を調整 -1～1以上も保持する
+              try { VertexMorph_FromProcItem(maid.body0, "anal_swell2", (y) * -0.5f); } catch { /*LogError(ex);*/ }
+              try { VertexMorph_FromProcItem(maid.body0, "anal_swell3", (y - 1f) * -0.5f); } catch { /*LogError(ex);*/ }
+
+              //スライダ最小値調整 Yに応じて設定
+              if (osawari.maidsState[osawariID].analSlider1Value < osawariASliderMin * y) osawari.maidsState[osawariID].analSlider1Value = osawariASliderMin * y;
+              if (osawari.maidsState[osawariID].analSlider2Value < osawariASliderMin * y) osawari.maidsState[osawariID].analSlider2Value = osawariASliderMin * y;
+            }
+          
+          }
+          
+          else if (osawariLock == 3) { //変形を初期化する処理
+
+            Maid maid = osawari.stockMaids[osawariID].mem;
+          
+            if(osawariPoint == "VA_"){
+              //try { VertexMorph_FromProcItem(maid.body0, "atp_vagina", 0f); } catch { /*LogError(ex);*/ }
+              try { VertexMorph_FromProcItem(maid.body0, "vaginakupa", 0f); } catch { /*LogError(ex);*/ }
+              try { VertexMorph_FromProcItem(maid.body0, "labiakupa_dia", 0f); } catch { /*LogError(ex);*/ }
+              try { VertexMorph_FromProcItem(maid.body0, "labiakupa_dia_L", 0f); } catch { /*LogError(ex);*/ }
+              try { VertexMorph_FromProcItem(maid.body0, "labiakupa_dia_R", 0f); } catch { /*LogError(ex);*/ }
+              //腰の前後
+              //osawari.maidsState[osawariID].maidXxx.transform.localPosition = Vector3.zero;
+            
+            }else if(osawariPoint == "AN_"){
+              try { VertexMorph_FromProcItem(maid.body0, "anal_swell2", 0f); } catch { /*LogError(ex);*/ }
+              try { VertexMorph_FromProcItem(maid.body0, "anal_swell3", 0f); } catch { /*LogError(ex);*/ }
+            
+            }else if(osawariPoint == "HL_" || osawariPoint == "HR_"){
+              try { VertexMorph_FromProcItem(maid.body0, "hip_type_A", 0f); } catch { /*LogError(ex);*/ }
+              try { VertexMorph_FromProcItem(maid.body0, "hip_type_V", 0f); } catch { /*LogError(ex);*/ }
+              try { VertexMorph_FromProcItem(maid.body0, "slim_hip1", 0f); } catch { /*LogError(ex);*/ }
+              try { VertexMorph_FromProcItem(maid.body0, "slim_hip2", 0f); } catch { /*LogError(ex);*/ }
+              try { VertexMorph_FromProcItem(maid.body0, "slim_oshiri", 0f); } catch { /*LogError(ex);*/ }
+              try { VertexMorph_FromProcItem(maid.body0, "debu_pelvis_x", 0f); } catch { /*LogError(ex);*/ }
+            }
+            //胸は別処理 MuneOsawariクラスで戻す
+
+            //LastUpdate()で変形のFixがあるので一応次フレームで終了処理
+            osawariLock = 9;
+          
+          
+          }
+          
+          else if (osawariLock == 9) {
+            //おさわり終了処理
+            osawariLock = 0;
+            osawariID = -1;
+            osawariLevel = 0;
+            osawariPoint = "";
+            mouse_move = 0f;
+            Move_atp.x = 0f;
+            Move_atp.y = 0f;
+            Move_atp.z = 0f;
+            Mune_atp.x = 0f;
+            Mune_atp.y = 0f;
+            Mune_atp.z = 0f;
+          }
+
+        } //osawariHand()
+        
+
+        //int変換
+        private int intCnv(string s) {
+          int i;
+          if (int.TryParse(s, out i)) return i;
+          else return 0;
+        }
+
+      } //class OsawariInput
+      
+      
+      
+      //おさわり処理関係終了-----------------------
 
 
 
 
-        //おさわり処理関係終了-----------------------
-
-
-
-
-    }
-}
+    } //class VibeYourMaid
+} //namespace
 
 
 
