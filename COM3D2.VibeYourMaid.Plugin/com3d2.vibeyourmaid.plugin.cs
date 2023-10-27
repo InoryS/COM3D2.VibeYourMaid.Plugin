@@ -2558,7 +2558,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
             //maidsState[maidID].uDatsuStock = 66;
             maidsState[maidID].uDatsu = 1;
             //maidsState[maidID].uDatsu = 2;
-            EffectUterusDatsu(maidID);
+            EffectUterusDatsu(maidID, maid, mState);
             }
                 manualTriggeredUterusDatsu = false;
           }
