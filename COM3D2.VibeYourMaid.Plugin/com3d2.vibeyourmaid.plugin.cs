@@ -2553,6 +2553,8 @@ namespace CM3D2.VibeYourMaid.Plugin {
           {
             foreach (int maidID in vmId)
             {
+            Maid maid = stockMaids[maidID].mem;
+            MaidState mState = maidsState[maidID];
             maidsState[maidID].boostBase = 100f;
             maidsState[maidID].uDatsuWait = -1.1f;
             //maidsState[maidID].uDatsuStock = 66;
