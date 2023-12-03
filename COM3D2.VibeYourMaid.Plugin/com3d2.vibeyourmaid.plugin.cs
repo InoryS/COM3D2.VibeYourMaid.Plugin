@@ -8,6 +8,7 @@ using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 using System.IO;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityInjector.Attributes;
 using UnityInjector;
 using System.Xml;
@@ -15,7 +16,8 @@ using System.Threading;
 using CM3D2.ExternalSaveData.Managed;
 
 
-// コンパイル用コマンド　"C:\Windows\Microsoft.NET\Framework\v3.5\csc" /t:library /lib:..\COM3D2x64_Data\Managed /r:UnityEngine.dll /r:UnityInjector.dll /r:Assembly-CSharp.dll /r:Assembly-CSharp-firstpass.dll /r:..\COM3D2.ExternalSaveData.Managed.dll COM3D2.VibeYourMaid.Plugin.cs
+// コンパイル用コマンド （ ..\COM3D2\ 部分は環境に合わせて変更 足りないdllはソースと同じ場所にコピーでも可）
+//   C:\Windows\Microsoft.NET\Framework\v3.5\csc.exe /o /t:library /lib:"..\COM3D2\Sybaris" /lib:"..\COM3D2\Sybaris\UnityInjector" /lib:"..\COM3D2\COM3D2x64_Data\Managed" /r:UnityEngine.dll /r:UnityEngine.VR.dll /r:UnityInjector.dll /r:Assembly-CSharp.dll /r:Assembly-CSharp-firstpass.dll /r:COM3D2.ExternalSaveData.Managed.dll COM3D2.VibeYourMaid.Plugin.cs
 // コンパイルオプション
 //   エンパイアズライフ有効 -define:EmpiresLife
 //   2.5用 (2.5環境のパスでビルド) -define:COM3D2_5
@@ -26,22 +28,23 @@ using CM3D2.ExternalSaveData.Managed;
 #else
 [assembly: AssemblyTitle("VibeYourMaid COM3D2")]
 #endif
-[assembly: AssemblyVersion("2.0.5.88")]
-namespace CM3D2.VibeYourMaid.Plugin {
-
+[assembly: AssemblyVersion("2.0.6.00")]
+namespace CM3D2.VibeYourMaid.Plugin
+{
     [
       PluginFilter("COM3D2x64"), PluginFilter("COM3D2VRx64"), PluginFilter("COM3D2OHx64"), PluginFilter("COM3D2OHVRx64"),
-      PluginName("VibeYourMaid"), PluginVersion("2.0.5.88.ovr"),
+      PluginName("VibeYourMaid"), PluginVersion("2.0.6.00.ovr"),
       DefaultExecutionOrder(-1)
     ]
     public class VibeYourMaid : PluginBase
     {
-        string PluginVersionLabel = "2.0.5.88-Inory";
+        string PluginVersionLabel = "2.0.6.00-Inory";
 
         public BasicVoiceSet[] bvs;
-        public class BasicVoiceSet {
-
-          public BasicVoiceSet(string[][] v1, string[][] v2, string[][] v3, string[][] v4, string[][] v5, string[][] v6, string[] v7){
+        public class BasicVoiceSet
+        {
+          public BasicVoiceSet(string[][] v1, string[][] v2, string[][] v3, string[][] v4, string[][] v5, string[][] v6, string[] v7)
+          {
             sLoopVoice20Vibe = v1;
             sLoopVoice20Fera = v2;
             sLoopVoice30Vibe = v3;
@@ -50,7 +53,8 @@ namespace CM3D2.VibeYourMaid.Plugin {
             sOrgasmVoice30Fera = v6;
             sLoopVoice40Vibe = v7;
           }
-          public BasicVoiceSet(){
+          public BasicVoiceSet()
+          {
             sLoopVoice20Vibe = new string[][]{};
             sLoopVoice20Fera = new string[][]{};
             sLoopVoice30Vibe = new string[][]{};
@@ -82,7 +86,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
         }
 
 
-          #region VoiceSet
+        #region VoiceSet
             //性格別声テーブル　ツンデレ---------------------------------------------------------------
             class BasicVoicePride : BasicVoiceSet { public BasicVoicePride() {
               //弱バイブ　通常
@@ -91,7 +95,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
               new string[] { "S0_01236.ogg" , "S0_01237.ogg" , "S0_103950.ogg", "S0_103951.ogg", "s0_01238.ogg" , "s0_01239.ogg" },
               new string[] { "S0_01246.ogg" , "S0_01247.ogg" , "S0_01254.ogg" , "S0_01255.ogg" },
               new string[] { "S0_01238.ogg" , "S0_01239.ogg" , "S0_103952.ogg", "S0_103953.ogg" },
-              //new string[] { "S0_01268.ogg" , "S0_01269.ogg" , "S0_01270.ogg" , "S0_01271.ogg" } //ca001e(L0-L3)首絞め 
+              //new string[] { "S0_01268.ogg" , "S0_01269.ogg" , "S0_01270.ogg" , "S0_01271.ogg" } //ca001e(L0-L3)首絞め
               new string[] { "S0_01296.ogg" , "S0_01297.ogg" , "S0_01304.ogg" , "S0_01305.ogg" }
               };
               //弱バイブ　フェラ
@@ -152,7 +156,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
               new string[] { "S1_02309.ogg" , "S1_02310.ogg" , "S1_102717.ogg", "S1_102718.ogg", "s1_02391.ogg" , "s1_02392.ogg" },
               new string[] { "S1_02319.ogg" , "S1_02320.ogg" , "S1_02327.ogg" , "S1_02328.ogg" },
               new string[] { "S1_02311.ogg" , "S1_02312.ogg" , "S1_102719.ogg", "S1_102720.ogg" },
-              //new string[] { "S1_02341.ogg" , "S1_02342.ogg" , "S1_02343.ogg" , "S1_02344.ogg" } //ca001e(L0-L3)首絞め 
+              //new string[] { "S1_02341.ogg" , "S1_02342.ogg" , "S1_02343.ogg" , "S1_02344.ogg" } //ca001e(L0-L3)首絞め
               new string[] { "S1_02369.ogg" , "S1_02370.ogg" , "S1_02377.ogg" , "S1_02378.ogg" }
               };
               //弱バイブ　フェラ
@@ -938,7 +942,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
               sLoopVoice40Vibe = new string[] { "H7_03086.ogg" , "H7_03087.ogg" , "H7_03102.ogg" , "H7_03103.ogg" , "H7_02889.ogg" };
             }}
 
-            
+
             //性格別声テーブル　無愛想---------------------------------------------------------------
             class BasicVoiceCurtness : BasicVoiceSet { public BasicVoiceCurtness() {
               //弱バイブ　通常
@@ -993,7 +997,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
               sLoopVoice40Vibe = new string[] { "H8_01455.ogg" , "H8_01456.ogg" , "H8_01457.ogg" , "H8_01472.ogg" , "H8_01459.ogg" };
             }}
 
-            
+
             //性格別声テーブル　お嬢様---------------------------------------------------------------
             class BasicVoiceMissy : BasicVoiceSet { public BasicVoiceMissy() {
               //弱バイブ　通常
@@ -1048,7 +1052,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
               sLoopVoice40Vibe = new string[] { "H9_00894.ogg" , "H9_00909.ogg" , "H9_00895.ogg" , "H9_00910.ogg" , "H9_04413.ogg" };
             }}
 
-            
+
             //性格別声テーブル　幼馴染---------------------------------------------------------------
             class BasicVoiceChildhood : BasicVoiceSet { public BasicVoiceChildhood() {
               //弱バイブ　通常
@@ -1103,47 +1107,49 @@ namespace CM3D2.VibeYourMaid.Plugin {
               sLoopVoice40Vibe = new string[] { "H10_04171.ogg" , "H10_04165.ogg" , "H10_04166.ogg" , "H10_04168.ogg" , "H10_04170.ogg" };
             }}
 
-            
+
             //性格別声テーブル　ドＭ---------------------------------------------------------------
             class BasicVoiceMasochist : BasicVoiceSet { public BasicVoiceMasochist() {
               //弱バイブ　通常
               sLoopVoice20Vibe = new string[][] {
-              new string[] { "H11_00673.ogg" , "H11_00674.ogg" , "H11_00681.ogg" , "H11_00682.ogg" },
-              new string[] { "H11_00865.ogg" , "H11_00866.ogg" , "H11_00689.ogg" , "H11_00690.ogg" },
-              new string[] { "H11_00675.ogg" , "H11_00676.ogg" , "H11_00683.ogg" , "H11_00684.ogg" },
-              new string[] { "H11_00867.ogg" , "H11_00868.ogg" , "H11_00691.ogg" , "H11_00692.ogg" },
-              new string[] { "H11_00705.ogg" , "H11_00706.ogg" , "H11_00729.ogg" , "H11_00730.ogg" }
+              new string[] { "H11_00673.ogg" , "H11_00674.ogg" , "H11_00681.ogg" , "H11_00682.ogg" }, //ca001a + ca001b(L0,L1)
+              new string[] { "H11_00865.ogg" , "H11_00866.ogg" , "H11_00689.ogg" , "H11_00690.ogg" }, //ca001j(L0,L1) + ca001c(L0,L1)
+              new string[] { "H11_00675.ogg" , "H11_00676.ogg" , "H11_00683.ogg" , "H11_00684.ogg" }, //ca001a(L2,L3) + ca001b(L2,L3)
+              new string[] { "H11_00867.ogg" , "H11_00868.ogg" , "H11_00691.ogg" , "H11_00692.ogg" }, //ca001j(L2,L3) + ca001c(L2,L3)
+              new string[] { "H11_00705.ogg" , "H11_00706.ogg" , "H11_00729.ogg" , "H11_00730.ogg" }  //ca001d(L0,L1) + ca001f(L0,L1)
               };
               //弱バイブ　フェラ
               sLoopVoice20Fera = new string[][] {
+              new string[] { "H11_00713.ogg" , "H11_00714.ogg" , "H11_00721.ogg" , "H11_00722.ogg" }, //ca003a(L0,L1) + ca003b(L0,L1)
               new string[] { "H11_00713.ogg" , "H11_00714.ogg" , "H11_00721.ogg" , "H11_00722.ogg" },
-              new string[] { "H11_00713.ogg" , "H11_00714.ogg" , "H11_00721.ogg" , "H11_00722.ogg" },
-              new string[] { "H11_00715.ogg" , "H11_00716.ogg" , "H11_00723.ogg" , "H11_00724.ogg" },
+              new string[] { "H11_00715.ogg" , "H11_00716.ogg" , "H11_00723.ogg" , "H11_00724.ogg" }, //ca003a(L2,L3) + ca003b(L2,L3)
               new string[] { "H11_00715.ogg" , "H11_00716.ogg" , "H11_00723.ogg" , "H11_00724.ogg" },
               new string[] { "H11_00713.ogg" , "H11_00714.ogg" , "H11_00721.ogg" , "H11_00722.ogg" }
               };
               //強バイブ　通常
               sLoopVoice30Vibe = new string[][] {
-              new string[] { "H11_00677.ogg" , "H11_00678.ogg" , "H11_00685.ogg" , "H11_00686.ogg" },
-              new string[] { "H11_00869.ogg" , "H11_00870.ogg" , "H11_00693.ogg" , "H11_00694.ogg" },
-              new string[] { "H11_00679.ogg" , "H11_00680.ogg" , "H11_00687.ogg" , "H11_00688.ogg" },
-              new string[] { "H11_00871.ogg" , "H11_00872.ogg" , "H11_00695.ogg" , "H11_00696.ogg" },
-              new string[] { "H11_00708.ogg" , "H11_00707.ogg" , "H11_00731.ogg" , "H11_00732.ogg" }
+              new string[] { "H11_00677.ogg" , "H11_00678.ogg" , "H11_00685.ogg" , "H11_00686.ogg" }, //ca001a(L4,L5) + ca001b(L4,L5)
+              new string[] { "H11_00869.ogg" , "H11_00870.ogg" , "H11_00693.ogg" , "H11_00694.ogg" }, //ca001j(L4,L5) + ca001c(L4,L5)
+              new string[] { "H11_00679.ogg" , "H11_00680.ogg" , "H11_00687.ogg" , "H11_00688.ogg" }, //ca001a(L6,L7) + ca001b(L6,L7)
+              new string[] { "H11_00871.ogg" , "H11_00872.ogg" , "H11_00695.ogg" , "H11_00696.ogg" }, //ca001j(L6,L7) + ca001c(L6,L7)
+              new string[] { "H11_00708.ogg" , "H11_00707.ogg" , "H11_00731.ogg" , "H11_00732.ogg" }  //ca001d(L2,L3) + ca001f(L2,L3)
               };
               //強バイブ　フェラ
               sLoopVoice30Fera = new string[][] {
+              new string[] { "H11_00717.ogg" , "H11_00718.ogg" , "H11_00725.ogg" , "H11_00726.ogg" }, //ca003a(L4,L5) + ca003b(L4,L5)
               new string[] { "H11_00717.ogg" , "H11_00718.ogg" , "H11_00725.ogg" , "H11_00726.ogg" },
-              new string[] { "H11_00717.ogg" , "H11_00718.ogg" , "H11_00725.ogg" , "H11_00726.ogg" },
-              new string[] { "H11_00719.ogg" , "H11_00720.ogg" , "H11_00727.ogg" , "H11_00728.ogg" },
+              new string[] { "H11_00719.ogg" , "H11_00720.ogg" , "H11_00727.ogg" , "H11_00728.ogg" }, //ca003a(L6,L7) + ca003b(L6,L7)
               new string[] { "H11_00719.ogg" , "H11_00720.ogg" , "H11_00727.ogg" , "H11_00728.ogg" },
               new string[] { "H11_00717.ogg" , "H11_00718.ogg" , "H11_00725.ogg" , "H11_00726.ogg" }
               };
               //絶頂　通常
               sOrgasmVoice30Vibe = new string[][] {
-              new string[] { "H11_00902.ogg" , "H11_00905.ogg" , "H11_00923.ogg" , "H11_00924.ogg" },
-              new string[] { "H11_04914.ogg" , "H11_04738.ogg" , "H11_04915.ogg" , "H11_04983.ogg" ,"H11_05086.ogg" },
-              new string[] { "H11_01458.ogg" , "H11_02000.ogg" , "H11_01850.ogg" , "H11_01963.ogg" , "H11_04177.ogg" , "H11_04265.ogg" , "H11_01980.ogg" , "H11_01988.ogg" , "H11_02029.ogg" , "H11_04914.ogg" , "H11_04738.ogg" , "H11_04915.ogg" , "H11_04983.ogg" ,"H11_05086.ogg" },
-              new string[] { "H11_04902.ogg" , "H11_05069.ogg" , "H11_05104.ogg" , "H11_05150.ogg" , "H11_04450.ogg" , "H11_01875.ogg" , "H11_01880.ogg" , "H11_01883.ogg" , "H11_01885.ogg" , "H11_02204.ogg" , "H11_01945.ogg" , "H11_04253.ogg" , "H11_03646.ogg" , "H11_03545.ogg" , "H11_03414.ogg" , "H11_03548.ogg" , "H11_03596.ogg" , "H11_05093.ogg" , "H11_01988.ogg" , "H11_04914.ogg" , "H11_04738.ogg" , "H11_04915.ogg" , "H11_04983.ogg" ,"H11_05086.ogg" },
+              new string[] { "H11_00902.ogg" , "H11_00905.ogg" , "H11_00923.ogg" , "H11_00924.ogg" }, //sou_00001(L1) sou_00002(L0) yam02(L2,L3)
+              new string[] { "H11_04914.ogg" , "H11_04738.ogg" , "H11_04915.ogg" , "H11_04983.ogg" ,"H11_05086.ogg" }, //ntr_0005(L20) ? ntr_0005(L21) ntr_0010(L17) nytg_ntr_advhook_0001(L22)
+              new string[] { "H11_01458.ogg" , "H11_02000.ogg" , "H11_01850.ogg" , "H11_01963.ogg" , "H11_04177.ogg" , "H11_04265.ogg" , "H11_01980.ogg" , "H11_01988.ogg" , "H11_02029.ogg" ,
+                             "H11_04914.ogg" , "H11_04738.ogg" , "H11_04915.ogg" , "H11_04983.ogg" ,"H11_05086.ogg" }, //2行目と同じ
+              new string[] { "H11_04902.ogg" , "H11_05069.ogg" , "H11_05104.ogg" , "H11_05150.ogg" , "H11_04450.ogg" , "H11_01875.ogg" , "H11_01880.ogg" , "H11_01883.ogg" , "H11_01885.ogg" , "H11_02204.ogg" , "H11_01945.ogg" , "H11_04253.ogg" , "H11_03646.ogg" , "H11_03545.ogg" , "H11_03414.ogg" , "H11_03548.ogg" , "H11_03596.ogg" , "H11_05093.ogg" , "H11_01988.ogg" ,
+                             "H11_04914.ogg" , "H11_04738.ogg" , "H11_04915.ogg" , "H11_04983.ogg" ,"H11_05086.ogg" }, //2行目と同じ
               new string[] { "H11_00902.ogg" , "H11_00905.ogg" , "H11_00923.ogg" , "H11_00924.ogg" }
               };
               //絶頂　フェラ
@@ -1158,7 +1164,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
               sLoopVoice40Vibe = new string[] { "H11_00957.ogg" , "H11_00969.ogg" , "H11_00958.ogg" , "H11_00970.ogg" , "H11_02817.ogg" };
             }}
 
-            
+
             //性格別声テーブル　腹黒---------------------------------------------------------------
             class BasicVoiceCrafty : BasicVoiceSet { public BasicVoiceCrafty() {
               //弱バイブ　通常
@@ -1276,7 +1282,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
               sLoopVoice40Vibe = new string[] { "V1_00806.ogg" , "V1_00812.ogg" , "V1_00807.ogg" , "V1_00810.ogg" , "V1_00811.ogg" }; //rr2_ca001c(L0), rr2_ca001a(L0,L1), rr2_ca001b(L0,L1)
             }}
 
-            
+
             //性格別声テーブル　淑女---------------------------------------------------------------
             class BasicVoiceDame : BasicVoiceSet { public BasicVoiceDame() {
               //弱バイブ　通常
@@ -1317,13 +1323,13 @@ namespace CM3D2.VibeYourMaid.Plugin {
               sOrgasmVoice30Vibe = new string[][] {
               new string[] { "V0_00743.ogg" , "V0_00763.ogg" , "V0_00747.ogg" , "V0_00731.ogg" , "V0_00751.ogg" , "V0_00832.ogg" , "V0_00848.ogg" , "V0_10704.ogg" , "V0_10750.ogg"}, //sou_00001(L3), yam01_抜く(L3), sou06_アナル処女喪失挿入(L3),sou01_性器に挿入(L3),sou07_発情挿入(L3),sa_被虐ダメージ台詞_叩く(L7),sa_被虐ダメージ台詞_ロウ(L11)
               new string[] { "V0_09763.ogg" , "V0_09813.ogg" , "V0_09511.ogg" , "V0_10702.ogg" , "V0_10705.ogg" , "V0_10651.ogg"}, //kashizuki初々しい,慣れ始め,VIP純愛 あたりから抽出
-              new string[] { "V0_09912.ogg" , "V0_09913.ogg" , "V0_09976.ogg" , "V0_10604.ogg" , "V0_10651.ogg" , "V0_11154.ogg" ,  //kashizuki慣れ,VIP ntr, 愛撫 あたりから抽出
+              new string[] { "V0_09912.ogg" , "V0_09913.ogg" , "V0_09976.ogg" , "V0_10604.ogg" , "V0_10651.ogg" , "V0_11154.ogg" , //kashizuki慣れ,VIP ntr, 愛撫 あたりから抽出
                              "V0_11177.ogg" , "V0_11249.ogg" , "V0_11282.ogg" , "V0_11375.ogg" , "V0_11376.ogg" , "V0_09941.ogg",  //↑の続き
                              "V0_09763.ogg" , "V0_09813.ogg" , "V0_09511.ogg" , "V0_10702.ogg" , "V0_10705.ogg" }, //2行目と同じ
               new string[] { "V0_09912.ogg" , "V0_09913.ogg" , "V0_10604.ogg" , "V0_11154.ogg" ,                   //3行目と同じ 少し減らす
                              "V0_11177.ogg" , "V0_11249.ogg" , "V0_11282.ogg" , "V0_11376.ogg" , "V0_09941.ogg" ,  //4行目と同じ 少し減らす
                              "V0_09763.ogg" , "V0_09813.ogg" , "V0_09511.ogg" , "V0_10702.ogg" , "V0_10705.ogg" ,  //2行目と同じ
-                             "V0_06225.ogg" , "V0_05516.ogg" , "V0_06949.ogg" , "V0_07658.ogg" , "V0_10749.ogg"  }, 
+                             "V0_06225.ogg" , "V0_05516.ogg" , "V0_06949.ogg" , "V0_07658.ogg" , "V0_10749.ogg"  },
               new string[] { "V0_00743.ogg" , "V0_00763.ogg" , "V0_00747.ogg" , "V0_00731.ogg" , "V0_00751.ogg" , "V0_00832.ogg" , "V0_00848.ogg" , "V0_10704.ogg" , "V0_10750.ogg"}  //1行目と同じ
               };
               //絶頂　フェラ
@@ -1339,13 +1345,74 @@ namespace CM3D2.VibeYourMaid.Plugin {
             }}
 
 
+            //性格別声テーブル　ギャル---------------------------------------------------------------
+            class BasicVoiceGal : BasicVoiceSet { public BasicVoiceGal() {
+              //弱バイブ　通常
+              sLoopVoice20Vibe = new string[][] {
+              new string[] { "H13_01036.ogg" , "H13_01037.ogg" , "H13_01044.ogg" , "H13_01045.ogg" }, //ca001a + ca001b(L0,L1)
+              new string[] { "H13_01252.ogg" , "H13_01253.ogg" , "H13_01052.ogg" , "H13_01053.ogg" }, //ca001j(L0,L1) + ca001c(L0,L1)
+              new string[] { "H13_01038.ogg" , "H13_01039.ogg" , "H13_01046.ogg" , "H13_01047.ogg" }, //ca001a(L2,L3) + ca001b(L2,L3)
+              new string[] { "H13_01254.ogg" , "H13_01255.ogg" , "H13_01054.ogg" , "H13_01055.ogg" }, //ca001j(L2,L3) + ca001c(L2,L3)
+              //new string[] { "H13_01068.ogg" , "H13_01069.ogg" , "H13_01100.ogg" , "H13_011001.ogg" }  //ca001d(L0,L1) + ca001f(L0,L1)
+              new string[] { "H13_01104.ogg" , "H13_01105.ogg" , "H13_01112.ogg" , "H13_01113.ogg" }  //ca001f(L4-L5)喪失 + ca001g(L4-L5)酔い
+              };
+              //弱バイブ　フェラ
+              sLoopVoice20Fera = new string[][] {
+              new string[] { "H13_01084.ogg" , "H13_01085.ogg" , "H13_01092.ogg" , "H13_01093.ogg" }, //ca003a(L0,L1) + ca003b(L0,L1)
+              new string[] { "H13_01084.ogg" , "H13_01085.ogg" , "H13_01092.ogg" , "H13_01093.ogg" },
+              new string[] { "H13_01086.ogg" , "H13_01087.ogg" , "H13_01094.ogg" , "H13_01095.ogg" }, //ca003a(L2,L3) + ca003b(L2,L3)
+              new string[] { "H13_01086.ogg" , "H13_01087.ogg" , "H13_01094.ogg" , "H13_01095.ogg" },
+              new string[] { "H13_01084.ogg" , "H13_01085.ogg" , "H13_01092.ogg" , "H13_01093.ogg" }
+              };
+              //強バイブ　通常
+              sLoopVoice30Vibe = new string[][] {
+              new string[] { "H13_01040.ogg" , "H13_01041.ogg" , "H13_01048.ogg" , "H13_01049.ogg" }, //ca001a(L4,L5) + ca001b(L4,L5)
+              new string[] { "H13_01256.ogg" , "H13_01257.ogg" , "H13_01056.ogg" , "H13_01057.ogg" }, //ca001j(L4,L5) + ca001c(L4,L5)
+              new string[] { "H13_01042.ogg" , "H13_01043.ogg" , "H13_01050.ogg" , "H13_01051.ogg" }, //ca001a(L6,L7) + ca001b(L6,L7)
+              new string[] { "H13_01258.ogg" , "H13_01259.ogg" , "H13_01058.ogg" , "H13_01059.ogg" }, //ca001j(L6,L7) + ca001c(L6,L7)
+              //new string[] { "H13_01070.ogg" , "H13_01071.ogg" , "H13_01102.ogg" , "H13_01103.ogg" }  //ca001d(L2,L3) + ca001f(L2,L3)
+              new string[] { "H13_01106.ogg" , "H13_01107.ogg" , "H13_01114.ogg" , "H13_01115.ogg" }  //ca001f(L6,L7)喪失 + ca001g(L6,L7)酔い
+              };
+              //強バイブ　フェラ
+              sLoopVoice30Fera = new string[][] {
+              new string[] { "H13_01088.ogg" , "H13_01089.ogg" , "H13_01096.ogg" , "H13_01097.ogg" }, //ca003a(L4,L5) + ca003b(L4,L5)
+              new string[] { "H13_01088.ogg" , "H13_01089.ogg" , "H13_01096.ogg" , "H13_01097.ogg" },
+              new string[] { "H13_01090.ogg" , "H13_01091.ogg" , "H13_01098.ogg" , "H13_01099.ogg" }, //ca003a(L6,L7) + ca003b(L6,L7)
+              new string[] { "H13_01090.ogg" , "H13_01091.ogg" , "H13_01098.ogg" , "H13_01099.ogg" },
+              new string[] { "H13_01088.ogg" , "H13_01089.ogg" , "H13_01096.ogg" , "H13_01097.ogg" }
+              };
+              //絶頂　通常
+              sOrgasmVoice30Vibe = new string[][] {
+              new string[] { "H13_01297.ogg" , "H13_01298.ogg" , "H13_01306.ogg" , "H13_01307.ogg" , "H13_01289.ogg" }, //sou_00001(L1,L2) sou_00005(L2,L3) 未使用音声
+              new string[] { "H13_04314.ogg" , "H13_04358.ogg" , "H13_04428.ogg" , "H13_04469.ogg" , "H13_04856.ogg" , "H13_04877.ogg" },
+              new string[] { "H13_00543.ogg" , "H13_00698.ogg" , "H13_00725.ogg" , "H13_04621.ogg" , "H13_04622.ogg" , "H13_04693.ogg" ,
+                             "H13_04314.ogg" , "H13_04358.ogg" , "H13_04428.ogg" , "H13_04469.ogg" , "H13_04856.ogg" , "H13_04877.ogg" }, //2行目と同じ
+              new string[] { "H13_00450.ogg" , "H13_00550.ogg" , "H13_00818.ogg" , "H13_02260.ogg" , "H13_03328.ogg" , "H13_03371.ogg" , "H13_03602.ogg" ,
+                             "H13_04621.ogg" , //3行目の一部
+                             "H13_04314.ogg" , "H13_04358.ogg" , "H13_04428.ogg" , "H13_04469.ogg" , "H13_04856.ogg" , "H13_04877.ogg" }, //2行目と同じ
+              new string[] { "H13_01297.ogg" , "H13_01298.ogg" , "H13_01306.ogg" , "H13_01307.ogg" , "H13_01289.ogg" } //1行目と同じ
+              };
+              //絶頂　フェラ
+              sOrgasmVoice30Fera = new string[][] {
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+              new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" }
+              };
+              //停止時
+              sLoopVoice40Vibe = new string[] { "H13_01366.ogg" , "H13_01360.ogg" , "H13_01361.ogg" , "H13_01364.ogg" , "H13_01365.ogg" }; //rr2_ca001c(L0), rr2_ca001a(L0,L1), rr2_ca001b(L1,L2)
+            }}
+
+
             //　性格別声テーブル　こっち来て
-            public string[] sCallVoice = new string[] { "S0_13972.ogg" , "S1_03893.ogg" , "s2_08163.ogg" , "S3_11386.ogg" , "s4_15255.ogg" , "s5_16924.ogg" , "s6_18089.ogg" , "" , "" };
+            //public string[] sCallVoice = new string[] { "S0_13972.ogg" , "S1_03893.ogg" , "s2_08163.ogg" , "S3_11386.ogg" , "s4_15255.ogg" , "s5_16924.ogg" , "s6_18089.ogg" , "" , "" };
 
-          #endregion
+        #endregion
 
 
-          #region CustomVoice
+        #region CustomVoice
+            /*
             //カスタム音声テーブル　弱バイブ版---------------------------------------------------------------
               //カスタムボイス１
               public string[][] sLoopVoice20Custom1 = new string[][] {
@@ -1447,14 +1514,15 @@ namespace CM3D2.VibeYourMaid.Plugin {
               public string[] sLoopVoice40Custom4 = new string[] { "N3_00205.ogg" , "N3_00205.ogg" , "N3_00205.ogg" , "N3_00205.ogg" , "N3_00205.ogg" };
 
             //改変終了---------------------------------------
-          #endregion
+            */
+        #endregion
 
 
 
         //GUIで設定保存したい変数はここ
-        public class VibeYourMaidCfgWriting {  //@API実装//→API用にpublicに変更
-        
-          public VibeYourMaidCfgWriting(){ }
+        public class VibeYourMaidCfgWriting  //@API実装//→API用にpublicに変更
+        {
+          public VibeYourMaidCfgWriting() { }
 
           //　表情テーブル　（バイブ）
           public string[][] sFaceAnime20Vibe = new string[][] {
@@ -1470,7 +1538,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
             new string[] { "エロ痛み我慢" , "エロ痛み我慢２" , "エロ痛み我慢３" , "エロメソ泣き" , "エロ羞恥３" , "エロ我慢３" }
           };
           public string[] sFaceAnime40Vibe = new string[] { "少し怒り" , "思案伏せ目" , "まぶたギュ" , "エロメソ泣き" };
-            
+
           public string[] sFaceAnimeStun = new string[] { "絶頂射精後１" , "興奮射精後１" , "エロメソ泣き" , "エロ痛み２" , "エロ我慢３" , "引きつり笑顔" , "エロ通常３" , "泣き" };
 
           //シェイプキーアニメリスト
@@ -1513,7 +1581,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
           public int[] guiHoverColor = new int[]{48, 48, 48, 224}; //マウスオーバー時のGUI背景色と不透明度 RGBA 0～255
 
           public bool bVoiceOverrideEnabledV = true;          //　キス時の音声オーバライド（上書き）機能を使う
-          public int iYodareAppearLevelV = 3;                 //　所定の興奮レベル以上でよだれをつける（１～４のどれかを入れる、０で無効） 
+          public int iYodareAppearLevelV = 3;                 //　所定の興奮レベル以上でよだれをつける（１～４のどれかを入れる、０で無効）
           public int vExciteLevelThresholdV1 = 100;           //　興奮レベル１→２閾値
           public int vExciteLevelThresholdV2 = 180;           //　興奮レベル２→３閾値
           public int vExciteLevelThresholdV3 = 250;           //　興奮レベル３→４閾値
@@ -1569,7 +1637,13 @@ namespace CM3D2.VibeYourMaid.Plugin {
           //絶頂時の尿と潮
           public float orgazmNyoLowerLimit = 0f;  //絶頂時の尿吹き乱数下限 120で常時尿 失神時は50
           public float orgazmSioLowerLimit = 0f;  //絶頂時の潮吹き乱数下限 30で常時潮吹き
-            
+          //絶頂時の潮吹き間隔
+          public float orgazmSioDuration = 4f;   //絶頂後の潮吹き持続時間 この秒数+sioVolume/30 長いと複数回潮を吹く
+          public float orgazmSioStartMin = 0.5f; //絶頂後の潮吹き始め開始秒 乱数最小値
+          public float orgazmSioStartMax = 1f;   //絶頂後の潮吹き始め開始秒 乱数最大値
+          public float orgazmSioNextMin = 2f;    //絶頂後の潮吹き2回目以降の間隔 乱数最小値
+          public float orgazmSioNextMax = 4f;    //絶頂後の潮吹き2回目以降の間隔 乱数最大値
+
           //クリトリス勃起上限
           public float clitorisMax = 100;
 
@@ -1591,22 +1665,43 @@ namespace CM3D2.VibeYourMaid.Plugin {
           public bool OrgsmAnimeEnabled = false;
           public bool ToikiEnabled = true;
           public bool AiekiEnabled = true;
+          public bool AheEnabled = true;
+          public bool NyoEnabled = true;
           public bool SioEnabled = true;
+
+          public bool NyoWaitPlaying = true;  //尿吹き中に次の尿吹きを開始しない
+
+          public float NyoKupaMove = 0.0145f;    //尿のクパ値に応じた移動量 (体の前側が正)
+          public float NyoOffsetY = 0.012f;      //尿の前後補正 (体の前側が正)
+          public float NyoInvertOffsetY = 0.01f; //俯せで尿道が下になる場合の追加補正量 (体の前側が正) ※尿パーティクルが上寄りのため
+          public float NyoOffsetZ = 0f;          //尿の上下補正 (奥側が正)
+          public float SioKupaMove = 0.014f;     //潮のクパ値に応じた移動量 (体の前側が正)
+          public float SioOffsetY = 0.0125f;     //潮の前後補正 (体の前側が正)
+          public float SioOffsetZ = -0.03f;      //潮の上下補正 (奥側が正)
+          
+          //尿と潮の当たり判定 地面判定に合わせる
+          public bool NyoHeightFix = true;  
+          public bool SioHeightFix = true;
+          //尿と潮の描画優先度 半透明スカートに合わせた値
+          public int NyoRenderQueue = 3172;
+          public int SioRenderQueue = 3172;
+          
           public string SioParticle = "pSIO02_com3D2";  //潮パーティクル
           public float[] SioScale = {0.3f, 0.3f, 0.6f}; //潮パーティクルのスケール
           public float SioGravity = 0.5f;  //潮パーティクルの飛散時の重力
           public float SioDuration = 2.5f; //潮吹き終わりまでの秒数 短いとまとめて出る
-          public bool SioHeightFix = true;
-          public bool NyoEnabled = true;
-          public bool NyoHeightFix = true;
-          public bool AheEnabled = true;
+
+          public float[] AiekiScale = {0.5f, 0.5f, 0.6f}; //愛液1～3パーティクルのスケール
+          public float AiekiGravity = 0.05f;  //愛液1～3飛散時の重力
+          public float AiekiDuration = 0.25f; //愛液1～3吹き終わりまでの秒数 短いとまとめて出る
+
+
           public bool aseAnimeEnabled = true;
           public float aseSwet = 0.5f;     //汗シェイプキー最大値
           public float aseSwetTare = 1.0f; //汗シェイプキー最大値
           public float aseSwetBig = 0.1f;  //汗シェイプキー最大値
-          public bool zViceWaitEnabled = true;
-          public bool UndressingReaction = true; //脱衣時のリアクション
 
+          public bool zViceWaitEnabled = true;
           public bool MouthNomalEnabled = true;
           public bool MouthKissEnabled = true;
           public bool MouthFeraEnabled = true;
@@ -1614,13 +1709,13 @@ namespace CM3D2.VibeYourMaid.Plugin {
 
           public bool hibuAnime1Enabled = true;
           public float kupaWave = 5f;
-
           public bool hibuAnime2Enabled = true;
-
           public bool uDatsuEnabled = false;
 
           public bool ClearEnabled = false;
           public bool TaikiEnabled = true;
+
+          public bool UndressingReaction = true; //脱衣時のリアクション
 
           public bool camCheckEnabled = true;
           public bool camCheckVoiceEnabled = true;
@@ -1649,13 +1744,13 @@ namespace CM3D2.VibeYourMaid.Plugin {
           public int[] yotogiExciteLinkValue = new int[]{0, 100, 150, 200, 300}; //連動時のレベルに対応する興奮値
           public bool maidStatusLinkVoiceSetExite = true;  //ボイスセットの興奮レベル判定に興奮値を利用
           public bool maidStatusLinkVoiceSetOrgasm = true; //ボイスセットの絶頂レベル判定に興奮値を利用
-          
+
           //お触り
           public bool osawariEnabled = true;
           public bool osawariAlways = false;       //常時おさわり
           public float osawariMoveRate = 1.0f;
           public string osawariButton = "AX";      //VRお触りボタン (AX,BY,Tigger,Grip)
-          public float osawariRelease = 0.25f;     //VRのおさわり解除距離
+          public float osawariRelease = 0.2f;      //VRのおさわり解除距離
           public float osawariHandRadius = 0.015f; //手の当たり判定の球半径
           public float osawariHSliderMin = 20f;    //お触り挿入時のスライダ最小値 前
           public float osawariASliderMin = 15f;    //お触り挿入時のスライダ最小値 後
@@ -1663,8 +1758,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
           //メイド切り替え
           public bool CamChangeEnabled = true;
           public float cameraChangeDistance = 1.8f;     //メイド切り替え時の距離 0なら距離は変更しない
-
-          public bool onloadAdjustCameraDistance = true; //シーン切り替わり時にメイドとの距離が近すぎる場合は修正する
+          public bool onloadAdjustCameraDistance = true; //シーン切り替わり時にカメラのターゲットが近すぎたらターゲットをメイドの位置に修正する
 
           //メイド固定
           public int maidFollowLookPoint = 0;           //メイド固定のデフォルトの注視点 (胸:0 顔:1 腰:2)
@@ -1715,18 +1809,20 @@ namespace CM3D2.VibeYourMaid.Plugin {
           public float vrCameraMoveSpeedLR = 1.5f;     //移動速度倍率 左右移動
           public float vrCameraMoveSpeedTurn = 1f;     //移動速度倍率 左右回転
 
+          public bool outputMotionList = false;
+
         }
 
-#if EmpiresLife
+        #if EmpiresLife
         private GameObject gameObject_ui;
-#endif        
+        #endif
         //private bool StartFlag = false; //　シーンがかわってから操作されたかどうか
 
         private CameraMain mainCamera;
 
         //メイド取得フラグ
         private bool reGetMaid = false;
-        
+
         //男モデル
         private Maid man;
         private Maid[] SubMans = new Maid[5];
@@ -1735,7 +1831,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
         private float[] syaseiValue = new float[]{ 0f , 0f , 0f , 0f , 0f };
         private int[] mansLevel = new int[]{ 0 , 0 , 0 , 0 , 0 };
         private bool[] syaseiLock = new bool[]{ false , false , false , false , false };
-        private int MansFGet = 0;
+        //private int MansFGet = 0;
 
         //　音声・表情のモード切り替え用
         /*private string[] ModeSelectList = new string[]{ "通常固定" , "フェラ固定" , "カスタム１" , "カスタム２" , "カスタム３" , "カスタム４" };
@@ -1744,23 +1840,23 @@ namespace CM3D2.VibeYourMaid.Plugin {
           new string[] { "デフォルト" ,
             "ツンデレ" , "クーデレ" , "純真" , "ヤンデレ" , "姉ちゃん" , "僕っ娘" , "ドＳ" ,
             "無垢" , "真面目" , "凛デレ" , "無口" , "小悪魔" , "おしとやか" , "メイド秘書" , "ふわふわ妹" , "無愛想" , "お嬢様" , "幼馴染" ,
-            "ドＭ" , "腹黒" , "気さく" , "淑女" },
+            "ドＭ" , "腹黒" , "気さく" , "淑女" , "ギャル"},
           new string[] { "" ,
             "Pride" , "Cool" , "Pure" , "Yandere" , "Anesan" , "Genki" , "Sadist" ,
             "Muku" , "Majime" , "Rindere" , "Silent" , "Devilish" , "Ladylike" , "Secretary" , "Sister" , "Curtness" , "Missy" , "Childhood" ,
-            "Masochist" , "Crafty" , "Friendly" , "Dame" }
+            "Masochist" , "Crafty" , "Friendly" , "Dame" , "Gal" }
         };*/
         private string[][] personalList = new string[][] { //性格追加時に更新
           new string[] {
             "ツンデレ" , "クーデレ" , "純真" , "ヤンデレ" , "姉ちゃん" , "僕っ娘" , "ドＳ" ,
             "無垢" , "真面目" , "凛デレ" , "無口" , "小悪魔" , "お淑やか" , "ﾒｲﾄﾞ秘書" , "ふわ妹" , "無愛想" , "お嬢様" , "幼馴染" ,
-            "ドＭ" , "腹黒" , "気さく" , "淑女" , "指定無" },
+            "ドＭ" , "腹黒" , "気さく" , "淑女" , "ギャル" , "指定無" },
           new string[] {
             "Pride" , "Cool" , "Pure" , "Yandere" , "Anesan" , "Genki" , "Sadist" ,
             "Muku" , "Majime" , "Rindere" , "Silent" , "Devilish" , "Ladylike" , "Secretary" , "Sister" , "Curtness" , "Missy" , "Childhood" ,
-            "Masochist" , "Crafty" , "Friendly" , "Dame" }
+            "Masochist" , "Crafty" , "Friendly" , "Dame" , "Gal" }
         };
-        
+
         public string[][] reactionVoice = new string[][] { //性格追加時に更新
           new string[] { "s0_01898.ogg" , "s0_01899.ogg" , "s0_01902.ogg" , "s0_01900.ogg" },
           new string[] { "s1_03223.ogg" , "s1_03246.ogg" , "s1_03247.ogg" , "s1_03210.ogg" },
@@ -1779,14 +1875,15 @@ namespace CM3D2.VibeYourMaid.Plugin {
           new string[] { "H7_03163.ogg" , "H7_03167.ogg" , "H7_03164.ogg" , "H7_03172.ogg" },
           new string[] { "H8_08466.ogg" , "H8_01430.ogg" , "H8_01421.ogg" , "H8_01382.ogg" , "H8_01396.ogg" , "H8_01398.ogg" },
           new string[] { "H9_00825.ogg" , "H9_00833.ogg" , "H9_00841.ogg" , "H9_00824.ogg" , "H9_00966.ogg" , "H9_00860.ogg" , "H9_00987.ogg" },
-          new string[] { "H10_04104.ogg" , "H10_04120.ogg" , "H10_04108.ogg" , "H10_04092.ogg" , "H10_04112.ogg" , "H10_04242.ogg" , "H10_04253.ogg" },
-          new string[] { "H11_00902.ogg" , "H11_00905.ogg" , "H11_00923.ogg" , "H11_00924.ogg" },
-          new string[] { "H12_01467.ogg" , "H12_01468.ogg" , "H12_01475.ogg" , "H12_01460.ogg" },
-          new string[] { "V1_00744.ogg" , "V1_00745.ogg" , "V1_00751.ogg" , "V1_00737.ogg" }, //w1_sou05_処女挿入喪失.ks(L2,L3), w1_sou07_発情挿入.ks(L1) w1_sou03_酔い挿入.ks(L3)
-          new string[] { "V0_00742.ogg" , "V0_00743.ogg" , "V0_00749.ogg" , "V0_00735.ogg" }  //v1_sou05_処女挿入喪失.ks(L2,L3), v1_sou07_発情挿入.ks(L1) v1_sou03_酔い挿入.ks(L3)
+          new string[] { "H10_04104.ogg", "H10_04120.ogg", "H10_04108.ogg", "H10_04092.ogg", "H10_04112.ogg", "H10_04242.ogg", "H10_04253.ogg" },
+          new string[] { "H11_00902.ogg", "H11_00905.ogg", "H11_00923.ogg", "H11_00924.ogg" },
+          new string[] { "H12_01467.ogg", "H12_01468.ogg", "H12_01475.ogg", "H12_01460.ogg" },
+          new string[] { "V1_00744.ogg" , "V1_00745.ogg" , "V1_00751.ogg" , "V1_00737.ogg" }, //気さく w1_sou05_処女挿入喪失.ks(L2,L3), w1_sou07_発情挿入.ks(L1) w1_sou03_酔い挿入.ks(L3)
+          new string[] { "V0_00742.ogg" , "V0_00743.ogg" , "V0_00749.ogg" , "V0_00735.ogg" }, //淑女   v1_sou05_処女挿入喪失.ks(L2,L3), v1_sou07_発情挿入.ks(L1) v1_sou03_酔い挿入.ks(L3)
+          new string[] { "H13_01298.ogg", "H13_01299.ogg", "H13_01286.ogg", "H13_01287.ogg" } //ギャル p1_sou0001(L2,L3) p1_sou0009(L2,L3)
         };
 
-        //脱衣ボイス script/sex/yotogi/99_system 各興奮度(250,150,50,-100) トップx4, ボトムx4, ブラx4, パンツx4(200→抜くL3 150→L4 50→L3), ずらしx4(50まで→パンツL1 150と250→拘束愛撫L6～L10 or 抜くL2～L3)
+        //脱衣ボイス script/sex/yotogi/99_system 各興奮度(250,150,50,-100) トップx4, ボトムx4, ブラx4, パンツx4(200→抜くL3 150→L4 50→L3), ずらしx4(150と250→拘束愛撫L6～L10 or 抜くL2～L3) 50と-100→パンツL1 
         public string[][] UndressingVoice = new string[][] { //性格追加時に更新
           new string[] { "S0_05670" , "S0_05669" , "S0_05668" , "S0_05667"  ,  "S0_05674" , "S0_05673" , "S0_05672" , "S0_05671"  ,  "S0_05682" , "S0_05681" , "S0_05680" , "S0_05679"  ,  "S0_01950" , "S0_05686" , "S0_05685" , "S0_05683"  ,  "S0_05529" , "S0_05538" , "S0_05684" , "S0_05684" },
           new string[] { "S1_05467" , "S1_05466" , "S1_05465" , "S1_05464"  ,  "S1_05471" , "S1_05470" , "S1_05469" , "S1_05468"  ,  "S1_05479" , "S1_05478" , "S1_05477" , "S1_05476"  ,  "S1_03247" , "S1_05483" , "S1_05482" , "S1_05480"  ,  "S1_05258" , "S1_05258" , "S1_05481" , "S1_05481" },
@@ -1809,7 +1906,8 @@ namespace CM3D2.VibeYourMaid.Plugin {
           new string[] { "H11_00940", "H11_00939", "H11_00938", "H11_00937 ",  "H11_00944", "H11_00943", "H11_00942", "H11_00941" ,  "H11_00952", "H11_00951", "H11_00950", "H11_00949" ,  "H11_00920", "H11_00956", "H11_00955", "H11_00953 ",  "H11_01032", "H11_01031", "H11_00954", "H11_00954"},
           new string[] { "H12_01512", "H12_01511", "H12_01510", "H12_01509 ",  "H12_01516", "H12_01515", "H12_01514", "H12_01513" ,  "H12_01524", "H12_01523", "H12_01522", "H12_01521" ,  "H12_01484", "H12_01528", "H12_01527", "H12_01525 ",  "H12_01607", "H12_01606", "H12_01526", "H12_01526"},
           new string[] { "V1_00789" , "V1_00788" , "V1_00787" , "V1_00786"  ,  "V1_00793" , "V1_00792" , "V1_00791" , "V1_00790"  ,  "V1_00801" , "V1_00800" , "V1_00799" , "V1_00798"  ,  "V1_00761" , "V1_00805" , "V1_00804" , "V1_00802"  ,  "V1_00836" , "V1_00833" , "V1_00803" , "V1_00803" },
-          new string[] { "V0_00787" , "V0_00786" , "V0_00785" , "V0_00784"  ,  "V0_00791" , "V0_00790" , "V0_00789" , "V0_00788"  ,  "V0_00799" , "V0_00798" , "V0_00797" , "V0_00796"  ,  "V0_00759" , "V0_00803" , "V0_00802" , "V0_00800"  ,  "V0_00834" , "V0_00832" , "V0_00801" , "V0_00801" }
+          new string[] { "V0_00787" , "V0_00786" , "V0_00785" , "V0_00784"  ,  "V0_00791" , "V0_00790" , "V0_00789" , "V0_00788"  ,  "V0_00799" , "V0_00798" , "V0_00797" , "V0_00796"  ,  "V0_00759" , "V0_00803" , "V0_00802" , "V0_00800"  ,  "V0_00834" , "V0_00832" , "V0_00801" , "V0_00801" },
+          new string[] { "H13_01343", "H13_01342", "H13_01341", "H13_01340" ,  "H13_01347", "H13_01346", "H13_01345", "H13_01344" ,  "H13_01355", "H13_01354", "H13_01353", "H13_01352" ,  "H13_01315", "H13_01359", "H13_01358", "H13_01356" ,  "H13_01315", "H13_01313", "H13_01357", "H13_01357"}
         };
 
         //SE切替関連
@@ -1818,13 +1916,13 @@ namespace CM3D2.VibeYourMaid.Plugin {
           new string[] { "se020.ogg" , "se028.ogg" },
           new string[] { "se019.ogg" , "se029.ogg" }
         };
-        
-        
 
-#if EmpiresLife
+
+
+        #if EmpiresLife
         //脱衣処理用
 	      private bool isItem = true; //メイドアイテム
-#endif
+        #endif
 
         //アヘ関連
         private float fEyePosToSliderMul  = 5000f;
@@ -1840,7 +1938,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
 
         private float WaitTime = 0;                         //　シーン15開始時の待機時間用
         private float timerRate = Time.deltaTime * 60;
-        
+
         private bool scKeyOff = false;
 
         //　Chu-B Lip / VR
@@ -1870,17 +1968,17 @@ namespace CM3D2.VibeYourMaid.Plugin {
         //DCMクラスとカメラ無効プロパティの有無
         bool hasDcmIgnoreCameraMotion = false;
         #endif
-
-        //子宫脱按钮用
+        //子宫脱按钮用 #109
         private bool manualTriggeredUterusDatsu = false;
 
-
-
-      //--------------------------------------------
-      //ゲーム起動時の処理--------------------------
+        //--------------------------------------------
+        //ゲーム起動時の処理--------------------------
         //VibeYourMaidConfig cfg;
         VibeYourMaidCfgWriting cfgw = new VibeYourMaidCfgWriting();
         public void Awake() {
+
+          //シーンロード登録
+          SceneManager.activeSceneChanged += OnActiveSceneChanged;
 
           // フォルダ確認
           if (!System.IO.Directory.Exists(@"Sybaris\UnityInjector\Config\VibeYourMaid\")) {
@@ -1892,12 +1990,12 @@ namespace CM3D2.VibeYourMaid.Plugin {
           if (!System.IO.Directory.Exists(@"Sybaris\UnityInjector\Config\VibeYourMaid\CommonDressSet\")) {
             System.IO.DirectoryInfo di = System.IO.Directory.CreateDirectory(@"Sybaris\UnityInjector\Config\VibeYourMaid\CommonDressSet"); //ない場合はフォルダ作成
           }
-          
-          if(!File.Exists(@"Sybaris\UnityInjector\Config\VibeYourMaid\MList.txt")){
+
+          if (!File.Exists(@"Sybaris\UnityInjector\Config\VibeYourMaid\MList.txt")) {
             StreamWriter sw = File.CreateText(@"Sybaris\UnityInjector\Config\VibeYourMaid\MList.txt");
             sw.Close();
           }
-          
+
 
           GameObject.DontDestroyOnLoad(this);
           string path = UnityEngine.Application.dataPath;
@@ -1908,22 +2006,25 @@ namespace CM3D2.VibeYourMaid.Plugin {
           // Iniファイル書き出し
           SaveConfig(cfg, "Config");
           */
-          
-          //Configファイルのロード ファイルがなければデフォルトを保存
+
+          //Configファイルのロード
           ConfigFileLoad();
+          //Configファイルのセーブ ファイルががない場合のみ
           ConfigFileSave();
 
           // ChuBLip判別
           bChuBLip = path.Contains("COM3D2OHx64") || path.Contains("COM3D2OHx86") || path.Contains("COM3D2OHVRx64");
           // VR判別
           bVR = path.Contains("COM3D2OHVRx64") || path.Contains("COM3D2VRx64") || Environment.CommandLine.ToLower().Contains("/vr");
-          
+
           //UNZIP用モーションリスト作成
           MajFileLoad();
           UnzipMotionLoad();
           MajFileSave(false);
-          //イタズラ用モーションリスト作成
+          //イタズラ用モーションリスト読み込み
           ItazuraMotionLoad();
+          //口モードモーションリスト読み込み
+          MouseMotionLoad();
 
           //ボイスセットサイズは性格数に合わせる
           bvs = new BasicVoiceSet[personalList[1].Length];
@@ -1953,13 +2054,15 @@ namespace CM3D2.VibeYourMaid.Plugin {
           if (bvs[19] == null) bvs[19] = new BasicVoiceCrafty().getBase();
           if (bvs[20] == null) bvs[20] = new BasicVoiceFriendly().getBase();
           if (bvs[21] == null) bvs[21] = new BasicVoiceDame().getBase();
+          if (bvs[22] == null) bvs[22] = new BasicVoiceGal().getBase();
+
           //保存
           BvsFileSave();
           BvsCheck(); //存在しないファイルをチェック
 
           //脱衣設定読み込み ファイルがなければデフォルトを保存
           if (UndressingVoiceLoad()) UndressingVoiceSave();
-          
+
           XmlFilesCheck();
 
           //configからデフォルト値を設定
@@ -2014,15 +2117,13 @@ namespace CM3D2.VibeYourMaid.Plugin {
           #endif
 
         }
-      //--------------------------------------------
+        //--------------------------------------------
 
 
 
         public void Start() {
 
-          UnityEngine.Debug.Log("[VibeYourMaid] bChuBLip="+bChuBLip+" bVR="+bVR+" bOculusVR="+bOculusVR);
-
-          //GUI Style初期化          
+          //GUI Style初期化
           gsWin = new GUIStyle("box");
           gsWin.fontSize = 12;
           gsWin.alignment = TextAnchor.UpperLeft;
@@ -2089,6 +2190,8 @@ namespace CM3D2.VibeYourMaid.Plugin {
             //if (bOculusVR) vrCameraTransform = GameObject.Find("TrackingSpace/CenterEyeAnchor").transform;
             //else vrCameraTransform = GameObject.Find("Main Camera (eye)").transform;
           }
+          UnityEngine.Debug.Log("[VibeYourMaid] bChuBLip="+bChuBLip+" bVR="+bVR+" bOculusVR="+bOculusVR);
+
           //VRショートカット用コントローラー初期化 VR以外でも判定に利用する
           vrShortCutController = new VRShortCutController(cfgw, bOculusVR);
 
@@ -2096,21 +2199,21 @@ namespace CM3D2.VibeYourMaid.Plugin {
           initOsawari();
         }
 
-        public void OnDestroy (){
+        /*public void OnDestroy () {
 
-        }
+        }*/
 
 
-      //--------------------------------------------
-      //シーン開始時の処理--------------------------
-        void OnLevelWasLoaded(int level) {
-
+        //--------------------------------------------
+        //シーン開始時の処理--------------------------
+        void OnActiveSceneChanged(Scene preScene, Scene scene)
+        {
           //レベルの取得
-          vSceneLevel = level;
-          
+          vSceneLevel = scene.buildIndex;
+
           //有効シーンにある場合プラグインを有効化（現在は基本的に、メイドさんがいれば全てのシーンで有効）
           SceneLevelEnable = true;
-          
+
           //SEの再生をストップ
           GameMain.Instance.SoundMgr.StopSe();
 
@@ -2128,24 +2231,26 @@ namespace CM3D2.VibeYourMaid.Plugin {
             maidsState[maidID].motionLinkID = -1;
           }
 
-#if EmpiresLife
+          #if EmpiresLife
           //エンパイアズライフのフラグ初期化
           lifeStart = 0;
-          if(vSceneLevel == 3)gameObject_ui = GameObject.Find("UI Root"); //UIオブジェクトの取得
-#endif
+          if (vSceneLevel == 3) gameObject_ui = GameObject.Find("UI Root"); //UIオブジェクトの取得
+          #endif
 
           //男モデル取得
-          for (int i = 0; i < SubMans.Length; i++){
+          for (int i = 0; i < SubMans.Length; i++) {
             SubMans[i] = GameMain.Instance.CharacterMgr.GetMan(i);
           }
-          //男Body取得のため、一度呼び出しておく
-          if(vSceneLevel == 15 && MansFGet < 2){
+          //男Body取得のため、一度呼び出しておく 初回に2回だけ実行？
+          /*if (vSceneLevel == 15 && MansFGet < 2) {
             ++MansFGet;
-            foreach(Maid m in SubMans){
-              m.Visible = true;
-              m.transform.position = new Vector3(0f, -10f, 0f);
+            foreach (Maid m in SubMans) {
+              if (!m.Visible) {
+                m.Visible = true;
+                m.transform.position = new Vector3(0f, -10f, 0f);
+              }
             }
-          }
+          }*/
 
           //メイド固定の調整値は戻す
           maidFollowHeightOffset = 0f; //高さのずれを0
@@ -2153,11 +2258,11 @@ namespace CM3D2.VibeYourMaid.Plugin {
           followReturnSpeedY = -1f; //縦移動速度は標準に戻す
 
           //カラオケ開始時はメイド固定解除
-          if (level == 36) maidFollowEnabled = false;
+          if (vSceneLevel == 36) maidFollowEnabled = false;
 
+          //ダンス開始時にメイド固定解除
           if (cfgw.maidFollowDisabledDanceStart) {
-            string sceneName = GameMain.Instance.GetNowSceneName();
-            if (sceneName.StartsWith("SceneDance_")) maidFollowEnabled = false;
+            if (GameMain.Instance.GetNowSceneName().StartsWith("SceneDance_")) maidFollowEnabled = false;
           }
 
           //カメラジャンプ時の位置初期化無効化 無効時間で制御
@@ -2166,21 +2271,21 @@ namespace CM3D2.VibeYourMaid.Plugin {
 
           man = SubMans[0];
         }
-      //--------------------------------------------
+        //--------------------------------------------
 
 
 
 
 
-      //--------------------------------------------
-      //GUI表示処理---------------------------------
+        //--------------------------------------------
+        //GUI表示処理---------------------------------
         Rect node;
         Rect node2;
         Rect node3;
         Rect node4;
         //Rect node4a;
         Rect node5;
-        
+
         GUIStyle gsWin;
         GUIStyle gsLabel;
         GUIStyle gsLabelY;
@@ -2201,9 +2306,9 @@ namespace CM3D2.VibeYourMaid.Plugin {
           if (!cfgw.bPluginEnabledV || cfgw.mainGuiFlag == 0) return;
 
             if (tgID != -1 && !reGetMaid){ //フェードアウト中はGUIを更新しない
-              
+
               if (SceneLevelEnable){
-                
+
                 if (vSceneLevel == 15 && WaitTime < 120 ){
 
                   WaitTime += timerRate;
@@ -2229,18 +2334,18 @@ namespace CM3D2.VibeYourMaid.Plugin {
                     node3 = GUI.Window(324103, node3, WindowCallback3, configTitle, gsWin);
                   }
 
-                  if(cfgw.unzipGuiFlag){
+                  if (cfgw.unzipGuiFlag) {
                     node4 = GUI.Window(324104, node4, WindowCallback4, "ムラムラしたのでメイドさんを押し倒す", gsWin);
-                    
+
                     /*調整中
-                    if(maidsState[tgID].senyouTokusyuMotion.Count > 0){
+                    if (maidsState[tgID].senyouTokusyuMotion.Count > 0) {
                       node4a = new Rect( node4.x - 220 , node4.y , 220 , 220 );
                       node4a = GUI.Window(3241042, node4a, WindowCallback4a, "特殊モーション", gsWin);
                     }*/
-                    
+
                   }
 
-                  }else if (cfgw.mainGuiFlag == 2){
+                  } else if (cfgw.mainGuiFlag == 2) {
                     node.height = 20;
                   }
                 }
@@ -2248,37 +2353,37 @@ namespace CM3D2.VibeYourMaid.Plugin {
             }
 
             if (cfgw.mainGuiFlag == 1) { //リモコン展開時のみ
-            if (tgID != -1
-#if EmpiresLife
-             || (lifeStart > 0 && !elFade)
-#endif
-            ){
-              if(cfgw.subGuiFlag == 2){
+            #if EmpiresLife
+            if (tgID != -1 || (lifeStart > 0 && !elFade)) {
+            #else
+            if (tgID != -1) {
+            #endif
+              if (cfgw.subGuiFlag == 2) {
                 node2 = GUI.Window(324102, node2, WindowCallback2b, "メイド呼び出し", gsWin);
-              }else{
+              } else {
                 node2 = GUI.Window(324102, node2, WindowCallback2a, "サブキャラ操作", gsWin);
               }
             }
-            
-#if EmpiresLife
-            if (lifeStart > 0 && !elFade)node5 = GUI.Window(324105, node5, WindowCallback5, "エンパイアズライフ", gsWin);
-#endif
+
+            #if EmpiresLife
+              if (lifeStart > 0 && !elFade) node5 = GUI.Window(324105, node5, WindowCallback5, "エンパイアズライフ", gsWin);
+            #endif
             }
-            
+
         }
-      //--------------------------------------------
+        //--------------------------------------------
 
 
 
 
 
-      //--------------------------------------------
-      //フレーム毎の処理----------------------------
+        //--------------------------------------------
+        //フレーム毎の処理----------------------------
         void Update() {
 
           if (Input.anyKeyDown) {
             //プラグインの有効無効切替
-            if(Input.GetKeyDown(cfgw.keyPluginToggleV0) && !scKeyOff && AndKey()) {
+            if (Input.GetKeyDown(cfgw.keyPluginToggleV0) && !scKeyOff && AndKey()) {
               cfgw.bPluginEnabledV = !cfgw.bPluginEnabledV;
               if (cfgw.bPluginEnabledV) {
                 Console.WriteLine("VibeYourMaid Plugin 有効化");
@@ -2296,16 +2401,16 @@ namespace CM3D2.VibeYourMaid.Plugin {
           if (!cfgw.bPluginEnabledV) return;
 
           //画面がフェードするたびに、メイド情報の再取得フラグを立てる
-          if(FadeMgr.GetFadeIn()) {
+          if (FadeMgr.GetFadeIn()) {
 
             //おさわり中なら終了させる
             osawari.endOsawari();
 
-            if (!reGetMaid)reGetMaid = true;
+            if (!reGetMaid) reGetMaid = true;
 
           } else {
             //フェード終了後、再取得フラグが立っていたらメイド情報取得
-            if(reGetMaid){
+            if (reGetMaid) {
               GetStockMaids(); //メイドさんの取得
               VisibleMaidCheck(true); //アクティブなメイドさんのIDを取得
               reGetMaid = false;
@@ -2313,12 +2418,12 @@ namespace CM3D2.VibeYourMaid.Plugin {
             //カメラが近すぎる場合は距離を修正
             if (cfgw.onloadAdjustCameraDistance) adjustCameraDistance();
           }
-          
+
           bool onWindow = false; //マウスがGUIウィンドウ上にあるか
 
           //メイン処理---
           if (tgID != -1 && SceneLevelEnable && !reGetMaid) {
-          
+
             timerRate = Time.deltaTime * 60;
 
             foreach (int maidID in vmId) {
@@ -2327,46 +2432,46 @@ namespace CM3D2.VibeYourMaid.Plugin {
               MaidState mState = maidsState[maidID];
 
               //非表示のメイドがいたらアクティブメイドをチェックし直す
-              /*if(!maid.Visible || !mState.maidHead){
+              /*if (!maid.Visible || !mState.maidHead) {
                 VisibleMaidCheck(true); //vmIdがずれるので処理は終了
-                if(tgID == -1)GameMain.Instance.SoundMgr.StopSe();
+                if (tgID == -1) GameMain.Instance.SoundMgr.StopSe();
                 return; //このフレームの処理は終了
               }*/
-              if (!maid.Visible) continue;
-              
+              if (!maid.Visible) continue; //見えないメイドはスキップ
+
               //オートモード処理
               PowerAutoChange(maidID, mState);
-              
-              StateMajorCheck(maidID, mState);  //バイブステート変更処理実行
-              
-              ExciteCheck(maidID, mState);  //メイドの興奮判定
-              
+
+              StateMajorCheck(maidID, maid, mState);  //バイブステート変更処理実行
+
+              ExciteCheck(mState);  //メイドの興奮判定
+
               StatusFluctuation(maidID, maid, mState);  //メイドのステータス変更処理実行
 
               //絶頂音声が終わった時の処理
-              if (mState.orgasmVoice == 2 && !maid.AudioMan.audiosource.isPlaying ){
+              if (mState.orgasmVoice == 2 && !maid.AudioMan.audiosource.isPlaying) {
                 mState.orgasmVoice = 0;          //絶頂時音声フラグOFF
                 mState.voiceHoldTime = 0;       //音声をすぐ再生するため、タイマーリセット
                 mState.faceHoldTime = 0;
-                if(mState.vStateMajor == 40)mState.vStateMajorOld = 30;  //再生中にバイブ停止していた場合に、余韻状態に移行させるため
+                if (mState.vStateMajor == 40) mState.vStateMajorOld = 30;  //再生中にバイブ停止していた場合に、余韻状態に移行させるため
               }
-              
+
               //ボイスセット再生処理
               VoiceSetPlay(maidID, maid, mState);
-              
+
               //モーションセット処理
               MotionSetChange(maidID, maid, mState);
-              
+
               //カメラ位置取得 キス判定
               CameraPosCheck(maid, mState);
 
               //目線と顔の自動変更
               EyeAutoChange(maid, mState);
-              
+
               //乳首設定処理
-              if(mState.chikubiEnabled){
+              if (mState.chikubiEnabled) {
                 int cv = ChikubiCheck(maid);
-                if(mState.chikubi_View != cv || mState.vStateMajor != 10){
+                if (mState.chikubi_View != cv || mState.vStateMajor != 10) {
                   ChikubiSet(maid, mState, cv);
                   mState.chikubi_View = cv;
                 }
@@ -2376,58 +2481,57 @@ namespace CM3D2.VibeYourMaid.Plugin {
               if (cfgw.osawariEnabled) targetInstallation(maidID, mState);
 
               //ステート10が継続している場合はここで処理終了
-              if(mState.vStateMajor == 10 && mState.vStateMajorOld == 10)continue;
+              if (mState.vStateMajor == 10 && mState.vStateMajorOld == 10) continue;
 
+
+              //各メイドの興奮値を連動
+              ChangeYotogiParamSlider(maidID, maid, mState);
 
               //絶頂スタートフラグのチェック
-              if(!mState.orgasmStart){
-                if(OrgasmCheck(maidID, mState)){
-                  foreach(int ID in vmId){
-                    if(ID != maidID && !LinkMaidCheck(maidID, ID))continue;
+              if (!mState.orgasmStart) {
+                if (OrgasmCheck(maidID, maid, mState)) {
+                  foreach (int ID in vmId) {
+                    if (ID != maidID && !LinkMaidCheck(maidID, ID)) continue;
                     maidsState[ID].orgasmStart = true;
                   }
                 }
               }
-              
-              //各メイドの興奮値を連動
-              ChangeYotogiParamSlider(maidID, mState);
-
-              OrgasmProcess(maidID, mState);  //絶頂していた場合の処理実行
-              OrgasmBonus(maidID, mState);  //絶頂後ボーナスタイム中の処理
+              OrgasmProcess(maidID, maid, mState);  //絶頂していた場合の処理実行
+              OrgasmBonus(mState);  //絶頂後ボーナスタイム中の処理
 
 
                //射精値MAX時の処理
-              if(mState.syaseiMotion != "Non" && SyaseiCheck(maidID, 100f) && mState.orgasmCmb <= 3){
+              if (mState.syaseiMotion != "Non" && SyaseiCheck(maidID, 100f) && mState.orgasmCmb <= 3) {
                 string lastMotion = maid.body0.LastAnimeFN;  //現在のモーションを取得
 
                 MotionChange(maid, mState.syaseiMotion + ".anm", false, 0.7f, 1f);
                 MotionChangeAf(maid, lastMotion, true, 0.5f, 1f); // 終わったら再生する
-                
+
                 ManMotionChange(mState.syaseiMotion + ".anm", maidID, false, 0.7f, 1f);
                 ManMotionChangeAf(lastMotion, maidID, true, 0.5f, 1f); // 終わったら再生する
-                
+
                 ReactionPlay(maidID);
               }
-             
+
               StunCheck(maidID, maid, mState);  //メイドの放心判定
-              
+
               //演出関係
-              mState.kaikanLevel = kaikanLevelCheck(maidID);  //フェイスブレンドレベルチェック
-              EffectSio(maidID, maid, mState);  //潮吹き
+              mState.kaikanLevel = kaikanLevelCheck(maidID, mState);  //フェイスブレンドレベルチェック
+              EffectSio(maid, mState);  //潮吹き
               EffectToiki(maid, mState);  //吐息
               EffectAieki(maid, mState);  //愛液
 
               mState.continuationTime += timerRate;  //バイブ責めの継続時間加算
-              if(mState.faceHoldTime > 0)mState.faceHoldTime -= timerRate;  //表情変更タイマー減少
-              if(mState.motionHoldTime > 0)mState.motionHoldTime -= timerRate;  //モーション変更タイマー減少
-              if(mState.yoinHoldTime > 0)mState.yoinHoldTime -= timerRate;  //余韻タイマー減少
-              if(mState.orgasmHoldTime > 0 && mState.orgasmValue < 100)mState.orgasmHoldTime -= timerRate;  //絶頂後のボーナスタイマー減少
-              
-              
+              if (mState.faceHoldTime > 0) mState.faceHoldTime -= timerRate;  //表情変更タイマー減少
+              if (mState.motionHoldTime > 0) mState.motionHoldTime -= timerRate;  //モーション変更タイマー減少
+              if (mState.yoinHoldTime > 0) mState.yoinHoldTime -= timerRate;  //余韻タイマー減少
+              if (mState.orgasmHoldTime > 0 && mState.orgasmValue < 100) mState.orgasmHoldTime -= timerRate;  //絶頂後のボーナスタイマー減少
+
+
               //モーション変更処理
-              if (mState.motionHoldTime <= 0){
+              if (mState.motionHoldTime <= 0) {
                 //モーションアジャスト アイテムセット（双頭バイブのみ）
-                if(mState.sVibeFlag){
+                if (mState.sVibeFlag) {
                   maid.SetProp("handitem" , "HandItemH_SoutouVibe_I_.menu", 0, true, false);
                   maid.body0.SetMask(TBody.SlotID.HandItemR, true);
                   maid.AllProcPropSeqStart();
@@ -2435,55 +2539,58 @@ namespace CM3D2.VibeYourMaid.Plugin {
                 }
 
                 MotionAdjustPsv(maidID, maid, mState);
-                
-                if(mState.orgasmVoice == 1 || mState.orgasmVoice == 3){  //絶頂時モーション変更実行
-                  ZeccyoMotionSelect(maidID);
-                  if(mState.orgasmVoice == 3)mState.orgasmVoice = 2;
-                  
-                }else{  //通常時モーション変更実行
-                  if (mState.skipMotionChange) mState.skipMotionChange = false;
-                  else MaidMotionChange(maidID, maid, mState, true);
+
+                if (mState.orgasmVoice == 1 || mState.orgasmVoice == 3) {  //絶頂時モーション変更実行
+                  ZeccyoMotionSelect(maidID, maid, mState);
+                  if (mState.orgasmVoice == 3) mState.orgasmVoice = 2;
+
+                } else {  //通常時モーション変更実行
+                  MaidMotionChange(maidID, maid, mState, true);
                 }
                 mState.motionHoldTime = UnityEngine.Random.Range(200f,600f);  //次のモーション変更タイマーセット
               }
-                            
-              
+
+
               //表情の変更処理
-              if(mState.faceHoldTime <= 0){
+              if (mState.faceHoldTime <= 0) {
                 ChangeFaceAnime(maidID, maid, mState);  //表情変更実行
                 ChangeFaceBlend(maidID, maid, mState);  //フェイスブレンド変更実行
                 mState.faceHoldTime = cfgw.vStateAltTimeVBase + UnityEngine.Random.Range(0f , cfgw.vStateAltTimeVRandomExtend); //次の表情変更タイマーセット
               }
-              
-              
+
+
               //音声の変更処理
-              if(mState.voiceHoldTime <= 0 && (mState.orgasmVoice != 2 || !cfgw.zViceWaitEnabled) && (maid.AudioMan.audiosource.loop || !maid.AudioMan.audiosource.isPlaying || lifeStart != 0)){
+              if (mState.voiceHoldTime <= 0 && (mState.orgasmVoice != 2 || !cfgw.zViceWaitEnabled) && (maid.AudioMan.audiosource.loop || !maid.AudioMan.audiosource.isPlaying
+              #if EmpiresLife
+               || lifeStart != 0
+              #endif
+              )) {
                 MaidVoicePlay(maidID, maid, mState);  //音声変更実行
                 mState.voiceHoldTime = cfgw.voiceHoldTimeBase + UnityEngine.Random.Range(0f , cfgw.voiceHoldTimeRandomExtend); //次の音声変更タイマーセット
               }
-              
-              if(mState.voiceHoldTime > 0 && mState.vsFlag != 2)mState.voiceHoldTime -= timerRate;  //音声変更タイマー減少
-              if(mState.voiceHoldTime <= 0 && maid.AudioMan.audiosource.loop && (mState.vStateMajor == 20 || mState.vStateMajor == 30)){
+
+              if (mState.voiceHoldTime > 0 && mState.vsFlag != 2) mState.voiceHoldTime -= timerRate;  //音声変更タイマー減少
+              if (mState.voiceHoldTime <= 0 && maid.AudioMan.audiosource.loop && (mState.vStateMajor == 20 || mState.vStateMajor == 30)) {
                 maid.AudioMan.Stop(0f);  //ADVのオートモードが機能するよう、ループ音声を切り替える前に一旦止める
               }
-              
-              
+
+
               //余韻状態の処理
-              if(mState.yoinHoldTime <= 0){
-                if(mState.vStateMajor == 40){
-                  if(mState.vStateMajorOld != 40){  //余韻状態開始時の場合は、感度や連続絶頂回数によって余韻時間増加させる
+              if (mState.yoinHoldTime <= 0) {
+                if (mState.vStateMajor == 40) {
+                  if (mState.vStateMajorOld != 40) {  //余韻状態開始時の場合は、感度や連続絶頂回数によって余韻時間増加させる
                     //mState.yoinHoldTime = cfgw.voiceHoldTimeBase + UnityEngine.Random.Range(0f , cfgw.vStateAltTimeVRandomExtend) + Mathf.CeilToInt(mState.boostValue * 20) + Mathf.CeilToInt(Mathf.Sqrt((float)mState.orgasmCmb)) * 60 + Mathf.CeilToInt(mState.orgasmValue) + Mathf.CeilToInt(mState.exciteValue / 120) ;
                     mState.yoinHoldTime = 300f + Mathf.CeilToInt(mState.boostValue * 20) + (float)mState.orgasmCmb * 100 + Mathf.CeilToInt(mState.orgasmValue) * 5 + Mathf.CeilToInt(mState.exciteValue / 30);
-                    if(mState.yoinHoldTime > 5000f )mState.yoinHoldTime = 5000f;
+                    if (mState.yoinHoldTime > 5000f ) mState.yoinHoldTime = 5000f;
 
-                  }else if(mState.kaikanLevel <= 1){  //前回も余韻状態だった場合かつ、勃起値とスタミナが正常値なら完全停止
+                  } else if (mState.kaikanLevel <= 1) {  //前回も余韻状態だった場合かつ、勃起値とスタミナが正常値なら完全停止
                     mState.vStateMajor = 50;
-                    
+
                     //各種タイマーも同時にリセット
                     mState.motionHoldTime = 0;
                     mState.faceHoldTime = 0;
                     mState.voiceHoldTime = 0;
-                    
+
                   }
                 }
               }
@@ -2492,35 +2599,35 @@ namespace CM3D2.VibeYourMaid.Plugin {
 
 
             //男の射精値増加処理
-            for (int im = 0; im < SubMans.Length; im++){
-              if(syaseiLock[im])continue;
-              if(!SubMans[im].Visible || MansTg[im] == -1)mansLevel[im] = 0;
-              if(mansLevel[im] == 0){
+            for (int im = 0; im < SubMans.Length; im++) {
+              if (syaseiLock[im]) continue;
+              if (!SubMans[im].Visible || MansTg[im] == -1) mansLevel[im] = 0;
+              if (mansLevel[im] == 0) {
                 syaseiValue[im] -= 0.02f * timerRate;
-              }else if(mansLevel[im] == 1){
+              } else if (mansLevel[im] == 1) {
                 syaseiValue[im] += 0.01f * timerRate;
-              }else{
+              } else {
                 syaseiValue[im] += 0.017f * timerRate;
               }
-              if(syaseiValue[im] < 0f)syaseiValue[im] = 0f;
-              if(syaseiValue[im] > 100f)syaseiValue[im] = 100f;
+              if (syaseiValue[im] < 0f) syaseiValue[im] = 0f;
+              if (syaseiValue[im] > 100f) syaseiValue[im] = 100f;
             }
 
             if (Input.anyKey) {
               //ダブルクリック判定
               DClicCheck();
-              
+
               //ショートカットキー
               ShortCutKey();
-              
+
               //VRショートカット
               ShortCutVR(vrShortCutController);
 
             }
-            
+
             //一人称視点処理
             FpsModeChange();
-            
+
             //カメラのメイド追従処理
             MaidFollowingCamera(tgID);
 
@@ -2536,7 +2643,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
 
             //お触り処理 (ウィンドウ上にある場合は処理しない)
             if (cfgw.osawariEnabled && !onWindow) osawariHand();
-            
+
           } else {
             //メイドがいなくても処理する
             if (Input.anyKey) {
@@ -2548,7 +2655,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
 
 
 
-          //子宮脱按钮
+          //子宮脱按钮 #109
           if (manualTriggeredUterusDatsu)
           {
             foreach (int maidID in vmId)
@@ -2568,53 +2675,53 @@ namespace CM3D2.VibeYourMaid.Plugin {
 
 
 
-#if EmpiresLife
+          #if EmpiresLife
           //エンパイアズライフ開始
-          if(vSceneLevel == 3 && Input.GetKeyDown(cfgw.keyPluginToggleV11)){
-            
+          if (vSceneLevel == 3 && Input.GetKeyDown(cfgw.keyPluginToggleV11)) {
+
             //背景が存在するかどうかチェック
             UnityEngine.Object @object = GameMain.Instance.BgMgr.CreateAssetBundle("Shitsumu_ChairRot");
-            if (@object == null){
+            if (@object == null) {
               @object = Resources.Load("BG/Shitsumu_ChairRot");
-              if (@object == null){
+              if (@object == null) {
                 @object = Resources.Load("BG/2_0/Shitsumu_ChairRot");
               }
             }
-            
-            if (@object != null){
-              if(lifeStart == 0){
-                if(!bVR)Camera.main.fieldOfView = 50.0f;
+
+            if (@object != null) {
+              if (lifeStart == 0) {
+                if (!bVR) Camera.main.fieldOfView = 50.0f;
                 gameObject_ui.SetActive(false);
                 flagN = GameMain.Instance.CharacterMgr.status.GetFlag("時間帯") == 3;
-                
+
                 ElStart();
-                
-                if(!flagN)StartCoroutine ("ElChange", 0);
-                if(flagN)StartCoroutine ("ElChange", 1);
+
+                if (!flagN) StartCoroutine("ElChange", 0);
+                if (flagN) StartCoroutine("ElChange", 1);
               } else {
                 gameObject_ui.SetActive(true);
                 ElEnd();
-              
+
               }
             }
           }
-          
+
           //エンパイアズライフモードの処理
-          if(vSceneLevel == 3) StartCoroutine ("EmpiresLife");
-#endif          
+          if (vSceneLevel == 3) StartCoroutine("EmpiresLife");
+          #endif
 
           //マウスがウィンドウ上ならキー以外のイベントはキャンセルして透過させない
           if (onWindow) Input.ResetInputAxes();
 
         }
-      //--------------------------------------------
+        //--------------------------------------------
 
 
 
 
 
-      //--------------------------------------------
-      //フレーム終了時の処理------------------------
+       //--------------------------------------------
+        //フレーム終了時の処理------------------------
         void LateUpdate() {
 
           //VR移動
@@ -2622,85 +2729,85 @@ namespace CM3D2.VibeYourMaid.Plugin {
 
           //処理フレーム分割数 2～4
           int mc = Math.Min(4, maidCount+1);
-          
-          if(tgID != -1 && SceneLevelEnable){
+
+          if (tgID != -1 && SceneLevelEnable) {
 
             int shapeTgNum1 = 0;
 
-            foreach(int maidID in vmId){
-              
+            foreach (int maidID in vmId) {
+
               Maid maid = stockMaids[maidID].mem;
               MaidState mState = maidsState[maidID];
 
               //口元の変更処理
               MouthChange(maid, mState);
-              
+
               //シェイプキー操作
-              if(maidID == tgID)EffectGakupiku(maid, mState);  //痙攣操作
-              
-              if(mState.vStateMajor == 20){
+              if (maidID == tgID) EffectGakupiku(maid, mState);  //痙攣操作
+
+              if (mState.vStateMajor == 20) {
                 ShapeKeyRandam(maidID, maid, mState, cfgw.ShapeListR , cfgw.RandamMin1 , cfgw.RandamMax1 );
-                ShapeKeyWave(maidID, maid, mState, cfgw.ShapeListW , cfgw.ShapeListW2 , cfgw.WaveMin1 , cfgw.WaveMax1 , cfgw.WaveSpead1 );
-                ShapeKeyIncrease(maidID, mState, cfgw.ShapeListI , cfgw.IncreaseMax1 , cfgw.IncreaseSpead1 );
+                ShapeKeyWave(maid, mState, cfgw.ShapeListW , cfgw.ShapeListW2 , cfgw.WaveMin1 , cfgw.WaveMax1 , cfgw.WaveSpead1 );
+                ShapeKeyIncrease(maid, mState, cfgw.ShapeListI , cfgw.IncreaseMax1 , cfgw.IncreaseSpead1 );
               }
-              else if(mState.vStateMajor == 30){
+              else if (mState.vStateMajor == 30) {
                 ShapeKeyRandam(maidID, maid, mState, cfgw.ShapeListR , cfgw.RandamMin2 , cfgw.RandamMax2 );
-                ShapeKeyWave(maidID, maid, mState, cfgw.ShapeListW , cfgw.ShapeListW2 , cfgw.WaveMin2 , cfgw.WaveMax2 , cfgw.WaveSpead2 );
-                ShapeKeyIncrease(maidID, mState, cfgw.ShapeListI , cfgw.IncreaseMax2 , cfgw.IncreaseSpead2 );
+                ShapeKeyWave(maid, mState, cfgw.ShapeListW , cfgw.ShapeListW2 , cfgw.WaveMin2 , cfgw.WaveMax2 , cfgw.WaveSpead2 );
+                ShapeKeyIncrease(maid, mState, cfgw.ShapeListI , cfgw.IncreaseMax2 , cfgw.IncreaseSpead2 );
               }
 
               EffectHibuAnime(maidID, maid, mState, mc);  //秘部アニメ操作
-              EffectNyodo(maidID, mState);  //尿道
+              EffectNyodo(maid, mState);  //尿道
 
-              //以下の処理はメイドが複数いた場合、処理するフレームを分割する（最大9分割）
-              if(shapeTgNum1 == shapeTgNum2){
+              //以下の処理はメイドが複数いた場合、処理するフレームを分割する（最大8分割）
+              if (shapeTgNum1 == shapeTgNum2) {
                 EffectAse(maid, mState);  //汗
                 EffectBokki(maid, mState);  //勃起操作
                 EffectAhe(maid, mState, mc);  //瞳操作
                 EffectUterusDatsu(maidID, maid, mState); //子宮脱操作
 
-                if(mState.vStateMajor == 20){
-                  ShapeKeyKupaWave(maidID, mState, cfgw.WaveMin1 , cfgw.WaveMax1 , cfgw.WaveSpead1 * mc * 0.5f );
+                if (mState.vStateMajor == 20) {
+                  ShapeKeyKupaWave(mState, cfgw.WaveMin1 , cfgw.WaveMax1 , cfgw.WaveSpead1 * mc * 0.5f );
                 }
-                else if(mState.vStateMajor == 30){
-                  ShapeKeyKupaWave(maidID, mState, cfgw.WaveMin2 , cfgw.WaveMax2 , cfgw.WaveSpead2 * mc * 0.5f );
+                else if (mState.vStateMajor == 30) {
+                  ShapeKeyKupaWave(mState, cfgw.WaveMin2 , cfgw.WaveMax2 , cfgw.WaveSpead2 * mc * 0.5f );
                 }
                 //赤面処理
-                if(mState.sekimenValue > 0f)try {VertexMorph_FromProcItem(maid.body0, "hoho2", mState.sekimenValue);} catch { /*LogError(ex);*/ }
+                if (mState.sekimenValue > 0f) try { VertexMorph_FromProcItem(maid.body0, "hoho2", mState.sekimenValue); } catch { /*LogError(ex);*/ }
               }
 
               shapeTgNum1++;
-              if(shapeTgNum1 >= mc)shapeTgNum1 = 0;
-              
+              if (shapeTgNum1 >= mc) shapeTgNum1 = 0;
+
               //バイブステートのバックアップ
               mState.vStateMajorOld = mState.vStateMajor;
-              
+
             }
-            
-            
+
+
             //変更シェイプキーの適用
             VertexMorph_FixBlendValues();
-            
+
             shapeTgNum2++; //毎フレーム1人ずらす
-            if(shapeTgNum2 >= mc)shapeTgNum2 = 0;
-            
-            
+            if (shapeTgNum2 >= mc) shapeTgNum2 = 0;
+
+
             //メインメイドが変わったときの処理
-            if(tgID != tgIDBack){
-              if(man.Visible && cfgw.autoMoveEnabled){
+            if (tgID != tgIDBack) {
+              if (man.Visible && cfgw.autoMoveEnabled) {
                 MansTg[0] = tgID;
                 man.transform.position = stockMaids[tgID].mem.transform.position;
                 man.transform.eulerAngles = stockMaids[tgID].mem.transform.eulerAngles;
                 ManMotionChange(tgID, true, 0.5f, 1.0f);
               }
-              
+
               ChangeSE(tgID, true);
             }
           }
-          if(tgID != tgIDBack)tgIDBack = tgID;
+          if (tgID != tgIDBack) tgIDBack = tgID;
 
         }
-      //--------------------------------------------
+        //--------------------------------------------
 
 
 
@@ -2709,8 +2816,8 @@ namespace CM3D2.VibeYourMaid.Plugin {
 
 
 
-      //---------------------------------------------------
-      //メイドのデータ取得関連-----------------------------
+        //---------------------------------------------------
+        //メイドのデータ取得関連-----------------------------
         public List<MaidInfo> stockMaids = new List<MaidInfo>();
         public List<MaidState> maidsState = new List<MaidState>();
         public List<int> vmId = new List<int>();
@@ -2718,8 +2825,9 @@ namespace CM3D2.VibeYourMaid.Plugin {
         public int tgIDBack = -1;
         public int maidCount = 0;
 
-        public class MaidInfo{
-          public MaidInfo(Maid m, int n, string fn, string ln, string ps, string con){
+        public class MaidInfo
+        {
+          public MaidInfo(Maid m, int n, string fn, string ln, string ps, string con) {
             mem = m;
             id = n;
             fName = fn;
@@ -2736,8 +2844,8 @@ namespace CM3D2.VibeYourMaid.Plugin {
           public string contract = ""; //契約
         }
 
-        public class MaidState{
-          
+        public class MaidState
+        {
           public Transform maidHead = null;  //メイドの頭位置取得用
           public Transform maidMune = null;  //メイドの胸位置取得用
           public Transform maidHara = null;  //メイドの股間位置取得用
@@ -2749,15 +2857,15 @@ namespace CM3D2.VibeYourMaid.Plugin {
           public bool linkEnabled = false;  //メインメイドとリンクさせるかどうか
           public int linkID = -1;  //リンクメイドのID
           public bool visibleBack = false;  //メイドがもともと表示されていたかのチェック
-          
+
           public bool sVibeFlag = false;
-          
+
           //ボイスモードのセレクト用
           public int voiceMode = 0;
-          public int voiceMode2 = 0;
+          //public int voiceMode2 = 0; //カスタムボイスで利用 未使用
           public bool autoVoiceEnabled = true;
           public int iRandomVoiceBackup = 0;
-          
+
           //オートモード用
           public int pAutoSelect = 0;
           public float pAutoTime = 0f;  //責めのオート変更時間
@@ -2776,7 +2884,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
           public string faceBlendBackup = "";
           public float sekimenValue = 0f;
           public int kaikanLevel;
-          
+
           //ボイスセット用
           public string editVoiceSetName = "";
           public List<string[]> editVoiceSet = new List<string[]>();
@@ -2788,45 +2896,44 @@ namespace CM3D2.VibeYourMaid.Plugin {
           //public float vsInterval = 10f;
 
           //瞳操作関連
-          public float aheValue = 0f; 
-          public float aheValue2 = 0f; 
+          public float aheValue = 0f;
+          public float aheValue2 = 0f;
           public float fAheDefEyeL = -9999f;
           public float fAheDefEyeR = -9999f;
           public bool aheResetFlag = false;
-          
-          
+
+
           //興奮度管理
-          public int exciteLevel = 1;            //0～300の興奮度を、1～4の興奮レベルに変換した値
-          public float exciteValue = 0f;       //現在興奮値
+          public int exciteLevel = 1;         //0～300の興奮度を、1～4の興奮レベルに変換した値
+          public float exciteValue = 0f;      //現在興奮値
 
-          public float resistBase = 0f;          //抵抗値のベース値
-          public float resistBonus = 0f;          //抵抗の特別加算値
-          public float resistValue = 0f;          //現在抵抗値
+          public float resistBase = 0f;       //抵抗値のベース値
+          public float resistBonus = 0f;      //抵抗の特別加算値
+          public float resistValue = 0f;      //現在抵抗値
 
-          public float boostBase = 0.5f;            //感度のベース値
-          public float boostBonus = 0f;           //感度の特別加算値
-          public float boostValue = 0f;           //現在感度
-          public float jirashi = 0;            //焦らし度
-          
-          public float maidStamina = 3000f;        //スタミナ
+          public float boostBase = 0.5f;      //感度のベース値
+          public float boostBonus = 0f;       //感度の特別加算値
+          public float boostValue = 0f;       //現在感度
+          public float jirashi = 0;           //焦らし度
+
+          public float maidStamina = 3000f;   //スタミナ
           public bool stunFlag = false;
 
           public float orgasmValue = 0f;            //現在絶頂値　100になると絶頂
           public int orgasmLevel  = 0;              //夜伽スライダー反映に利用
           public int orgasmCount = 0;               //絶頂回数
           public int orgasmCmb = 0;                 //連続絶頂回数
-          public float orgasmHoldTime = 0f;          //絶頂後のボーナスタイム
+          public float orgasmHoldTime = 0f;         //絶頂後のボーナスタイム
           public int orgasmVoice = 0;               //絶頂時音声フラグ
           public bool orgasmStart = false;          //絶頂開始フラグ
-          public float continuationTime;             //バイブ責めの継続時間
-          
+          public float continuationTime;            //バイブ責めの継続時間
+
           //フェラ状態チェック
           public int bIsBlowjobing = 0;
           public string zAnimeFileName = "";
-          
+
           //モーション変更関連
           public float motionHoldTime = 0f;
-          public bool skipMotionChange; //モーションの変更を1回スキップ
           public int motionAltTime = 0;
           public int mcFlag = -1;
           public string maidMotionBackup = "";
@@ -2846,7 +2953,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
           public int[] syaseiMarks = new int[]{0, 0, 0, 0, 0};
           public bool[] giveSexual = new bool[]{true, false, false, false, false, false, false, false, false, false};
           public bool elItazuraFlag = false;
-          
+
           //モーションセット関連
           public string editMotionSetName = "";
           public List<List<string>> editMotionSet = new List<List<string>>();
@@ -2859,7 +2966,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
           //秘部操作関連
           public float bokkiValue1 = 0f;              //クリ勃起値
           public int cliMode = 0;                     //クリモード(1:通常、2:巨クリ、3:ふたなり)
-          public float cliScale = 1f;             //クリ縮小率
+          public float cliScale = 1f;                 //クリ縮小率
           public int uDatsu = 0;                      //子宮脱フラグ
           public bool bokkiResetFlag = false;
           public float labiaValue = 0;
@@ -2876,7 +2983,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
           public float analSlider1Value = 10f;
           public float hibuSlider2Value = 3f;
           public float analSlider2Value = 3f;
-          
+
           //一時操作関連
           public float hibuTempValue = 0f;
           public float analTempValue = 0f;
@@ -2887,23 +2994,24 @@ namespace CM3D2.VibeYourMaid.Plugin {
           public bool gakupikuResetFlag= false;
           public float gakupikuTime = 0;                          //痙攣時間判定
           public bool gakupikuFlag = true;                        //痙攣動作フラグ
-          public bool gakupikuOn = false;  
+          public bool gakupikuOn = false;
           public float gakupikuValue = 0f;
-          
+
           //ちんぽ操作関連
           public float chinpoValue1 = 0f;              //　ちんぽ勃起値
           public float soriValue1 = 0f;                //　ちんぽ反り値
-          
+
           //汗関連
           public bool aseResetFlag = false;
           public float aseTime = 0f; //汗変更タイミング調整に利用
-          
+
           //カメラが顔に近づいているかどうか
+          public float cameraCheckTime = 0f;
           public bool cameraCheck = false;
           public bool cameraCheckVoice = false;
           public bool eyeToCamOld = false;
           public bool headToCamOld = false;
-          
+
           //メイドの口元変更
           public float MouthHoldTime = 0f;
           public int MouthMode = 0;
@@ -2920,7 +3028,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
           public float maVBack = 1f;
           public float miVBack = 1f;
           public float mdwVBack = 1f;
-          
+
           //演出関係
           public bool fToiki1 = false;
           public bool fToiki2 = false;
@@ -2929,8 +3037,8 @@ namespace CM3D2.VibeYourMaid.Plugin {
           public bool fAieki3 = false;
           public bool fSio = false;
           public bool fSio2 = false;
-          public float sioTime = float.PositiveInfinity;
-          public float sioTime2 = float.PositiveInfinity;
+          public float sioTime = 0;
+          public float sioTime2 = 0;
           public float sioVolume = 0f;
           public float nyoVolume = 0f;
           public float nyodoTime = 0f;
@@ -2945,33 +3053,33 @@ namespace CM3D2.VibeYourMaid.Plugin {
           public float shapeKeyIncreaseValue = 0f;
           public float shapeKeyRandomInterval = 0.01f; // 動作間隔(秒)
           public float shapeKeyRandomDelta = 0f;       // 前回動作からの経過時間
-          
+
           //アイテム関連
           public string itemV = "";
           public string itemA = "";
-          
+
           //エロステータス・経験値関連
           public float cliHidai = 0f; //クリトリス肥大度
           public float chikubiHidai = 0.2f; //乳首肥大度
-          
+
           public int orgTotal = 0; //トータル絶頂数
-          public int orgMax = 0; //最大連続絶頂数
-          
+          public int orgMax = 0;   //最大連続絶頂数
+
           public int orgTotalChitsu = 0; //トータル絶頂数（膣）
-          public int orgTotalAnal = 0; //トータル絶頂数（アナル）
-          public int orgTotalEtc = 0; //トータル絶頂数（その他）
-          
-          public int[] syaseiTotal1 = new int[]{0, 0, 0, 0}; //射精回数（膣、アナル、口、外）
+          public int orgTotalAnal = 0;   //トータル絶頂数（アナル）
+          public int orgTotalEtc = 0;    //トータル絶頂数（その他）
+
+          public int[] syaseiTotal1 = new int[]{0, 0, 0, 0};         //射精回数（膣、アナル、口、外）
           public float[] syaseiTotal2 = new float[]{0f, 0f, 0f, 0f}; //射精量（膣、アナル、口、外）
-          
-          public int sioTotal1 = 0; //潮吹き回数
-          public int nyoTotal1 = 0; //放尿回数
+
+          public int sioTotal1 = 0;    //潮吹き回数
+          public int nyoTotal1 = 0;    //放尿回数
           public float sioTotal2 = 0f; //潮吹き量
           public float nyoTotal2 = 0f; //放尿量
-          
-          public int stanTotal = 0; //失神回数
-          public int uDatsuTotal = 0; //子宮脱回数
-          
+
+          public int stanTotal = 0;    //失神回数
+          public int uDatsuTotal = 0;  //子宮脱回数
+
           //お触り関連
           public string bodyName = "";
           public GameObject targetSphere_mouth = null;
@@ -2990,7 +3098,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
           public Transform IK_hipR = null;
           public Transform Hip_R = null;
           public Transform IK_anal = null;
-          
+
           //乳首関連
           public int chikubi_View = -1;
           public bool chikubiEnabled = false;
@@ -3019,9 +3127,9 @@ namespace CM3D2.VibeYourMaid.Plugin {
 
 
         //メイドデータをストック
-        void GetStockMaids(){
+        void GetStockMaids() {
           stockMaids.Clear();
-          for (int i = 0; i < GameMain.Instance.CharacterMgr.GetStockMaidCount(); i++){
+          for (int i = 0; i < GameMain.Instance.CharacterMgr.GetStockMaidCount(); i++) {
             Maid sm = GameMain.Instance.CharacterMgr.GetStockMaid(i);
             string fn = sm.status.firstName;
             string ln = sm.status.lastName;
@@ -3029,51 +3137,55 @@ namespace CM3D2.VibeYourMaid.Plugin {
             string con = sm.status.contract.ToString();
 
             stockMaids.Add(new MaidInfo(sm, i, fn, ln, ps, con));
-            
+
             //State枠がまだ作られていないメイドの場合は追加
-            if(maidsState.Count <= i)maidsState.Add(new MaidState());
+            if (maidsState.Count <= i) maidsState.Add(new MaidState());
             //初期化
             maidsState[i].vsTime = UnityEngine.Random.Range(cfgw.voiceSetInterval-cfgw.voiceSetIntervalRange*0.5f, cfgw.voiceSetInterval+cfgw.voiceSetIntervalRange*0.5f);
           }
+
+          //お触り機能のキャッシュ配列が足りなくならないように拡張
+          osawari.setStockMaidsCount(stockMaids.Count);
         }
 
         //アクティブメイドのIDをリスト化する
-        void VisibleMaidCheck(bool forceCheck){
+        void VisibleMaidCheck(bool forceCheck)
+        {
           vmId.Clear();
-          foreach(var sm in stockMaids){
-            
-            if(sm.mem.Visible){
+          foreach (var sm in stockMaids) {
+            MaidState maidState= maidsState[sm.id];
+            if (sm.mem.Visible) {
               vmId.Add(sm.id); //メイドIDをリストに追加
 
-              if(forceCheck || !maidsState[sm.id].visibleBack){ //新たにメイドが表示されていた場合の処理
-                VisibleMaidCheckActivate(sm.id, sm.mem, maidsState[sm.id]);
+              if (forceCheck || !maidState.visibleBack) { //新たにメイドが表示されていた場合の処理
+                VisibleMaidCheckActivate(sm.id, sm.mem, maidState);
               }
-              
-            }else{
-              if(maidsState[sm.id].visibleBack){ //表示されていたメイドが消えた場合の処理
-                targetDestroy(sm.id, maidsState[sm.id]); //お触り用ターゲット消去
+
+            } else {
+              if (maidState.visibleBack) { //表示されていたメイドが消えた場合の処理
+                targetDestroy(sm.id, maidState); //お触り用ターゲット消去
                 maidsState[sm.id] = new MaidState();
                 maidsState[sm.id].visibleBack = false;
               }
             }
           }
-          
+
           //メイドが存在する場合にフラグを有効化
-          if(vmId.Count > 0){
-            if(vmId.IndexOf(tgID) == -1)tgID = vmId[0];
+          if (vmId.Count > 0) {
+            if (vmId.IndexOf(tgID) == -1)tgID = vmId[0];
           } else {
             tgID = -1;
           }
-          
+
           maidCount = vmId.Count;
         }
-        
+
         //アクティブなメイドを単体で再読み込み
         void VisibleMaidCheckActivate(int maidID, Maid maid, MaidState maidState)
         {
           //メイドさんの顔と胸を取得する
           Transform[] objList = maid.transform.GetComponentsInChildren<Transform>();
-          if (objList.Count() != 0){
+          if (objList.Count() != 0) {
             maidState.maidHead = null;
             maidState.maidMune = null;
             maidState.maidHara = null;
@@ -3085,7 +3197,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
               else if (maidState.maidXxx == null && gameobject.name == "Bip01 Pelvis") maidState.maidXxx = gameobject;
             }
           }
-          
+
           //お触り用ターゲットセット
           if (cfgw.osawariEnabled) {
             targetDestroy(maidID, maidState);
@@ -3094,13 +3206,13 @@ namespace CM3D2.VibeYourMaid.Plugin {
 
           //エロステータス読み込み
           LoadEroState(maidID);
-          
+
           //乳首設定読込
           ChikubiLoad(maidID, 0);
           ChikubiLoad(maidID, 1);
-          
-          //ボイスセット自動設定
-          if (maidState.kissVoiceSetName == "") {
+
+          //ボイスセット自動設定 読み込み済みなら再設定しない
+          if (!maidState.visibleBack && maidState.kissVoiceSetName == "") {
             bool skipAutoKiss = false;
             MaidStatus.Status status = maid.status;
             //メイド個別設定
@@ -3118,9 +3230,9 @@ namespace CM3D2.VibeYourMaid.Plugin {
             if (!skipAutoKiss && maidState.kissVoiceSetName == "" && status.heroineType != MaidStatus.HeroineType.Sub) {
               if (status.specialRelation == MaidStatus.SpecialRelation.Married) { //結婚
                 if (cfgw.autoKissVoiceSetMarried != "") maidState.kissVoiceSetName = cfgw.autoKissVoiceSetMarried;
-              } else if (status.seikeiken != MaidStatus.Seikeiken.No_No || status.relation == MaidStatus.Relation.Lover) { //非処女またはで恋人
+              } else if (status.seikeiken != MaidStatus.Seikeiken.No_No || status.relation == MaidStatus.Relation.Lover) { //非処女または恋人
                 if (cfgw.autoKissVoiceSetFamiliar != "") maidState.kissVoiceSetName = cfgw.autoKissVoiceSetFamiliar;
-              } else {
+              } else { //処女で恋人未満
                 if (cfgw.autoKissVoiceSetInnocent != "") maidState.kissVoiceSetName = cfgw.autoKissVoiceSetInnocent;
               }
             }
@@ -3128,55 +3240,55 @@ namespace CM3D2.VibeYourMaid.Plugin {
 
           maidState.visibleBack = true;
         }
-        
-        //エロステータスLOAD
-        private void LoadEroState(int maidID){
-          Maid maid = stockMaids[maidID].mem;
-          if(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "cliMode", "0") != "")maidsState[maidID].cliMode = intCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "cliMode", "0"));
-          if(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "cliScale", "0") != "")maidsState[maidID].cliScale = floatCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "cliScale", "1"));
-          
-          if(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "cliHidai", "0") != "")maidsState[maidID].cliHidai = floatCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "cliHidai", "0"));
-          if(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "chikubiHidai", "0") != "")maidsState[maidID].chikubiHidai = floatCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "chikubiHidai", "0"));
-          
-          if(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "orgTotal", "0") != "")maidsState[maidID].orgTotal = intCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "orgTotal", "0"));
-          if(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "orgMax", "0") != "")maidsState[maidID].orgMax = intCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "orgMax", "0"));
-          if(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "orgTotalChitsu", "0") != "")maidsState[maidID].orgTotalChitsu = intCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "orgTotalChitsu", "0"));
-          if(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "orgTotalAnal", "0") != "")maidsState[maidID].orgTotalAnal = intCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "orgTotalAnal", "0"));
-          if(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "orgTotalEtc", "0") != "")maidsState[maidID].orgTotalEtc = intCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "orgTotalEtc", "0"));
-          
-          if(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "seiekiChitsu1", "0") != "")maidsState[maidID].syaseiTotal1[0] = intCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "seiekiChitsu1", "0"));
-          if(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "seiekiAnal1", "0") != "")maidsState[maidID].syaseiTotal1[1] = intCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "seiekiAnal1", "0"));
-          if(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "seiekiKuti1", "0") != "")maidsState[maidID].syaseiTotal1[2] = intCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "seiekiKuti1", "0"));
-          if(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "seiekiSoto1", "0") != "")maidsState[maidID].syaseiTotal1[3] = intCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "seiekiSoto1", "0"));
-          if(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "seiekiChitsu2", "0") != "")maidsState[maidID].syaseiTotal2[0] = floatCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "seiekiChitsu2", "0"));
-          if(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "seiekiAnal2", "0") != "")maidsState[maidID].syaseiTotal2[1] = floatCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "seiekiAnal2", "0"));
-          if(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "seiekiKuti2", "0") != "")maidsState[maidID].syaseiTotal2[2] = floatCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "seiekiKuti2", "0"));
-          if(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "seiekiSoto2", "0") != "")maidsState[maidID].syaseiTotal2[3] = floatCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "seiekiSoto2", "0"));
-          
-          if(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "sioTotal1", "0") != "")maidsState[maidID].sioTotal1 = intCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "sioTotal1", "0"));
-          if(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "nyoTotal1", "0") != "")maidsState[maidID].nyoTotal1 = intCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "nyoTotal1", "0"));
-          if(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "sioTotal2", "0") != "")maidsState[maidID].sioTotal2 = floatCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "sioTotal2", "0"));
-          if(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "nyoTotal2", "0") != "")maidsState[maidID].nyoTotal2 = floatCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "nyoTotal2", "0"));
 
-          if(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "stanTotal", "0") != "")maidsState[maidID].stanTotal = intCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "stanTotal", "0"));
-          if(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "uDatsuTotal", "0") != "")maidsState[maidID].uDatsuTotal = intCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "uDatsuTotal", "0"));
+        //エロステータスLOAD
+        private void LoadEroState(int maidID) {
+          Maid maid = stockMaids[maidID].mem;
+          if (ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "cliMode", "0") != "") maidsState[maidID].cliMode = intCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "cliMode", "0"));
+          if (ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "cliScale", "0") != "") maidsState[maidID].cliScale = floatCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "cliScale", "1"));
+
+          if (ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "cliHidai", "0") != "") maidsState[maidID].cliHidai = floatCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "cliHidai", "0"));
+          if (ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "chikubiHidai", "0") != "") maidsState[maidID].chikubiHidai = floatCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "chikubiHidai", "0"));
+
+          if (ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "orgTotal", "0") != "") maidsState[maidID].orgTotal = intCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "orgTotal", "0"));
+          if (ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "orgMax", "0") != "") maidsState[maidID].orgMax = intCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "orgMax", "0"));
+          if (ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "orgTotalChitsu", "0") != "") maidsState[maidID].orgTotalChitsu = intCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "orgTotalChitsu", "0"));
+          if (ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "orgTotalAnal", "0") != "") maidsState[maidID].orgTotalAnal = intCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "orgTotalAnal", "0"));
+          if (ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "orgTotalEtc", "0") != "") maidsState[maidID].orgTotalEtc = intCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "orgTotalEtc", "0"));
+
+          if (ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "seiekiChitsu1", "0") != "") maidsState[maidID].syaseiTotal1[0] = intCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "seiekiChitsu1", "0"));
+          if (ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "seiekiAnal1", "0") != "") maidsState[maidID].syaseiTotal1[1] = intCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "seiekiAnal1", "0"));
+          if (ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "seiekiKuti1", "0") != "") maidsState[maidID].syaseiTotal1[2] = intCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "seiekiKuti1", "0"));
+          if (ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "seiekiSoto1", "0") != "") maidsState[maidID].syaseiTotal1[3] = intCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "seiekiSoto1", "0"));
+          if (ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "seiekiChitsu2", "0") != "") maidsState[maidID].syaseiTotal2[0] = floatCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "seiekiChitsu2", "0"));
+          if (ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "seiekiAnal2", "0") != "") maidsState[maidID].syaseiTotal2[1] = floatCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "seiekiAnal2", "0"));
+          if (ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "seiekiKuti2", "0") != "") maidsState[maidID].syaseiTotal2[2] = floatCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "seiekiKuti2", "0"));
+          if (ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "seiekiSoto2", "0") != "") maidsState[maidID].syaseiTotal2[3] = floatCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "seiekiSoto2", "0"));
+
+          if (ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "sioTotal1", "0") != "") maidsState[maidID].sioTotal1 = intCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "sioTotal1", "0"));
+          if (ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "nyoTotal1", "0") != "") maidsState[maidID].nyoTotal1 = intCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "nyoTotal1", "0"));
+          if (ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "sioTotal2", "0") != "") maidsState[maidID].sioTotal2 = floatCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "sioTotal2", "0"));
+          if (ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "nyoTotal2", "0") != "") maidsState[maidID].nyoTotal2 = floatCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "nyoTotal2", "0"));
+
+          if (ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "stanTotal", "0") != "") maidsState[maidID].stanTotal = intCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "stanTotal", "0"));
+          if (ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "uDatsuTotal", "0") != "") maidsState[maidID].uDatsuTotal = intCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "uDatsuTotal", "0"));
         }
 
         //エロステータスSAVE
-        private void SaveEroState(int maidID){
+        private void SaveEroState(int maidID) {
           Maid maid = stockMaids[maidID].mem;
           ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "cliMode", maidsState[maidID].cliMode.ToString(), true);
           ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "cliScale", maidsState[maidID].cliScale.ToString(), true);
-          
+
           ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "cliHidai", maidsState[maidID].cliHidai.ToString(), true);
           ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "chikubiHidai", maidsState[maidID].chikubiHidai.ToString(), true);
-          
+
           ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "orgTotal", maidsState[maidID].orgTotal.ToString(), true);
           ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "orgMax", maidsState[maidID].orgMax.ToString(), true);
           ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "orgTotalChitsu", maidsState[maidID].orgTotalChitsu.ToString(), true);
           ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "orgTotalAnal", maidsState[maidID].orgTotalAnal.ToString(), true);
           ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "orgTotalEtc", maidsState[maidID].orgTotalEtc.ToString(), true);
-          
+
           ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "seiekiChitsu1", maidsState[maidID].syaseiTotal1[0].ToString(), true);
           ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "seiekiAnal1", maidsState[maidID].syaseiTotal1[1].ToString(), true);
           ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "seiekiKuti1", maidsState[maidID].syaseiTotal1[2].ToString(), true);
@@ -3185,22 +3297,22 @@ namespace CM3D2.VibeYourMaid.Plugin {
           ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "seiekiAnal2", maidsState[maidID].syaseiTotal2[1].ToString(), true);
           ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "seiekiKuti2", maidsState[maidID].syaseiTotal2[2].ToString(), true);
           ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "seiekiSoto2", maidsState[maidID].syaseiTotal2[3].ToString(), true);
-          
+
           ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "sioTotal1", maidsState[maidID].sioTotal1.ToString(), true);
           ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "nyoTotal1", maidsState[maidID].nyoTotal1.ToString(), true);
           ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "sioTotal2", maidsState[maidID].sioTotal2.ToString(), true);
           ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "nyoTotal2", maidsState[maidID].nyoTotal2.ToString(), true);
-          
+
           ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "stanTotal", maidsState[maidID].stanTotal.ToString(), true);
           ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "uDatsuTotal", maidsState[maidID].uDatsuTotal.ToString(), true);
         }
-        
+
 
         //メイド呼び出し（夜伽のサブメイド読み込み&PlacementWindowのActiveMaidを参考にした）
-        private void LoadMaid(Maid newmaid){
+        private void LoadMaid(Maid newmaid) {
             int k = 0;
-            while (k < GameMain.Instance.CharacterMgr.GetMaidCount()){
-                if (GameMain.Instance.CharacterMgr.GetMaid(k) == null || GameMain.Instance.CharacterMgr.GetMaid(k) == newmaid){
+            while (k < GameMain.Instance.CharacterMgr.GetMaidCount()) {
+                if (GameMain.Instance.CharacterMgr.GetMaid(k) == null || GameMain.Instance.CharacterMgr.GetMaid(k) == newmaid) {
                     break;
                 }
                 k++;
@@ -3210,7 +3322,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                 Console.WriteLine("アクティブメイド登録 インデックスエラー: " + k);
                 return;
             }
-            
+
             GameMain.Instance.CharacterMgr.SetActiveMaid(newmaid, k/*MaidList.Count+1*/);
             newmaid.Visible = true;
             newmaid.AllProcProp();
@@ -3219,79 +3331,79 @@ namespace CM3D2.VibeYourMaid.Plugin {
 
 
         //メイドの衣装めくれ処理
-        private void MekureChanged(int maidID, string mekure, bool autoMode){
+        private void MekureChanged(int maidID, string mekure, bool autoMode) {
           Maid maid = stockMaids[maidID].mem;
           string skirt = isPropChanged(maidID, "skirt");
           string onepiece = isPropChanged(maidID, "onepiece");
           string panz = isPropChanged(maidID, "panz");
           string mizugi = isPropChanged(maidID, "mizugi");
-	  
-          if (mekure == "前"){
-            if (skirt == "本：めくれ前" || onepiece == "本：めくれ前" ){ //本衣装のめくれ（前）状態だった場合
-              if(autoMode){
-                if(maid.body0.GetMask(TBody.SlotID.skirt))maid.ResetProp("skirt", false);
-                if(maid.body0.GetMask(TBody.SlotID.onepiece))maid.ResetProp("onepiece", false);
+
+          if (mekure == "前") {
+            if (skirt == "本：めくれ前" || onepiece == "本：めくれ前") { //本衣装のめくれ（前）状態だった場合
+              if (autoMode){
+                if (maid.body0.GetMask(TBody.SlotID.skirt)) maid.ResetProp("skirt", false);
+                if (maid.body0.GetMask(TBody.SlotID.onepiece)) maid.ResetProp("onepiece", false);
               }
-            } else if (skirt == "仮：めくれ前" || onepiece == "仮：めくれ前" ){ //仮衣装のめくれ（前）状態だった場合
-              if(autoMode){
-                if(maid.body0.GetMask(TBody.SlotID.skirt))maid.SetProp(MPN.skirt, maid.GetProp(MPN.skirt).strTempFileName.Replace("_mekure", ""), 0, true, false);
-                if(maid.body0.GetMask(TBody.SlotID.onepiece))maid.SetProp(MPN.onepiece, maid.GetProp(MPN.onepiece).strTempFileName.Replace("_mekure", ""), 0, true, false);
+            } else if (skirt == "仮：めくれ前" || onepiece == "仮：めくれ前") { //仮衣装のめくれ（前）状態だった場合
+              if (autoMode) {
+                if (maid.body0.GetMask(TBody.SlotID.skirt)) maid.SetProp(MPN.skirt, maid.GetProp(MPN.skirt).strTempFileName.Replace("_mekure", ""), 0, true, false);
+                if (maid.body0.GetMask(TBody.SlotID.onepiece)) maid.SetProp(MPN.onepiece, maid.GetProp(MPN.onepiece).strTempFileName.Replace("_mekure", ""), 0, true, false);
               }
-            } else if (skirt == "仮：めくれ後" || onepiece == "仮：めくれ後" ){ //仮衣装のめくれ（後）状態だった場合
-              if(maid.body0.GetMask(TBody.SlotID.skirt))ItemChangeTemp(maidID, "skirt", "後");
-              if(maid.body0.GetMask(TBody.SlotID.onepiece))ItemChangeTemp(maidID, "onepiece", "後");
-            
-            } else if (skirt == "仮：通常" || onepiece == "仮：通常" ){ //仮衣装の通常状態だった場合
-              if(maid.body0.GetMask(TBody.SlotID.skirt))ItemChangeTemp(maidID, "skirt", "めくれスカート", true);
-              if(maid.body0.GetMask(TBody.SlotID.onepiece))ItemChangeTemp(maidID, "onepiece", "めくれスカート", true);
-            } else if(skirt != "無し" || onepiece != "無し" ) { //本衣装の通常状態だった場合
-              if(maid.body0.GetMask(TBody.SlotID.skirt))ItemChangeTemp(maidID, "skirt", "めくれスカート", false);
-              if(maid.body0.GetMask(TBody.SlotID.onepiece))ItemChangeTemp(maidID, "onepiece", "めくれスカート", false);
+            } else if (skirt == "仮：めくれ後" || onepiece == "仮：めくれ後") { //仮衣装のめくれ（後）状態だった場合
+              if (maid.body0.GetMask(TBody.SlotID.skirt)) ItemChangeTemp(maidID, "skirt", "後");
+              if (maid.body0.GetMask(TBody.SlotID.onepiece)) ItemChangeTemp(maidID, "onepiece", "後");
+
+            } else if (skirt == "仮：通常" || onepiece == "仮：通常") { //仮衣装の通常状態だった場合
+              if (maid.body0.GetMask(TBody.SlotID.skirt)) ItemChangeTemp(maidID, "skirt", "めくれスカート", true);
+              if (maid.body0.GetMask(TBody.SlotID.onepiece)) ItemChangeTemp(maidID, "onepiece", "めくれスカート", true);
+            } else if (skirt != "無し" || onepiece != "無し") { //本衣装の通常状態だった場合
+              if (maid.body0.GetMask(TBody.SlotID.skirt)) ItemChangeTemp(maidID, "skirt", "めくれスカート", false);
+              if (maid.body0.GetMask(TBody.SlotID.onepiece)) ItemChangeTemp(maidID, "onepiece", "めくれスカート", false);
             }
           }
 
-          if (mekure == "後"){
-            if (skirt == "本：めくれ後" || onepiece == "本：めくれ後" ){ //本衣装のめくれ（後）状態だった場合
-              if(autoMode){
-                if(maid.body0.GetMask(TBody.SlotID.skirt))maid.ResetProp("skirt", false);
-                if(maid.body0.GetMask(TBody.SlotID.onepiece))maid.ResetProp("onepiece", false);
+          if (mekure == "後") {
+            if (skirt == "本：めくれ後" || onepiece == "本：めくれ後") { //本衣装のめくれ（後）状態だった場合
+              if (autoMode) {
+                if (maid.body0.GetMask(TBody.SlotID.skirt)) maid.ResetProp("skirt", false);
+                if (maid.body0.GetMask(TBody.SlotID.onepiece)) maid.ResetProp("onepiece", false);
               }
-            } else if (skirt == "仮：めくれ後" || onepiece == "仮：めくれ後" ){ //仮衣装のめくれ（後）状態だった場合
-              if(autoMode){
-                if(maid.body0.GetMask(TBody.SlotID.skirt))maid.SetProp(MPN.skirt, maid.GetProp(MPN.skirt).strTempFileName.Replace("_mekure_back", ""), 0, true, false);
-                if(maid.body0.GetMask(TBody.SlotID.onepiece))maid.SetProp(MPN.onepiece, maid.GetProp(MPN.onepiece).strTempFileName.Replace("_mekure_back", ""), 0, true, false);
+            } else if (skirt == "仮：めくれ後" || onepiece == "仮：めくれ後") { //仮衣装のめくれ（後）状態だった場合
+              if (autoMode){
+                if (maid.body0.GetMask(TBody.SlotID.skirt)) maid.SetProp(MPN.skirt, maid.GetProp(MPN.skirt).strTempFileName.Replace("_mekure_back", ""), 0, true, false);
+                if (maid.body0.GetMask(TBody.SlotID.onepiece)) maid.SetProp(MPN.onepiece, maid.GetProp(MPN.onepiece).strTempFileName.Replace("_mekure_back", ""), 0, true, false);
               }
-            } else if (skirt == "仮：めくれ前" || onepiece == "仮：めくれ前" ){ //仮衣装のめくれ（前）状態だった場合
-              if(maid.body0.GetMask(TBody.SlotID.skirt))ItemChangeTemp(maidID, "skirt", "前");
-              if(maid.body0.GetMask(TBody.SlotID.onepiece))ItemChangeTemp(maidID, "onepiece", "前");
-            
-            } else if (skirt == "仮：通常" || onepiece == "仮：通常"){ //仮衣装の通常状態だった場合
-              if(maid.body0.GetMask(TBody.SlotID.skirt))ItemChangeTemp(maidID, "skirt", "めくれスカート後ろ", true);
-              if(maid.body0.GetMask(TBody.SlotID.onepiece))ItemChangeTemp(maidID, "onepiece", "めくれスカート後ろ", true);
-            } else if(skirt != "無し" || onepiece != "無し" ) { //本衣装の通常状態だった場合
-              if(maid.body0.GetMask(TBody.SlotID.skirt))ItemChangeTemp(maidID, "skirt", "めくれスカート後ろ", false);
-              if(maid.body0.GetMask(TBody.SlotID.onepiece))ItemChangeTemp(maidID, "onepiece", "めくれスカート後ろ", false);
+            } else if (skirt == "仮：めくれ前" || onepiece == "仮：めくれ前") { //仮衣装のめくれ（前）状態だった場合
+              if (maid.body0.GetMask(TBody.SlotID.skirt)) ItemChangeTemp(maidID, "skirt", "前");
+              if (maid.body0.GetMask(TBody.SlotID.onepiece)) ItemChangeTemp(maidID, "onepiece", "前");
+
+            } else if (skirt == "仮：通常" || onepiece == "仮：通常") { //仮衣装の通常状態だった場合
+              if (maid.body0.GetMask(TBody.SlotID.skirt)) ItemChangeTemp(maidID, "skirt", "めくれスカート後ろ", true);
+              if (maid.body0.GetMask(TBody.SlotID.onepiece)) ItemChangeTemp(maidID, "onepiece", "めくれスカート後ろ", true);
+            } else if (skirt != "無し" || onepiece != "無し") { //本衣装の通常状態だった場合
+              if (maid.body0.GetMask(TBody.SlotID.skirt)) ItemChangeTemp(maidID, "skirt", "めくれスカート後ろ", false);
+              if (maid.body0.GetMask(TBody.SlotID.onepiece)) ItemChangeTemp(maidID, "onepiece", "めくれスカート後ろ", false);
             }
           }
 
-          if (mekure == "ずらし"){
-              
-            if (panz == "本：ずらし" || mizugi == "本：ずらし" ){ //本衣装のずらし状態だった場合
-              if(autoMode){
-                if(maid.body0.GetMask(TBody.SlotID.panz))maid.ResetProp("panz", false);
-                if(maid.body0.GetMask(TBody.SlotID.mizugi))maid.ResetProp("mizugi", false);
+          if (mekure == "ずらし") {
+
+            if (panz == "本：ずらし" || mizugi == "本：ずらし") { //本衣装のずらし状態だった場合
+              if (autoMode) {
+                if (maid.body0.GetMask(TBody.SlotID.panz)) maid.ResetProp("panz", false);
+                if (maid.body0.GetMask(TBody.SlotID.mizugi)) maid.ResetProp("mizugi", false);
               }
-            } else if (panz == "仮：ずらし" || mizugi == "仮：ずらし" ){ //仮衣装のずらし状態だった場合
-              if(autoMode){
-                if(maid.body0.GetMask(TBody.SlotID.panz))maid.SetProp(MPN.panz, maid.GetProp(MPN.panz).strTempFileName.Replace("_zurashi", ""), 0, true, false);
-                if(maid.body0.GetMask(TBody.SlotID.mizugi))maid.SetProp(MPN.mizugi, maid.GetProp(MPN.mizugi).strTempFileName.Replace("_zurashi", ""), 0, true, false);
+            } else if (panz == "仮：ずらし" || mizugi == "仮：ずらし") { //仮衣装のずらし状態だった場合
+              if (autoMode) {
+                if (maid.body0.GetMask(TBody.SlotID.panz)) maid.SetProp(MPN.panz, maid.GetProp(MPN.panz).strTempFileName.Replace("_zurashi", ""), 0, true, false);
+                if (maid.body0.GetMask(TBody.SlotID.mizugi)) maid.SetProp(MPN.mizugi, maid.GetProp(MPN.mizugi).strTempFileName.Replace("_zurashi", ""), 0, true, false);
               }
-            } else if (panz == "仮：通常" || mizugi == "仮：通常" ){ //仮衣装の通常状態だった場合
-              if(maid.body0.GetMask(TBody.SlotID.panz))ItemChangeTemp(maidID, "panz", "パンツずらし", true);
-              if(maid.body0.GetMask(TBody.SlotID.mizugi))ItemChangeTemp(maidID, "mizugi", "パンツずらし", true);
-            } else if(panz != "無し" || mizugi != "無し" ) { //本衣装の通常状態だった場合
-              if(maid.body0.GetMask(TBody.SlotID.panz))ItemChangeTemp(maidID, "panz", "パンツずらし", false);
-              if(maid.body0.GetMask(TBody.SlotID.mizugi))ItemChangeTemp(maidID, "mizugi", "パンツずらし", false);
+            } else if (panz == "仮：通常" || mizugi == "仮：通常") { //仮衣装の通常状態だった場合
+              if (maid.body0.GetMask(TBody.SlotID.panz)) ItemChangeTemp(maidID, "panz", "パンツずらし", true);
+              if (maid.body0.GetMask(TBody.SlotID.mizugi)) ItemChangeTemp(maidID, "mizugi", "パンツずらし", true);
+            } else if (panz != "無し" || mizugi != "無し") { //本衣装の通常状態だった場合
+              if (maid.body0.GetMask(TBody.SlotID.panz)) ItemChangeTemp(maidID, "panz", "パンツずらし", false);
+              if (maid.body0.GetMask(TBody.SlotID.mizugi)) ItemChangeTemp(maidID, "mizugi", "パンツずらし", false);
             }
           }
 
@@ -3302,7 +3414,6 @@ namespace CM3D2.VibeYourMaid.Plugin {
         private bool isPorori(int maidID, string name)
         {
           MaidProp prop = stockMaids[maidID].mem.GetProp(name);
-          
           return prop.strFileName.Contains("_porori") || prop.strTempFileName.Contains("_porori");
         }
 
@@ -3384,28 +3495,28 @@ namespace CM3D2.VibeYourMaid.Plugin {
         }
 
         //メイドの衣装状態チェック（めくれ、パンツずらし）
-        private string isPropChanged(int maidID, string mpn){
+        private string isPropChanged(int maidID, string mpn) {
           MaidProp prop = stockMaids[maidID].mem.GetProp(mpn);
           SortedDictionary<string, string> sortedDictionary;
           string text;
           string result;
-          
+
           if (prop.nFileNameRID != 0 && Menu.m_dicResourceRef.TryGetValue(prop.nFileNameRID, out sortedDictionary) && sortedDictionary.TryGetValue("めくれスカート", out text)){
-            if (text.Equals(prop.strTempFileName)){
+            if (text.Equals(prop.strTempFileName)) {
               result = "本：めくれ前";
               Console.WriteLine(mpn + result);
               return result;
             }
           }
           if (prop.nFileNameRID != 0 && Menu.m_dicResourceRef.TryGetValue(prop.nFileNameRID, out sortedDictionary) && sortedDictionary.TryGetValue("めくれスカート後ろ", out text)){
-            if (text.Equals(prop.strTempFileName)){
+            if (text.Equals(prop.strTempFileName)) {
               result = "本：めくれ後";
               Console.WriteLine(mpn + result);
               return result;
             }
           }
-          if (prop.nFileNameRID != 0 && Menu.m_dicResourceRef.TryGetValue(prop.nFileNameRID, out sortedDictionary) && sortedDictionary.TryGetValue("パンツずらし", out text)){
-            if (text.Equals(prop.strTempFileName)){
+          if (prop.nFileNameRID != 0 && Menu.m_dicResourceRef.TryGetValue(prop.nFileNameRID, out sortedDictionary) && sortedDictionary.TryGetValue("パンツずらし", out text)) {
+            if (text.Equals(prop.strTempFileName)) {
               result = "本：ずらし";
               Console.WriteLine(mpn + result);
               return result;
@@ -3418,28 +3529,28 @@ namespace CM3D2.VibeYourMaid.Plugin {
           }
 
           if (prop.nTempFileNameRID != 0){
-            if(prop.strTempFileName.Contains("_mekure_back")){
+            if (prop.strTempFileName.Contains("_mekure_back")) {
               result = "仮：めくれ後";
               Console.WriteLine(mpn + result);
               return result;
             }
-            if(prop.strTempFileName.Contains("_mekure")){
+            if (prop.strTempFileName.Contains("_mekure")) {
               result = "仮：めくれ前";
               Console.WriteLine(mpn + result);
               return result;
             }
-            if(prop.strTempFileName.Contains("_zurashi")){
+            if (prop.strTempFileName.Contains("_zurashi")) {
               result = "仮：ずらし";
               Console.WriteLine(mpn + result);
               return result;
             }
-            if(prop.strTempFileName.Contains("_porori")){
+            if (prop.strTempFileName.Contains("_porori")) {
               result = "仮：ぽろり";
               Console.WriteLine(mpn + result);
               return result;
             }
 
-            if(prop.strTempFileName.Contains("del.menu")){
+            if (prop.strTempFileName.Contains("del.menu")) {
               result = "無し";
               return result;
             }
@@ -3447,34 +3558,35 @@ namespace CM3D2.VibeYourMaid.Plugin {
             Console.WriteLine(mpn + result);
             return result;
           }
-          
-          if(prop.strFileName.Contains("del.menu")){
+
+          if (prop.strFileName.Contains("del.menu")) {
             result = "無し";
             return result;
           }
-          
+
           result = "本：通常";  //本衣装の普通状態だった場合
           Console.WriteLine(mpn + result);
           return result;
 
         }
-        
+
         //めくれ、ずらし処理
-        public void ItemChangeTemp(int maidID, string mpn, string name, bool temp){
+        public void ItemChangeTemp(int maidID, string mpn, string name, bool temp) {
                 Maid maid = stockMaids[maidID].mem;
           MaidProp prop = maid.GetProp(mpn);
           SortedDictionary<string, string> sortedDictionary;
           string filename;
-          if(temp){
-            if (prop.nTempFileNameRID != 0 && global::Menu.m_dicResourceRef.TryGetValue(prop.nTempFileNameRID, out sortedDictionary) && sortedDictionary.TryGetValue(name, out filename)){
+          if (temp) {
+            if (prop.nTempFileNameRID != 0 && global::Menu.m_dicResourceRef.TryGetValue(prop.nTempFileNameRID, out sortedDictionary) && sortedDictionary.TryGetValue(name, out filename)) {
               maid.SetProp(mpn, filename, 0, true, false);
             }
-          }else{
-            if (prop.nFileNameRID != 0 && global::Menu.m_dicResourceRef.TryGetValue(prop.nFileNameRID, out sortedDictionary) && sortedDictionary.TryGetValue(name, out filename)){
+          } else {
+            if (prop.nFileNameRID != 0 && global::Menu.m_dicResourceRef.TryGetValue(prop.nFileNameRID, out sortedDictionary) && sortedDictionary.TryGetValue(name, out filename)) {
               maid.SetProp(mpn, filename, 0, true, false);
             }
           }
         }
+
         /**  .menuの前に _porori 等をつける場合
           @return 差分があればtrue */
         public bool ItemChangeTempSuffix(Maid maid, string mpn, string suffix, bool temp) {
@@ -3496,13 +3608,13 @@ namespace CM3D2.VibeYourMaid.Plugin {
           }
           return false;
         }
-        public void ItemChangeTemp(int maidID, string mpn, string temp){
-                Maid maid = stockMaids[maidID].mem;
+        public void ItemChangeTemp(int maidID, string mpn, string temp) {
+          Maid maid = stockMaids[maidID].mem;
           MaidProp prop = maid.GetProp(mpn);
-          if(temp == "前"){
+          if (temp == "前") {
             maid.SetProp(mpn, prop.strTempFileName.Replace("_mekure", "_mekure_back"), 0, true, false);
           }
-          if(temp == "後"){
+          if (temp == "後") {
             maid.SetProp(mpn, prop.strTempFileName.Replace("_mekure_back", "_mekure"), 0, true, false);
           }
         }
@@ -3510,100 +3622,102 @@ namespace CM3D2.VibeYourMaid.Plugin {
 
 
         //フェラしてるかチェック
-        private void checkBlowjobing(int maidID, Maid maid, MaidState maidState){
-          
-          string sLastAnimeFileName = "";
+        private void checkBlowjobing(int maidID, Maid maid, MaidState maidState) {
 
-          if (maidState.orgasmVoice == 0){
-            sLastAnimeFileName = maid.body0.LastAnimeFN;
+          if (maidState.orgasmVoice == 0) {
+            checkBlowjobing(maidID, maid, maidState, maid.body0.LastAnimeFN);
           } else {
-            sLastAnimeFileName = maidState.zAnimeFileName;
+            checkBlowjobing(maidID, maid, maidState, maidState.zAnimeFileName);
           }
-          
-          checkBlowjobing(maidID, maid, maidState, sLastAnimeFileName);
-          
+
         }
 
-        private void checkBlowjobing(int maidID, Maid maid, MaidState maidState, string motion){
-          
-          string sLastAnimeFileName = motion;
+        private void checkBlowjobing(int maidID, Maid maid, MaidState maidState, string sLastAnimeFileName) {
 
           //メイドさんのモーションファイル名に含まれる文字列で判別させる
           if (sLastAnimeFileName != null) {
 
             maidState.bIsBlowjobing = CheckMouthMode(sLastAnimeFileName);
-            
+
             //メインメイドの場合はマウスモードを切り替える
-            if (maidState.bIsBlowjobing == 0 && maidState.orgasmCmb <= 3){  //0の時は連続絶頂中じゃなければ切り替える
+            if (maidState.bIsBlowjobing == 0 && maidState.orgasmCmb <= 3) {  //0の時は連続絶頂中じゃなければ切り替える
               int r = UnityEngine.Random.Range(0,10);
-              if(maidState.boostBase > 40 && maidState.kaikanLevel > 4){  //感度が40以上の時はランダムでアヘか食いしばり 
-                if(r < 4){
+              if (maidState.boostBase > 40 && maidState.kaikanLevel > 4) {  //感度が40以上の時はランダムでアヘか食いしばり
+                if (r < 4) {
                   maidState.MouthMode = UnityEngine.Random.Range(2,5);
-                  if(maidState.MouthMode < 3) maidState.MouthMode = 0;
+                  if (maidState.MouthMode < 3) maidState.MouthMode = 0;
                 }
-              } else if(maidState.boostBase > 8 && maidState.kaikanLevel > 3){  //感度が8以上の時はランダムで歯を食いしばる
-                if(r < 4){
+              } else if (maidState.boostBase > 8 && maidState.kaikanLevel > 3) {  //感度が8以上の時はランダムで歯を食いしばる
+                if (r < 4) {
                   maidState.MouthMode = 0;
                 } else {
                   maidState.MouthMode = 4;
                 }
-              }else{
-                maidState.MouthMode = maidState.bIsBlowjobing; 
+              } else {
+                maidState.MouthMode = maidState.bIsBlowjobing;
               }
             }
 
-            if(maidState.bIsBlowjobing == 1 && cfgw.MouthKissEnabled)maidState.MouthMode = maidState.bIsBlowjobing; //1の時はキスが有効なら切り替える
-            if(maidState.bIsBlowjobing == 2 && cfgw.MouthFeraEnabled)maidState.MouthMode = maidState.bIsBlowjobing; //2の時はフェラが有効なら切り替える
-            
-            if(maidState.stunFlag)maidState.MouthMode = 3;  //放心中は無条件でアヘらせる
+            if (maidState.bIsBlowjobing == 1 && cfgw.MouthKissEnabled) maidState.MouthMode = maidState.bIsBlowjobing; //1の時はキスが有効なら切り替える
+            if (maidState.bIsBlowjobing == 2 && cfgw.MouthFeraEnabled) maidState.MouthMode = maidState.bIsBlowjobing; //2の時はフェラが有効なら切り替える
 
-            
+            if (maidState.stunFlag) maidState.MouthMode = 3;  //放心中は無条件でアヘらせる
+
+
             //カメラが顔に近づいている場合、キスに変更
-            if(maidState.bIsBlowjobing == 0 && (maidState.cameraCheck || (osawari.isOsawari(maidID, "MO_")) ) ){
+            if (maidState.bIsBlowjobing == 0 && (maidState.cameraCheck || (osawari.isOsawari(maidID, "MO_")))) {
               maidState.bIsBlowjobing = 1;
-              if(cfgw.MouthKissEnabled && !maidState.stunFlag){
+              if (cfgw.MouthKissEnabled && !maidState.stunFlag) {
                 maidState.MouthMode = 1;
               }
             }
-            
+
             //フェラの時は顔をカメラに向けないようにする
-            if(maidState.bIsBlowjobing == 2){
+            if (maidState.bIsBlowjobing == 2) {
               maid.body0.boHeadToCam = false;
             }
-          
+
           }
         }
 
-        //マウスモード判定用キャッシュ
-        private Dictionary<string, byte> MouseModeDic = new Dictionary<string, byte>();
+        //マウスモード判定用キャッシュ モーション名(".anm"含む)とマウスモード(0:口なし 1:キス 2:フェラ)  起動時にMList.txtの設定も追加される
+        private Dictionary<string, byte> MouthModeDic = new Dictionary<string, byte>();
         //マウスモードのチェック
-        private int CheckMouthMode(string motion){
-
+        private int CheckMouthMode(string motion)
+        {
           //キャッシュから取得
-          if (MouseModeDic.ContainsKey(motion)) return MouseModeDic[motion];
-          
+          if (MouthModeDic.ContainsKey(motion)) return MouthModeDic[motion];
+
           byte mm = 0;
 
           if (motion.Contains("fera")) { mm = 2; //フェラ
             if (motion.Contains("feranasi")) mm = 0; //フェラ無し
           }
           if (motion.Contains("sixnine")) mm = 2; //シックスナイン
-          if (motion.Contains("_ir")) {
-            if (motion.Contains("_ir_")) mm = 2; //イラマ
-            if (motion.Contains("_ir2_")) mm = 2; //イラマ
-            if (motion.Contains("_ir2v_")) mm = 2; //イラマ
-            if (motion.Contains("_irruma_")) mm = 2; //イラマ
+          if (motion.Contains("_ir_")) mm = 2; //イラマ
+          if (motion.Contains("_ir2_")) mm = 2; //イラマ
+          if (motion.Contains("_ir2v_")) mm = 2; //イラマ
+          if (motion.Contains("_irruma_")) mm = 2; //イラマ
+          if (motion.Contains("_kuti")) { mm = 2; //乱交3Pくち
+            if (motion.Contains("_kutiosae")) mm = 0; //口抑え
+            if (motion.Contains("_kutioou")) mm = 0; //口覆う
+            if (motion.Contains("_kutifusagu")) mm = 0; //乱交3P口塞ぎ
           }
-          if (motion.Contains("_kuti")) mm = 2; //乱交３Ｐ
-          if (motion.Contains("housi")) { mm = 2; //乱交奉仕
-            if (motion.Contains("harem_housi_aibu")) mm = 0;
+          if (motion.Contains("housi")) { mm = 2; //奉仕
+            if (motion.Contains("harem_housi_aibu")) mm = 0; //ハーレム奉仕愛撫
+            if (motion.Contains("harem_housi_naburu")) mm = 0; //ハーレム奉仕嬲る
+            if (motion.Contains("harem_housi2_naburu")) mm = 0; //ハーレム奉仕嬲る
           }
-          if (motion.Contains("kiss")) mm = 1; //キス
-          if (motion.Contains("ran4p")) { mm = 2; //乱交４Ｐ
+          if (motion.Contains("ran3p_bed_kouhaii")) mm = 2; //乱交3Pベッド後背位
+          if (motion.Contains("ran3p_turusi_seijyoui")) mm = 2; //乱交3P吊るし正常位
+          if (motion.Contains("ran4p")) { mm = 2; //乱交4P
             if (motion.Contains("ran4p_kijyoui")) mm = 0;
+            if (motion.Contains("ran4p_dai_seijyoui")) mm = 0;
           }
+
+          if (motion.Contains("kiss")) mm = 1; //キス
           if (motion.Contains("3ana")) mm = 2; //三つ穴
-          
+
           if (motion.Contains("taiki")) { mm = 0; //待機中は含めない
             if (motion.Contains("ir_in_taiki")) mm = 2; //咥え始めはフェラに含める
             if (motion.Contains("dt_in_taiki")) mm = 2; //咥え始めはフェラに含める
@@ -3612,17 +3726,17 @@ namespace CM3D2.VibeYourMaid.Plugin {
           }
           if (motion.Contains("shaseigo")) mm = 0; //射精後は含めない
           if (motion.Contains("surituke")) mm = 1; //乱交３Ｐ擦り付け時は咥えないのでは含めない
-          if (motion.Contains("name")) {
-            if (motion.Contains("siriname")) mm = 2; //尻舐めはフェラ扱い
-            if (motion.Contains("asiname")) mm = 2; //足舐めはフェラ扱い
-            if (motion.Contains("tikubiname")) mm = 2; //乳首舐めはフェラ扱い
-          }
+          if (motion.Contains("siriname")) mm = 2; //尻舐めはフェラ扱い
+          if (motion.Contains("asiname")) mm = 2; //足舐めはフェラ扱い
+          if (motion.Contains("tikubiname")) mm = 2; //乳首舐めはフェラ扱い
+
           if (motion.Contains("yuri_kunni") && motion.Contains("f2")) mm = 2; //百合のクンニする側をフェラに
           if (motion.Contains("harem_haimenzai") && motion.Contains("f2")) mm = 1; //ハーレムのキス担当
+
           if (motion.Contains("2vibe_vibe")) mm = 0;
           if (motion.Contains("onani_ona_")) mm = 0;
-          
-          MouseModeDic.Add(motion, mm); //キャッシュ
+
+          MouthModeDic.Add(motion, mm); //キャッシュに追加
 
           return mm;
         }
@@ -3630,170 +3744,158 @@ namespace CM3D2.VibeYourMaid.Plugin {
 
 
         //カメラとメイドさんの距離判定
-        //private float cameraCheckTime = 0f;
+        private void CameraPosCheck(Maid maid, MaidState maidState) {
 
-        private void CameraPosCheck(Maid maid, MaidState maidState){
-        
-          /*if(cameraCheckTime > 0){
-            cameraCheckTime -= timerRate;
-            return;
-          }
-          cameraCheckTime = 60f;*/
+          if (maidState.cameraCheckTime > Time.time) return;
+          maidState.cameraCheckTime = Time.time + 0.1f; //0.1秒後
 
           if (!mainCamera) return;
 
           bool bInRange = DistanceToMaid(maid, maidState, cfgw.camCheckRange);
-
+          //Console.WriteLine("CameraPosCheck bInRange="+bInRange);
           //ボイスセット連動
           maidState.cameraCheckVoice = bInRange && cfgw.camCheckVoiceEnabled;
 
-          if(!cfgw.camCheckEnabled){
-            if(maidState.cameraCheck){
+          if (!cfgw.camCheckEnabled) {
+            if (maidState.cameraCheck) {
               maidState.cameraCheck = false;
               maid.body0.boEyeToCam = maidState.eyeToCamOld;
               maid.body0.boHeadToCam = maidState.headToCamOld;
             }
             return;
           }
-          if(maidState.bIsBlowjobing == 2)return;
-          
-          
+          if (maidState.bIsBlowjobing == 2) return;
+
           if (bInRange && !maidState.cameraCheck) {
             maidState.eyeToCamOld = maid.body0.boEyeToCam;
             maidState.headToCamOld = maid.body0.boHeadToCam;
             maidState.cameraCheck = true;
-            
-            if(!fpsModeEnabled) maid.EyeToCamera((Maid.EyeMoveType)5, 0.8f); //一人称視点でない場合のみ、顔と目の追従を自動で有効にする
-            if(maidState.stunFlag) maid.body0.boEyeToCam = false;
-            
-            if(maidState.bIsBlowjobing != 1){
+
+            if (!fpsModeEnabled) maid.EyeToCamera((Maid.EyeMoveType)5, 0.8f); //一人称視点でない場合のみ、顔と目の追従を自動で有効にする
+            if (maidState.stunFlag) maid.body0.boEyeToCam = false;
+
+            if (maidState.bIsBlowjobing != 1) {
               maid.AudioMan.Stop();     //現在の音声停止
               maidState.voiceHoldTime = 0;     //音声タイマーリセット
             }
 
-          } else if(!bInRange && maidState.cameraCheck){
+          } else if (!bInRange && maidState.cameraCheck) {
             maid.body0.boEyeToCam = maidState.eyeToCamOld;
             maid.body0.boHeadToCam = maidState.headToCamOld;
             maidState.cameraCheck = false;
             maidState.voiceHoldTime = 0;
           }
-        
+
         }
-        
-        private bool LinkMaidCheck(int maidID, int checkID){
-          if(checkID < 0)return false;
-          if(maidsState[maidID].linkID == -1 && maidsState[checkID].linkID == -1)return false;
-          if(maidID != maidsState[checkID].linkID && maidsState[maidID].linkID != checkID && maidsState[checkID].linkID != maidsState[maidID].linkID)return false;
+
+        private bool LinkMaidCheck(int maidID, int checkID) {
+          if (checkID < 0) return false;
+          if (maidsState[maidID].linkID == -1 && maidsState[checkID].linkID == -1) return false;
+          if (maidID != maidsState[checkID].linkID && maidsState[maidID].linkID != checkID && maidsState[checkID].linkID != maidsState[maidID].linkID) return false;
           return true;
         }
 
-        private bool DistanceToMaid(Maid maid, MaidState maidState,  float cr){
+        private bool DistanceToMaid(Maid maid, MaidState maidState,  float cr) {
 
           //メイドさんの顔情報がない場合、取得する
-          if(!maidState.maidHead){
+          if (!maidState.maidHead) {
             Transform[] objList = maid.transform.GetComponentsInChildren<Transform>();
-            if (objList.Count() != 0){
+            if (objList.Count() != 0) {
               maidState.maidHead = null;
-              foreach (var gameobject in objList){
-                if (gameobject.name == "Bone_Face" && maidState.maidHead == null)maidState.maidHead = gameobject;
+              foreach (var gameobject in objList) {
+                if (gameobject.name == "Bone_Face" && maidState.maidHead == null) maidState.maidHead = gameobject;
               }
             }
             if (!maidState.maidHead) return false; //取得できなかった場合
           }
-          
-          //カメラ位置を取得
-          Transform cameraPos;
-          float camCR;
-          if (bVR) {
-            cameraPos = GameMain.Instance.OvrMgr.EyeAnchor;
-            camCR = cr;
-          } else {
-            cameraPos = mainCamera.transform;
-           camCR = cr * (35.0f / Camera.main.fieldOfView);
-          }
-          
+
           //カメラと近接判定対象（ターゲット）の距離取得
-          return Vector3.Distance(maidState.maidHead.transform.position, cameraPos.position) <= camCR;
-        
+          if (bVR) {
+            return Vector3.Distance(maidState.maidHead.transform.position, GameMain.Instance.OvrMgr.EyeAnchor.position) <= cr;
+          } else {
+            return Vector3.Distance(maidState.maidHead.transform.position, mainCamera.transform.position) <= cr * (35.0f / Camera.main.fieldOfView);
+          }
+
         }
 
-      //メイドのデータ取得関連終了-------------------------
+        //メイドのデータ取得関連終了-------------------------
 
 
 
 
 
-      //-------------------------------------------------
-      //ステータス変更関係-------------------------------
+        //-------------------------------------------------
+        //ステータス変更関係-------------------------------
 
-        
+
         //バイブステートの変更
-        private void StateMajorCheck(int maidID, MaidState maidState) {
-        
+        private void StateMajorCheck(int maidID, Maid maid, MaidState maidState) {
+
           int level = maidState.vLevel;
             //お触り時のLinkMaidCheckの取得方法修正
           //int osawariLevel = osawari.getOsawariLevel(maidID);
-          //if((osawari.isOsawari(maidID) || osawari.LinkMaidCheck(maidID)) && level < osawariLevel)level = osawariLevel;
-          level = Math.Max(level, osawari.getOsawariLevel(maidID));
-          if (maidState.linkID != -1) {
+          //if ((osawari.isOsawari(maidID) || osawari.LinkMaidCheck(maidID)) && level < osawariLevel) level = osawariLevel;
+          if (maidState.linkID == -1) {
+            level = Math.Max(level, osawari.getOsawariLevel(maidID));
+          } else {
             level = Math.Max(level, osawari.getOsawariLevel(maidState.linkID));
           }
 
-          if(level == 2) { //　「バイブ強」
-            if (maidState.vStateMajor != 30){
-              if(maidID == tgID)ChangeSE(tgID, true);
+          if (level == 2) { //　「バイブ強」
+            if (maidState.vStateMajor != 30) {
+              if (maidID == tgID) ChangeSE(tgID, true);
               maidState.vStateMajor = 30;
             }
-          } else if(level == 1) { //　「バイブ弱」
-            if (maidState.vStateMajor != 20){
-              if(maidID == tgID)ChangeSE(tgID, true);
+          } else if (level == 1) { //　「バイブ弱」
+            if (maidState.vStateMajor != 20) {
+              if (maidID == tgID) ChangeSE(tgID, true);
               maidState.vStateMajor = 20;
             }
-          } else if(level == 0) { //　「バイブ停止」        
-            if(osawari.isOsawari(maidID)){
-              if(maidID == tgID)GameMain.Instance.SoundMgr.StopSe();
+          } else if (level == 0) { //　「バイブ停止」
+            if (osawari.isOsawari(maidID)) {
+              if (maidID == tgID) GameMain.Instance.SoundMgr.StopSe();
               maidState.vStateMajor = 40;
               maidState.yoinHoldTime = 120f;
-            }else if (maidState.vStateMajor == 50){
+            } else if (maidState.vStateMajor == 50) {
               maidState.vStateMajor = 10;
-            }else if (maidState.vStateMajor != 10 && maidState.vStateMajor != 40){
-              if(maidID == tgID)GameMain.Instance.SoundMgr.StopSe();
+            } else if (maidState.vStateMajor != 10 && maidState.vStateMajor != 40) {
+              if (maidID == tgID) GameMain.Instance.SoundMgr.StopSe();
               maidState.vStateMajor = 40;
               maidState.yoinHoldTime = 0f;
             }
           }
-          
-          
+
+
           //バイブステートが変わったら、時間カウンタをリセットする。同時に男の責レベルも設定する
-          if(maidState.vStateMajor != maidState.vStateMajorOld) {
+          if (maidState.vStateMajor != maidState.vStateMajorOld) {
             //時間カウンタのリセット
             maidState.voiceHoldTime = 0;
             maidState.faceHoldTime = 0;
             maidState.continuationTime = 0;
             maidState.motionHoldTime = 0;
             int im2 = 1;
-            for (int im = 0; im < SubMans.Length; im++){
-              if(!SubMans[im].Visible || MansTg[im] != maidID)continue;
-              float fDistance = Vector3.Distance(stockMaids[maidID].mem.transform.position, SubMans[im].transform.position);
-              if(fDistance > 1f)continue;
-              if(maidState.giveSexual[im2]){
+            for (int im = 0; im < SubMans.Length; im++) {
+              if (!SubMans[im].Visible || MansTg[im] != maidID) continue;
+              float fDistance = Vector3.Distance(maid.transform.position, SubMans[im].transform.position);
+              if (fDistance > 1f) continue;
+              if (maidState.giveSexual[im2]) {
                 mansLevel[im] = level;
-              }else{
+              } else {
                 mansLevel[im] = 0;
               }
               ++im2;
             }
           }
         }
-        
-        
+
+
         //興奮度の判定
-        private void ExciteCheck(int maidID, MaidState maidState) {
-          if(maidState.exciteValue < cfgw.vExciteLevelThresholdV1 * 60) {
+        private void ExciteCheck(MaidState maidState) {
+          if (maidState.exciteValue < cfgw.vExciteLevelThresholdV1 * 60) {
             maidState.exciteLevel = 1;
-          } else if(maidState.exciteValue < cfgw.vExciteLevelThresholdV2 * 60) {
+          } else if (maidState.exciteValue < cfgw.vExciteLevelThresholdV2 * 60) {
             maidState.exciteLevel = 2;
-          } else if( maidState.exciteValue < cfgw.vExciteLevelThresholdV3 * 60) {
+          } else if (maidState.exciteValue < cfgw.vExciteLevelThresholdV3 * 60) {
             maidState.exciteLevel = 3;
           } else {
             maidState.exciteLevel = 4;
@@ -3803,136 +3905,136 @@ namespace CM3D2.VibeYourMaid.Plugin {
 
         //ステータスの変更処理
         private void StatusFluctuation(int maidID, Maid maid, MaidState maidState) {
-        
+
           float excitePlusBase = 0;     //興奮のベース加算値
-          if(maidState.vStateMajor == 20)excitePlusBase = 13;
-          if(maidState.vStateMajor == 30)excitePlusBase = 20;
+          if (maidState.vStateMajor == 20) excitePlusBase = 13;
+          if (maidState.vStateMajor == 30) excitePlusBase = 20;
 
 
           //抵抗値変動処理（同じバイブの強度を続けると抵抗値が上がる）
-          if(maidState.vStateMajor != maidState.vStateMajorOld){
+          if (maidState.vStateMajor != maidState.vStateMajorOld) {
             maidState.resistBonus = 0; //強度が変わった時はリセット
 
-          }else if(maidState.vStateMajor != 10) { //強度が同じ時は、経過時間により加算
-            if(maidState.continuationTime < 120){  //開始2秒は減少
+          } else if (maidState.vStateMajor != 10) { //強度が同じ時は、経過時間により加算
+            if (maidState.continuationTime < 120) {  //開始2秒は減少
               maidState.resistBonus -= 0.02f * timerRate;
-            }else{
-              if(maidState.vStateMajor == 20){
+            } else {
+              if (maidState.vStateMajor == 20) {
                 maidState.resistBonus += 0.01f * maidState.exciteLevel * timerRate;
-              }else if(maidState.vStateMajor == 30){
+              } else if (maidState.vStateMajor == 30) {
                 maidState.resistBonus += 0.03f * maidState.exciteLevel * timerRate;
               }
             }
           }
-          
-          
+
+
           //ベース感度の上限設定
-          if(maidState.orgasmCount < 15){
-            if(maidState.boostBase > 15)maidState.boostBase = 15;
-          }else{
-            if(maidState.boostBase > 50)maidState.boostBase = 50;
+          if (maidState.orgasmCount < 15) {
+            if (maidState.boostBase > 15) maidState.boostBase = 15;
+          } else {
+            if (maidState.boostBase > 50) maidState.boostBase = 50;
           }
           maidState.boostValue = maidState.boostBase + maidState.boostBonus;   //現在感度を計算
           maidState.resistValue = maidState.resistBase + maidState.resistBonus + maidState.exciteLevel * maidState.exciteLevel - maidState.boostValue; //現在抵抗値を計算
-          
-          
+
+
           //興奮加算値を計算
           float excitePlus = (excitePlusBase - maidState.resistValue) * Mathf.Sqrt(maidState.boostValue);
-          if (excitePlus < -1){
+          if (excitePlus < -1) {
             excitePlus = -1;
-          } else if( excitePlus > 10 && maidState.orgasmCmb == 0 ){
+          } else if ( excitePlus > 10 && maidState.orgasmCmb == 0 ) {
             excitePlus = 10;
-          } else if( excitePlus > 20 && maidState.orgasmCmb >= 1 ){
+          } else if ( excitePlus > 20 && maidState.orgasmCmb >= 1 ) {
             excitePlus = 20;
-          } else if( excitePlus > 30 && maidState.orgasmCmb >= 5 ){
+          } else if ( excitePlus > 30 && maidState.orgasmCmb >= 5 ) {
             excitePlus = 30;
           }
-          
-          
+
+
           //興奮値、勃起値、変動処理
           int randamValue;
-          if(maidState.vStateMajor == 10 || maidState.vStateMajor == 40  || (!maidState.giveSexual[0] && maidState.exciteValue > (cfgw.vExciteLevelThresholdV1 + 10) * 60) && maidState.itemV == "" && maidState.itemA == "" && osawari.isOsawari(maidID) ) { //　バイブ停止時　現在抵抗値に従って減少
-          
+          if (maidState.vStateMajor == 10 || maidState.vStateMajor == 40  || (!maidState.giveSexual[0] && maidState.exciteValue > (cfgw.vExciteLevelThresholdV1 + 10) * 60) && maidState.itemV == "" && maidState.itemA == "" && osawari.isOsawari(maidID) ) { //　バイブ停止時　現在抵抗値に従って減少
+
             //興奮値を減算
-            if(maidState.exciteValue > 0 && !ExciteLock)maidState.exciteValue -= 10 * maidState.exciteLevel * timerRate;
-            if(maidState.exciteValue < 0)maidState.exciteValue = 0;
-            
+            if (maidState.exciteValue > 0 && !ExciteLock) maidState.exciteValue -= 10 * maidState.exciteLevel * timerRate;
+            if (maidState.exciteValue < 0) maidState.exciteValue = 0;
+
             //絶頂値を減算
-            if (maidState.orgasmValue > 0 && !OrgasmLock){
-              if(maidState.stunFlag)maidState.orgasmValue -= 0.04f * timerRate;
-              if(!maidState.stunFlag)maidState.orgasmValue -= 0.1f * timerRate;
+            if (maidState.orgasmValue > 0 && !OrgasmLock) {
+              if (maidState.stunFlag) maidState.orgasmValue -= 0.04f * timerRate;
+              if (!maidState.stunFlag) maidState.orgasmValue -= 0.1f * timerRate;
             }
-            
+
             //勃起値減算
             maidState.bokkiValue1 -= 0.05f * timerRate;
-            if(maidState.bokkiValue1 < 0)maidState.bokkiValue1 = 0f;
-            
+            if (maidState.bokkiValue1 < 0) maidState.bokkiValue1 = 0f;
+
             //スタミナ回復
-            //if(maidState.stunFlag)maidState.maidStamina +=  25 * Time.deltaTime;
-            //if(!maidState.stunFlag)maidState.maidStamina +=  15 * Time.deltaTime;
+            //if (maidState.stunFlag) maidState.maidStamina +=  25 * Time.deltaTime;
+            //if (!maidState.stunFlag) maidState.maidStamina +=  15 * Time.deltaTime;
             //maidState.maidStamina += (3500 - maidState.maidStamina) * 0.008f * Time.deltaTime;
             maidState.maidStamina += (4500 - maidState.maidStamina) * 0.008f * Time.deltaTime;
-            if(maidState.maidStamina > 3000) maidState.maidStamina = 3000;
-            
-          
-          } else if(maidState.vStateMajor == 20) { //　バイブ弱時
-          
+            if (maidState.maidStamina > 3000) maidState.maidStamina = 3000;
+
+
+          } else if (maidState.vStateMajor == 20) { //　バイブ弱時
+
             //興奮値を加算
-            if(!ExciteLock)maidState.exciteValue += excitePlus * timerRate;
-            if(maidState.exciteValue > 18000)maidState.exciteValue = 18000;
-            if(maidState.exciteValue < 0)maidState.exciteValue = 0;
+            if (!ExciteLock) maidState.exciteValue += excitePlus * timerRate;
+            if (maidState.exciteValue > 18000) maidState.exciteValue = 18000;
+            if (maidState.exciteValue < 0) maidState.exciteValue = 0;
 
             //感度加算判定　300分の1の確率で加算（現在興奮度により上昇値変動）
             randamValue = UnityEngine.Random.Range(0, (int)(300 / timerRate));
-            if (randamValue < 1 && maidState.exciteValue > 0){
-              if(!ExciteLock && !OrgasmLock)maidState.boostBase = maidState.boostBase + 0.2f * maidState.exciteLevel;
-              
-              if(maid.body0.LastAnimeFN.Contains( "cli" ))maidState.cliHidai += (maidState.boostValue + maidState.bokkiValue1) / (15000f * (maidState.cliHidai / 2 + 1)); //クリ肥大値加算
-              if(maidState.cliHidai > 100)maidState.cliHidai = 100f;
-              //if(maid.body0.LastAnimeFN.Contains( "tikubi" ))maidState.chikubiHidai += (Mathf.Sqrt(maidState.boostValue) + Mathf.Sqrt(maidState.orgasmValue)) / 2000f;
+            if (randamValue < 1 && maidState.exciteValue > 0) {
+              if (!ExciteLock && !OrgasmLock) maidState.boostBase = maidState.boostBase + 0.2f * maidState.exciteLevel;
+
+              if (maid.body0.LastAnimeFN.Contains( "cli" )) maidState.cliHidai += (maidState.boostValue + maidState.bokkiValue1) / (15000f * (maidState.cliHidai / 2 + 1)); //クリ肥大値加算
+              if (maidState.cliHidai > 100) maidState.cliHidai = 100f;
+              //if (maid.body0.LastAnimeFN.Contains( "tikubi" )) maidState.chikubiHidai += (Mathf.Sqrt(maidState.boostValue) + Mathf.Sqrt(maidState.orgasmValue)) / 2000f;
             }
 
             //絶頂値加算処理
-            if (maidState.exciteLevel > 1 && maidState.orgasmValue > 30 && !OrgasmLock){
-              if(maidState.stunFlag)maidState.orgasmValue -= 0.02f * timerRate;
-              if(!maidState.stunFlag)maidState.orgasmValue -= 0.05f * timerRate;
+            if (maidState.exciteLevel > 1 && maidState.orgasmValue > 30 && !OrgasmLock) {
+              if (maidState.stunFlag) maidState.orgasmValue -= 0.02f * timerRate;
+              if (!maidState.stunFlag) maidState.orgasmValue -= 0.05f * timerRate;
               maidState.jirashi += Mathf.Sqrt(maidState.boostValue) * maidState.orgasmValue * 0.001f * timerRate;
             }
             //勃起値加算
             maidState.bokkiValue1 += 0.02f * timerRate;
 
             //スタミナ回復
-            //if(maidState.stunFlag)maidState.maidStamina +=  10 * Time.deltaTime;
-            //if(!maidState.stunFlag)maidState.maidStamina +=  6 * Time.deltaTime;
+            //if (maidState.stunFlag) maidState.maidStamina +=  10 * Time.deltaTime;
+            //if (!maidState.stunFlag) maidState.maidStamina +=  6 * Time.deltaTime;
             maidState.maidStamina += (3500 - maidState.maidStamina) * 0.003f * Time.deltaTime;
-            if(maidState.maidStamina > 3000) maidState.maidStamina = 3000;
-            
+            if (maidState.maidStamina > 3000) maidState.maidStamina = 3000;
 
-          } else if(maidState.vStateMajor == 30) { //　バイブ強時
-          
+
+          } else if (maidState.vStateMajor == 30) { //　バイブ強時
+
             //興奮値を加算
-            if(!ExciteLock){ maidState.exciteValue += excitePlus * timerRate; }
-            if(maidState.exciteValue > 18000){ maidState.exciteValue = 18000; }
-            if(maidState.exciteValue < 0){ maidState.exciteValue = 0; }
+            if (!ExciteLock) { maidState.exciteValue += excitePlus * timerRate; }
+            if (maidState.exciteValue > 18000) { maidState.exciteValue = 18000; }
+            if (maidState.exciteValue < 0) { maidState.exciteValue = 0; }
 
 
             //感度加算判定　300分の1の確率で0.1加算
             randamValue = UnityEngine.Random.Range(0, (int)(300 / timerRate));
-            if (randamValue < 1 && maidState.exciteValue > 0){
-              if(!ExciteLock && !OrgasmLock)maidState.boostBase = maidState.boostBase + 0.1f;
-              
-              if(maid.body0.LastAnimeFN.Contains( "cli" ))maidState.cliHidai += (maidState.boostValue + maidState.bokkiValue1) / (10000f * (maidState.cliHidai / 2 + 1)); //クリ肥大値加算
-              if(maidState.cliHidai > 100)maidState.cliHidai = 100f;
-              //if(maid.body0.LastAnimeFN.Contains( "tikubi" ))maidState.chikubiHidai += (Mathf.Sqrt(maidState.boostValue) + Mathf.Sqrt(maidState.orgasmValue)) / 1000f;
+            if (randamValue < 1 && maidState.exciteValue > 0) {
+              if (!ExciteLock && !OrgasmLock) maidState.boostBase = maidState.boostBase + 0.1f;
+
+              if (maid.body0.LastAnimeFN.Contains( "cli" )) maidState.cliHidai += (maidState.boostValue + maidState.bokkiValue1) / (10000f * (maidState.cliHidai / 2 + 1)); //クリ肥大値加算
+              if (maidState.cliHidai > 100) maidState.cliHidai = 100f;
+              //if (maid.body0.LastAnimeFN.Contains( "tikubi" )) maidState.chikubiHidai += (Mathf.Sqrt(maidState.boostValue) + Mathf.Sqrt(maidState.orgasmValue)) / 1000f;
               maidState.sioVolume += maidState.boostValue * maidState.orgasmValue * 0.002f;
               maidState.nyoVolume += maidState.boostValue * maidState.orgasmValue * 0.002f;
             }
 
 
             //絶頂値加算処理
-            if (maidState.exciteLevel > 1 && !OrgasmLock && (maidState.giveSexual[0] || maidState.itemV != "" || maidState.itemA != "" || osawari.isOsawari(maidID)) ){
-              if(maidState.stunFlag)maidState.orgasmValue += Mathf.Sqrt(maidState.boostValue) * 0.012f * timerRate;
-              if(!maidState.stunFlag)maidState.orgasmValue += Mathf.Sqrt(maidState.boostValue) * 0.03f * timerRate;
+            if (maidState.exciteLevel > 1 && !OrgasmLock && (maidState.giveSexual[0] || maidState.itemV != "" || maidState.itemA != "" || osawari.isOsawari(maidID)) ) {
+              if (maidState.stunFlag) maidState.orgasmValue += Mathf.Sqrt(maidState.boostValue) * 0.012f * timerRate;
+              if (!maidState.stunFlag) maidState.orgasmValue += Mathf.Sqrt(maidState.boostValue) * 0.03f * timerRate;
             }
             //勃起値加算
             maidState.bokkiValue1 += 0.03f * timerRate;
@@ -3942,11 +4044,11 @@ namespace CM3D2.VibeYourMaid.Plugin {
             if (maidState.maidStamina > 3000) maidState.maidStamina = 3000;
             if (maidState.maidStamina < 0) maidState.maidStamina = 0;
           }
-        
+
         }
-        
-        //夜伽シーンの興奮値と官能値を絶頂度にあわせて変更  100→150→200で上昇 絶頂時に300 
-        private void ChangeYotogiParamSlider(int maidID, MaidState maidState)
+
+        //夜伽シーンの興奮値と官能値を絶頂度にあわせて変更  100→150→200で上昇 絶頂時に300
+        private void ChangeYotogiParamSlider(int maidID, Maid maid, MaidState maidState)
         {
           if (!cfgw.yotogiExciteLink) return;
 
@@ -3971,13 +4073,13 @@ namespace CM3D2.VibeYourMaid.Plugin {
             #if DEBUG
             Console.WriteLine("orgasmValue="+maidState.orgasmValue+" kaikanLevel="+maidState.kaikanLevel+" oLevel="+oLevel+" currentExcite="+cfgw.yotogiExciteLinkValue[oLevel]);
             #endif
-            setExcite(maidID, cfgw.yotogiExciteLinkValue[oLevel]);
+            setExcite(maidID, maid, cfgw.yotogiExciteLinkValue[oLevel]);
           }
           maidState.orgasmLevel = oLevel;
         }
 
-        /** メイドの興奮値を設定 夜伽スライダーがあればそれも変更する */
-        private void setExcite(int maidID, int excite)
+        // メイドの興奮値を設定 夜伽スライダーがあればそれも変更する
+        private void setExcite(int maidID, Maid maid, int excite)
         {
           excite = Math.Max(-100, Math.Min(300, excite));
 
@@ -3997,48 +4099,47 @@ namespace CM3D2.VibeYourMaid.Plugin {
           }
 
           //メイドステータスの興奮値を変更
-          stockMaids[maidID].mem.status.currentExcite = excite;
-          stockMaids[maidID].mem.status.currentSensual = excite;
+          maid.status.currentExcite = excite;
+          maid.status.currentSensual = excite;
         }
 
-        //絶頂スタートのチェック
-        private bool OrgasmCheck(int maidID, MaidState maidState) {
-          if(maidState.vStateMajor != 30)return false;  //バイブ強じゃない場合は不可
-          bool ov = false;
-          foreach(int ID in vmId){
-            if(ID != maidID && !LinkMaidCheck(maidID, ID))continue;
-            if((maidsState[ID].orgasmValue < 100 || maidState.exciteLevel < 2) && (maidsState[ID].giveSexual[0] || maidsState[ID].itemV != "" || maidsState[ID].itemA != ""))return false;  //絶頂値と興奮値チェック
-            //if((maidState.orgasmVoice >= 2 || maidState.vsFlag == 2) && cfgw.zViceWaitEnabled)return false;  //音声フラグチェック
-            if(!stockMaids[maidID].mem.AudioMan.audiosource.loop && stockMaids[maidID].mem.AudioMan.audiosource.isPlaying && cfgw.zViceWaitEnabled)return false;  //音声フラグチェック
-            
-            if(maidsState[ID].orgasmValue >= 100)ov = true; //絶頂値100超えがいるかどうか
+        //絶頂スタートのチェック リンク中のメイドが1人でも絶頂していればtrue
+        private bool OrgasmCheck(int maidID, Maid maid, MaidState maidState) {
+          if (maidState.vStateMajor != 30) return false;  //バイブ強じゃない場合は不可
+          foreach (int ID in vmId) {
+            if (ID != maidID && !LinkMaidCheck(maidID, ID)) continue;
+            //if ((maidState.orgasmVoice >= 2 || maidState.vsFlag == 2) && cfgw.zViceWaitEnabled) return false;  //音声フラグチェック
+            if (!maid.AudioMan.audiosource.loop && maid.AudioMan.audiosource.isPlaying && cfgw.zViceWaitEnabled) return false;  //音声フラグチェック
+            MaidState linkMaidState = maidsState[ID];
+            if ((linkMaidState.orgasmValue < 100 || linkMaidState.exciteLevel < 2) && (linkMaidState.giveSexual[0] || linkMaidState.itemV != "" || linkMaidState.itemA != "")) return false;  //絶頂値と興奮値チェック
+
+            if (linkMaidState.orgasmValue >= 100) return true; //絶頂値100超えがいるかどうか
           }
-          
-          if(ov)return true;
           return false;
         }
-        
-        
+
+
         //絶頂時の処理
-        private void OrgasmProcess(int maidID, MaidState maidState) {
-        
-          if(!maidState.orgasmStart)return;
+        private void OrgasmProcess(int maidID, Maid maid, MaidState maidState) {
+
+          if (!maidState.orgasmStart) return;
           maidState.orgasmStart = false;
-          /*if (maidState.orgasmValue < 100 || (maidState.exciteLevel < 2 && maidState.giveSexual[0]) || maidState.vStateMajor != 30 || ((maidState.orgasmVoice >= 2 || maidState.vsFlag == 2) && cfgw.zViceWaitEnabled) )return;
-          if(tgID == maidID || maidState.linkEnabled){  //リンクメイドがいる場合は、全員が条件を満たしていないと絶頂しない
-            foreach(int ID in vmId){
-              if(tgID != ID && !maidsState[ID].linkEnabled)continue;
-              if(maidsState[ID].orgasmHoldTime > 590)continue;
+          /*if (maidState.orgasmValue < 100 || (maidState.exciteLevel < 2 && maidState.giveSexual[0]) || maidState.vStateMajor != 30 || ((maidState.orgasmVoice >= 2 || maidState.vsFlag == 2) && cfgw.zViceWaitEnabled) ) return;
+          if (tgID == maidID || maidState.linkEnabled){  //リンクメイドがいる場合は、全員が条件を満たしていないと絶頂しない
+            foreach (int ID in vmId) {
+              if (tgID != ID && !maidsState[ID].linkEnabled) continue;
+              if (maidsState[ID].orgasmHoldTime > 590) continue;
               maidsState[ID].orgasmValue = 110;
-              
-              if((maidsState[ID].orgasmVoice == 2 || maidsState[ID].vsFlag == 2) && cfgw.zViceWaitEnabled){
+
+              if ((maidsState[ID].orgasmVoice == 2 || maidsState[ID].vsFlag == 2) && cfgw.zViceWaitEnabled) {
                 maidsState[ID].motionHoldTime = 0;
                 maidsState[ID].orgasmVoice = 3;
               }
             }
           }*/
-          
-          Maid maid = stockMaids[maidID].mem;
+
+          //Console.WriteLine("OrgasmProcess maidID="+maidID+" giveSexual[0]="+maidState.giveSexual[0]+" sioVolume="+maidState.sioVolume+" nyoVolume="+maidState.nyoVolume);
+
 
           //絶頂時の音声処理
           maid.AudioMan.Stop();     //現在の音声停止
@@ -4046,86 +4147,85 @@ namespace CM3D2.VibeYourMaid.Plugin {
           maidState.voiceHoldTime = 0;       //音声・表情タイマーリセット（即再生のため）
           maidState.faceHoldTime = 0;
           maidState.motionHoldTime = 0;      //モーション用タイマーリセット（即再生のため）
-          
-        
-          if(maidState.giveSexual[0] || maidState.itemV != "" || maidState.itemA != "" || osawari.isOsawari(maidID)){
+
+
+          if (maidState.giveSexual[0] || maidState.itemV != "" || maidState.itemA != "" || osawari.isOsawari(maidID)) {
             maidState.orgasmCount += 1;  //絶頂カウント加算
             maidState.orgasmCmb += 1;      //連続絶頂数加算
             maidState.uDatsuStock += 1;   //子宮脱用
             maidState.resistBonus = 0;    //抵抗加算値初期化
-            if(!ExciteLock && !OrgasmLock)maidState.boostBase += 1;  //感度加算
-            
+            if (!ExciteLock && !OrgasmLock) maidState.boostBase += 1;  //感度加算
+
             //エロステータス加算
             maidState.orgTotal += 1;
-            if(maidState.orgasmCmb > maidState.orgMax)maidState.orgMax = maidState.orgasmCmb;
-            
+            if (maidState.orgasmCmb > maidState.orgMax) maidState.orgMax = maidState.orgasmCmb;
+
             //スタミナ減少
             maidState.maidStamina -= maidState.boostValue;
             if (maidState.maidStamina < 0) maidState.maidStamina = 0;
-          
+
             maidState.orgasmValue = 0f;  //絶頂値リセット
             maidState.orgasmHoldTime = 600;   //絶頂後のボーナスタイム設定
-          
+
             //潮吹き
-            float sr = UnityEngine.Random.Range(cfgw.orgazmSioLowerLimit, cfgw.orgazmSioLowerLimit + maidState.sioVolume);
-            if(sr >= 30f){
-              sr = Math.Max(30, maidState.sioVolume); //増えすぎないように加算分を戻す 閾値以下にはしない
+            float sr = UnityEngine.Random.Range(0, maidState.sioVolume);
+            if (sr + cfgw.orgazmSioLowerLimit >= 30f) {
               maidState.fSio = true;
-              maidState.sioTime = sr * 10f;
-              maidState.sioVolume -= sr;
+              maidState.sioTime = Time.time + (sr + cfgw.orgazmSioLowerLimit)/30f * cfgw.orgazmSioDuration; //潮吹き終了時間 3秒以上 2秒以上なら複数回吹く場合もある
+              maidState.sioTime2 = Math.Max(maidState.sioTime2, Time.time + UnityEngine.Random.Range(cfgw.orgazmSioStartMin, cfgw.orgazmSioStartMax)); //0～1秒後までランダム 連続時は間隔に合わせる
+              maidState.sioVolume -= sr; //0以上
             }
             //尿吹き 失神時は出やすくする
             float lowerLimit = maidState.stunFlag ? cfgw.orgazmNyoLowerLimit * 0.4f : cfgw.orgazmNyoLowerLimit;
             float nyoTh = maidState.stunFlag ? 50f : 120f;
-            float nr = UnityEngine.Random.Range(lowerLimit, lowerLimit + maidState.nyoVolume);
-            if (nr >= nyoTh){
-              nr = Math.Max(nyoTh, maidState.nyoVolume); //増えすぎないように加算分を戻す 閾値以下にはしない
-              EffectNyo(maidID, maidState, nr);
+            float nr = UnityEngine.Random.Range(0, maidState.nyoVolume);
+            if (nr + lowerLimit >= nyoTh) {
+              EffectNyo(maid, maidState, nr, false);
             }
           }
 
           //興奮値を削減
-          if(!ExciteLock){
-            if(maidState.orgasmCmb > 3){
+          if (!ExciteLock) {
+            if (maidState.orgasmCmb > 3) {
               maidState.exciteValue = maidState.exciteValue * 0.8f;
-            }else{
+            } else {
               maidState.exciteValue = maidState.exciteValue * 0.5f;
             }
           }
-          
-          
+
+
           //連続絶頂の場合マウスモードをランダム変更
-          if(maidState.orgasmCmb > 3){
+          if (maidState.orgasmCmb > 3) {
             maidState.MouthMode = UnityEngine.Random.Range(2,5);
-            if(maidState.MouthMode < 3) maidState.MouthMode = 0;
+            if (maidState.MouthMode < 3) maidState.MouthMode = 0;
           }
-          
+
           //アヘ値の変更
           maidState.aheValue2 = maidState.orgasmCmb * 10;
-          if(maidState.aheValue2 > 60)maidState.aheValue2 = UnityEngine.Random.Range(0, 60);
-          
-          
+          if (maidState.aheValue2 > 60) maidState.aheValue2 = UnityEngine.Random.Range(0, 60);
+
+
           //オートモード時、絶頂後すぐにモーションが変わらないように時間追加
-          if(maidState.pAutoSelect != 0 && maidState.pAutoTime < 200f)maidState.pAutoTime += 200f;
-          if(maidState.eAutoSelect == true && maidState.eAutoTime < 200f)maidState.eAutoTime += 200f;
-          if(maidState.editMotionSetName != ""){
-            if(maidState.msTime1 < 300f)maidState.msTime1 += 300f;
-            if(maidState.msTime2 < 300f)maidState.msTime2 += 300f;
+          if (maidState.pAutoSelect != 0 && maidState.pAutoTime < 200f) maidState.pAutoTime += 200f;
+          if (maidState.eAutoSelect == true && maidState.eAutoTime < 200f) maidState.eAutoTime += 200f;
+          if (maidState.editMotionSetName != "") {
+            if (maidState.msTime1 < 300f) maidState.msTime1 += 300f;
+            if (maidState.msTime2 < 300f) maidState.msTime2 += 300f;
           }
-          
+
           //エロステータス更新
           SaveEroState(maidID);
-          
+
         }
 
 
         //絶頂ボーナスタイムの処理
-        private void OrgasmBonus(int maidID, MaidState maidState) {
-          if (maidState.orgasmHoldTime > 0){
+        private void OrgasmBonus(MaidState maidState) {
+          if (maidState.orgasmHoldTime > 0) {
             maidState.boostBonus = maidState.jirashi / 20 + 3 * maidState.orgasmCmb ;  //感度ボーナス設定
-            //if(maidState.boostBonus > 200)maidState.boostBonus = 200;
-          
-          }else if(maidState.orgasmCmb > 0){ //ボーナスタイム終了時の処理
+            //if (maidState.boostBonus > 200) maidState.boostBonus = 200;
+
+          } else if (maidState.orgasmCmb > 0) { //ボーナスタイム終了時の処理
             maidState.jirashi = 0;
             maidState.boostBonus = 0 ;
             maidState.orgasmCmb = 0;
@@ -4133,120 +4233,123 @@ namespace CM3D2.VibeYourMaid.Plugin {
 
           }
         }
-        
-        
+
+
         //メイドの放心判定
         private void StunCheck(int maidID, Maid maid, MaidState maidState) {
-        
-          //放心状態にする
-          if(!maidState.stunFlag && maidState.maidStamina < 500 ){
-            maidState.stunFlag = true;
-            maidState.orgasmValue = 0;  //絶頂値リセット
-            maid.EyeToCamera((Maid.EyeMoveType)0, 0.8f);  //メイドの視線を外す
-            maidState.stanTotal += 1; //失神回数
-            //エロステータス更新
-            SaveEroState(maidID);
-            
-            maid.SetProp("eye_hi", "_I_SkinHi002.menu", 0, true, false); //ハイライトを消す
-            maid.SetProp("eye_hi_r", "_I_SkinHi002.menu", 0, true, false);
-            maid.AllProcPropSeqStart();
-          }
-          
-          //放心から回復する
-          if(maidState.stunFlag && maidState.maidStamina > 1500 ){
-            maidState.stunFlag = false;
-            maidState.voiceHoldTime = 0;  //音声・表情タイマーリセット（即再生のため）
-            maidState.faceHoldTime = 0;
-            maidState.vStateMajorOld = 30;  //バイブが停止していた場合に余韻状態に移行させるため
 
-            maid.ResetProp("eye_hi", false);//ハイライトを戻す
-            maid.ResetProp("eye_hi_r", false);
-            maid.AllProcPropSeqStart();
+          //放心から回復する
+          if (maidState.stunFlag) {
+            if (maidState.maidStamina > 1500) {
+              maidState.stunFlag = false;
+              maidState.voiceHoldTime = 0;  //音声・表情タイマーリセット（即再生のため）
+              maidState.faceHoldTime = 0;
+              maidState.vStateMajorOld = 30;  //バイブが停止していた場合に余韻状態に移行させるため
+
+              maid.ResetProp("eye_hi", false);//ハイライトを戻す
+              maid.ResetProp("eye_hi_r", false);
+              maid.AllProcPropSeqStart();
+            }
+          } else {
+            //放心状態にする
+            if (maidState.maidStamina < 500) {
+              maidState.stunFlag = true;
+              maidState.orgasmValue = 0;  //絶頂値リセット
+              maid.EyeToCamera((Maid.EyeMoveType)0, 0.8f);  //メイドの視線を外す
+              maidState.stanTotal += 1; //失神回数
+              //エロステータス更新
+              SaveEroState(maidID);
+
+              maid.SetProp("eye_hi", "_I_SkinHi002.menu", 0, true, false); //ハイライトを消す
+              maid.SetProp("eye_hi_r", "_I_SkinHi002.menu", 0, true, false);
+              maid.AllProcPropSeqStart();
+            }
           }
+
         }
-        
-        
+
+
         //フェイスブレンド等のレベルチェック
-        private int kaikanLevelCheck(int maidID) {
+        private int kaikanLevelCheck(int maidID, MaidState maidState) {
 
           //クリ勃起値、スタミナ、連続絶頂数によってフェイスブレンドレベルを変更
           int kaikanLevel = 0;
-          if(maidsState[maidID].bokkiValue1 > 90){
+          if (maidState.bokkiValue1 > 90) {
             kaikanLevel = 5;
-          }else if(maidsState[maidID].bokkiValue1 > 70){
+          } else if (maidState.bokkiValue1 > 70) {
             kaikanLevel = 4;
-          }else if(maidsState[maidID].bokkiValue1 > 50){
+          } else if (maidState.bokkiValue1 > 50) {
             kaikanLevel = 3;
-          }else if(maidsState[maidID].bokkiValue1 > 30){
+          } else if (maidState.bokkiValue1 > 30) {
             kaikanLevel = 2;
-          }else {
+          } else {
             kaikanLevel = 1;
           }
-          if(maidsState[maidID].maidStamina < 1500) {
+          if (maidState.maidStamina < 1500) {
             kaikanLevel += 5;
-          }else if(maidsState[maidID].maidStamina < 1800) {
+          } else if (maidState.maidStamina < 1800) {
             kaikanLevel += 4;
-          }else if(maidsState[maidID].maidStamina < 2100) {
+          } else if (maidState.maidStamina < 2100) {
             kaikanLevel += 3;
-          }else if(maidsState[maidID].maidStamina < 2400) {
+          } else if (maidState.maidStamina < 2400) {
             kaikanLevel += 2;
-          }else if(maidsState[maidID].maidStamina < 2700) {
+          } else if (maidState.maidStamina < 2700) {
             kaikanLevel += 1;
           }
-          kaikanLevel += maidsState[maidID].orgasmCmb;
-          if(maidsState[maidID].stunFlag)kaikanLevel += 2;
-        
+          kaikanLevel += maidState.orgasmCmb;
+          if (maidState.stunFlag) kaikanLevel += 2;
+
           return kaikanLevel;
         }
 
 
-      //ステータス変更関係終了---------------------------
+        //ステータス変更関係終了---------------------------
 
 
 
 
 
-      //-------------------------------------------------
-      //表情変更関係-------------------------------------
+        //-------------------------------------------------
+        //表情変更関係-------------------------------------
 
         //フェイスアニメ変更処理
         private void ChangeFaceAnime(int maidID, Maid maid, MaidState maidState) {
-        
+
           int iRandomFace = 0;
           string faceAnimeName = "";
-          
+
           //「バイブ停止」から遷移してくる時には、その時点での表情をバックアップしておく
-          if(maidState.vStateMajor != 10 && maidState.vStateMajorOld == 10)maidState.faceAnimeBackup = maid.ActiveFace;
+          if (maidState.vStateMajor != 10 && maidState.vStateMajorOld == 10) maidState.faceAnimeBackup = maid.ActiveFace;
 
           //変更するフェイスアニメを決定
-          if(maidState.stunFlag) {
+          if (maidState.stunFlag) {
             iRandomFace = UnityEngine.Random.Range(0 , cfgw.sFaceAnimeStun.Length);
             faceAnimeName = cfgw.sFaceAnimeStun[iRandomFace];
 
-          }else if(maidState.vStateMajor == 20) {
+          } else if (maidState.vStateMajor == 20) {
             iRandomFace = UnityEngine.Random.Range(0 , cfgw.sFaceAnime20Vibe[maidState.exciteLevel - 1].Length);
             faceAnimeName = cfgw.sFaceAnime20Vibe[maidState.exciteLevel - 1][iRandomFace];
 
-          }else if(maidState.vStateMajor == 40) {
+          } else if (maidState.vStateMajor == 40) {
             if (maidState.orgasmCmb > 0){
               faceAnimeName = cfgw.sFaceAnime40Vibe[3];
-            }else{
+            } else {
               faceAnimeName = cfgw.sFaceAnime40Vibe[maidState.exciteLevel - 1];
             }
-          
-          }else if(maidState.vStateMajor == 30) {
+
+          } else if (maidState.vStateMajor == 30) {
             iRandomFace = UnityEngine.Random.Range(0 , cfgw.sFaceAnime30Vibe[maidState.exciteLevel - 1].Length);
             faceAnimeName = cfgw.sFaceAnime30Vibe[maidState.exciteLevel - 1][iRandomFace];
-          
-          }else if(maidState.vStateMajor == 10 && maidState.vStateMajorOld == 50) {
+
+          } else if (maidState.vStateMajor == 10 && maidState.vStateMajorOld == 50) {
             faceAnimeName = maidState.faceAnimeBackup;
             maidState.faceAnimeBackup = "";
-            
+
           }
-          
+
           //""か"変更しない"でなければ、フェイスアニメを適用する
-          if(faceAnimeName != "" && faceAnimeName != "変更しない")maid.FaceAnime(faceAnimeName , cfgw.fAnimeFadeTimeV , 0);
-          
+          if (faceAnimeName != "" && faceAnimeName != "変更しない") maid.FaceAnime(faceAnimeName , cfgw.fAnimeFadeTimeV , 0);
+
         }
 
 
@@ -4255,8 +4358,8 @@ namespace CM3D2.VibeYourMaid.Plugin {
         private void ChangeFaceBlend(int maidID, Maid maid, MaidState maidState) {
 
           //「バイブ停止」から遷移してくる時には、その時点でのブレンドをバックアップしておく
-          if(maidState.vStateMajor != 10 && maidState.vStateMajorOld == 10)maidState.faceBlendBackup = maid.FaceName3;
-          
+          if (maidState.vStateMajor != 10 && maidState.vStateMajorOld == 10) maidState.faceBlendBackup = maid.FaceName3;
+
           string faceBlendCurrent = maidState.faceBlendBackup;
           string sChangeCheek = "";
           string sChangeTears = "";
@@ -4269,94 +4372,94 @@ namespace CM3D2.VibeYourMaid.Plugin {
           int iOverrideTears = 0;
           bool bOverrideYodare = false;
           bool bOverrideSekimen = false;
-          
-          
-          if(maidState.kaikanLevel > 9){
+
+
+          if (maidState.kaikanLevel > 9) {
             iOverrideCheek = 3;       //"頬３"
             iOverrideTears = 3;       //"涙３"
             bOverrideYodare = true;   //よだれ
             bOverrideSekimen = true;  //赤面
-          }else if(maidState.kaikanLevel > 6){
+          } else if (maidState.kaikanLevel > 6) {
             iOverrideCheek = 3;       //"頬３"
             iOverrideTears = 3;       //"涙３"
             bOverrideYodare = true;   //よだれ
-          }else if(maidState.kaikanLevel > 5){
+          } else if (maidState.kaikanLevel > 5) {
             iOverrideCheek = 3;       //"頬３"
             iOverrideTears = 3;       //"涙３"
-          }else if(maidState.kaikanLevel > 4){
+          } else if (maidState.kaikanLevel > 4) {
             iOverrideCheek = 3;       //"頬３"
             iOverrideTears = 2;       //"涙２"
-          }else if(maidState.kaikanLevel > 3){
+          } else if (maidState.kaikanLevel > 3) {
             iOverrideCheek = 3;       //"頬３"
             iOverrideTears = 1;       //"涙１"
-          }else if(maidState.kaikanLevel > 2){
+          } else if (maidState.kaikanLevel > 2) {
             iOverrideCheek = 2;       //"頬２"
             iOverrideTears = 1;       //"涙１"
-          }else if(maidState.kaikanLevel > 1){
+          } else if (maidState.kaikanLevel > 1) {
             iOverrideCheek = 2;       //"頬１"
             iOverrideTears = 0;       //"涙１"
-          }else{
+          } else {
             iOverrideCheek = 1;       //"頬１"
             iOverrideTears = 0;       //"涙０"
           }
-          
-          
-          
+
+
+
           faceBlendCurrent = faceBlendCurrent.Replace("オリジナル", ""); //取得したフェイスブレンド情報から「オリジナル」の記述を削除
-          if(faceBlendCurrent == "") faceBlendCurrent = "頬０涙０";  // 背景選択時、スキル選択時は、"" が返ってきてエラーが出るため
-          
+          if (faceBlendCurrent == "") faceBlendCurrent = "頬０涙０";  // 背景選択時、スキル選択時は、"" が返ってきてエラーが出るため
+
           sChangeCheek = faceBlendCurrent.Substring(0 , 2);
           sChangeTears = faceBlendCurrent.Substring(2 , 2);
-          if(faceBlendCurrent.Length == 7) sChangeYodare = "よだれ";
+          if (faceBlendCurrent.Length == 7) sChangeYodare = "よだれ";
 
           //元々のフェイスブレンドと比較する
-          if(cfgw.HohoEnabled){
-            if(sChangeCheek == "頬０") iChangeCheek = 0;
-            if(sChangeCheek == "頬１") iChangeCheek = 1;
-            if(sChangeCheek == "頬２") iChangeCheek = 2;
-            if(sChangeCheek == "頬３") iChangeCheek = 3;
-            if(iOverrideCheek > iChangeCheek) iChangeCheek = iOverrideCheek;
-            if(iChangeCheek == 0) sChangeCheek = "頬０";
-            if(iChangeCheek == 1) sChangeCheek = "頬１";
-            if(iChangeCheek == 2) sChangeCheek = "頬２";
-            if(iChangeCheek == 3) sChangeCheek = "頬３";
+          if (cfgw.HohoEnabled) {
+            if (sChangeCheek == "頬０") iChangeCheek = 0;
+            if (sChangeCheek == "頬１") iChangeCheek = 1;
+            if (sChangeCheek == "頬２") iChangeCheek = 2;
+            if (sChangeCheek == "頬３") iChangeCheek = 3;
+            if (iOverrideCheek > iChangeCheek) iChangeCheek = iOverrideCheek;
+            if (iChangeCheek == 0) sChangeCheek = "頬０";
+            if (iChangeCheek == 1) sChangeCheek = "頬１";
+            if (iChangeCheek == 2) sChangeCheek = "頬２";
+            if (iChangeCheek == 3) sChangeCheek = "頬３";
           }
-          if(cfgw.NamidaEnabled){
-            if(sChangeTears == "涙０") iChangeTears = 0;
-            if(sChangeTears == "涙１") iChangeTears = 1;
-            if(sChangeTears == "涙２") iChangeTears = 2;
-            if(sChangeTears == "涙３") iChangeTears = 3;
-            if(iOverrideTears > iChangeTears) iChangeTears = iOverrideTears;
-            if(iChangeTears == 0) sChangeTears = "涙０";
-            if(iChangeTears == 1) sChangeTears = "涙１";
-            if(iChangeTears == 2) sChangeTears = "涙２";
-            if(iChangeTears == 3) sChangeTears = "涙３";
+          if (cfgw.NamidaEnabled) {
+            if (sChangeTears == "涙０") iChangeTears = 0;
+            if (sChangeTears == "涙１") iChangeTears = 1;
+            if (sChangeTears == "涙２") iChangeTears = 2;
+            if (sChangeTears == "涙３") iChangeTears = 3;
+            if (iOverrideTears > iChangeTears) iChangeTears = iOverrideTears;
+            if (iChangeTears == 0) sChangeTears = "涙０";
+            if (iChangeTears == 1) sChangeTears = "涙１";
+            if (iChangeTears == 2) sChangeTears = "涙２";
+            if (iChangeTears == 3) sChangeTears = "涙３";
           }
-          if(cfgw.YodareEnabled && bOverrideYodare)sChangeYodare = "よだれ";
-          
-          
+          if (cfgw.YodareEnabled && bOverrideYodare) sChangeYodare = "よだれ";
+
+
           //フェイスブレンドを適用
           sChangeBlend = sChangeCheek + sChangeTears + sChangeYodare;
           maid.FaceBlend(sChangeBlend);
-          
+
           //赤面処理
-          if(cfgw.HohoEnabled && bOverrideSekimen){
+          if (cfgw.HohoEnabled && bOverrideSekimen) {
             maidState.sekimenValue = 1f;
-          }else{
+          } else {
             maidState.sekimenValue = 0f;
           }
-        
+
         }
 
-        
-      //表情変更関係終了---------------------------------
+
+        //表情変更関係終了---------------------------------
 
 
 
 
 
-      //-------------------------------------------------
-      //サウンド処理関係---------------------------------
+        //-------------------------------------------------
+        //サウンド処理関係---------------------------------
 
         //メイドの音声再生処理
         private void MaidVoicePlay(int maidID, Maid maid, MaidState maidState) {
@@ -4364,8 +4467,8 @@ namespace CM3D2.VibeYourMaid.Plugin {
           //フェラしているかのチェック
           checkBlowjobing(maidID, maid, maidState);
 
-          if (maidState.autoVoiceEnabled){
-            if (maidState.bIsBlowjobing > 0){
+          if (maidState.autoVoiceEnabled) {
+            if (maidState.bIsBlowjobing > 0) {
               maidState.voiceMode = 1;
             } else {
               maidState.voiceMode = 0;
@@ -4373,63 +4476,64 @@ namespace CM3D2.VibeYourMaid.Plugin {
           }
 
           int iPersonal = Array.IndexOf(personalList[1], stockMaids[maidID].personal);
-          if(iPersonal < 0)iPersonal = 0;
-          if(maidState.voiceMode2 > 0)iPersonal = maidState.voiceMode2 - 1;
+          if (iPersonal < 0) iPersonal = 0;
+          //if (maidState.voiceMode2 > 0) iPersonal = maidState.voiceMode2 - 1;
           string[] VoiceList = new string[1];
           int vi = 0;
-          
+
           //バイブ弱の音声
-          if (maidState.vStateMajor == 20){
-                if(maidState.stunFlag){
+          if (maidState.vStateMajor == 20) {
+                if (maidState.stunFlag) {
                   vi = 4;
-                }else{
+                } else {
                   vi = maidState.exciteLevel - 1;
                 }
 
-                if (maidState.voiceMode == 0){ //通常音声
+                if (maidState.voiceMode == 0) { //通常音声
                   VoiceList = bvs[iPersonal].sLoopVoice20Vibe[vi];
-                  
-                }else if (maidState.voiceMode == 1){ //フェラ音声
+
+                } else if (maidState.voiceMode == 1) { //フェラ音声
                   VoiceList = bvs[iPersonal].sLoopVoice20Fera[vi];
-                  
-                } else if (maidState.voiceMode == 2){ //カスタム音声１
-                    VoiceList = sLoopVoice20Custom1[vi];
-                }else if (maidState.voiceMode == 3){ //カスタム音声２
-                    VoiceList = sLoopVoice20Custom2[vi];
-                }else if (maidState.voiceMode == 4){ //カスタム音声３
-                    VoiceList = sLoopVoice20Custom3[vi];
-                }else if (maidState.voiceMode == 5){ //カスタム音声４
-                    VoiceList = sLoopVoice20Custom4[vi];
                 }
+                /*else if (maidState.voiceMode == 2) { //カスタム音声１
+                    VoiceList = sLoopVoice20Custom1[vi];
+                } else if (maidState.voiceMode == 3) { //カスタム音声２
+                    VoiceList = sLoopVoice20Custom2[vi];
+                } else if (maidState.voiceMode == 4) { //カスタム音声３
+                    VoiceList = sLoopVoice20Custom3[vi];
+                } else if (maidState.voiceMode == 5) { //カスタム音声４
+                    VoiceList = sLoopVoice20Custom4[vi];
+                }*/
           }
 
           //バイブ強の音声
-          if (maidState.vStateMajor == 30){
-                if (maidState.orgasmVoice == 0){
+          if (maidState.vStateMajor == 30) {
+                if (maidState.orgasmVoice == 0) {
 
-                    if(maidState.stunFlag){
+                    if (maidState.stunFlag) {
                       vi = 4;
-                    }else{
+                    } else {
                       vi = maidState.exciteLevel - 1;
                     }
 
-                    if (maidState.voiceMode == 0){ //通常音声
+                    if (maidState.voiceMode == 0) { //通常音声
                       VoiceList = bvs[iPersonal].sLoopVoice30Vibe[vi];
-                        
-                    }else if (maidState.voiceMode == 1){ //フェラ音声
+
+                    } else if (maidState.voiceMode == 1) { //フェラ音声
                       VoiceList = bvs[iPersonal].sLoopVoice30Fera[vi];
 
-                    }else if (maidState.voiceMode == 2){ //カスタム音声１
-                        VoiceList = sLoopVoice30Custom1[vi];
-                    }else if (maidState.voiceMode == 3){ //カスタム音声２
-                        VoiceList = sLoopVoice30Custom2[vi];
-                    }else if (maidState.voiceMode == 4){ //カスタム音声３
-                        VoiceList = sLoopVoice30Custom3[vi];
-                    }else if (maidState.voiceMode == 5){ //カスタム音声４
-                        VoiceList = sLoopVoice30Custom4[vi];
                     }
+                    /*else if (maidState.voiceMode == 2) { //カスタム音声１
+                        VoiceList = sLoopVoice30Custom1[vi];
+                    } else if (maidState.voiceMode == 3) { //カスタム音声２
+                        VoiceList = sLoopVoice30Custom2[vi];
+                    } else if (maidState.voiceMode == 4) { //カスタム音声３
+                        VoiceList = sLoopVoice30Custom3[vi];
+                    } else if (maidState.voiceMode == 5) { //カスタム音声４
+                        VoiceList = sLoopVoice30Custom4[vi];
+                    }*/
 
-                }else{  //絶頂時音声
+                } else {  //絶頂時音声
                     #if DEBUG
                     Console.WriteLine("exciteLevel="+maidState.exciteLevel+" kaikanLevel="+maidState.kaikanLevel+" orgasmCmb="+maidState.orgasmCmb+" orgasmCount="+maidState.orgasmCount);
                     #endif
@@ -4445,70 +4549,71 @@ namespace CM3D2.VibeYourMaid.Plugin {
                       if (vi < 0) vi = 0;
                     }
 
-                    if (maidState.voiceMode == 0){ //通常音声
+                    if (maidState.voiceMode == 0) { //通常音声
                       VoiceList = bvs[iPersonal].sOrgasmVoice30Vibe[vi];
-                        
-                    }else if (maidState.voiceMode == 1){ //フェラ音声
+
+                    } else if (maidState.voiceMode == 1) { //フェラ音声
                       VoiceList = bvs[iPersonal].sOrgasmVoice30Fera[vi];
 
-                    }else if (maidState.voiceMode == 2){ //カスタム音声１
-                        VoiceList = sOrgasmVoice30Custom1[vi];
-                    }else if (maidState.voiceMode == 3){ //カスタム音声２
-                        VoiceList = sOrgasmVoice30Custom2[vi];
-                    }else if (maidState.voiceMode == 4){ //カスタム音声３
-                        VoiceList = sOrgasmVoice30Custom3[vi];
-                    }else if (maidState.voiceMode == 5){ //カスタム音声４
-                        VoiceList = sOrgasmVoice30Custom4[vi];
                     }
+                    /*else if (maidState.voiceMode == 2) { //カスタム音声１
+                        VoiceList = sOrgasmVoice30Custom1[vi];
+                    } else if (maidState.voiceMode == 3) { //カスタム音声２
+                        VoiceList = sOrgasmVoice30Custom2[vi];
+                    } else if (maidState.voiceMode == 4) { //カスタム音声３
+                        VoiceList = sOrgasmVoice30Custom3[vi];
+                    } else if (maidState.voiceMode == 5) { //カスタム音声４
+                        VoiceList = sOrgasmVoice30Custom4[vi];
+                    }*/
                 }
           }
 
-          
+
           int iRandomVoice = UnityEngine.Random.Range(0, VoiceList.Length);
-          
+
           //絶頂音声が重複しないようにする
-          if (maidState.orgasmVoice != 0){
-              while (iRandomVoice == maidState.iRandomVoiceBackup && VoiceList.Length > 1){
+          if (maidState.orgasmVoice != 0) {
+              while (iRandomVoice == maidState.iRandomVoiceBackup && VoiceList.Length > 1) {
                   iRandomVoice = UnityEngine.Random.Range(0, VoiceList.Length);
               }
               maidState.iRandomVoiceBackup = iRandomVoice;
           }
-          
-          
+
+
           //バイブ動作時の音声を実際に再生する
-          if(maidState.vStateMajor == 30 || maidState.vStateMajor == 20){
+          if (maidState.vStateMajor == 30 || maidState.vStateMajor == 20) {
             maid.AudioMan.audiosource.time = 0;
-            if (maidState.orgasmVoice == 0){
+            if (maidState.orgasmVoice == 0) {
               maid.AudioMan.LoadPlay(VoiceList[iRandomVoice], 0f, false, true);
-            }else{
+            } else {
               maid.AudioMan.LoadPlay(VoiceList[iRandomVoice], 0f, false, false);
               maidState.orgasmVoice = 2;   //絶頂音声再生中のフラグ
             }
-            #if DEBUG
+            //#if DEBUG
             Console.WriteLine(stockMaids[maidID].personal +" ["+(maidState.orgasmVoice == 0?"L":"O")+maidState.vStateMajor+":"+vi+":"+iRandomVoice+"] "+VoiceList[iRandomVoice]);
-            #endif
+            //#endif
           }
 
 
           //バイブ停止時の音声
-          if (maidState.vStateMajor == 40){
+          if (maidState.vStateMajor == 40) {
                 int VoiceValue;
 
-                if(maidState.stunFlag){
+                if (maidState.stunFlag) {
                   vi = 1;
-                }else{
+                } else{
                   vi = 0;
                 }
 
-                if (maidState.orgasmCmb > 0){
+                if (maidState.orgasmCmb > 0) {
                     VoiceValue = 3 + vi;
-                }else{
+                } else {
                     //VoiceValue = maidState.exciteLevel - 1 + vi;
                     //kaikanLevel 1～12 1以下になったらボイス終了
                     int kaikan = maidState.kaikanLevel;
                     if (kaikan >= 6) {
                       if (kaikan <= 8) kaikan = 4; //6-8
-                      else if (kaikan <= 10)  kaikan = 5; //9-10
+                      else if (kaikan <= 10) kaikan = 5; //9-10
                       else kaikan = 6; //11-12
                     }
                     VoiceValue = Math.Min(4, Math.Max(maidState.exciteLevel, kaikan-1) - 1 + vi);
@@ -4517,45 +4622,49 @@ namespace CM3D2.VibeYourMaid.Plugin {
                     #endif
                 }
 
-                if (maidState.voiceMode == 2){
+                /*if (maidState.voiceMode == 2) {
                     VoiceList = sLoopVoice40Custom1;
-                }else if (maidState.voiceMode == 3){
+                } else if (maidState.voiceMode == 3) {
                     VoiceList = sLoopVoice40Custom2;
-                }else if (maidState.voiceMode == 4){
+                } else if (maidState.voiceMode == 4) {
                     VoiceList = sLoopVoice40Custom3;
-                }else if (maidState.voiceMode == 5){
+                } else if (maidState.voiceMode == 5) {
                     VoiceList = sLoopVoice40Custom4;
-                }else{
+                } else {
                     VoiceList = bvs[iPersonal].sLoopVoice40Vibe;
-                }
+                }*/
+                VoiceList = bvs[iPersonal].sLoopVoice40Vibe;
                 maid.AudioMan.audiosource.time = 0;
                 maid.AudioMan.LoadPlay(VoiceList[VoiceValue], 0f, false, true);
-                #if DEBUG
+                //#if DEBUG
                 Console.WriteLine(stockMaids[maidID].personal +" ["+maidState.vStateMajor+":"+VoiceValue+"] "+VoiceList[VoiceValue]);
-                #endif
+                //#endif
           }
-          
-          
+
+
           //余韻終了時
-          if(maidState.vStateMajor == 10 && maidState.vStateMajorOld == 50) {
+          if (maidState.vStateMajor == 10 && maidState.vStateMajorOld == 50) {
             maid.AudioMan.Stop(1.5f);
           }
 
         }
-        
+
         //リアクション音声・表情の再生
-        private void ReactionPlay(int maidID){
+        private void ReactionPlay(int maidID) {
           Maid maid = stockMaids[maidID].mem;
           int iPersonal = Array.IndexOf(personalList[1], stockMaids[maidID].personal);
-          if(maidsState[maidID].voiceMode2 > 0)iPersonal = maidsState[maidID].voiceMode2 - 1;
+          //if (maidsState[maidID].voiceMode2 > 0) iPersonal = maidsState[maidID].voiceMode2 - 1;
           string[] VoiceList = reactionVoice[iPersonal];
           int iRandom = UnityEngine.Random.Range(0, VoiceList.Length);
-          
+
           maid.AudioMan.audiosource.time = 0;
-          maid.AudioMan.LoadPlay(VoiceList[iRandom], 0f, false, false);
+          string voiceFile = VoiceList[iRandom];
+          maid.AudioMan.LoadPlay(voiceFile, 0f, false, false);
           //maidsState[maidID].vsFlag = 2;
           maidsState[maidID].orgasmVoice = 2;
-          
+
+          Console.WriteLine("[VibeYourMaid] リアクションボイス: "+voiceFile);
+
           iRandom = UnityEngine.Random.Range(0 , cfgw.sFaceAnime30Vibe[3].Length);
           maid.FaceAnime(cfgw.sFaceAnime30Vibe[3][iRandom] , 0.5f , 0);
           maidsState[maidID].faceHoldTime = cfgw.vStateAltTimeVBase + UnityEngine.Random.Range(0f , cfgw.vStateAltTimeVRandomExtend); //次の表情変更タイマーセット
@@ -4566,12 +4675,16 @@ namespace CM3D2.VibeYourMaid.Plugin {
         {
           if (!cfgw.UndressingReaction) return;
 
+          //絶頂ボイス再生中は再生しない
+          if (maidsState[maidID].orgasmVoice == 2) return;
+
           Maid maid = stockMaids[maidID].mem;
           //サブヒロインは除外
           if (maid.status.heroineType == MaidStatus.HeroineType.Sub) return;
 
           int iPersonal = Array.IndexOf(personalList[1], stockMaids[maidID].personal);
-          
+          if (iPersonal == -1) return;
+
           int idx = 3;
           if (pos == 5) idx = 8; //ぽろり → ブラの200
           else if (pos <= 4) { //ずらしも対応
@@ -4582,74 +4695,78 @@ namespace CM3D2.VibeYourMaid.Plugin {
             idx = 4*pos + excite;
           }
           if (iPersonal < UndressingVoice.Length && idx < UndressingVoice[iPersonal].Length) {
-            //maid.AudioMan.audiosource.time = 0; //ボタンから再生するので動作テスト用に0にしない
-            maid.AudioMan.LoadPlay(UndressingVoice[iPersonal][idx]+".ogg", 0f, false, false);
+            maid.AudioMan.audiosource.time = 0;
+            string voiceFile = UndressingVoice[iPersonal][idx]+".ogg";
+            maid.AudioMan.LoadPlay(voiceFile, 0f, false, false);
+            maidsState[maidID].orgasmVoice = 2; //ループ音をキャンセルして再生させるため絶頂ボイス扱い
+
+            Console.WriteLine("[VibeYourMaid] 脱衣ボイス: "+voiceFile);
           }
 
-          //余韻状態に変更 モーション変更はキャンセル
+          //バイブ停止時は表情変更
           if (maidsState[maidID].vStateMajor == 10) {
-            maidsState[maidID].vStateMajor = 40;
-            maidsState[maidID].vStateMajorOld = 30;
-            maidsState[maidID].skipMotionChange = true;
+            maidsState[maidID].vStateMajor = 40; //余韻状態
+            ChangeFaceAnime(maidID, maid, maidsState[maidID]);  //表情変更実行
+            //ChangeFaceBlend(maidID, maid, maidsState[maidID]);  //フェイスブレンド変更実行
+            //ここで戻すと表情はバックアップから戻らない
+            maidsState[maidID].vStateMajor = 10;
           }
         }
 
         //SE変更処理
         private string seFileBack = "";
-        private void ChangeSE(int maidID, bool mode){
-        
+        private void ChangeSE(int maidID, bool mode) {
+
           int iSE1 = maidsState[maidID].vLevel;
-          //if(osawari.isOsawari(maidID)) {
+          //if (osawari.isOsawari(maidID)) {
           int osawariLevel = osawari.getOsawariLevel(maidID);
           //バイブまたはで股間のおさわりの場合のみ
           if (iSE1 < osawariLevel && (iSE1 != 0 || osawari.isOsawari(maidID, "VA_") || osawari.isOsawari(maidID, "AN_"))) iSE1 = osawariLevel;
           //}
-          
-          if(iSE1 != 0){
+
+          if (iSE1 != 0) {
             bool vibe = false;
             string motion = stockMaids[maidID].mem.body0.LastAnimeFN;
             string seFile = "";
 
-            if(cfgw.SelectSE != 2){
+            if (cfgw.SelectSE != 2) {
               seFile = SeFileList[iSE1][cfgw.SelectSE];
-            }else{
+            } else {
               seFile = SeFileList[iSE1][1];
-              if(maidsState[maidID].itemV !="" || maidsState[maidID].itemA != "")vibe = true;
+              if (maidsState[maidID].itemV !="" || maidsState[maidID].itemA != "") vibe = true;
             }
 
-            if(seFile != seFileBack || mode){
+            if (seFile != seFileBack || mode) {
               GameMain.Instance.SoundMgr.StopSe();
               GameMain.Instance.SoundMgr.PlaySe(seFile , true);
               int iSE2 = maidsState[maidID].vLevel;
-              if(vibe && iSE2 > 0)GameMain.Instance.SoundMgr.PlaySe(SeFileList[iSE2][0] , true);
+              if (vibe && iSE2 > 0) GameMain.Instance.SoundMgr.PlaySe(SeFileList[iSE2][0] , true);
               seFileBack = seFile;
             }
-            
+
           }
         }
 
 
 
-      //サウンド処理関係了-------------------------------
+        //サウンド処理関係了-------------------------------
 
 
 
 
 
-      //-------------------------------------------------
-      //モーションファイルの読み込み関係-----------------
+        //-------------------------------------------------
+        //モーションファイルの読み込み関係-----------------
 
         //チェック用モーションリスト変数
-        private List<string> MotionList_tati = new List<string>();
-        private List<string> MotionList_suwari = new List<string>();
-        private List<string> MotionList_zoukin = new List<string>();
-        private List<string> MotionList_kyuuzi = new List<string>();
-        private List<string> MotionList_fukisouji = new List<string>();
-        private List<string> MotionList_mop = new List<string>();
-        private List<string> MotionList_vibe = new List<string>();
+        private HashSet<string> MotionList_tati = new HashSet<string>();
+        private HashSet<string> MotionList_suwari = new HashSet<string>();
+        private HashSet<string> MotionList_zoukin = new HashSet<string>();
+        private HashSet<string> MotionList_kyuuzi = new HashSet<string>();
+        private HashSet<string> MotionList_fukisouji = new HashSet<string>();
+        private HashSet<string> MotionList_mop = new HashSet<string>();
+        private HashSet<string> MotionList_vibe = new HashSet<string>();
 
-        private List<string> allFiles = new List<string>();
-        private List<string> allFilesOld = new List<string>();
         private HashSet<string> allFilesSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);    //検索用
         private HashSet<string> allFilesOldSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase); //検索用
 
@@ -4660,33 +4777,37 @@ namespace CM3D2.VibeYourMaid.Plugin {
         private List<string> YotogiGroup = new List<string>();
         private int YotogiMenu = 0;
 
-        
+
         //UNZIP用のモーションリスト作成
-        void UnzipMotionLoad(){
+        void UnzipMotionLoad()
+        {
           Console.WriteLine("モーションファイル読み込み開始");
           System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
           sw.Start();
-          
+
+          List<string> allFiles = new List<string>();
+          List<string> allFilesOld = new List<string>();
+
           //全ファイルの中から.anmファイルの抜き出す
           string[] Files = GameUty.FileSystem.GetList("motion", AFileSystemBase.ListType.AllFile);
           string[] FilesOld = GameUty.FileSystemOld.GetList("motion", AFileSystemBase.ListType.AllFile);
-          
-          foreach (string file in Files){
-            if( Path.GetExtension( file ) == ".anm" ) {
+
+          foreach (string file in Files) {
+            if (Path.GetExtension( file ) == ".anm") {
               string motionName = Path.GetFileNameWithoutExtension(file);
               if (allFilesSet.Add(motionName)) allFiles.Add(motionName); //重複除外
             }
           }
-          foreach (string file in FilesOld){
-            if( Path.GetExtension( file ) == ".anm" ) {
+          foreach (string file in FilesOld) {
+            if (Path.GetExtension( file ) == ".anm") {
               string motionName = Path.GetFileNameWithoutExtension(file);
               if (allFilesOldSet.Add(motionName) && !allFilesSet.Contains(motionName)) allFilesOld.Add(motionName); //重複除外 Newにあれば追加しない
             }
           }
           try {
           string[] FilesMod= GameUty.FileSystemMod.GetList("", AFileSystemBase.ListType.AllFile);
-          foreach (string file in FilesMod){
-            if( Path.GetExtension( file ) == ".anm" ) {
+          foreach (string file in FilesMod) {
+            if (Path.GetExtension( file ) == ".anm") {
               string motionName = Path.GetFileNameWithoutExtension(file);
               if (allFilesSet.Add(motionName)) allFiles.Add(motionName); //重複除外
             }
@@ -4695,20 +4816,22 @@ namespace CM3D2.VibeYourMaid.Plugin {
           //ファイル名でソート
           allFiles.Sort();
           allFilesOld.Sort();
-          
-          
-          //モーションファイル一覧を出力したいときに使うだけ
-          /*foreach (string file in allFiles){
-            File.AppendAllText(@"Sybaris\UnityInjector\Config\VibeYourMaid\モーションリスト.csv", file + Environment.NewLine);
+
+
+          //モーションファイル一覧を出力したいとき
+          if (cfgw.outputMotionList) {
+            foreach (string file in allFiles) {
+              File.AppendAllText(@"Sybaris\UnityInjector\Config\VibeYourMaid\モーションリスト.csv", file + Environment.NewLine);
+            }
+            foreach (string file in allFilesOld) {
+              File.AppendAllText(@"Sybaris\UnityInjector\Config\VibeYourMaid\モーションリストOLD.csv", file + Environment.NewLine);
+            }
           }
-          foreach (string file in allFilesOld){
-            File.AppendAllText(@"Sybaris\UnityInjector\Config\VibeYourMaid\モーションリストOLD.csv", file + Environment.NewLine);
-          }*/
-          
+
           sw.Stop();
           Console.WriteLine("モーションファイル読み込み終了 : "+(sw.ElapsedMilliseconds)+"ms");
-          
-          
+
+
           //読み込んだモーションファイルの中からモーション変更可能なものを抽出
             Console.WriteLine("夜伽リスト抽出開始");
             sw.Reset();
@@ -4716,7 +4839,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
             string m2 = "";
             string m3 = "";
             string hatu = "";
-            
+
             List<string> ListF = new List<string>();
             List<string> ListF2 = new List<string>();
             List<string> ListN = new List<string>();
@@ -4748,41 +4871,41 @@ namespace CM3D2.VibeYourMaid.Plugin {
             List<string> YotogiListName10 = new List<string>();
             List<string> YotogiListName11 = new List<string>();
             List<string> YotogiListName12 = new List<string>();
-            
+
             List<string> _YotogiListSabun = new List<string>();
 
 
-            foreach (string file in allFiles){
-              
-              if( Regex.IsMatch(file,"_[1234]") && ((Regex.IsMatch(file,@"^[a-zA-Z]_") && !Regex.IsMatch(file,"m_"))  || Regex.IsMatch(file,@"[a-zA-Z][0-9][0-9]")) && (file.EndsWith( "_f" ) || file.EndsWith( "_f2" ) || file.EndsWith( "_f3" )) ){
-              
+            foreach (string file in allFiles) {
+
+              if (Regex.IsMatch(file,"_[1234]") && ((Regex.IsMatch(file,@"^[a-zA-Z]_") && !Regex.IsMatch(file,"m_")) || Regex.IsMatch(file,@"[a-zA-Z][0-9][0-9]")) && (file.EndsWith( "_f" ) || file.EndsWith( "_f2" ) || file.EndsWith( "_f3" ))) {
+
                 string basefile = file + ".anm";
-                if(!Regex.IsMatch(basefile,"m_"))basefile = Regex.Replace(basefile, @"^[a-zA-Z]_", "");
+                if (!Regex.IsMatch(basefile,"m_")) basefile = Regex.Replace(basefile, @"^[a-zA-Z]_", "");
                 basefile = Regex.Replace(basefile, @"[a-zA-Z][0-9][0-9]", "");
-                
+
                 int i = YotogiListBase.IndexOf(basefile);
-                if(i < 0){
+                if (i < 0) {
                   YotogiListBase.Add(basefile);
                   _YotogiListSabun.Add(basefile);
                   _YotogiListSabun.Add(file + ".anm");
-                }else{
+                } else {
                   _YotogiListSabun.Add(file + ".anm");
                 }
               }
-              
-              if ( file.Contains( "_1" ) && (!Regex.IsMatch(file,@"^[a-zA-Z]_") || Regex.IsMatch(file,"x_manguri") || Regex.IsMatch(file,"m_") ) && !Regex.IsMatch(file,@"[a-zA-Z][0-9][0-9]") && (file.EndsWith( "_f" ) || file.EndsWith( "_f2" ) || file.EndsWith( "_f3" )) ){
+
+              if (file.Contains( "_1" ) && (!Regex.IsMatch(file,@"^[a-zA-Z]_") || Regex.IsMatch(file,"x_manguri") || Regex.IsMatch(file,"m_") ) && !Regex.IsMatch(file,@"[a-zA-Z][0-9][0-9]") && (file.EndsWith( "_f" ) || file.EndsWith( "_f2" ) || file.EndsWith( "_f3" ))) {
                 m2 = file.Replace("_1", "_2");
                 m3 = file.Replace("_1", "_3");
                 hatu = file.Replace("_1", "_hatu_3");
 
-                if ( allFilesSet.Contains(m2) && allFilesSet.Contains(m3) ){
-                
+                if (allFilesSet.Contains(m2) && allFilesSet.Contains(m3)) {
+
                   string name = MotionNameChange(file);
-                  
-                  if(allFilesSet.Contains(hatu) || allFilesOldSet.Contains(hatu))name = name + " [H]";
+
+                  if (allFilesSet.Contains(hatu) || allFilesOldSet.Contains(hatu)) name = name + " [H]";
                   int mid = maj.motionName.IndexOf(file);
-                  if(mid == -1 || maj.hkupa1[mid] == -1)name = "★" + name;
-                  
+                  if (mid == -1 || maj.hkupa1[mid] == -1) name = "★" + name;
+
                   ListF.Add(file);
                   ListN.Add(name);
 
@@ -4794,107 +4917,109 @@ namespace CM3D2.VibeYourMaid.Plugin {
                   ListN.Add(MotionNameChange(file));
               }
             }
+            allFiles = null;
 
-            foreach (string file in allFilesOld){
-              
-              if( Regex.IsMatch(file,"_[1234]") && ((Regex.IsMatch(file,@"^[a-zA-Z]_") && !Regex.IsMatch(file,"m_"))  || Regex.IsMatch(file,@"[a-zA-Z][0-9][0-9]")) && (file.EndsWith( "_f" ) || file.EndsWith( "_f2" ) || file.EndsWith( "_f3" )) ){
-              
+            foreach (string file in allFilesOld) {
+
+              if (Regex.IsMatch(file,"_[1234]") && ((Regex.IsMatch(file,@"^[a-zA-Z]_") && !Regex.IsMatch(file,"m_"))  || Regex.IsMatch(file,@"[a-zA-Z][0-9][0-9]")) && (file.EndsWith( "_f" ) || file.EndsWith( "_f2" ) || file.EndsWith( "_f3" ))) {
+
                 string basefile = file + ".anm";
-                if(!Regex.IsMatch(basefile,"m_"))basefile = Regex.Replace(basefile, @"^[a-zA-Z]_", "");
+                if (!Regex.IsMatch(basefile,"m_")) basefile = Regex.Replace(basefile, @"^[a-zA-Z]_", "");
                 basefile = Regex.Replace(basefile, @"[a-zA-Z][0-9][0-9]", "");
-                
+
                 int i = YotogiListBase.IndexOf(basefile);
-                if(i < 0){
+                if (i < 0) {
                   YotogiListBase.Add(basefile);
                   _YotogiListSabun.Add(basefile);
                   _YotogiListSabun.Add(file + ".anm");
-                }else{
+                } else {
                   _YotogiListSabun.Add(file + ".anm");
                 }
               }
-              
-              if ( file.Contains( "_1" ) && (!Regex.IsMatch(file,@"^[a-zA-Z]_") || Regex.IsMatch(file,"x_manguri") || Regex.IsMatch(file,"m_") ) && !Regex.IsMatch(file,@"[a-zA-Z][0-9][0-9]") && (file.EndsWith( "_f" ) || file.EndsWith( "_f2" ) || file.EndsWith( "_f3" )) ){
+
+              if (file.Contains( "_1" ) && (!Regex.IsMatch(file,@"^[a-zA-Z]_") || Regex.IsMatch(file,"x_manguri") || Regex.IsMatch(file,"m_") ) && !Regex.IsMatch(file,@"[a-zA-Z][0-9][0-9]") && (file.EndsWith( "_f" ) || file.EndsWith( "_f2" ) || file.EndsWith( "_f3" ))) {
                 m2 = file.Replace("_1", "_2");
                 m3 = file.Replace("_1", "_3");
                 hatu = file.Replace("_1", "_hatu_3");
 
-                if ( allFilesOldSet.Contains(m2) && allFilesOldSet.Contains(m3) ){
-                
+                if (allFilesOldSet.Contains(m2) && allFilesOldSet.Contains(m3)) {
+
                   string name = MotionNameChange(file);
-                  
+
                   int mid = maj.motionName.IndexOf(file);
-                  if(mid == -1 || maj.hkupa1[mid] == -1)name = "★" + name;
-                  
+                  if (mid == -1 || maj.hkupa1[mid] == -1) name = "★" + name;
+
                   ListF.Add(file);
                   ListN.Add(name);
 
                 }
               }
             }
-            
-            
+            allFilesOld = null;
+
+
             List<string> ListN2 = new List<string>(ListN);
             ListN2.Sort();
-            for (int i = 0; i < ListN2.Count; i++){
+            for (int i = 0; i < ListN2.Count; i++) {
               int n = ListN.IndexOf(ListN2[i]);
               string file = ListF[n];
-              
-              if(file.Contains( "ganmenkijyoui" )){//１１：その他
+
+              if (file.Contains( "ganmenkijyoui" )) {//１１：その他
                 YotogiList11.Add(file);
                 YotogiListName11.Add(ListN2[i]);
                 //Console.WriteLine(file);
 
-              }else if(file.Contains( "yuri" )){//８：百合
+              } else if (file.Contains( "yuri" )) {//８：百合
                 YotogiList8.Add(file);
                 YotogiListName8.Add(ListN2[i]);
                 //Console.WriteLine(file);
 
-              }else if(file.Contains( "harem" ) || file.Contains( "wfera" ) || file.Contains( "wasikoki" )){//９：ハーレム
+              } else if (file.Contains( "harem" ) || file.Contains( "wfera" ) || file.Contains( "wasikoki" )) {//９：ハーレム
                 YotogiList9.Add(file);
                 YotogiListName9.Add(ListN2[i]);
                 //Console.WriteLine(file);
 
-              }else if(file.Contains( "ran" ) || file.Contains( "3p_" ) || file.Contains( "6p_" )){//１０：乱交
+              } else if (file.Contains( "ran" ) || file.Contains( "3p_" ) || file.Contains( "6p_" )) {//１０：乱交
                 YotogiList10.Add(file);
                 YotogiListName10.Add(ListN2[i]);
                 //Console.WriteLine(file);
 
-              }else if(file.Contains( "kousoku" ) || file.Contains( "mokuba" ) || file.Contains( "harituke" ) || file.Contains( "turusi" )){//７：ＳＭ
+              } else if (file.Contains( "kousoku" ) || file.Contains( "mokuba" ) || file.Contains( "harituke" ) || file.Contains( "turusi" )) {//７：ＳＭ
                 YotogiList7.Add(file);
                 YotogiListName7.Add(ListN2[i]);
                 //Console.WriteLine(file);
 
-              }else if(file.Contains( "fera" ) || file.Contains( "paizuri" ) || file.Contains( "tekoki" ) || file.Contains( "arai" ) || file.Contains( "asiname" )){//６：奉仕
+              } else if (file.Contains( "fera" ) || file.Contains( "paizuri" ) || file.Contains( "tekoki" ) || file.Contains( "arai" ) || file.Contains( "asiname" )) {//６：奉仕
                 YotogiList6.Add(file);
                 YotogiListName6.Add(ListN2[i]);
                 //Console.WriteLine(file);
 
-              }else if(file.Contains( "onani" )){//５：オナニー
+              } else if (file.Contains( "onani" )){//５：オナニー
                 YotogiList5.Add(file);
                 YotogiListName5.Add(ListN2[i]);
                 //Console.WriteLine(file);
 
-              }else if(file.Contains( "daijyou" ) || file.Contains( "kyousitu" ) || file.Contains( "atama" ) || file.Contains( "table" )){//４：台上
+              } else if (file.Contains( "daijyou" ) || file.Contains( "kyousitu" ) || file.Contains( "atama" ) || file.Contains( "table" )) {//４：台上
                 YotogiList4.Add(file);
                 YotogiListName4.Add(ListN2[i]);
                 //Console.WriteLine(file);
 
-              }else if(file.Contains( "ritui" ) || file.Contains( "tati" ) || file.Contains( "hekimen" ) || file.Contains( "tikan" ) || file.Contains( "ekiben" ) || file.Contains( "poseizi" )){//３：立ち・壁面
+              } else if (file.Contains( "ritui" ) || file.Contains( "tati" ) || file.Contains( "hekimen" ) || file.Contains( "tikan" ) || file.Contains( "ekiben" ) || file.Contains( "poseizi" )) {//３：立ち・壁面
                 YotogiList3.Add(file);
                 YotogiListName3.Add(ListN2[i]);
                 //Console.WriteLine(file);
 
-              }else if(file.Contains( "aibu" ) || file.Contains( "vibe" ) || file.Contains( "kunni" )){//０：愛撫
+              } else if (file.Contains( "aibu" ) || file.Contains( "vibe" ) || file.Contains( "kunni" )) {//０：愛撫
                 YotogiList0.Add(file);
                 YotogiListName0.Add(ListN2[i]);
                 //Console.WriteLine(file);
 
-              }else if(file.Contains( "haimen" ) || file.Contains( "kouhaii" ) || file.Contains( "sokui" ) || file.Contains( "sukebeisu_sex" ) || file.Contains( "kakaemzi" )){//２：挿入 後
+              } else if (file.Contains( "haimen" ) || file.Contains( "kouhaii" ) || file.Contains( "sokui" ) || file.Contains( "sukebeisu_sex" ) || file.Contains( "kakaemzi" )) {//２：挿入 後
                 YotogiList2.Add(file);
                 YotogiListName2.Add(ListN2[i]);
                 //Console.WriteLine(file);
 
-              }else if(file.Contains( "sex" ) || file.Contains( "manguri" ) || file.Contains( "seijyoui" ) || file.Contains( "kijyoui" ) || file.Contains( "taimenzai" ) || file.Contains( "matuba" ) || file.Contains( "kakaekomizai" )){//１：挿入 前
+              } else if (file.Contains( "sex" ) || file.Contains( "manguri" ) || file.Contains( "seijyoui" ) || file.Contains( "kijyoui" ) || file.Contains( "taimenzai" ) || file.Contains( "matuba" ) || file.Contains( "kakaekomizai" )) {//１：挿入 前
                 YotogiList1.Add(file);
                 YotogiListName1.Add(ListN2[i]);
                 //Console.WriteLine(file);
@@ -4905,14 +5030,14 @@ namespace CM3D2.VibeYourMaid.Plugin {
                 //Console.WriteLine(file);
 
               }
-              
-              if(ListN2[i].Contains( "[H]" )){//１２：発情有り
+
+              if (ListN2[i].Contains( "[H]" )) {//１２：発情有り
                 YotogiList12.Add(file);
                 YotogiListName12.Add(ListN2[i]);
               }
-              
+
               //モーションアジャスト用の初期値設定
-              if(!maj.motionName.Contains(file)){
+              if (!maj.motionName.Contains(file)) {
                 maj.motionName.Add(file);
                 maj.baceMotion.Add("");
                 maj.basicHeight.Add(0f);
@@ -4938,11 +5063,11 @@ namespace CM3D2.VibeYourMaid.Plugin {
                 maj.mVoiceSet.Add("");
                 //maj.iTargetLH.Add(0);
                 //maj.iTargetRH.Add(0);
-                
+
                 maj.syaseiMarks.Add(new int[]{0, 0, 0, 0, 0});
-                
+
                 maj.giveSexual.Add(GiveSexualSet(file));
-                
+
                 maj.itemSet.Add(new bool[]{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false});
                 maj.prefabSet.Add(0);
                 maj.prefabSetX.Add(0);
@@ -4953,7 +5078,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                 maj.maidToCam.Add(-1);
               }
             }
-            
+
 
             YotogiList.Add(YotogiList0);
             YotogiList.Add(YotogiList1);
@@ -4982,7 +5107,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
             YotogiListName.Add(YotogiListName10);
             YotogiListName.Add(YotogiListName11);
             YotogiListName.Add(YotogiListName12);
-            
+
             YotogiGroup.Add("愛撫");
             YotogiGroup.Add("挿入 前");
             YotogiGroup.Add("挿入 後");
@@ -5000,23 +5125,23 @@ namespace CM3D2.VibeYourMaid.Plugin {
 
 
             //差分ファイル振り分け
-            foreach (string file in YotogiListBase){
+            foreach (string file in YotogiListBase) {
               List<string> list = new List<string>();
 
-              foreach (string sabun in _YotogiListSabun){
+              foreach (string sabun in _YotogiListSabun) {
 
                 string basefile = sabun;
-                if(!Regex.IsMatch(basefile,"m_"))basefile = Regex.Replace(basefile, @"^[a-zA-Z]_", "");
+                if (!Regex.IsMatch(basefile,"m_")) basefile = Regex.Replace(basefile, @"^[a-zA-Z]_", "");
                 basefile = Regex.Replace(basefile, @"[a-zA-Z][0-9][0-9]", "");
 
-                if(file == basefile && !Regex.IsMatch(sabun,"b[0-9][0-9]")){
+                if (file == basefile && !Regex.IsMatch(sabun,"b[0-9][0-9]")) {
                   list.Add(sabun);
                 }
               }
-              
+
               YotogiListSabun.Add(list);
             }
-            
+
             sw.Stop();
             Console.WriteLine("夜伽リスト抽出終了 : "+(sw.ElapsedMilliseconds)+"ms");
 
@@ -5024,35 +5149,63 @@ namespace CM3D2.VibeYourMaid.Plugin {
 
 
         //イタズラ用モーションリストの読み込み
-        void ItazuraMotionLoad(){
-        
-          MotionList_tati = ReadTextFaile(@"Sybaris\UnityInjector\Config\VibeYourMaid\MList.txt" , "tati_list");  //立ちモーション
-          MotionList_suwari = ReadTextFaile(@"Sybaris\UnityInjector\Config\VibeYourMaid\MList.txt" , "suwari_list");  //座りモーション
-          MotionList_zoukin = ReadTextFaile(@"Sybaris\UnityInjector\Config\VibeYourMaid\MList.txt" , "zoukin_list");  //雑巾がけモーション
-          MotionList_kyuuzi = ReadTextFaile(@"Sybaris\UnityInjector\Config\VibeYourMaid\MList.txt" , "kyuuzi_list");  //給仕モーション
-          MotionList_fukisouji = ReadTextFaile(@"Sybaris\UnityInjector\Config\VibeYourMaid\MList.txt" , "fukisouji_list");  //拭き掃除モーション
-          MotionList_mop = ReadTextFaile(@"Sybaris\UnityInjector\Config\VibeYourMaid\MList.txt" , "mop_list");  //モップ掛けモーション
-          
-          //チェック様にイタズラモーションをひとまとめにする
+        void ItazuraMotionLoad()
+        {
           Console.WriteLine("イタズラモーションリスト結合開始");
-          foreach(string[] x in MotionList20){
-            foreach(string xx in x){
+
+          List<string>[] motionList = ReadListFile(@"Sybaris\UnityInjector\Config\VibeYourMaid\MList.txt",
+            new string[]{"tati_list", "suwari_list", "zoukin_list", "kyuuzi_list", "fukisouji_list", "mop_list"});
+          foreach (string m in motionList[0]) { MotionList_tati.Add(m); } //立ちモーション
+          foreach (string m in motionList[1]) { MotionList_suwari.Add(m); } //座りモーション
+          foreach (string m in motionList[2]) { MotionList_zoukin.Add(m); } //雑巾がけモーション
+          foreach (string m in motionList[3]) { MotionList_kyuuzi.Add(m); } //給仕モーション
+          foreach (string m in motionList[4]) { MotionList_fukisouji.Add(m); } //拭き掃除モーション
+          foreach (string m in motionList[5]) { MotionList_mop.Add(m); } //モップ掛けモーション
+          #if DEBUG
+          Console.WriteLine("立ち : "+string.Join(",", motionList[0].ToArray()));
+          Console.WriteLine("座り : "+string.Join(",", motionList[1].ToArray()));
+          Console.WriteLine("雑巾 : "+string.Join(",", motionList[2].ToArray()));
+          Console.WriteLine("給仕 : "+string.Join(",", motionList[3].ToArray()));
+          Console.WriteLine("拭き : "+string.Join(",", motionList[4].ToArray()));
+          Console.WriteLine("モップ : "+string.Join(",", motionList[5].ToArray()));
+          #endif
+
+          //チェック用にイタズラモーションをひとまとめにする
+          foreach (string[] x in MotionList20) {
+            foreach (string xx in x) {
               MotionList_vibe.Add(xx);
             }
           }
-          foreach(string[] x in MotionList30){
-            foreach(string xx in x){
+          foreach (string[] x in MotionList30) {
+            foreach (string xx in x) {
               MotionList_vibe.Add(xx);
             }
           }
-          foreach(string[] x in MotionList40){
-            foreach(string xx in x){
+          foreach (string[] x in MotionList40) {
+            foreach (string xx in x) {
               MotionList_vibe.Add(xx);
             }
           }
           Console.WriteLine("イタズラモーションリスト結合終了");
         }
 
+        //MList.txtから口モードの例外設定を読み込む
+        void MouseMotionLoad()
+        {
+          List<string>[] motionList = ReadListFile(@"Sybaris\UnityInjector\Config\VibeYourMaid\MList.txt",
+            new string[]{"MouseMode_None", "MouseMode_Kiss", "MouseMode_Fera"});  //口モード
+
+          for (int i=0; i < motionList.Length; i++) {
+            List<string> list = motionList[i];
+            if (list.Count() > 0) {
+              foreach (string motion in list) {
+                //キャッシュに追加
+                MouthModeDic.Add(motion, (byte)i);
+              }
+              Console.WriteLine("口モード["+i+"] "+string.Join(",", list.ToArray()));
+            }
+          }
+        }
 
         //派生モーション抽出
         /*public List<string[]> haseiMotionList = new List<string[]>();
@@ -5060,16 +5213,16 @@ namespace CM3D2.VibeYourMaid.Plugin {
           haseiMotionList.Clear();
           Match match = regZeccyou.Match(motion);
           string kihonMotion = match.Groups[2].Value;
-          
+
           List<string> files;
-          if(MotionOldCheckB(motion)){
+          if (MotionOldCheckB(motion)) {
             files = allFiles;
-          }else{
+          } else {
             files = allFilesOld;
           }
-          
-          foreach (string file in files){
-            if(file.Contains(kihonMotion)){
+
+          foreach (string file in files) {
+            if (file.Contains(kihonMotion)) {
               string[] m = new string[] { file, MotionNameChange(file) };
               haseiMotionList.Add(m);
             }
@@ -5081,8 +5234,9 @@ namespace CM3D2.VibeYourMaid.Plugin {
         //モーションの日本語名をキャッシュ
         private Dictionary<string, string> motionNameDic = new Dictionary<string, string>();
         //モーション名の日本語変換
-        private string MotionNameChange(string motion){
-
+        private string MotionNameChange(string motion)
+        {
+          //キャッシュに追加済みならその値を返却
           if (motionNameDic.ContainsKey(motion)) return motionNameDic[motion];
 
           string name = motion
@@ -5105,26 +5259,26 @@ namespace CM3D2.VibeYourMaid.Plugin {
           .Replace("tikan", "痴漢").Replace("table", "テーブル").Replace("kaiwa", "会話").Replace("ritui", "立位").Replace("dildo", "ディルド").Replace("peace", "ピース").Replace("harem", "ハーレム")
           .Replace("iziri", "弄り").Replace("houti", "放置").Replace("denma", "電マ").Replace("atama", "頭掴み").Replace("onani_ona", "オナニー").Replace("onani", "オナニー")
           .Replace("sokui", "側位").Replace("kakae", "抱え").Replace("kunni", "クンニ").Replace("kougo", "交互").Replace("housi", "奉仕").Replace("naziri", "詰り").Replace("otoko", "男")
+          .Replace("douzi", "同時").Replace("taiki", "待機")
           .Replace("2ana", "二穴").Replace("yubi", "指").Replace("mune", "胸").Replace("aibu", "愛撫").Replace("vibe", "バイブ").Replace("furo", "風呂").Replace("deep", "ディープ")
-          .Replace("fera", "フェラ").Replace("arai", "洗い").Replace("daki", "抱き").Replace("momi", "揉み").Replace("hibu", "秘部").Replace("hold", "ホールド").Replace("kuti", "くち")
+          .Replace("fera", "フェラ").Replace("arai", "洗い").Replace("daki", "抱き").Replace("momi", "揉み").Replace("hibu", "秘部").Replace("hold", "ホールド").Replace("kuti", "くち").Replace("sita", "舌")
           .Replace("yuri", "百合").Replace("kiss", "キス").Replace("osae", "押え").Replace("itya", "ｲﾁｬｲﾁｬ").Replace("name", "舐め").Replace("siri", "尻").Replace("tati", "立ち").Replace("tubo", "壺")
           .Replace("nasi", "無し").Replace("pose", "ポーズ").Replace("onna", "女").Replace("lead", "リード").Replace("kyou", "強").Replace("self", "セルフ").Replace("anal", "アナル")
           .Replace("sofa", "ソファ").Replace("muri", "無理やり")
           .Replace("cli", "クリ").Replace("sex", "SEX").Replace("zai", "座位").Replace("mzi", "M字").Replace("uma", "馬乗").Replace("isu", "椅子").Replace("ude", "腕").Replace("inu", "犬")
-          .Replace("iya", "嫌").Replace("oku", "最奥").Replace("ana", "穴").Replace("ubi", "指").Replace("pai", "ﾊﾟｲｽﾞﾘ").Replace("bed", "ベッド").Replace("dai", "台")
+          .Replace("iya", "嫌").Replace("oku", "最奥").Replace("ana", "穴").Replace("ubi", "指").Replace("pai", "ﾊﾟｲｽﾞﾘ").Replace("bed", "ベッド").Replace("dai", "台").Replace("oou", "覆う")
           .Replace("ir", "ｲﾗﾏﾁｵ").Replace("gr", "ｸﾞﾗｲﾝﾄﾞ").Replace("mp", "MP").Replace("le", "左").Replace("ri", "右").Replace("wp", "Wピース").Replace("bg", "ブリッジ")
           .Replace("_1_f2", "_女B").Replace("_f2", "_女B").Replace("_1_f3", "_女C").Replace("_f3", "_女C").Replace("_1_f", "").Replace("_f", "").Replace("x_", "").Replace("om_", "").Replace("m_", "M豚")
           .Replace(".anm", "");
 
-          if(Regex.IsMatch(motion,"om_"))name = name + " New";
+          if (Regex.IsMatch(motion,"om_")) name = name + " New";
 
           motionNameDic.Add(motion, name);
 
           return name;
-        
         }
-        
-        
+
+
         //モーションアジャスト関係
         private string[][] boneList = new string[][] {
           new string[] { "" , "無し" },
@@ -5147,7 +5301,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
             "Odogu_KousokudaiHgata", "Odogu_Sankakumokuba", "Odogu_Sexisu", "Odogu_ashikokidai" }
         };
         private float[] prefabAdjust = new float[] { 0f, 0f, 0f, 0f, 0.0011f, 0f, 0f, 0f, 0.0008f, 0.00105f, 0.00105f, 0.00185f, 0f, 0f};
-        
+
         public MotionAdjust maj = new MotionAdjust();
         public class MotionAdjust{
           public MotionAdjust(){
@@ -5220,41 +5374,41 @@ namespace CM3D2.VibeYourMaid.Plugin {
           public List<float> analRight;
           public List<int> maidToCam;
         }
-        
-        private bool[] GiveSexualSet(string motion){
+
+        private bool[] GiveSexualSet(string motion) {
           bool[] nb = new bool[]{false, false, false, false, false, false, false, false, false, false};
           string manMotion = Regex.Replace(motion, @"_f\d?$", "_m");
           manMotion = Regex.Replace(manMotion, @"_f\d?_", "_m_");
-          if(motion.Contains( "aibu" ) || motion.Contains( "vibe" ) || motion.Contains( "kunni" ) || motion.Contains( "ganmenkijyoui" ) || motion.Contains( "denma" )){
+          if (motion.Contains( "aibu" ) || motion.Contains( "vibe" ) || motion.Contains( "kunni" ) || motion.Contains( "ganmenkijyoui" ) || motion.Contains( "denma" )) {
             nb[0] = true;
-          
-          }else if(motion.Contains( "fera" ) || motion.Contains( "paizuri" ) || motion.Contains( "tekoki" ) || motion.Contains( "arai" ) || motion.Contains( "asiname" ) || motion.Contains( "onahokoki" ) || motion.Contains( "pantskoki" ) || motion.Contains( "asikoki" )){
+
+          } else if (motion.Contains( "fera" ) || motion.Contains( "paizuri" ) || motion.Contains( "tekoki" ) || motion.Contains( "arai" ) || motion.Contains( "asiname" ) || motion.Contains( "onahokoki" ) || motion.Contains( "pantskoki" ) || motion.Contains( "asikoki" )) {
             int im2 = 1;
-            for (int im = 0; im < SubMans.Length; im++){
-              if(allFilesSet.Contains(manMotion) || allFilesOldSet.Contains(manMotion)){
+            for (int im = 0; im < SubMans.Length; im++) {
+              if (allFilesSet.Contains(manMotion) || allFilesOldSet.Contains(manMotion)) {
                 nb[im2] = true;
-                
+
                 ++im2;
                 manMotion = Regex.Replace(manMotion, @"_m\d?$", "_m" + im2);
                 manMotion = Regex.Replace(manMotion, @"_m\d?_", "_m" + im2 + "_");
-              
-              }else{
+
+              } else {
                 break;
               }
             }
-            
-          }else{
+
+          } else {
             nb[0] = true;
             int im2 = 1;
-            for (int im = 0; im < SubMans.Length; im++){
-              if(allFilesSet.Contains(manMotion) || allFilesOldSet.Contains(manMotion)){
+            for (int im = 0; im < SubMans.Length; im++) {
+              if (allFilesSet.Contains(manMotion) || allFilesOldSet.Contains(manMotion)) {
                 nb[im2] = true;
-                
+
                 ++im2;
                 manMotion = Regex.Replace(manMotion, @"_m\d?$", "_m" + im2);
                 manMotion = Regex.Replace(manMotion, @"_m\d?_", "_m" + im2 + "_");
-              
-              }else{
+
+              } else {
                 break;
               }
             }
@@ -5262,23 +5416,23 @@ namespace CM3D2.VibeYourMaid.Plugin {
           nb[9] = true;  //9は初期設定がされているかどうかのフラグ
           return nb;
         }
-        
-        
-        private int MotionIdCheck(string motion){
+
+
+        private int MotionIdCheck(string motion) {
           motion = motion.Replace(".anm", "");
           motion = Regex.Replace(motion, "_[23](?!ana)(?!p_)(?!vibe)", "_1");
           motion = Regex.Replace(motion, "_hatu_", "_");
-          //if(!Regex.IsMatch(motion, "m_"))motion = Regex.Replace(motion, @"^[a-zA-Z]_", "");
+          //if (!Regex.IsMatch(motion, "m_")) motion = Regex.Replace(motion, @"^[a-zA-Z]_", "");
           motion = Regex.Replace(motion, @"[a-zA-Z][0-9][0-9]", "");
-          
+
           return maj.motionName.IndexOf(motion.ToLower());
         }
-        
-        
-        private void MotionAdjustDo(int maidID, string motion, bool item, int mainID){
-        
-          Console.WriteLine("MotionAdjustDo("+maidID+","+motion+","+item+","+mainID+")");
-          
+
+
+        private void MotionAdjustDo(int maidID, string motion, bool item, int mainID)
+        {
+          Console.WriteLine("MotionAdjustDo( "+maidID+", "+motion+", "+item+", "+mainID+" )");
+
           MaidState maidState = maidsState[maidID];
 
           //string motionMan = Regex.Replace(motion, @"_f\d?\.", "_m.");
@@ -5286,14 +5440,14 @@ namespace CM3D2.VibeYourMaid.Plugin {
           motion = motion.Replace(".anm", "");
           motion = Regex.Replace(motion, "_[23](?!ana)(?!p_)(?!vibe)", "_1");
           motion = Regex.Replace(motion, "_hatu_", "_");
-          //if(!Regex.IsMatch(motion, "m_"))motion = Regex.Replace(motion, @"^[a-zA-Z]_", "");
+          //if (!Regex.IsMatch(motion, "m_")) motion = Regex.Replace(motion, @"^[a-zA-Z]_", "");
           motion = Regex.Replace(motion, @"[a-zA-Z][0-9][0-9]", "");
-          
+
           maidState.motionID = maj.motionName.IndexOf(motion.ToLower());
           int mid = maidState.motionID;
-          
-          if(mid < 0)return;
-          
+
+          if (mid < 0) return;
+
           maidState.baceMotion = maj.baceMotion[mid]; //ベースモーションの指定があれば取得
           maidState.outMotion = MotionCheckTokusyu(motion, sOutMaidMotion); //抜きモーションがあるかチェック
           maidState.syaseiMotion = MotionCheckTokusyu(motion, syaseiMaidMotion); //射精モーションがあるかチェック
@@ -5301,13 +5455,13 @@ namespace CM3D2.VibeYourMaid.Plugin {
           maidState.motionSissinMove = MotionCheckTokusyu(motion, sMotionSissinMove);   //失神モーションがあるかチェック
           maidState.motionSissinTaiki = MotionCheckTokusyu(motion, sMotionSissinTaiki);
           maidState.senyouTokusyuMotion = MotionCheckTokusyuList(motion, sSenyouTokusyuMotion);  //特殊モーションがあるかチェック
-          if(!maj.analEnabled[mid])maidState.analMode = false;
-          
+          if (!maj.analEnabled[mid]) maidState.analMode = false;
+
           //射精設定と快感上昇設定を取得する
           maidState.syaseiMarks = maj.syaseiMarks[mid];
           maidState.giveSexual = maj.giveSexual[mid];
-          
-          if(!cfgw.majEnabled)return;
+
+          if (!cfgw.majEnabled) return;
 
           Maid maid = stockMaids[maidID].mem;
           //基準点
@@ -5319,7 +5473,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
             float majForward = (maj.basicForward[mid]) * maid.status.body.height;
             float majRight = (maj.basicRight[mid]) * maid.status.body.height;
             float majAngleY = (maj.basicAngleY[mid]) % 360;
-            
+
             //基準点の回転前のメインメイドの向きからの移動量
             Vector3 move = Quaternion.Euler(0, baseMaidAngleY, 0) * new Vector3(majRight, majHeight, majForward);
             //メインメイドの位置調整
@@ -5342,27 +5496,27 @@ namespace CM3D2.VibeYourMaid.Plugin {
           setManMotionItem(maidID);
 
           //kupa値適用
-          if(cfgw.majKupaEnabled){
+          if (cfgw.majKupaEnabled) {
             if (!osawari.isOsawari(maidID)) {
-            if(!maidState.analMode){
-              if(maj.hkupa1[mid] >= 0)maidState.hibuSlider1Value = maj.hkupa1[mid];
-              if(maj.akupa1[mid] >= 0)maidState.analSlider1Value = maj.akupa1[mid];
-              if(maj.hkupa2[mid] >= 0)maidState.hibuSlider2Value = maj.hkupa2[mid];
-              if(maj.akupa2[mid] >= 0)maidState.analSlider2Value = maj.akupa2[mid];
-            }else{
-              if(maj.hkupa1[mid] >= 0)maidState.hibuSlider1Value = maj.akupa1[mid];
-              if(maj.akupa1[mid] >= 0)maidState.analSlider1Value = Math.Min(100, maj.hkupa1[mid] + 10f);
-              if(maj.hkupa2[mid] >= 0)maidState.hibuSlider2Value = maj.akupa2[mid];
-              if(maj.akupa2[mid] >= 0)maidState.analSlider2Value = Math.Min(100, maj.hkupa2[mid] + 10f);
+              if (!maidState.analMode) {
+                if (maj.hkupa1[mid] >= 0) maidState.hibuSlider1Value = maj.hkupa1[mid];
+                if (maj.akupa1[mid] >= 0) maidState.analSlider1Value = maj.akupa1[mid];
+                if (maj.hkupa2[mid] >= 0) maidState.hibuSlider2Value = maj.hkupa2[mid];
+                if (maj.akupa2[mid] >= 0) maidState.analSlider2Value = maj.akupa2[mid];
+              } else {
+                if (maj.hkupa1[mid] >= 0) maidState.hibuSlider1Value = maj.akupa1[mid];
+                if (maj.akupa1[mid] >= 0) maidState.analSlider1Value = Math.Min(100, maj.hkupa1[mid] + 10f);
+                if (maj.hkupa2[mid] >= 0) maidState.hibuSlider2Value = maj.akupa2[mid];
+                if (maj.akupa2[mid] >= 0) maidState.analSlider2Value = Math.Min(100, maj.hkupa2[mid] + 10f);
+              }
             }
+            if (maid.GetProp(MPN.accvag).strTempFileName == "accVag_VibePink_I_.menu" || maid.GetProp(MPN.handitem).strTempFileName == "HandItemH_SoutouVibe_I_.menu") {
+              if (maidState.hibuSlider1Value < 60f) maidState.hibuSlider1Value = 60f;
+              if (maidState.hibuSlider2Value < 60f) maidState.hibuSlider2Value = 60f;
             }
-            if(maid.GetProp(MPN.accvag).strTempFileName == "accVag_VibePink_I_.menu" || maid.GetProp(MPN.handitem).strTempFileName == "HandItemH_SoutouVibe_I_.menu"){
-              if(maidState.hibuSlider1Value < 60f)maidState.hibuSlider1Value = 60f;
-              if(maidState.hibuSlider2Value < 60f)maidState.hibuSlider2Value = 60f;
-            }
-            if(maid.GetProp(MPN.accanl).strTempFileName == "accAnl_AnalVibe_I_.menu"){
-              if(maidState.analSlider1Value < 30f)maidState.analSlider1Value = 30f;
-              if(maidState.analSlider2Value < 30f)maidState.analSlider2Value = 30f;
+            if (maid.GetProp(MPN.accanl).strTempFileName == "accAnl_AnalVibe_I_.menu") {
+              if (maidState.analSlider1Value < 30f) maidState.analSlider1Value = 30f;
+              if (maidState.analSlider2Value < 30f) maidState.analSlider2Value = 30f;
             }
             //kupa変更のため余韻状態にする
             if (maidState.vStateMajor == 10) {
@@ -5375,15 +5529,15 @@ namespace CM3D2.VibeYourMaid.Plugin {
           if (maj.mVoiceSet.Count > mid &&  maj.mVoiceSet[mid] != "") {
             voiceSetLoad("evs_" + maj.mVoiceSet[mid] + ".xml", maidID);
           }
-          
+
           //メイドのアイテム装備
-          if(item){
+          if (item) {
             //メイドアイテム
             setMotionItem(maidID);
             //設置アイテム
             addMotionPrefab(maidID, mid);
           }
-          
+
           //目と顔の向き -1なら変更なし
           if (maj.maidToCam.Count > mid) {
             switch (maj.maidToCam[mid]) {
@@ -5395,19 +5549,19 @@ namespace CM3D2.VibeYourMaid.Plugin {
           }
 
           //IKアタッチ適用
-          /*if(SubMans[0].Visible){
-            if(maj.iTargetLH[mid] == 0){
+          /*if (SubMans[0].Visible) {
+            if (maj.iTargetLH[mid] == 0) {
               SubMans[0].IKTargetToBone("左手", null, "無し", Vector3.zero, IKCtrlData.IKAttachType.Point, false, false, IKCtrlData.IKExecTiming.Normal);
-            }else{
+            } else {
               SubMans[0].IKTargetToBone("左手", maid, boneList[maj.iTargetLH[mid]][0], new Vector3(0f, 0f, 0f), IKCtrlData.IKAttachType.Point, false, false, IKCtrlData.IKExecTiming.Normal);
             }
-            if(maj.iTargetRH[mid] == 0){
+            if (maj.iTargetRH[mid] == 0) {
               SubMans[0].IKTargetToBone("右手", null, "無し", Vector3.zero, IKCtrlData.IKAttachType.Point, false, false, IKCtrlData.IKExecTiming.Normal);
-            }else{
+            } else {
               SubMans[0].IKTargetToBone("右手", maid, boneList[maj.iTargetRH[mid]][0], new Vector3(0f, 0f, 0f), IKCtrlData.IKAttachType.Point, false, false, IKCtrlData.IKExecTiming.Normal);
             }
           }*/
-          //if(maj.hkupa1[mid] >= 60f)SubMans[0].IKTargetToBone("_IK_chinko1", maid, "_IK_vagina", new Vector3(0f, 0f, 0f), IKCtrlData.IKAttachType.Point, false, false, IKCtrlData.IKExecTiming.Normal);
+          //if (maj.hkupa1[mid] >= 60f) SubMans[0].IKTargetToBone("_IK_chinko1", maid, "_IK_vagina", new Vector3(0f, 0f, 0f), IKCtrlData.IKAttachType.Point, false, false, IKCtrlData.IKExecTiming.Normal);
 
         }
 
@@ -5428,7 +5582,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
           maid.transform.position += move;
           //メイドの回転
           maid.transform.eulerAngles = new Vector3(maid.transform.eulerAngles.x, (maid.transform.eulerAngles.y + majAngleY) % 360, maid.transform.eulerAngles.z);
-          
+
           //バックアップを変更
           maidsState[maidID].majPositionBak += move;
           maidsState[maidID].majAngleYBak += majAngleY;
@@ -5539,7 +5693,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
             if (manID >= 0 && im != manID) continue; //1人だけ処理する場合
             if (!SubMans[im].Visible || MansTg[im] != maidID) continue; //対象メイドのみ
             //Vector3 vm2 = SubMans[im].transform.position;
-            //if(Vector3.Distance(vm, vm2) > 1f)continue;
+            //if (Vector3.Distance(vm, vm2) > 1f) continue;
 
             Vector3 vm = maid.transform.position;
             //通常位置補正
@@ -5557,7 +5711,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
               vm.y += maj.analHeight[mid];
               vm += maidForward * maj.analForward[mid] + maidRight * maj.analRight[mid];
             }
-            
+
             //男位置設定
             SubMans[im].transform.position = vm;
             //男をメインメイドを起点に回転
@@ -5572,53 +5726,53 @@ namespace CM3D2.VibeYourMaid.Plugin {
           int mid = maidsState[maidID].motionID;
           Maid maid = stockMaids[maidID].mem;
 
-          if(cfgw.majItemClear){
-            if(!maj.itemSet[mid][0] && maidsState[maidID].itemV == "")maid.DelProp(MPN.accvag, true);
-            if(!maj.itemSet[mid][2] && maidsState[maidID].itemA == "")maid.DelProp(MPN.accanl, true);
-            if(!maj.itemSet[mid][1] && !maj.itemSet[mid][3] && !maj.itemSet[mid][4])maid.DelProp(MPN.handitem, true);
+          if (cfgw.majItemClear) {
+            if (!maj.itemSet[mid][0] && maidsState[maidID].itemV == "") maid.DelProp(MPN.accvag, true);
+            if (!maj.itemSet[mid][2] && maidsState[maidID].itemA == "") maid.DelProp(MPN.accanl, true);
+            if (!maj.itemSet[mid][1] && !maj.itemSet[mid][3] && !maj.itemSet[mid][4]) maid.DelProp(MPN.handitem, true);
             maid.DelProp(MPN.kousoku_upper, true);
             maid.DelProp(MPN.kousoku_lower, true);
             maid.AllProcPropSeqStart();
           }
 
-          if(maj.itemSet[mid][0]){ //バイブ
+          if (maj.itemSet[mid][0]) { //バイブ
             maid.SetProp("accvag" , "accVag_VibePink_I_.menu", 0, true, false);
             maid.body0.SetMask(TBody.SlotID.accVag, true);
           }
-          if(maj.itemSet[mid][2]){ //Aバイブ
+          if (maj.itemSet[mid][2]) { //Aバイブ
             maid.SetProp("accanl" , "accAnl_AnalVibe_I_.menu", 0, true, false);
             maid.body0.SetMask(TBody.SlotID.accAnl, true);
           }
-          
-          if(maj.itemSet[mid][1]){ //手　バイブ
+
+          if (maj.itemSet[mid][1]) { //手　バイブ
             maid.SetProp("handitem" , "HandItemR_VibePink_I_.menu", 0, true, false);
             maid.body0.SetMask(TBody.SlotID.HandItemR, true);
-            
-          }else if(maj.itemSet[mid][3]){//手　Aバイブ
+
+          } else if (maj.itemSet[mid][3]) {//手　Aバイブ
             maid.SetProp("handitem" , "HandItemR_AnalVibe_I_.menu", 0, true, false);
             maid.body0.SetMask(TBody.SlotID.HandItemR, true);
-            
-          }else if(maj.itemSet[mid][4]){//双頭バイブ
+
+          } else if (maj.itemSet[mid][4]) {//双頭バイブ
             //maid.SetProp("handitem" , "HandItemH_SoutouVibe_I_.menu", 0, true, false);
             //maid.body0.SetMask(TBody.SlotID.HandItemR, true);
             maidsState[maidID].sVibeFlag = true;
           }
-          
-          if (maj.itemSet[mid][5]){
+
+          if (maj.itemSet[mid][5]) {
             maid.SetProp("kousoku_upper" , "KousokuU_TekaseOne_I_.menu", 0, true, false);
             maid.body0.SetMask(TBody.SlotID.kousoku_upper, true);
           }
-          if (maj.itemSet[mid][7]){
+          if (maj.itemSet[mid][7]) {
             maid.SetProp("kousoku_upper" , "KousokuU_SMRoom_Haritsuke_I_.menu", 1, true, false);
             maid.body0.SetMask(TBody.SlotID.kousoku_upper, true);
           }
-          if (maj.itemSet[mid][6]){
+          if (maj.itemSet[mid][6]) {
             maid.SetProp("kousoku_lower" , "KousokuL_AshikaseUp_I_.menu", 0, true, false);
             maid.body0.SetMask(TBody.SlotID.kousoku_lower, true);
           }
 
           maid.AllProcPropSeqStart();
-          
+
         }
 
         void setManMotionItem(int maidID)
@@ -5626,40 +5780,40 @@ namespace CM3D2.VibeYourMaid.Plugin {
           int mid = maidsState[maidID].motionID;
           if (mid < 0) return;
           Maid maid = stockMaids[maidID].mem;
-          if(cfgw.majItemClear){
-            for (int im = 0; im < SubMans.Length; im++){
-              if (!SubMans[im].Visible || MansTg[im] != maidID) continue; //対象メイドのみ            
+          if (cfgw.majItemClear) {
+            for (int im = 0; im < SubMans.Length; im++) {
+              if (!SubMans[im].Visible || MansTg[im] != maidID) continue; //対象メイドのみ
               man.DelProp(MPN.handitem, true);
               man.AllProcPropSeqStart();
             }
           }
-          
+
           //男の高さと向きをメイドに合わせる
           int im2 = 1;
-          for (int im = 0; im < SubMans.Length; im++){
-            if (!SubMans[im].Visible || MansTg[im] != maidID) continue; //対象メイドのみ            
+          for (int im = 0; im < SubMans.Length; im++) {
+            if (!SubMans[im].Visible || MansTg[im] != maidID) continue; //対象メイドのみ
             //男のアイテム装備
-            if(im2 == 1){
-              if(maj.itemSet[mid][10]){ //手　バイブ
+            if (im2 == 1) {
+              if (maj.itemSet[mid][10]) { //手　バイブ
                 SubMans[im].SetProp("handitem" , "HandItemR_VibePink_I_.menu", 0, true, false);
-              }else if(maj.itemSet[mid][11]){//手　Aバイブ
+              } else if (maj.itemSet[mid][11]) {//手　Aバイブ
                 SubMans[im].SetProp("handitem" , "HandItemR_AnalVibe_I_.menu", 0, true, false);
-              }else if(maj.itemSet[mid][12]){//電マ
+              } else if (maj.itemSet[mid][12]) {//電マ
                 SubMans[im].SetProp("handitem" , "HandItemR_Denma_I_.menu", 0, true, false);
               }
               SubMans[im].AllProcPropSeqStart();
             }
-            if(im2 == 2){
-              if(maj.itemSet[mid][15]){ //手　バイブ
+            if (im2 == 2) {
+              if (maj.itemSet[mid][15]) { //手　バイブ
                 SubMans[im].SetProp("handitem" , "HandItemR_VibePink_I_.menu", 0, true, false);
-              }else if(maj.itemSet[mid][16]){//手　Aバイブ
+              } else if (maj.itemSet[mid][16]) {//手　Aバイブ
                 SubMans[im].SetProp("handitem" , "HandItemR_AnalVibe_I_.menu", 0, true, false);
-              }else if(maj.itemSet[mid][17]){//電マ
+              } else if (maj.itemSet[mid][17]) {//電マ
                 SubMans[im].SetProp("handitem" , "HandItemR_Denma_I_.menu", 0, true, false);
               }
               SubMans[im].AllProcPropSeqStart();
             }
-            
+
             ++im2;
             //motionMan = Regex.Replace(motionMan, @"_m\d?\.", "_m" + im2 + ".");
             //motionMan = Regex.Replace(motionMan, @"_m\d?_", "_m" + im2 + "_");
@@ -5674,8 +5828,8 @@ namespace CM3D2.VibeYourMaid.Plugin {
         void setMotionPrefabPosition(int maidID, int mid, bool add)
         {
             Maid maid = stockMaids[maidID].mem;
-            for (int si = 1; si < prefabList[0].Length; si++){
-              if(si == maj.prefabSet[mid]){
+            for (int si = 1; si < prefabList[0].Length; si++) {
+              if (si == maj.prefabSet[mid]) {
                 GameObject obj = GameMain.Instance.BgMgr.GetPrefabFromBg(prefabList[0][si] + maidID);
                 if (add && !obj) { //追加されていない場合だけ追加
                   GameMain.Instance.BgMgr.AddPrefabToBg(prefabList[1][si], prefabList[0][si]+maidID, null, Vector3.zero, Vector3.zero);
@@ -5698,23 +5852,23 @@ namespace CM3D2.VibeYourMaid.Plugin {
             }
         }
 
-        void MotionAdjustPsv(int maidID, Maid maid, MaidState maidState){
-          
+        void MotionAdjustPsv(int maidID, Maid maid, MaidState maidState) {
+
           string motion = maid.body0.LastAnimeFN;
           motion = regZeccyouBackup.Match(motion).Groups[1].Value;  // 「 - Que…」を除く
-          
+
           motion = Regex.Replace(motion, "_[23](?!ana)(?!p_)(?!vibe)", "_1");
           motion = Regex.Replace(motion, "_hatu_", "_");
-          //if(!Regex.IsMatch(motion, "m_"))motion = Regex.Replace(motion, @"^[a-zA-Z]_", "");
+          //if (!Regex.IsMatch(motion, "m_")) motion = Regex.Replace(motion, @"^[a-zA-Z]_", "");
           motion = Regex.Replace(motion, @"[a-zA-Z][0-9][0-9]", "");
           motion = motion.Replace(".anm", "");
           /*Match match = regZeccyou.Match(motion);
           motion = match.Groups[2].Value;  //現在モーションファイル名の先頭部分取得
           motion = motion + "_1_f";*/
-          
+
           int mid = maj.motionName.IndexOf(motion.ToLower());
-          if(mid < 0 || mid == maidState.motionID)return;  //モーションファイルがマッチしない、もしくは現在と同じなら終了
-          
+          if (mid < 0 || mid == maidState.motionID) return;  //モーションファイルがマッチしない、もしくは現在と同じなら終了
+
           maidState.motionID = mid;
 
           maidState.inMotion = MotionCheckTokusyu(motion, sInMaidMotion); //挿入モーションがあるかチェック
@@ -5724,50 +5878,50 @@ namespace CM3D2.VibeYourMaid.Plugin {
           maidState.motionSissinMove = MotionCheckTokusyu(motion, sMotionSissinMove);   //失神モーションがあるかチェック
           maidState.motionSissinTaiki = MotionCheckTokusyu(motion, sMotionSissinTaiki);
           maidState.senyouTokusyuMotion = MotionCheckTokusyuList(motion, sSenyouTokusyuMotion);  //特殊モーションがあるかチェック
-          if(!maj.analEnabled[mid])maidState.analMode = false;
-          
+          if (!maj.analEnabled[mid]) maidState.analMode = false;
+
           //射精設定と快感上昇設定を取得する
           maidState.syaseiMarks = maj.syaseiMarks[mid];
           maidState.giveSexual = maj.giveSexual[mid];
-          
-          if(!cfgw.majEnabled)return;
-          
+
+          if (!cfgw.majEnabled) return;
+
           //kupa値適用
           if (!osawari.isOsawari(maidID)) {
-          if(!maidState.analMode){
-            if(maj.hkupa1[mid] >= 0)maidState.hibuSlider1Value = maj.hkupa1[mid];
-            if(maj.akupa1[mid] >= 0)maidState.analSlider1Value = maj.akupa1[mid];
-            if(maj.hkupa2[mid] >= 0)maidState.hibuSlider2Value = maj.hkupa2[mid];
-            if(maj.akupa2[mid] >= 0)maidState.analSlider2Value = maj.akupa2[mid];
-          }else{
-            if(maj.hkupa1[mid] >= 0)maidState.hibuSlider1Value = maj.akupa1[mid];
-            if(maj.akupa1[mid] >= 0)maidState.analSlider1Value = Math.Min(100f, maj.hkupa1[mid] + 10f);
-            if(maj.hkupa2[mid] >= 0)maidState.hibuSlider2Value = maj.akupa2[mid];
-            if(maj.akupa2[mid] >= 0)maidState.analSlider2Value = Math.Min(100f, maj.hkupa2[mid] + 10f);
+          if (!maidState.analMode) {
+            if (maj.hkupa1[mid] >= 0) maidState.hibuSlider1Value = maj.hkupa1[mid];
+            if (maj.akupa1[mid] >= 0) maidState.analSlider1Value = maj.akupa1[mid];
+            if (maj.hkupa2[mid] >= 0) maidState.hibuSlider2Value = maj.hkupa2[mid];
+            if (maj.akupa2[mid] >= 0) maidState.analSlider2Value = maj.akupa2[mid];
+          } else {
+            if (maj.hkupa1[mid] >= 0) maidState.hibuSlider1Value = maj.akupa1[mid];
+            if (maj.akupa1[mid] >= 0) maidState.analSlider1Value = Math.Min(100f, maj.hkupa1[mid] + 10f);
+            if (maj.hkupa2[mid] >= 0) maidState.hibuSlider2Value = maj.akupa2[mid];
+            if (maj.akupa2[mid] >= 0) maidState.analSlider2Value = Math.Min(100f, maj.hkupa2[mid] + 10f);
           }
           }
-          if(maid.GetProp(MPN.accvag).strTempFileName == "accVag_VibePink_I_.menu" || maid.GetProp(MPN.handitem).strTempFileName == "HandItemH_SoutouVibe_I_.menu"){
-            if(maidState.hibuSlider1Value < 60f)maidState.hibuSlider1Value = 60f;
-            if(maidState.hibuSlider2Value < 60f)maidState.hibuSlider2Value = 60f;
+          if (maid.GetProp(MPN.accvag).strTempFileName == "accVag_VibePink_I_.menu" || maid.GetProp(MPN.handitem).strTempFileName == "HandItemH_SoutouVibe_I_.menu") {
+            if (maidState.hibuSlider1Value < 60f) maidState.hibuSlider1Value = 60f;
+            if (maidState.hibuSlider2Value < 60f) maidState.hibuSlider2Value = 60f;
           }
-          if(maid.GetProp(MPN.accanl).strTempFileName == "accAnl_AnalVibe_I_.menu"){
-            if(maidState.analSlider1Value < 30f)maidState.analSlider1Value = 30f;
-            if(maidState.analSlider2Value < 30f)maidState.analSlider2Value = 30f;
+          if (maid.GetProp(MPN.accanl).strTempFileName == "accAnl_AnalVibe_I_.menu") {
+            if (maidState.analSlider1Value < 30f) maidState.analSlider1Value = 30f;
+            if (maidState.analSlider2Value < 30f) maidState.analSlider2Value = 30f;
           }
         }
-        
-      //モーションファイルの読み込み関係終了-----------------
+
+        //モーションファイルの読み込み関係終了-----------------
 
 
 
 
 
-      //-------------------------------------------------
-      //モーションチェンジ関係---------------------------
+        //-------------------------------------------------
+        //モーションチェンジ関係---------------------------
 
         private Regex regZeccyou = new Regex(@"^([jtk]_)?(.*)_[1234].*");  // モーション名から基本となる部分を取り出す（不安）
         private Regex regZeccyouBackup = new Regex(@"^(.*\.anm).*");  // たまにモーション名の後についてる「 - Queほにゃらら」を除く（適当）
-        
+
         private string[] sZeccyouMaidMotion1 = new string[] { "_ryouhou_zeccyou_f_once_", "zeccyou_ryouhou_f_once_", "_seikantaizeccyou_f_once_", "_zeccyou_f_once_", "_shasei_kuti_f_once_", "_shasei_naka_f_once_", "_shasei_kao_f_once_", "_shasei_soto_f_once_" };
         private string[] sZeccyouMaidMotion2 = new string[] { "_shasei_kuti_f_once_", "_shasei_naka_f_once_", "_shasei_kao_f_once_", "_shasei_soto_f_once_", "_seikantaizeccyou_f_once_", "_zeccyou_f_once_" };
         private string[] syaseiMaidMotion = new string[] { "_shasei_kuti_f_once_", "_shasei_naka_f_once_", "_shasei_kao_f_once_", "_shasei_soto_f_once_" };
@@ -5795,7 +5949,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
 					"_vibe_kuwae_f", "_vibe_kuwaezu_f", "_in_hibumise_f_once_", "_in_hibumise_modori_f_once_",
 					"_zeccyou_gaman_f", "_zikkyou_f", "_zirasu_f","_zirasi_taiki_f", "_zirasi_surituke_f", "_zirasi_surituke_in_f_once_",
 					};
-        
+
         //　バイブ弱時のモーションリスト
         private string[][] MotionList20 = new string[][] {
           new string[] { "rosyutu_omocya_1_f.anm" , "rosyutu_tati_vibe_onani_1_f.anm" }, //立ち
@@ -5807,7 +5961,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
           new string[] { "tati_kiss_loop_f.anm" }, //立ちキス
           new string[] { "k_aibu_kiss_2_f.anm" } //椅子座りキス
         };
-        
+
         //　バイブ強時のモーションリスト
         private string[][] MotionList30 = new string[][] {
           new string[] { "rosyutu_omocya_2_f.anm" , "rosyutu_omocya_3_f.anm" , "rosyutu_tati_vibe_onani_2_f.anm" }, //立ち
@@ -5831,237 +5985,230 @@ namespace CM3D2.VibeYourMaid.Plugin {
           new string[] { "tati_kiss_taiki_f.anm" }, //立ちキス
           new string[] { "k_aibu_kiss_1_f.anm" } //椅子座りキス
         };
-        
-        
-        private string MotionCheckTokusyu(string motion, string[] list){
-        
+
+
+        private string MotionCheckTokusyu(string motion, string[] list) {
+
           string t = motion;
           Match match = regZeccyou.Match(t);
-          
+
           //現在モーションファイル名の先頭部分取得
           t = match.Groups[2].Value;
-          
+
           //特殊モーションのファイル名が有るかどうかチェック
           bool check = false;
           string checkMotion = "";
-          
-          Console.WriteLine("モーションチェック：" + motion);
 
-          foreach(string m in list){
+          //Console.WriteLine("モーションチェック：" + motion);
+
+          foreach (string m in list) {
             checkMotion = t + m;
-            if(Regex.IsMatch(motion, "(harem|yuri|wfera|wasikoki)_")){
+            if (Regex.IsMatch(motion, "(harem|yuri|wfera|wasikoki)_")) {
               if (motion.Contains("_f.") || motion.EndsWith( "_f" )){
                 checkMotion = t + m;
-                Console.WriteLine("【f1】:" + checkMotion);
+                //Console.WriteLine("【f1】:" + checkMotion);
 
-              }else if (motion.Contains("_f2.") || motion.EndsWith( "_f2" )){
+              } else if (motion.Contains("_f2.") || motion.EndsWith( "_f2" )) {
                 checkMotion = t + m.Replace("_f_", "_f2_");
                 checkMotion = Regex.Replace(checkMotion, "_f$", "_f2");
-              }else if (motion.Contains("_f3.") || motion.EndsWith( "_f3" )){
+              } else if (motion.Contains("_f3.") || motion.EndsWith( "_f3" )) {
                 checkMotion = t + m.Replace("_f_", "_f2_");
                 checkMotion = Regex.Replace(checkMotion, "_f$", "_f3");
               }
             }
 
-            if(MotionOldCheck(checkMotion) != -1){
+            if (MotionOldCheck(checkMotion) != -1) {
               check = true;
               Console.WriteLine("【有り】" + checkMotion);
               break;
             }
-            Console.WriteLine("【無し】" + checkMotion);
+            //Console.WriteLine("【無し】" + checkMotion);
           }
-                
+
           //上記チェックで引っかからなかった場合、「cli」や「kiss」などの文字列を除去してもう一度チェック
-          if(!check){
+          if (!check) {
             string motion2 = "";
             int mid = MotionIdCheck(motion);
-            if(mid != -1)motion2 = maj.baceMotion[mid];
-            
-            if(motion2 == ""){
+            if (mid != -1) motion2 = maj.baceMotion[mid];
+
+            if (motion2 == "") {
               //t = t.Replace("_hibu", "").Replace("_kiss", "").Replace("_cli", "").Replace("_momi", "").Replace("_gr", "").Replace("_kuti", "").Replace("_kuti", "").Replace("_kuti", "").Replace("_kuti", "");
               t = Regex.Replace(t, @"_[^_]{1,}$", ""); //モーション名の最後尾の一節を削除
-            }else{
+            } else {
               t = motion2;
             }
-            foreach(string m in list){
+            foreach (string m in list) {
               checkMotion = t + m;
-              if(Regex.IsMatch(motion, "(harem|yuri|wfera|wasikoki)_")){
+              if (Regex.IsMatch(motion, "(harem|yuri|wfera|wasikoki)_")) {
                 if (motion.Contains("_f.") || motion.EndsWith( "_f" )){
                   checkMotion = t + m;
 
-                }else if (motion.Contains("_f2.") || motion.EndsWith( "_f2" )){
+                } else if (motion.Contains("_f2.") || motion.EndsWith( "_f2" )) {
                   checkMotion = t + m.Replace("_f_", "_f2_");
                   checkMotion = Regex.Replace(checkMotion, "_f$", "_f2");
-                }else if (motion.Contains("_f3.") || motion.EndsWith( "_f3" )){
+                } else if (motion.Contains("_f3.") || motion.EndsWith( "_f3" )) {
                   checkMotion = t + m.Replace("_f_", "_f3_");
                   checkMotion = Regex.Replace(checkMotion, "_f$", "_f3");
                 }
               }
 
-              if(MotionOldCheck(checkMotion) != -1){
+              if (MotionOldCheck(checkMotion) != -1) {
                 check = true;
                 Console.WriteLine("【有り】" + checkMotion);
                 break;
               }
-              Console.WriteLine("【無し】" + checkMotion);
+              //Console.WriteLine("【無し】" + checkMotion);
             }
           }
-          
-          if(check){
+
+          if (check) {
             return checkMotion;
-          }else{
+          } else {
             return "Non";
           }
         }
 
 
-        private List<string> MotionCheckTokusyuList(string motion, string[] list){
-        
+        private List<string> MotionCheckTokusyuList(string motion, string[] list) {
+
           string t = motion;
           Match match = regZeccyou.Match(t);
-          
+
           //現在モーションファイル名の先頭部分取得
           t = match.Groups[2].Value;
-          
+
           //特殊モーションのファイル名が有るかどうかチェック
           bool check = false;
           string checkMotion = "";
           List<string> motionList = new List<string>();
-          
-          Console.WriteLine("モーションチェック：" + motion);
 
-          foreach(string m in list){
+          //Console.WriteLine("モーションチェック：" + motion);
+
+          foreach (string m in list) {
             checkMotion = t + m;
-            if(Regex.IsMatch(motion, "(harem|yuri|wfera|wasikoki)_")){
+            if (Regex.IsMatch(motion, "(harem|yuri|wfera|wasikoki)_")) {
               if (motion.Contains("_f.") || motion.EndsWith( "_f" )){
                 checkMotion = t + m;
-                Console.WriteLine("【f1】:" + checkMotion);
+                //Console.WriteLine("【f1】:" + checkMotion);
 
-              }else if (motion.Contains("_f2.") || motion.EndsWith( "_f2" )){
+              } else if (motion.Contains("_f2.") || motion.EndsWith( "_f2" )) {
                 checkMotion = t + m.Replace("_f_", "_f2_");
                 checkMotion = Regex.Replace(checkMotion, "_f$", "_f2");
-              }else if (motion.Contains("_f3.") || motion.EndsWith( "_f3" )){
+              } else if (motion.Contains("_f3.") || motion.EndsWith( "_f3" )) {
                 checkMotion = t + m.Replace("_f_", "_f3_");
                 checkMotion = Regex.Replace(checkMotion, "_f$", "_f3");
               }
             }
 
-            if(MotionOldCheck(checkMotion) != -1){
+            if (MotionOldCheck(checkMotion) != -1) {
               check = true;
               motionList.Add(checkMotion);
             }
           }
-                
+
           //上記チェックで引っかからなかった場合、「cli」や「kiss」などの文字列を除去してもう一度チェック
-          if(!check){
+          if (!check) {
             string motion2 = "";
             int mid = MotionIdCheck(motion);
-            if(mid != -1)motion2 = maj.baceMotion[mid];
-            
-            if(motion2 == ""){
+            if (mid != -1) motion2 = maj.baceMotion[mid];
+
+            if (motion2 == "") {
               t = Regex.Replace(t, @"_[^_]{1,}$", ""); //モーション名の最後尾の一節を削除
-            }else{
+            } else {
               t = motion2;
             }
-            foreach(string m in list){
+            foreach (string m in list) {
               checkMotion = t + m;
-              if(Regex.IsMatch(motion, "(harem|yuri|wfera|wasikoki)_")){
+              if (Regex.IsMatch(motion, "(harem|yuri|wfera|wasikoki)_")) {
                 if (motion.Contains("_f.") || motion.EndsWith( "_f" )){
                   checkMotion = t + m;
 
-                }else if (motion.Contains("_f2.") || motion.EndsWith( "_f2" )){
+                } else if (motion.Contains("_f2.") || motion.EndsWith( "_f2" )) {
                   checkMotion = t + m.Replace("_f_", "_f2_");
                   checkMotion = Regex.Replace(checkMotion, "_f$", "_f2");
-                }else if (motion.Contains("_f3.") || motion.EndsWith( "_f3" )){
+                } else if (motion.Contains("_f3.") || motion.EndsWith( "_f3" )) {
                   checkMotion = t + m.Replace("_f", "_f3").Replace("_f_", "_f3_");
                   checkMotion = Regex.Replace(checkMotion, "_f$", "_f3");
                 }
               }
 
-              if(MotionOldCheck(checkMotion) != -1){
+              if (MotionOldCheck(checkMotion) != -1) {
                 check = true;
                 motionList.Add(checkMotion);
               }
             }
           }
-          
+
           return motionList;
         }
-        
-        
+
+
         //メイドのモーション変更（通常時） abs:強制的にモーションチェンジするかどうか（falseで強制）
-        private void MaidMotionChange(int maidID, Maid maid, MaidState maidState, bool abs){
+        private void MaidMotionChange(int maidID, Maid maid, MaidState maidState, bool abs) {
 
           float cs = 0.5f;
           float ls = 1f;
-          if (maidState.vStateMajor == 10 && maidState.vStateMajorOld == 50)cs = 1f;
-          
+          if (maidState.vStateMajor == 10 && maidState.vStateMajorOld == 50) cs = 1f;
+
           //現在のモーションを取得
           string motion = maid.body0.LastAnimeFN;
           motion = regZeccyouBackup.Match(motion).Groups[1].Value;  // 「 - Que…」を除く
-          if(Regex.IsMatch(motion, "_sissin"))motion = maj.motionName[maidState.motionID] + "_1_f.anm"; //失神モーションから遷移させる場合は、基本モーションを取得する
-          
+          if (Regex.IsMatch(motion, "_sissin")) motion = maj.motionName[maidState.motionID] + "_1_f.anm"; //失神モーションから遷移させる場合は、基本モーションを取得する
+
           bool cc = maidState.cameraCheck;
-          if(osawari.isOsawari(maidID, "MO_"))cc = true;
-          
-          
+          if (osawari.isOsawari(maidID, "MO_")) cc = true;
+
+
           //モーションカテゴリのチェック
           int check = MaidMotionCheck(motion, cc);
-          if(check == -1)return;
+          if (check == -1) return;
 
           //変更モーションに変換
           motion = MaidMotionSelect(motion, check, maidID, maidState);
 
           //モーションが同じ場合は変更しない
-          if(maid.body0.LastAnimeFN == motion)return;
-          
+          if (maid.body0.LastAnimeFN == motion) return;
+
           //実際にモーションを変更
-          int old = MotionOldCheck(motion);
-          if (old == 0){
-            if(abs)MotionChange(maid, motion, true, false, cs, ls);
-            if(!abs)MotionChangeAf(maid, motion, true, false, cs, ls);
-            ManMotionChange(motion, maidID, true, false, abs, cs, ls);
-          } else if(old == 1) {
-            if(abs)MotionChange(maid, motion, true, true, cs, ls);
-            if(!abs)MotionChangeAf(maid, motion, true, true, cs, ls);
-            ManMotionChange(motion, maidID, true, true, abs, cs, ls);
-          }
-          
-          
+          bool bNew = MotionOldCheck(motion) == 1;
+          if (abs) MotionChange(maid, motion, true, bNew, cs, ls);
+          else MotionChangeAf(maid, motion, true, bNew, cs, ls);
+          ManMotionChange(motion, maidID, true, bNew, abs, cs, ls);
+
           //百合・ハーレム用モーションチェンジ
-          /*if(Regex.IsMatch(motion, "yuri_") || Regex.IsMatch(motion, "harem_")){
+          /*if (Regex.IsMatch(motion, "yuri_") || Regex.IsMatch(motion, "harem_")) {
             SubMotionChange(maidID, motion, true, true, cs, ls);
           }*/
         }
-        
-        
-        
+
+
+
         //モーションカテゴリのチェック
-        private int MaidMotionCheck(string motion, bool cc){
+        private int MaidMotionCheck(string motion, bool cc) {
           #if DEBUG
           Console.WriteLine("MaidMotionCheck("+motion+", "+cc+")");
           #endif
 
           int check = -1;
-          
-          if (MotionList_tati.Contains(motion)){ //立ちモーションの場合
+
+          if (MotionList_tati.Contains(motion)) { //立ちモーションの場合
             check = 0;
-            if(cc)check = 6;
+            if (cc) check = 6;
 
-          } else if (MotionList_suwari.Contains(motion)){ //座りモーションの場合
+          } else if (MotionList_suwari.Contains(motion)) { //座りモーションの場合
             check = 1;
-            if(cc)check = 7;
+            if (cc) check = 7;
 
-          } else if (MotionList_zoukin.Contains(motion)){ //雑巾がけモーションの場合
+          } else if (MotionList_zoukin.Contains(motion)) { //雑巾がけモーションの場合
             check = 2;
 
-          } else if (MotionList_kyuuzi.Contains(motion)){ //給仕モーションの場合
+          } else if (MotionList_kyuuzi.Contains(motion)) { //給仕モーションの場合
             check = 3;
 
-          } else if (MotionList_fukisouji.Contains(motion)){ //拭き掃除モーションの場合
+          } else if (MotionList_fukisouji.Contains(motion)) { //拭き掃除モーションの場合
             check = 4;
 
-          } else if (MotionList_mop.Contains(motion)){ //モップ掛けモーションの場合
+          } else if (MotionList_mop.Contains(motion)) { //モップ掛けモーションの場合
             check = 5;
 
           } else if (Regex.IsMatch(motion, "_[123]")) { //変更可能な夜伽モーションの場合
@@ -6071,228 +6218,223 @@ namespace CM3D2.VibeYourMaid.Plugin {
             check = -1;
 
           }
-          
+
           return check;
         }
-        
-        
-        
+
+
+
         //通常時の変更モーションを調べて返す
-        private string MaidMotionSelect(string motion, int check, int maidID, MaidState maidState){
+        private string MaidMotionSelect(string motion, int check, int maidID, MaidState maidState) {
           #if DEBUG
           Console.WriteLine("MaidMotionSelect("+motion+", "+check+", "+maidID+")");
           #endif
 
           string t = motion;
-        
-          if(maidState.stunFlag && maidState.motionSissinMove != "Non"){ //失神している場合は失神モーションに変更
-            if ( maidState.vStateMajor == 40 || maidState.vStateMajor == 10 ){
+
+          if (maidState.stunFlag && maidState.motionSissinMove != "Non") { //失神している場合は失神モーションに変更
+            if (maidState.vStateMajor == 40 || maidState.vStateMajor == 10) {
               t = maidState.motionSissinTaiki + ".anm";
-            }else{
+            } else {
               t = maidState.motionSissinMove + ".anm";
             }
-          
-          }else if(check == 10){
-            
+
+          } else if (check == 10) {
+
             //一段階目のモーションをバックアップとして取る
             string motionBack = Regex.Replace(t, "_[123]", "_1");
             motionBack = Regex.Replace(motionBack, "_hatu_", "_");
-            if(!Regex.IsMatch(t, "m_"))motionBack = Regex.Replace(motionBack, @"^[a-zA-Z]_", "");
+            if (!Regex.IsMatch(t, "m_")) motionBack = Regex.Replace(motionBack, @"^[a-zA-Z]_", "");
             maidState.maidMotionBackup = Regex.Replace(motionBack, @"[a-zA-Z][0-9][0-9]", "");
-          
+
             //バイブ強度に合わせてモーション名を変換
-            if ( maidState.vStateMajor == 20 ){
+            if (maidState.vStateMajor == 20) {
               t = Regex.Replace(t, "_[13](?!ana)(?!p_)(?!vibe)", "_2");
               t = Regex.Replace(t, "_hatu_", "_");
-              if(!Regex.IsMatch(t, "m_"))t = Regex.Replace(t, @"^[a-zA-Z]_", "");
+              if (!Regex.IsMatch(t, "m_")) t = Regex.Replace(t, @"^[a-zA-Z]_", "");
               t = Regex.Replace(t, @"[a-zA-Z][0-9][0-9]", "");
-              
-            } else if ( maidState.vStateMajor == 30 ){
-              if(maidState.orgasmCmb <= 3){
+
+            } else if (maidState.vStateMajor == 30) {
+              if (maidState.orgasmCmb <= 3) {
                 t = Regex.Replace(t, "_[12](?!ana)(?!p_)(?!vibe)", "_3");
                 t = Regex.Replace(t, "_hatu_3", "_3");
-              }else{
+              } else {
                 t = Regex.Replace(t, "_[12](?!ana)(?!p_)(?!vibe)", "_3");
               }
-              if(!Regex.IsMatch(t, "m_"))t = Regex.Replace(t, @"^[a-zA-Z]_", "");
+              if (!Regex.IsMatch(t, "m_")) t = Regex.Replace(t, @"^[a-zA-Z]_", "");
               t = Regex.Replace(t, @"[a-zA-Z][0-9][0-9]", "");
-              
-            } else if ( maidState.vStateMajor == 40 || maidState.vStateMajor == 10 ){
+
+            } else if (maidState.vStateMajor == 40 || maidState.vStateMajor == 10) {
               t = Regex.Replace(t, "_[23](?!ana)(?!p_)(?!vibe)", "_1");
               t = Regex.Replace(t, "_hatu_", "_");
-              if(!Regex.IsMatch(t, "m_"))t = Regex.Replace(t, @"^[a-zA-Z]_", "");
+              if (!Regex.IsMatch(t, "m_")) t = Regex.Replace(t, @"^[a-zA-Z]_", "");
               t = Regex.Replace(t, @"[a-zA-Z][0-9][0-9]", "");
             }
 
             //差分モーションが有るかどうかチェック
-            if(!Regex.IsMatch(motion, "(harem|yuri|wfera|wasikoki)_")){
+            if (!Regex.IsMatch(motion, "(harem|yuri|wfera|wasikoki)_")) {
               int i = YotogiListBase.IndexOf(t.ToLower());
-              if(i >= 0){
+              if (i >= 0) {
                 int r = UnityEngine.Random.Range(0, YotogiListSabun[i].Count);
                 t = YotogiListSabun[i][r];
               }
             }
 
             //まんぐりバイブだけはファイルがおかしいため変更
-            if(t == "manguri_vibe_1_f.anm")t = "x_manguri_vibe_1_f.anm";
-            if(t == "manguri_vibe_2_f.anm")t = "x_manguri_vibe_2_f.anm";
-            if(t == "manguri_vibe_3_f.anm")t = "x_manguri_vibe_3_f.anm";
-            if(t == "manguri_vibe_oku_1_f.anm")t = "x_manguri_vibe_oku_1_f.anm";
-            if(t == "manguri_vibe_oku_2_f.anm")t = "x_manguri_vibe_oku_2_f.anm";
-            if(t == "manguri_vibe_oku_3_f.anm")t = "x_manguri_vibe_oku_3_f.anm";
-          
-          
-          } else if(check >= 0){
+            if (t == "manguri_vibe_1_f.anm") t = "x_manguri_vibe_1_f.anm";
+            if (t == "manguri_vibe_2_f.anm") t = "x_manguri_vibe_2_f.anm";
+            if (t == "manguri_vibe_3_f.anm") t = "x_manguri_vibe_3_f.anm";
+            if (t == "manguri_vibe_oku_1_f.anm") t = "x_manguri_vibe_oku_1_f.anm";
+            if (t == "manguri_vibe_oku_2_f.anm") t = "x_manguri_vibe_oku_2_f.anm";
+            if (t == "manguri_vibe_oku_3_f.anm") t = "x_manguri_vibe_oku_3_f.anm";
+
+
+          } else if (check >= 0) {
 
               int i20 = UnityEngine.Random.Range(0, MotionList20[check].Length);
               int i30 = UnityEngine.Random.Range(0, MotionList30[check].Length);
               int i40 = UnityEngine.Random.Range(0, MotionList40[check].Length);
 
               //通常モーションから遷移する場合にバックアップを取る
-              if(!MotionList_vibe.Contains(t) && !t.Contains("_once_")){
+              if (!MotionList_vibe.Contains(t) && !t.Contains("_once_")) {
                 maidState.maidMotionBackup = t;
               }
 
               //変更モーションを決定
-              if ( maidState.vStateMajor == 20  && t != MotionList20[check][i20] ){
+              if (maidState.vStateMajor == 20  && t != MotionList20[check][i20]) {
                 t = MotionList20[check][i20];
-              } else if ( maidState.vStateMajor == 30  && t != MotionList30[check][i30] ){
+              } else if (maidState.vStateMajor == 30  && t != MotionList30[check][i30]) {
                 t = MotionList30[check][i30];
-              } else if (maidState.vStateMajor == 40 ){
+              } else if (maidState.vStateMajor == 40) {
                 t = MotionList40[check][i40];
-              } else if (maidState.vStateMajor == 10 && maidState.vStateMajorOld == 50 ){
+              } else if (maidState.vStateMajor == 10 && maidState.vStateMajorOld == 50) {
                 t = maidState.maidMotionBackup;
               }
-          
+
           }
           #if DEBUG
           Console.WriteLine("    newMotion="+t);
           Console.WriteLine("    maidMotionBackup="+maidState.maidMotionBackup);
           #endif
-          
+
           return t;
-        
+
         }
-        
+
         //メイドのモーション変更（絶頂時）
-        private void ZeccyoMotionSelect(int maidID){
-        
-          Maid maid = stockMaids[maidID].mem;
+        private void ZeccyoMotionSelect(int maidID, Maid maid, MaidState maidState) {
+
           //現在のモーションを取得
           string motion = maid.body0.LastAnimeFN;
           motion = regZeccyouBackup.Match(motion).Groups[1].Value;  // 「 - Que…」を除く
-          
-          ZeccyoMotionSelect(motion, maidID);
+
+          ZeccyoMotionSelect(motion, maidID, maid, maidState);
         }
-        
-        private void ZeccyoMotionSelect(string motion, int maidID){
-        
-          Maid maid = stockMaids[maidID].mem;
+
+        private void ZeccyoMotionSelect(string motion, int maidID, Maid maid, MaidState maidState) {
+
           string t = motion;
-          
+
           Match match = regZeccyou.Match(t);
           string sHighExciteMotionBackup = regZeccyouBackup.Match(t).Groups[1].Value;  // 「 - Que…」を除く
-          
+
           //連続絶頂中の場合、専用モーション（_hatu_3）があるかどうか調べて変更する
-          if(Regex.IsMatch(t, "_hatu_3")){
-            if(SyaseiCheck(maidID, 100f)){
+          if (Regex.IsMatch(t, "_hatu_3")) {
+            if (SyaseiCheck(maidID, 100f)) {
               t = Regex.Replace(t, "_hatu_3", "_3");
-            }else{
+            } else {
               return;
             }
-          }else if(maidsState[maidID].orgasmCmb > 3){
+          } else if (maidState.orgasmCmb > 3) {
             t = Regex.Replace(t, "_[12](?!ana)(?!p_)(?!vibe)", "_3");
-            if(!Regex.IsMatch(t, "m_") && !Regex.IsMatch(t, "x_manguri_vibe"))t = Regex.Replace(t, @"^[a-zA-Z]_", "");
+            if (!Regex.IsMatch(t, "m_") && !Regex.IsMatch(t, "x_manguri_vibe")) t = Regex.Replace(t, @"^[a-zA-Z]_", "");
             t = Regex.Replace(t, @"[a-zA-Z][0-9][0-9]", "");
-            
-            if(MotionOldCheck(t.Replace("_3", "_hatu_3")) != -1){
+
+            if (MotionOldCheck(t.Replace("_3", "_hatu_3")) != -1) {
               t = Regex.Replace(t, "_3", "_hatu_3");
               //MotionChange(maid, t, true, 0.5f, 1f);
               MotionChange(maid, t, false, 0.5f, 1f); //ループせさないように修正
               MotionChangeAf(maid, sHighExciteMotionBackup, true, 0.5f, 1f); // 終わったら絶頂前モーションを再生する
-              
-              maidsState[maidID].zAnimeFileName = t;
-              
+
+              maidState.zAnimeFileName = t;
+
               ManMotionChange(t, maidID, true, 0.5f, 1f);
-              
+
               return;
-            
+
             }
           }
 
           //通常の絶頂モーション変更処理
           if (match.Success || sHighExciteMotionBackup == "settai_vibe_in_kaiwa_kyou_a01_f.anm" || sHighExciteMotionBackup == "settai_vibe_in_kaiwa_kyou_f.anm") {
-          
+
             //現在モーションファイル名の先頭部分取得
             string sZeccyouMotion = match.Groups[2].Value;
 
             //ポーズ維持、接待バイブのモーション名の場合は変換
-            if(sZeccyouMotion == "poseizi_hibu"){
+            if (sZeccyouMotion == "poseizi_hibu") {
               sZeccyouMotion = "poseizi";
-            }else if (sZeccyouMotion == "poseizi2_hibu"){
+            } else if (sZeccyouMotion == "poseizi2_hibu") {
               sZeccyouMotion = "poseizi2";
-            }else if(sHighExciteMotionBackup == "settai_vibe_in_kaiwa_kyou_a01_f.anm" || sHighExciteMotionBackup == "settai_vibe_in_kaiwa_kyou_f.anm"){
+            } else if (sHighExciteMotionBackup == "settai_vibe_in_kaiwa_kyou_a01_f.anm" || sHighExciteMotionBackup == "settai_vibe_in_kaiwa_kyou_f.anm") {
               sZeccyouMotion = "settai_vibe_in";
             }
-            
+
 
             //絶頂モーションのファイル名が有るかどうかチェック
             bool zf = false;
             string sZeccyouMotionMaid = "";
             string[] sZeccyouMaidMotion = sZeccyouMaidMotion1;
-            if((SyaseiCheck(maidID, 85f) && maidsState[maidID].orgasmCmb <= 3) || (SyaseiCheck(maidID, 100f) && maidsState[maidID].orgasmCmb > 3))sZeccyouMaidMotion = sZeccyouMaidMotion2;
+            if ((SyaseiCheck(maidID, 85f) && maidState.orgasmCmb <= 3) || (SyaseiCheck(maidID, 100f) && maidState.orgasmCmb > 3)) sZeccyouMaidMotion = sZeccyouMaidMotion2;
 
-            foreach(string z in sZeccyouMaidMotion){
+            foreach (string z in sZeccyouMaidMotion) {
               sZeccyouMotionMaid = sZeccyouMotion + z;
 
-              if(Regex.IsMatch(motion, "(harem|yuri|wfera|wasikoki)_")){
-                if (sHighExciteMotionBackup.Contains("_f.")){
+              if (Regex.IsMatch(motion, "(harem|yuri|wfera|wasikoki)_")) {
+                if (sHighExciteMotionBackup.Contains("_f.")) {
                   sZeccyouMotionMaid = sZeccyouMotion + z;
 
-                }else if (sHighExciteMotionBackup.Contains("_f2.")){
+                } else if (sHighExciteMotionBackup.Contains("_f2.")) {
                   sZeccyouMotionMaid = sZeccyouMotion + z.Replace("_f_", "_f2_");
 
-                }else if (sHighExciteMotionBackup.Contains("_f3.")){
+                } else if (sHighExciteMotionBackup.Contains("_f3.")) {
                   sZeccyouMotionMaid = sZeccyouMotion + z.Replace("_f_", "_f3_");
-              
+
                 }
               }
 
-              if(MotionOldCheck(sZeccyouMotionMaid) != -1){
+              if (MotionOldCheck(sZeccyouMotionMaid) != -1) {
                 zf = true;
                 break;
               }
             }
-                
+
             //上記チェックで引っかからなかった場合、「cli」や「kiss」などの文字列を除去してもう一度チェック
-            if(!zf){
+            if (!zf) {
               //string motion2 = "";
               int mid = MotionIdCheck(motion);
-              
-              if(maidsState[maidID].baceMotion == ""){
+
+              if (maidState.baceMotion == "") {
                 //sZeccyouMotion = sZeccyouMotion.Replace("_hibu", "").Replace("_kiss", "").Replace("_cli", "").Replace("_momi", "").Replace("_gr", "");
                 sZeccyouMotion = Regex.Replace(sZeccyouMotion, @"_[^_]{1,}$", ""); //モーション名の最後尾の一節を削除
-              }else{
-                sZeccyouMotion = maidsState[maidID].baceMotion;
+              } else {
+                sZeccyouMotion = maidState.baceMotion;
               }
 
-              foreach(string z in sZeccyouMaidMotion){
+              foreach (string z in sZeccyouMaidMotion) {
                 sZeccyouMotionMaid = sZeccyouMotion + z;
 
-                if(Regex.IsMatch(motion, "(harem|yuri|wfera|wasikoki)_")){
-                  if (sHighExciteMotionBackup.Contains("_f.")){
+                if (Regex.IsMatch(motion, "(harem|yuri|wfera|wasikoki)_")) {
+                  if (sHighExciteMotionBackup.Contains("_f.")) {
                     sZeccyouMotionMaid = sZeccyouMotion + z;
-
-                  }else if (sHighExciteMotionBackup.Contains("_f2.")){
+                  } else if (sHighExciteMotionBackup.Contains("_f2.")) {
                     sZeccyouMotionMaid = sZeccyouMotion + z.Replace("_f_", "_f2_");
-
-                  }else if (sHighExciteMotionBackup.Contains("_f3.")){
+                  } else if (sHighExciteMotionBackup.Contains("_f3.")) {
                     sZeccyouMotionMaid = sZeccyouMotion + z.Replace("_f_", "_f3_");
-              
                   }
                 }
 
-                if(MotionOldCheck(sZeccyouMotionMaid) != -1){
+                if (MotionOldCheck(sZeccyouMotionMaid) != -1) {
                   zf = true;
                   break;
                 }
@@ -6306,42 +6448,42 @@ namespace CM3D2.VibeYourMaid.Plugin {
               // 強制的に再生
               //メイドモーション変更
               MotionChange(maid, sZeccyouMotionMaid + ".anm", false, 0.5f, 1f);
-              maidsState[maidID].zAnimeFileName = sZeccyouMotionMaid + ".anm";
+              maidState.zAnimeFileName = sZeccyouMotionMaid + ".anm";
 
               MotionChangeAf(maid, sHighExciteMotionBackup, true, 0.5f, 1f); // 終わったら再生する
-              
+
               //男のモーション変更
               ManMotionChange(sZeccyouMotionMaid + ".anm", maidID, false, 0.5f, 1f);
               ManMotionChangeAf(sHighExciteMotionBackup, maidID, true, 0.5f, 1f); // 終わったら再生する
-              
-            }else {
+
+            } else {
               //絶頂モーションがない場合は、現在モーションをフェラ判別用に挿入する
-              maidsState[maidID].zAnimeFileName = maid.body0.LastAnimeFN;
+              maidState.zAnimeFileName = maid.body0.LastAnimeFN;
             }
           }
         }
 
 
         //複数・百合相手用モーション変更処理
-        private void SubMotionChange(int mainID, string motion, bool loop, bool abs, float cs, float ls){
-        
+        private void SubMotionChange(int mainID, string motion, bool loop, bool abs, float cs, float ls) {
+
           int im = 1;
           int im2 = 1;
-          if(Regex.IsMatch(motion, "_f2"))im2 = 2;
-          if(Regex.IsMatch(motion, "_f3"))im2 = 3;
-          if(Regex.IsMatch(motion, "_f4"))im2 = 4;
+          if (Regex.IsMatch(motion, "_f2")) im2 = 2;
+          if (Regex.IsMatch(motion, "_f3")) im2 = 3;
+          if (Regex.IsMatch(motion, "_f4")) im2 = 4;
 
           Console.WriteLine("SubMotionChange : mainID="+mainID+" motion="+motion+" im2="+im2);
 
-          foreach(int subID in vmId){
+          foreach (int subID in vmId) {
 
-            if(mainID == subID || !LinkMaidCheck(mainID, subID))continue;
-            
+            if (mainID == subID || !LinkMaidCheck(mainID, subID)) continue;
+
             Maid maid = stockMaids[subID].mem;
-            if(im == im2)++im;
+            if (im == im2) ++im;
             string t = Regex.Replace(motion, @"_f\d?\.", "_f" + im + ".");
             t = Regex.Replace(t, @"_f\d?_once_", "_f" + im + "_once_");
-            if(im == 1)t= t.Replace("_f1", "_f");
+            if (im == 1) t= t.Replace("_f1", "_f");
 
             if (MotionOldCheck(t) == -1) {
               t = Regex.Replace(t, "[a-zA-Z][0-9][0-9]", "");
@@ -6350,13 +6492,15 @@ namespace CM3D2.VibeYourMaid.Plugin {
               }
             }
 
-              if(abs){
+              if (abs) {
                 MotionChange(maid, t, loop, cs, ls);
-              }else{
+              } else {
                 MotionChangeAf(maid, t, loop, cs, ls);
               }
               MotionAdjustDo(subID, t, true, mainID); //モーションアジャスト実行
-              if(lifeStart >= 5)maidsState[subID].elItazuraFlag = true;
+              #if EmpiresLife
+              if (lifeStart >= 5) maidsState[subID].elItazuraFlag = true;
+              #endif
               //2人目のサブモーションならリンク情報を保存
               if (im == 2) {
                 //メインとサブのリンクはすべて解除
@@ -6369,88 +6513,88 @@ namespace CM3D2.VibeYourMaid.Plugin {
                 maidsState[mainID].motionLinkID = subID;
                 maidsState[subID].motionLinkID = mainID;
               }
-              
+
             //タイマーリセット
             maidsState[subID].motionHoldTime = 0f;
             maidsState[subID].voiceHoldTime = 0f;
             maidsState[subID].faceHoldTime = 0;
             maidsState[subID].MouthHoldTime = 0f;
-            
+
             ++im;
           }
         }
-        
+
 
         //男通常モーション変更処理
-        private void ManMotionChange(string motion, int maidID, bool loop, bool old, bool abs, float cs, float ls){
-        
+        private void ManMotionChange(string motion, int maidID, bool loop, bool old, bool abs, float cs, float ls) {
+
           string t = motion;
           t = Regex.Replace(t, @"_f\d?\.", "_m.");
           t = Regex.Replace(t, @"_f\d?_", "_m_");
-          
+
           //アナルモードの場合、男モーションをアナル用に変更
-          if(maidsState[maidID].analMode){
+          if (maidsState[maidID].analMode) {
             string bm = maidsState[maidID].analMotion.Replace("a_in_m_once_", "");
             string am = maidsState[maidID].analMotion.Replace("_in_m_once_", "");
             string analMotion = t.Replace(bm, am);
-            if(MotionOldCheck(analMotion) != -1){
+            if (MotionOldCheck(analMotion) != -1) {
               t = analMotion;
-            }else{
+            } else {
               analMotion = Regex.Replace(analMotion, "[a-zA-Z][0-9][0-9]", "");
-              if(MotionOldCheck(analMotion) != -1)t = analMotion;
+              if (MotionOldCheck(analMotion) != -1) t = analMotion;
             }
           }
 
           int im2 = 2;
-          for (int im = 0; im < SubMans.Length; im++){
+          for (int im = 0; im < SubMans.Length; im++) {
 
-            if(!SubMans[im].Visible || MansTg[im] != maidID)continue;
+            if (!SubMans[im].Visible || MansTg[im] != maidID) continue;
             float fDistance = Vector3.Distance(stockMaids[maidID].mem.transform.position, SubMans[im].transform.position);
-            if(fDistance > 1f)continue;
+            if (fDistance > 1f) continue;
 
             if ((allFilesSet.Contains(t.Replace(".anm", "")) && !old) || (allFilesOldSet.Contains(t.Replace(".anm", "")) && old)) {
-              if(abs){
-                MotionChange(SubMans[im], t, loop, old, cs, ls);
-              }else{
-                MotionChangeAf(SubMans[im], t, loop, old, cs, ls);
+              if (abs) {
+                StartCoroutine(MotionChangeCoroutine(SubMans[im], t, loop, old, cs, ls));
+              } else {
+                StartCoroutine(MotionChangeAfCoroutine(SubMans[im], t, loop, old, cs, ls));
               }
             } else {
               t = Regex.Replace(t, "[a-zA-Z][0-9][0-9]", "");
               if ((allFilesSet.Contains(t.Replace(".anm", "")) && !old) || (allFilesOldSet.Contains(t.Replace(".anm", "")) && old)) {
-                if(abs){
-                  MotionChange(SubMans[im], t, loop, old, cs, ls);
-                }else{
-                  MotionChangeAf(SubMans[im], t, loop, old, cs, ls);
+                if (abs) {
+                  StartCoroutine(MotionChangeCoroutine(SubMans[im], t, loop, old, cs, ls));
+                } else {
+                  StartCoroutine(MotionChangeAfCoroutine(SubMans[im], t, loop, old, cs, ls));
                 }
               } else {
                 break;
               }
             }
-            
+
             //射精処理
-            if(syaseiValue[im] >= 85f){
+            if (syaseiValue[im] >= 85f) {
               string[] marks = new string[] { "秘部", "秘部", "太股"};
-              if(t.Contains("_shasei")){
+              if (t.Contains("_shasei")) {
                 bool naka = false;
                 int marksInt = 0;
-                if(t.Contains("_shasei_naka") || t.Contains("_shasei_kuti"))naka = true;
-                if(maidsState[maidID].motionID >= 0)marksInt = maj.syaseiMarks[maidsState[maidID].motionID][im];
-                if(marksInt == 0){
-                  if(t.Contains( "asikoki" )){
+                if (t.Contains("_shasei_naka") || t.Contains("_shasei_kuti")) naka = true;
+                if (maidsState[maidID].motionID >= 0) marksInt = maj.syaseiMarks[maidsState[maidID].motionID][im];
+                if (marksInt == 0) {
+                  if (t.Contains( "asikoki" )) {
                     marksInt = 5;
-                  }else if(t.Contains( "fera" ) || t.Contains( "sixnine" )){
+                  } else if (t.Contains( "fera" ) || t.Contains( "sixnine" )) {
                     marksInt = 3;
-                  }else if(t.Contains( "tekoki" ) || t.Contains( "paizuri" )){
+                  } else if (t.Contains( "tekoki" ) || t.Contains( "paizuri" )) {
                     marksInt = 4;
-                  }else if(t.Contains( "haimen" ) || t.Contains( "kouhaii" ) || t.Contains( "sokui" ) || t.Contains( "sukebeisu_sex" ) || t.Contains( "kakaemzi" )){
+                  } else if (t.Contains( "haimen" ) || t.Contains( "kouhaii" ) || t.Contains( "sokui" ) || t.Contains( "sukebeisu_sex" ) || t.Contains( "kakaemzi" )) {
                     marksInt = 2;
-                  }else{
+                  } else {
                     marksInt = 1;
                   }
                 }
-                
+
                 EffectSyasei(maidID, marksInt, naka);
-                if(!syaseiLock[im])syaseiValue[im] = 0f;
+                if (!syaseiLock[im]) syaseiValue[im] = 0f;
               }
             }
 
@@ -6464,52 +6608,51 @@ namespace CM3D2.VibeYourMaid.Plugin {
           //男のアイテム装備
           //setManMotionItem(maidID);
         }
-        
+
         //男通常モーション変更処理（新旧自動判別）
-        private void ManMotionChange(string motion, int maidID, bool loop, float cs, float ls){
-        
+        private void ManMotionChange(string motion, int maidID, bool loop, float cs, float ls) {
+
           bool old = MotionOldCheckB(motion);
           ManMotionChange(motion, maidID, loop, old, true, cs, ls);
-        
+
         }
-        
+
         //男通常モーション変更処理（メイドモーション自動取得）
-        private void ManMotionChange(int maidID, bool loop, float cs, float ls){
-        
+        private void ManMotionChange(int maidID, bool loop, float cs, float ls) {
+
           Maid maid = stockMaids[maidID].mem;
           string motion = maid.body0.LastAnimeFN;
           ManMotionChange(motion, maidID, loop, cs, ls);
-        
+
         }
-        
+
         //男通常モーション変更処理（現在のモーション再生が終了したあと・新旧自動判別）
-        private void ManMotionChangeAf(string motion, int maidID, bool loop, float cs, float ls){
-        
+        private void ManMotionChangeAf(string motion, int maidID, bool loop, float cs, float ls) {
+
           bool old = MotionOldCheckB(motion);
           ManMotionChange(motion, maidID, loop, old, false, cs, ls);
-        
+
         }
-        
+
         //男通常モーション変更処理（現在のモーション再生が終了したあと・メイドモーション自動取得）
-        private void ManMotionChangeAf(int maidID, bool loop, float cs, float ls){
-        
+        private void ManMotionChangeAf(int maidID, bool loop, float cs, float ls) {
+
           Maid maid = stockMaids[maidID].mem;
           string motion = maid.body0.LastAnimeFN;
           ManMotionChangeAf(motion, maidID, loop, cs, ls);
-        
+
         }
 
 
-
         //実際にモーションを変更する（新旧自動判断）
-        private void MotionChange(Maid maid, string motion, bool loop, float cs, float ls){
-
+        private void MotionChange(Maid maid, string motion, bool loop, float cs, float ls)
+        {
           int old = MotionOldCheck(motion);
-          
+
           if (old == 0) {
             maid.CrossFadeAbsolute( motion, GameUty.FileSystem, false, loop, false, cs, ls );
             Console.WriteLine("オダメモーション：" + motion);
-          } else if(old == 1){
+          } else if (old == 1) {
             maid.CrossFadeAbsolute( motion, GameUty.FileSystemOld, false, loop, false, cs, ls );
             Console.WriteLine("カスメモーション：" + motion);
           } else {
@@ -6518,8 +6661,8 @@ namespace CM3D2.VibeYourMaid.Plugin {
           }
         }
         //実際にモーションを変更する（新旧指定）
-        private void MotionChange(Maid maid, string motion, bool loop, bool old, float cs, float ls){
-
+        private void MotionChange(Maid maid, string motion, bool loop, bool old, float cs, float ls)
+        {
           if (!old) {
             maid.CrossFadeAbsolute( motion, GameUty.FileSystem, false, loop, false, cs, ls );
             Console.WriteLine("オダメモーション：" + motion);
@@ -6530,19 +6673,17 @@ namespace CM3D2.VibeYourMaid.Plugin {
         }
 
         //現在のモーション再生が終了したあとにモーションを変更する（新旧自動判断）
-        private void MotionChangeAf(Maid maid, string motion, bool loop, float cs, float ls){
-
+        private void MotionChangeAf(Maid maid, string motion, bool loop, float cs, float ls)
+        {
           if (allFilesSet.Contains(motion.Replace(".anm", ""))) {
             maid.CrossFade( motion, GameUty.FileSystem, false, loop, true, cs, ls );
-
-          } else if(allFilesOldSet.Contains(motion.Replace(".anm", ""))){
+          } else if (allFilesOldSet.Contains(motion.Replace(".anm", ""))) {
             maid.CrossFade( motion, GameUty.FileSystemOld, false, loop, true, cs, ls );
-
           }
         }
         //現在のモーション再生が終了したあとにモーションを変更する（新旧指定）
-        private void MotionChangeAf(Maid maid, string motion, bool loop, bool old, float cs, float ls){
-
+        private void MotionChangeAf(Maid maid, string motion, bool loop, bool old, float cs, float ls)
+        {
           if (!old) {
             maid.CrossFade( motion, GameUty.FileSystem, false, loop, true, cs, ls );
           } else {
@@ -6550,75 +6691,96 @@ namespace CM3D2.VibeYourMaid.Plugin {
           }
         }
 
+        //実際にモーションを変更する（新旧指定） コルーチン対応
+        private IEnumerator MotionChangeCoroutine(Maid maid, string motion, bool loop, bool old, float cs, float ls)
+        {
+          int cnt = 0;
+          while (!maid.body0 || maid.body0.m_Bones == null) {
+            yield return new WaitForSeconds (0.1f);  // 0.1秒待つ
+            if (cnt++ > 50) yield break; //5秒たったら強制終了
+          }
+          MotionChange(maid, motion, loop, old, cs, ls);
+        }
+        //現在のモーション再生が終了したあとにモーションを変更する（新旧指定） コルーチン対応
+        private IEnumerator MotionChangeAfCoroutine(Maid maid, string motion, bool loop, bool old, float cs, float ls)
+        {
+          int cnt = 0;
+          while (!maid.body0 || maid.body0.m_Bones == null) {
+            yield return new WaitForSeconds (0.1f);  // 0.1秒待つ
+            if (cnt++ > 50) yield break; //5秒たったら強制終了
+          }
+          MotionChangeAf(maid, motion, loop, old, cs, ls);
+        }
+
         //モーションの新旧をチェックする
-        private int MotionOldCheck(string motion){
+        private int MotionOldCheck(string motion) {
           motion = motion.Replace(".anm", "");
           if (allFilesSet.Contains(motion)) {
             return 0;
-          } else if(allFilesOldSet.Contains(motion)){
+          } else if (allFilesOldSet.Contains(motion)) {
             return 1;
           } else {
             return -1;
           }
         }
-        private bool MotionOldCheckB(string motion){
-        
+        private bool MotionOldCheckB(string motion) {
+
           if (allFilesSet.Contains(motion.Replace(".anm", ""))) {
             return false;
           } else {
             return true;
           }
         }
-        
-        
+
+
         //アニメーションステータスを取得する
-	private AnimationState GetCurrentAnimationState(Maid maid){
-		AnimationState state = null;
-		
-		// アニメーション取得
-		Animation anime = maid.body0.GetAnimation();
-		if( anime != null ){
-			// アニメーション状態取得
-			state = anime[ maid.body0.LastAnimeFN ];
-		}
-		return state;
-	}
-        
-	//モーションの速度を変更する
-	private bool AnimationSpeedChange(Maid maid, float changeSpeed){
-	
-		AnimationState maidAniState = GetCurrentAnimationState(maid);
-		if(maidAniState != null){
-			if(maidAniState.enabled && (maidAniState.wrapMode == WrapMode.Loop || maidAniState.wrapMode == WrapMode.Once || maidAniState.wrapMode == WrapMode.Default)){
-				maidAniState.speed = changeSpeed;
-				return true;
-			}
-		}
-		return false;
-	}
+        private AnimationState GetCurrentAnimationState(Maid maid) {
+          AnimationState state = null;
+
+          // アニメーション取得
+          Animation anime = maid.body0.GetAnimation();
+          if (anime != null) {
+            // アニメーション状態取得
+            state = anime[ maid.body0.LastAnimeFN ];
+          }
+          return state;
+        }
+
+        //モーションの速度を変更する
+        private bool AnimationSpeedChange(Maid maid, float changeSpeed) {
+
+          AnimationState maidAniState = GetCurrentAnimationState(maid);
+          if (maidAniState != null) {
+            if (maidAniState.enabled && (maidAniState.wrapMode == WrapMode.Loop || maidAniState.wrapMode == WrapMode.Once || maidAniState.wrapMode == WrapMode.Default)) {
+              maidAniState.speed = changeSpeed;
+              return true;
+            }
+          }
+          return false;
+        }
 
 
-      //モーションチェンジ関係終了-----------------------
+        //モーションチェンジ関係終了-----------------------
 
 
 
 
-      //-------------------------------------------------
-      //モーションセット関係-----------------------------
+        //-------------------------------------------------
+        //モーションセット関係-----------------------------
         private bool ms_Overwrite = false;
         private int msCategory = 0;
         private int msErrer = 0;
         private string[] msErrerText = new string[] { "" , "モーションセット名が空白のため保存できません" , "上書きする場合は『上書／ｸﾘｱ』にチェックを入れて下さい" , "クリアする場合は『上書／ｸﾘｱ』にチェックを入れて下さい"};
-        
+
         MotionSet_Xml MSX = new MotionSet_Xml();
-        public class MotionSet_Xml{
+        public class MotionSet_Xml {
           public string saveMotionSetName = "";
           public List<List<string>> saveMotionSet = new List<List<string>>();
-        
+
         }
 
         //モーションセットXMLファイルを読み込む
-        private void MotionSetLoad(string xml, int maidID){
+        private void MotionSetLoad(string xml, int maidID) {
 
           MotionSetLoad(xml);
 
@@ -6627,18 +6789,18 @@ namespace CM3D2.VibeYourMaid.Plugin {
           maidsState[maidID].editMotionSet = new List<List<string>>(MSX.saveMotionSet);
         }
 
-        private void MotionSetLoad(string xml){
+        private void MotionSetLoad(string xml) {
 
           //保存先のファイル名
           string fileName = @"Sybaris\UnityInjector\Config\VibeYourMaid\EditMotionSet\" + xml;
           Console.WriteLine(fileName);
-          
-          if (System.IO.File.Exists(fileName)){
+
+          if (System.IO.File.Exists(fileName)) {
             //XmlSerializerオブジェクトを作成
             System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(MotionSet_Xml));
             //読み込むファイルを開く
             System.IO.StreamReader sr = new System.IO.StreamReader(fileName, new System.Text.UTF8Encoding(false));
-            
+
             //XMLファイルから読み込み、逆シリアル化する
             MSX = (MotionSet_Xml)serializer.Deserialize(sr);
 
@@ -6649,39 +6811,39 @@ namespace CM3D2.VibeYourMaid.Plugin {
         }
 
         //モーションセットをXMLファイルに保存する
-        private void MotionSetSave(){
+        private void MotionSetSave() {
 
           // フォルダ確認
           if (!System.IO.Directory.Exists(@"Sybaris\UnityInjector\Config\VibeYourMaid\EditMotionSet\")) {
             //ない場合はフォルダ作成
             System.IO.DirectoryInfo di = System.IO.Directory.CreateDirectory(@"Sybaris\UnityInjector\Config\VibeYourMaid\EditMotionSet");
           }
-          
-          
-          if(MSX.saveMotionSetName == ""){  //ボイスセット名が空白の場合保存しない
+
+
+          if (MSX.saveMotionSetName == "") {  //ボイスセット名が空白の場合保存しない
             msErrer = 1;
-            
+
           } else {
             //保存先のファイル名
             string fileName = @"Sybaris\UnityInjector\Config\VibeYourMaid\EditMotionSet\ems_" + MSX.saveMotionSetName + @".xml";
-            
-            if (System.IO.File.Exists(fileName) && !ms_Overwrite){  //上書きのチェック
+
+            if (System.IO.File.Exists(fileName) && !ms_Overwrite) {  //上書きのチェック
               msErrer = 2;
 
             } else {
-            
+
               //XmlSerializerオブジェクトを作成
               //オブジェクトの型を指定する
               System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(MotionSet_Xml));
-              
+
               //書き込むファイルを開く（UTF-8 BOM無し）
               System.IO.StreamWriter sw = new System.IO.StreamWriter(fileName, false, new System.Text.UTF8Encoding(false));
-              
+
               //シリアル化し、XMLファイルに保存する
               serializer.Serialize(sw, MSX);
               //ファイルを閉じる
               sw.Close();
-              
+
               ms_Overwrite = false;
               msErrer = 0;
             }
@@ -6689,37 +6851,37 @@ namespace CM3D2.VibeYourMaid.Plugin {
         }
 
         //モーションセット再生処理
-        private void MotionSetPlay(int maidID, Maid maid, MaidState maidState, string s, float t){
-        
+        private void MotionSetPlay(int maidID, Maid maid, MaidState maidState, string s, float t) {
+
           string motion = s.Replace("[S]", "").Replace("[L]", "").Replace("_ONCE_", "_once_");
-          
+
           MotionAdjustDo(maidID, motion, true, -1);
-          
-          if(s.Contains("[S]") || motion.Contains("_once_")){
+
+          if (s.Contains("[S]") || motion.Contains("_once_")) {
             maidState.mOnceFlag = true;
             maidState.mOnceBack = motion;
-            if(motion.Contains("_once_") && MotionOldCheck(motion.Replace("f_once_", "taiki_f")) != -1){
+            if (motion.Contains("_once_") && MotionOldCheck(motion.Replace("f_once_", "taiki_f")) != -1) {
               maidState.mOnceBack = motion.Replace("f_once_", "taiki_f");
             }
-          }else{
+          } else {
             maidState.mOnceFlag = false;
             maidState.mOnceBack = "";
-            if ( maidState.vStateMajor == 20 ){ //強度に合わせて変更
+            if ( maidState.vStateMajor == 20 ) { //強度に合わせて変更
               motion = motion.Replace("_1_", "_2_");
-            } else if ( maidState.vStateMajor == 30 ){
+            } else if ( maidState.vStateMajor == 30 ) {
               motion = motion.Replace("_1_", "_3_");
             }
           }
-          
+
           MotionChange(maid, motion, !maidState.mOnceFlag, t, 1f);
           //サブメイドとのリンクは解除
           maidState.motionLinkID = -1;
           if (maidState.motionLinkID != -1) maidsState[maidState.motionLinkID].motionLinkID = -1;
-          if((motion.Contains("yuri") || motion.Contains("harem") || motion.Contains("wfera") || motion.Contains("wasikoki"))) {
+          if ((motion.Contains("yuri") || motion.Contains("harem") || motion.Contains("wfera") || motion.Contains("wasikoki"))) {
             SubMotionChange(maidID, motion, !maidState.mOnceFlag, true, t, 1f);
             //サブメイドにリンクしている男を削除
             if (cfgw.autoManEnabled && maidState.motionLinkID != -1) {
-              for (int im = 0; im < SubMans.Length; im++){
+              for (int im = 0; im < SubMans.Length; im++) {
                 if (SubMans[im] && MansTg[im] == maidState.motionLinkID && SubMans[im].Visible) SubMans[im].Visible = false;
               }
             }
@@ -6727,66 +6889,68 @@ namespace CM3D2.VibeYourMaid.Plugin {
           //男を自動表示
           AutoMansVisible(maidID, s);
           ManMotionChange(motion, maidID, !maidState.mOnceFlag, t, 1f);
-          
+
           //タイマーリセット
           maidState.motionHoldTime = UnityEngine.Random.Range(200f,600f);
           maidState.voiceHoldTime = 0f;
           maidState.faceHoldTime = 0f;
           maidState.MouthHoldTime = 0f;
-        
+
         }
-        
-        
-        private void MotionSetChange(int maidID, Maid maid, MaidState maidState){
-        
-          if(maidState.editMotionSetName == "")return;
+
+
+        private void MotionSetChange(int maidID, Maid maid, MaidState maidState) {
+
+          if (maidState.editMotionSetName == "") return;
           maidState.msTime1 -= timerRate;
-          
+
           //シングルモーション後の処理
-          if(maidState.mOnceFlag){
+          if (maidState.mOnceFlag) {
             Animation anim = maid.body0.GetAnimation();
-            if(!anim.isPlaying){
+            if (!anim.isPlaying) {
               maidState.msTime2 = 1f;
               maidState.mOnceFlag = false;
-              if(MotionOldCheckB(maidState.mOnceBack)){
-                maid.CrossFadeAbsolute( maidState.mOnceBack, GameUty.FileSystemOld, false, true, false, 0f, 1f );
-              }else{
-                maid.CrossFadeAbsolute( maidState.mOnceBack, GameUty.FileSystem, false, true, false, 0f, 1f );
+              if (maid.body0.m_Bones != null) { //エラー対策
+                if (MotionOldCheckB(maidState.mOnceBack)) {
+                  maid.CrossFadeAbsolute( maidState.mOnceBack, GameUty.FileSystemOld, false, true, false, 0f, 1f );
+                } else {
+                  maid.CrossFadeAbsolute( maidState.mOnceBack, GameUty.FileSystem, false, true, false, 0f, 1f );
+                }
               }
             }
             return;
           }
-          
+
           //カテゴリ変更
-          if(maidState.msTime1 < 0){
+          if (maidState.msTime1 < 0) {
             maidState.msCategory = UnityEngine.Random.Range(0, maidState.editMotionSet.Count);
             maidState.msTime1 = UnityEngine.Random.Range(4000f, 6000f) + ((maidState.editMotionSet[maidState.msCategory].Count - 5) * 600);
-            
+
             //強度に合わせてモーション名を変更
             string cMotion = maidState.editMotionSet[maidState.msCategory][0];
-            if ( maidState.vStateMajor == 20 ){
+            if ( maidState.vStateMajor == 20 ) {
               cMotion = cMotion.Replace("_1_", "_2_");
-            } else if ( maidState.vStateMajor == 30 ){
+            } else if ( maidState.vStateMajor == 30 ) {
               cMotion = cMotion.Replace("_1_", "_3_");
             }
 
             string inMotion = MotionCheckTokusyu(maidState.editMotionSet[maidState.msCategory][0], sInMaidMotion); //挿入モーションがあるかチェック
-            if(inMotion == "Non" || inMotion == maidState.inMotion){
+            if (inMotion == "Non" || inMotion == maidState.inMotion) {
               MotionSetPlay(maidID, maid, maidState, cMotion, cfgw.majFadeTime);
               maidState.msTime2 = 90f;
-              
-            }else{
+
+            } else {
               MotionAdjustDo(maidID, maidState.editMotionSet[maidState.msCategory][0], true, -1);
-              
+
               MotionChange(maid, inMotion + ".anm", false, cfgw.majFadeTime, 1f);
               // 終わったら再生する
               MotionChangeAf(maid, cMotion, true, cfgw.majFadeTime, 1f);
-              
+
               //サブメイドとのリンクは解除
               maidState.motionLinkID = -1;
               if (maidState.motionLinkID != -1) maidsState[maidState.motionLinkID].motionLinkID = -1;
               //百合・ハーレム相手のモーション変更
-              if((inMotion.Contains("yuri") || inMotion.Contains("harem") || inMotion.Contains("wfera") || inMotion.Contains("wasikoki"))){
+              if ((inMotion.Contains("yuri") || inMotion.Contains("harem") || inMotion.Contains("wfera") || inMotion.Contains("wasikoki"))) {
                 SubMotionChange(maidID, inMotion + ".anm", false, true, cfgw.majFadeTime, 1f);
                 SubMotionChange(maidID, cMotion, true, false, cfgw.majFadeTime, 1f);
                 //サブメイドにリンクしている男を削除
@@ -6802,7 +6966,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
               ManMotionChange(inMotion + ".anm", maidID, false,cfgw.majFadeTime, 1f);
               ManMotionChangeAf(cMotion, maidID, true, cfgw.majFadeTime, 1f);
 
-              if(maidState.uDatsu == 2 && maj.hkupa1[maidState.motionID] > 50f){
+              if (maidState.uDatsu == 2 && maj.hkupa1[maidState.motionID] > 50f) {
                 maidState.uDatsuValue1 = 0f;
                 maidState.uDatsu = 0;
                 try { VertexMorph_FromProcItem(maid.body0, "pussy_uterus_prolapse", 0f); } catch { /*LogError(ex);*/ }
@@ -6817,22 +6981,22 @@ namespace CM3D2.VibeYourMaid.Plugin {
             }
             maidState.inMotion = inMotion;
           }
-          
+
           //モーション変更
-          if(maidState.msTime2 < 0){
+          if (maidState.msTime2 < 0) {
             int i = UnityEngine.Random.Range(0, maidState.editMotionSet[maidState.msCategory].Count);
             string motion = maidState.editMotionSet[maidState.msCategory][i];
             MotionSetPlay(maidID, maid, maidState, motion, cfgw.majFadeTime);
 
             maidState.msTime2 = UnityEngine.Random.Range(1500f, 2000f);
-            if(maidState.msTime1 < maidState.msTime2)maidState.msTime1 = maidState.msTime2 - 10f;
+            if (maidState.msTime1 < maidState.msTime2) maidState.msTime1 = maidState.msTime2 - 10f;
           }
-          
+
           maidState.msTime2 -= timerRate;
-        
+
         }
-        
-        private void MotionSetClear(int maidID){
+
+        private void MotionSetClear(int maidID) {
           maidsState[maidID].editMotionSetName = "";
           maidsState[maidID].editMotionSet = new List<List<string>>();
           maidsState[maidID].msTime1 = 0f;
@@ -6852,10 +7016,10 @@ namespace CM3D2.VibeYourMaid.Plugin {
       //演出関係-----------------------------------------
 
         //吐息 夜伽では事前にYotogiPlayManager.breatheObjectsが生成される影響でコマンドが選択できなくなるので無効 → 標準の夜伽の機能で興奮値200以上で表示される
-        private void EffectToiki(Maid maid, MaidState maidState){
-          
+        private void EffectToiki(Maid maid, MaidState maidState) {
+
           if (!maidState.fToiki1) {
-            if(maidState.kaikanLevel > 3){
+            if (maidState.kaikanLevel > 3) {
               //吐息無効なら非表示
               if (vSceneLevel == 14) {
                 GameObject obj = maid.GetPrefab("夜伽_吐息");
@@ -6866,7 +7030,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
               maidState.fToiki1 = true;
             }
           } else {
-            if(maidState.vStateMajor == 10){
+            if (maidState.vStateMajor == 10) {
               if (vSceneLevel == 14) {
                 GameObject obj = maid.GetPrefab("夜伽_吐息");
                 if (obj) obj.SetActive(false);
@@ -6878,35 +7042,36 @@ namespace CM3D2.VibeYourMaid.Plugin {
           }
 
           if (vSceneLevel != 14) { //夜伽ではエラーになるので無効
-            if(!maidState.fToiki2){
-              if(maidState.kaikanLevel > 6){
+            if (!maidState.fToiki2) {
+              if (maidState.kaikanLevel > 6) {
                 //吐息無効なら非表示
                 if (cfgw.ToikiEnabled) maid.AddPrefab("Particle/pToiki", "夜伽_吐息2", "Bip01 Head", new Vector3(0.042f, 0.076f, 0f), new Vector3(-90f, 90f, 0f));
                 maidState.fToiki2 = true;
               }
-            }else {
+            } else {
               maid.DelPrefab("夜伽_吐息2");
               maidState.fToiki2 = false;
             }
           }
         }
-        
-        
+
+
         //愛液 夜伽では事前にYotogiPlayManager.loveLiquidObjectsが生成される影響でコマンドが選択できなくなるので無効 → 標準の夜伽の機能で興奮値100以上で表示される
-        private void EffectAieki(Maid maid, MaidState maidState){
+        private void EffectAieki(Maid maid, MaidState maidState) {
 
           if (!maidState.fAieki1) {
-            if(maidState.exciteLevel > 1){
+            if (maidState.exciteLevel > 1) {
               if (vSceneLevel == 14) {
                 GameObject obj = maid.GetPrefab("夜伽_愛液1");
                 if (obj) obj.SetActive(cfgw.AiekiEnabled);
               } else {
                 if (cfgw.AiekiEnabled) maid.AddPrefab("Particle/pPistonEasy_cm3D2", "夜伽_愛液1", "_IK_vagina", new Vector3(0f, 0f, 0.01f), new Vector3(0f, -180f, 90f));
               }
+              setAiekiPrefab(maid.GetPrefab("夜伽_愛液1"));
               maidState.fAieki1 = true;
             }
           } else {
-            if(maidState.exciteLevel <= 1 || maidState.vStateMajor == 10 || maidState.vStateMajor == 40){
+            if (maidState.exciteLevel <= 1 || maidState.vStateMajor == 10 || maidState.vStateMajor == 40) {
               if (vSceneLevel == 14) {
                 GameObject obj = maid.GetPrefab("夜伽_愛液1");
                 if (obj) obj.SetActive(false);
@@ -6918,17 +7083,18 @@ namespace CM3D2.VibeYourMaid.Plugin {
           }
 
           if (!maidState.fAieki2) {
-            if(maidState.exciteLevel > 2){
+            if (maidState.exciteLevel > 2) {
               if (vSceneLevel == 14) {
                 GameObject obj = maid.GetPrefab("夜伽_愛液2");
                 if (obj) obj.SetActive(cfgw.AiekiEnabled);
               } else {
                 if (cfgw.AiekiEnabled) maid.AddPrefab("Particle/pPistonNormal_cm3D2", "夜伽_愛液2", "_IK_vagina", new Vector3(0f, 0f, 0.01f), new Vector3(0f, -180f, 90f));
               }
+              setAiekiPrefab(maid.GetPrefab("夜伽_愛液2"));
               maidState.fAieki2 = true;
             }
           } else {
-            if(maidState.exciteLevel <= 2 || maidState.vStateMajor == 10 || maidState.vStateMajor == 40){
+            if (maidState.exciteLevel <= 2 || maidState.vStateMajor == 10 || maidState.vStateMajor == 40) {
               if (vSceneLevel == 14) {
                 GameObject obj = maid.GetPrefab("夜伽_愛液2");
                 if (obj) obj.SetActive(false);
@@ -6940,17 +7106,18 @@ namespace CM3D2.VibeYourMaid.Plugin {
           }
 
           if (!maidState.fAieki3) {
-            if(maidState.exciteLevel > 3){
+            if (maidState.exciteLevel > 3) {
               if (vSceneLevel == 14) {
                 GameObject obj = maid.GetPrefab("夜伽_愛液3");
                 if (obj) obj.SetActive(cfgw.AiekiEnabled);
               } else {
                 if (cfgw.AiekiEnabled) maid.AddPrefab("Particle/pPistonHard_cm3D2", "夜伽_愛液3", "_IK_vagina", new Vector3(0f, 0f, 0.01f), new Vector3(0f, -180f, 90f));
               }
+              setAiekiPrefab(maid.GetPrefab("夜伽_愛液3"));
               maidState.fAieki3 = true;
             }
           } else {
-            if(maidState.exciteLevel <= 3 || maidState.vStateMajor == 10 || maidState.vStateMajor == 40){
+            if (maidState.exciteLevel <= 3 || maidState.vStateMajor == 10 || maidState.vStateMajor == 40) {
               if (vSceneLevel == 14) {
                 GameObject obj = maid.GetPrefab("夜伽_愛液3");
                 if (obj) obj.SetActive(false);
@@ -6960,26 +7127,53 @@ namespace CM3D2.VibeYourMaid.Plugin {
               maidState.fAieki3 = false;
             }
           }
-          
+
         }
-        
-        
-        //おしっこ
-        private void EffectNyo(int maidID, MaidState maidState, float volume){
-          if(!cfgw.NyoEnabled )return;
-          Maid maid = stockMaids[maidID].mem;
-          float hValue = Math.Max(maidState.hibuValue, maidState.hibuTempValue)*0.01f;
+        //愛液のPrefabを調整
+        private void setAiekiPrefab(GameObject prefab)
+        {
+          if (prefab) {
+            float xyScale = UnityEngine.Random.Range(0.9f, 1.1f);
+            prefab.transform.localScale = new Vector3(cfgw.AiekiScale[0]*xyScale, cfgw.AiekiScale[1]*xyScale, cfgw.AiekiScale[2]*UnityEngine.Random.Range(0.9f, 1.1f)); //スケール変更
+            foreach (ParticleSystem particle in prefab.GetComponentsInChildren<ParticleSystem>()) {
+              var main = particle.main;
+              main.scalingMode = ParticleSystemScalingMode.Hierarchy; //スケールを親から引き継ぐ
+              if (cfgw.AiekiGravity >= 0) main.gravityModifier = cfgw.AiekiGravity; //重力
+              if (cfgw.AiekiDuration >= 0) main.duration = cfgw.AiekiDuration; //時間
+            }
+          }
+        }
+
+        //おしっこ volumeは判定用で噴出量には影響しない
+        private void EffectNyo(Maid maid, MaidState maidState, float volume, bool force) {
+
+          if (!cfgw.NyoEnabled ) return;
+
+          //尿が吹き終わるまで次の再生をしないなら終了
+          if (!force && cfgw.NyoWaitPlaying) {
+            if (maid.GetPrefab("pNyou_cm3D2")) return;
+          }
+
+          //float hValue = Math.Max(maidState.hibuValue, maidState.hibuTempValue)*0.01f;
+          float hValue = GetBlendValues(maid.body0, "body", "kupa");
+          //尿道が下にある場合の追加補正
+          Transform tm = CMT.SearchObjName(maid.body0.m_Bones.transform, "Bip01 Pelvis", true);
+          Vector3 vec = tm.rotation * Vector3.up; //仰向 vec.y=1 俯せ vec.y=-1
+          //Console.WriteLine("Forward x="+vec.x+" y="+vec.y+" z="+vec.z);
+          float yOffset = Math.Max(0, - vec.y * cfgw.NyoInvertOffsetY);
+
           maid.DelPrefab("pNyou_cm3D2");
           //maid.AddPrefab("Particle/pNyou_cm3D2", "pNyou_cm3D2", "_IK_vagina", new Vector3(0f, -0.047f, 0.011f), new Vector3(20.0f, -180.0f, 180.0f));
-          maid.AddPrefab("Particle/pNyou_cm3D2", "pNyou_cm3D2", "_IK_vagina", new Vector3(0f, -0.01f-hValue*0.0135f, 0.01f), new Vector3(20.0f, -180.0f, 180.0f));
+          maid.AddPrefab("Particle/pNyou_cm3D2", "pNyou_cm3D2", "_IK_vagina", new Vector3(0f, -(cfgw.NyoOffsetY + hValue*cfgw.NyoKupaMove + yOffset), cfgw.NyoOffsetZ), new Vector3(20.0f, -180.0f, 180.0f)); //仰向けでの右手座標(左後奥が正)
           GameMain.Instance.SoundMgr.PlaySe("SE011.ogg", false);
           if (cfgw.NyoHeightFix) {
             GameObject prefab = maid.GetPrefab("pNyou_cm3D2");
             if (prefab) {
+              Renderer r = prefab.GetComponent<Renderer>();
+              if (r && r.material) r.material.renderQueue = cfgw.NyoRenderQueue;
               float floor = maid.body0.BoneHitHeightY;
-              ParticleSystem[] particles = prefab.GetComponentsInChildren<ParticleSystem>();
-              for (int i=0; i<particles.Length; i++) {
-                var collision = particles[i].collision;
+              foreach (ParticleSystem particle in prefab.GetComponentsInChildren<ParticleSystem>()) {
+                var collision = particle.collision;
                 for (int j=0; j<collision.maxPlaneCount; j++) {
                   Transform plane = collision.GetPlane(j);
                   if (plane) plane.position = new Vector3(plane.position.x, floor, plane.position.z);
@@ -6987,7 +7181,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
               }
             }
           }
-          
+
           maidState.nyoTotal1 += 1;
           maidState.nyoTotal2 += volume;
           maidState.nyoVolume -= volume;
@@ -6995,26 +7189,35 @@ namespace CM3D2.VibeYourMaid.Plugin {
           maidState.nyodoValue = 1f;
           maidState.nyodoTime = Time.time + 0.4f; //0.4秒後から開く
           maidState.nyodoKeepTime = Time.time + 5f; //5秒後から閉じる
-          EffectNyodo(maidID, maidState);
+          EffectNyodo(maid, maidState);
         }
-        
-        
-        //潮吹き
-        private void EffectSio(int maidID, Maid maid, MaidState maidState){
-          
-          if(!cfgw.SioEnabled || !maidState.fSio)return;
 
-          if(!maidState.fSio2){
+
+        //潮吹き
+        private void EffectSio(Maid maid, MaidState maidState) {
+
+          if (!cfgw.SioEnabled || !maidState.fSio) return;
+
+          //カウント
+          if (!maidState.fSio2) {
             maidState.fSio2 = true;
             maidState.sioTotal1 += 1;
           }
-          if(maidState.sioTime2 <= Time.time){
+
+          //潮吹き終了
+          if (maidState.sioTime <= Time.time) {
+            maidState.fSio = false;
+            maidState.fSio2 = false;
+          } else if (maidState.sioTime2 <= Time.time) {
             float duration = cfgw.SioDuration * UnityEngine.Random.Range(0.9f, 1.1f);  //噴出時間
-            float hValue = Math.Max(maidState.hibuValue, maidState.hibuTempValue)*0.01f;
+            //float hValue = Math.Max(maidState.hibuValue, maidState.hibuTempValue)*0.01f;
+            float hValue = GetBlendValues(maid.body0, "body", "kupa");
             maid.DelPrefab(cfgw.SioParticle);
-            maid.AddPrefab("Particle/"+cfgw.SioParticle, cfgw.SioParticle, "_IK_vagina", new Vector3(0f, -0.012f-hValue*0.0135f, 0f), new Vector3(0f, 180.0f, 0f)); //左 後 奥
+            maid.AddPrefab("Particle/"+cfgw.SioParticle, cfgw.SioParticle, "_IK_vagina", new Vector3(0f, -(cfgw.SioOffsetY + hValue*cfgw.SioKupaMove), cfgw.SioOffsetZ), new Vector3(0f, 180.0f, 0f)); //仰向けでの右手座標(左後奥が正)
             GameObject prefab = maid.GetPrefab(cfgw.SioParticle);
             if (prefab) {
+              Renderer r = prefab.GetComponent<Renderer>();
+              if (r && r.material) r.material.renderQueue = cfgw.SioRenderQueue;
               float xyScale = UnityEngine.Random.Range(0.9f, 1.1f);
               prefab.transform.localScale = new Vector3(cfgw.SioScale[0]*xyScale, cfgw.SioScale[1]*xyScale, cfgw.SioScale[2]*UnityEngine.Random.Range(0.9f, 1.1f)); //スケール変更
               float floor = maid.body0.BoneHitHeightY;
@@ -7022,17 +7225,21 @@ namespace CM3D2.VibeYourMaid.Plugin {
               if (footTm) floor = Math.Min(floor, footTm.position.y-0.05f);
               footTm = CMT.SearchObjName(maid.body0.m_Bones.transform, "Bip01 R Foot", true); //右足
               if (footTm) floor = Math.Min(floor, footTm.position.y-0.05f);*/
-              ParticleSystem[] particles = prefab.GetComponentsInChildren<ParticleSystem>();
-              for (int i=0; i<particles.Length; i++) {
-                var main = particles[i].main;
+              foreach (ParticleSystem particle in prefab.GetComponentsInChildren<ParticleSystem>()) {
+                var main = particle.main;
                 main.scalingMode = ParticleSystemScalingMode.Hierarchy; //スケールを親から引き継ぐ
                 main.gravityModifier = cfgw.SioGravity; //重力減少
                 main.duration = duration;
                 if (cfgw.SioHeightFix) {
-                  var collision = particles[i].collision;
+                  var collision = particle.collision;
                   for (int j=0; j<collision.maxPlaneCount; j++) {
                     Transform plane = collision.GetPlane(j);
-                    if (plane) plane.position = new Vector3(plane.position.x, floor, plane.position.z);
+                    if (plane) {
+                      //Console.WriteLine("Sio plane["+j+"] ("+plane.position.x+","+plane.position.y+","+plane.position.z+") floor="+floor);
+                      //floorがマイナスだとなぜか衝突するのでさらに下げる
+                      if (floor < 0) floor = floor * 1.5f;
+                      plane.position = new Vector3(plane.position.x, floor, plane.position.z);
+                    }
                   }
                 }
               }
@@ -7040,29 +7247,22 @@ namespace CM3D2.VibeYourMaid.Plugin {
               //追加されなかったらデフォルト潮
               maid.AddPrefab("Particle/pSio2_cm3D2", "pSio2_cm3D2", "_IK_vagina", new Vector3(0.006f, 0f, 0.03f), new Vector3(0f, 180.0f, 0f)); //左 後 奥
             }
-            maidState.sioTime2 = Time.time + UnityEngine.Random.Range(1f,9f); //次の潮吹までの時間
+            maidState.sioTime2 = Time.time + UnityEngine.Random.Range(cfgw.orgazmSioNextMin, cfgw.orgazmSioNextMax); //次の潮吹までの待ち時間
             //GameMain.Instance.SoundMgr.PlaySe("se061.ogg", false);
-            
-            maidState.sioTotal2 += UnityEngine.Random.Range(3f,5f);
-          
+
+            maidState.sioTotal2 += duration;
+
             maidState.nyodoValue = 1f;
             maidState.nyodoTime = Time.time;
             maidState.nyodoKeepTime = Math.Max(maidState.nyodoKeepTime, Time.time + duration - 1.25f); //放尿時間も考慮
-            EffectNyodo(maidID, maidState);
-          }
-
-          if(maidState.sioTime <= Time.time){
-            maidState.fSio = false;
-            maidState.fSio2 = false;
-            maidState.sioTime2 = 0f;
+            EffectNyodo(maid, maidState);
           }
         }
-        
+
         //尿道開度チェック LateUpdateから呼ばれる
-        private void EffectNyodo(int maidID, MaidState maidState) {
+        private void EffectNyodo(Maid maid, MaidState maidState) {
           if (maidState.nyodoTime > Time.time || maidState.nyodoValue <= 0.01f) return;
 
-          Maid maid = stockMaids[maidID].mem;
           float randomValue = 1f;
           if (maidState.nyodoKeepTime > Time.time) {
             randomValue = UnityEngine.Random.Range(0.6f, 1.0f);
@@ -7081,131 +7281,131 @@ namespace CM3D2.VibeYourMaid.Plugin {
             VertexMorph_FromProcItem(maid.body0, "nyodokupa", maidState.nyodoValue * randomValue);
           } catch { /*LogError(ex);*/ }
         }
-        
+
         //射精
-        private void EffectSyasei(int maidID, int mode, bool naka){
-          
-          if(mode == 6)return;
+        private void EffectSyasei(int maidID, int mode, bool naka) {
+
+          if (mode == 6) return;
           string[] marks = new string[] { "", "", ""};
           int i = 3;
-          
-          switch(mode){
+
+          switch (mode) {
               default: //指定無し
-                  if(naka){
-                    if(!maidsState[maidID].analMode){
+                  if (naka) {
+                    if (!maidsState[maidID].analMode) {
                       marks = new string[] { "", "秘部", "秘部"};
                       i = 0;
                     }
-                    if(maidsState[maidID].analMode){
+                    if (maidsState[maidID].analMode) {
                       marks = new string[] { "", "尻", "尻"};
                       i = 1;
                     }
                   }
-                  if(!naka)marks = new string[] { "太股", "腹" ,"胸"};
+                  else marks = new string[] { "太股", "腹" ,"胸"};
                   break;
-          
+
               case 1: //挿入 前
-                  if(naka){
-                    if(!maidsState[maidID].analMode){
+                  if (naka) {
+                    if (!maidsState[maidID].analMode) {
                       marks = new string[] { "", "秘部", "秘部"};
                       i = 0;
                     }
-                    if(maidsState[maidID].analMode){
+                    if (maidsState[maidID].analMode) {
                       marks = new string[] { "", "尻", "尻"};
                       i = 1;
                     }
                   }
-                  if(!naka)marks = new string[] { "太股", "腹" ,"胸"};
+                  else marks = new string[] { "太股", "腹" ,"胸"};
                   break;
-          
+
               case 2: //挿入 後
-                  if(naka){
-                    if(!maidsState[maidID].analMode){
+                  if (naka) {
+                    if (!maidsState[maidID].analMode) {
                       marks = new string[] { "", "秘部", "秘部"};
                       i = 0;
                     }
-                    if(maidsState[maidID].analMode){
+                    if (maidsState[maidID].analMode) {
                       marks = new string[] { "", "尻", "尻"};
                       i = 1;
                     }
                   }
-                  if(!naka)marks = new string[] { "太股", "尻" ,"背中"};
+                  else marks = new string[] { "太股", "尻" ,"背中"};
                   break;
-          
+
               case 3: //フェラ
-                  if(naka){
+                  if (naka) {
                     marks = new string[] { "", "口元", "口元"};
                     i = 2;
                   }
-                  if(!naka)marks = new string[] { "顔", "顔", "胸"};
+                  else marks = new string[] { "顔", "顔", "胸"};
                   break;
-          
+
               case 4: //手コキ
                   marks = new string[] { "顔", "胸", "腹"};
                   break;
-          
+
               case 5: //足コキ
                   marks = new string[] { "太股", "太股", ""};
                   break;
-          
+
               case 7: //アナル 前
-                  if(naka){
+                  if (naka) {
                     marks = new string[] { "", "尻", "尻"};
                     i = 1;
                   }
-                  if(!naka)marks = new string[] { "太股", "腹" ,"胸"};
+                  else marks = new string[] { "太股", "腹" ,"胸"};
                   break;
-          
+
               case 8: //アナル 後
-                  if(naka){
+                  if (naka) {
                     marks = new string[] { "", "尻", "尻"};
                     i = 1;
                   }
-                  if(!naka)marks = new string[] { "太股", "尻" ,"背中"};
+                  else marks = new string[] { "太股", "尻" ,"背中"};
                   break;
           }
-        
-          StartCoroutine (EffectSyasei(maidID, marks, i));
+
+          StartCoroutine(EffectSyasei(maidID, marks, i));
         }
-        
-        
-        private IEnumerator EffectSyasei(int maidID, string[] marks, int i){
-        
+
+
+        private IEnumerator EffectSyasei(int maidID, string[] marks, int i) {
+
           maidsState[maidID].syaseiTotal1[i] += 1;
-          foreach (string m in marks){
+          foreach (string m in marks) {
             yield return new WaitForSeconds (1f);  // 1秒待つ
-            
+
             GameMain.Instance.SoundMgr.PlaySe("se016.ogg" , false);
             maidsState[maidID].syaseiTotal2[i] += UnityEngine.Random.Range(1f,2f);
-            if(m == "太股"){
+            if (m == "太股") {
               EffectSeieki(maidID, m);
               EffectSeieki(maidID, m);
               EffectSeieki(maidID, m);
-            }else if(m == "背中" || m == "尻" || m == "腹" || m == "胸"){
+            } else if (m == "背中" || m == "尻" || m == "腹" || m == "胸") {
               EffectSeieki(maidID, m);
               EffectSeieki(maidID, m);
-            }else{
+            } else {
               EffectSeieki(maidID, m);
             }
           }
-          
+
           //エロステータス更新
           SaveEroState(maidID);
         }
 
-        private bool SyaseiCheck(int maidID, float check){
-          for (int im = 0; im < SubMans.Length; im++){
-            if(!SubMans[im].Visible || MansTg[im] != maidID)continue;
+        private bool SyaseiCheck(int maidID, float check) {
+          for (int im = 0; im < SubMans.Length; im++) {
+            if (!SubMans[im].Visible || MansTg[im] != maidID) continue;
             float fDistance = Vector3.Distance(stockMaids[maidID].mem.transform.position, SubMans[im].transform.position);
-            if(fDistance > 1f)continue;
-            if(syaseiValue[im] >= check)return true;
+            if (fDistance > 1f) continue;
+            if (syaseiValue[im] >= check) return true;
           }
           return false;
         }
-        
-        
-        public class SeiekiInfo{
-        
+
+
+        public class SeiekiInfo
+        {
           private String slotName;
           private int matNo;
           private int layer;
@@ -7219,7 +7419,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
           private float minScale;
           private float maxScale;
 
-          public SeiekiInfo(String slotName, int matNo, int layer, String res, int minX, int maxX, int minY, int maxY, float minRot, float maxRot, float minScale, float maxScale){
+          public SeiekiInfo(String slotName, int matNo, int layer, String res, int minX, int maxX, int minY, int maxY, float minRot, float maxRot, float minScale, float maxScale) {
             this.slotName = slotName;
             this.matNo = matNo;
             this.layer = layer;
@@ -7234,75 +7434,75 @@ namespace CM3D2.VibeYourMaid.Plugin {
             this.maxScale = maxScale;
           }
 
-          
-          public String SlotName{
+
+          public String SlotName {
             get { return this.slotName; }
           }
-          public int MatNo{
+          public int MatNo {
             get { return this.matNo; }
           }
-          public int Layer{
+          public int Layer {
             get { return this.layer; }
           }
-          public String Res{
+          public String Res {
             get { return this.res; }
           }
-          
-          public String GetFilName(){
+
+          public String GetFilName() {
             string[] strArray = this.res.Split(':');
             return "res:" + strArray[UnityEngine.Random.Range(0, strArray.Length)];
           }
 
-          public int MinX{
+          public int MinX {
             get { return this.minX; }
           }
 
-          public int MaxX{
+          public int MaxX {
             get { return this.maxX; }
           }
 
-          public int GetX(){
+          public int GetX() {
             return UnityEngine.Random.Range(this.minX, this.maxX);
           }
 
-          public int MinY{
+          public int MinY {
             get { return this.minY; }
           }
 
-          public int MaxY{
+          public int MaxY {
             get { return this.maxY; }
           }
 
-          public int GetY(){
+          public int GetY() {
             return (int)UnityEngine.Random.Range(this.minY, this.maxY);
           }
 
-          public float MinRot{
+          public float MinRot {
             get { return this.minRot; }
           }
 
-          public float MaxRot{
+          public float MaxRot {
             get { return this.maxRot; }
           }
 
-          public float GetRot(){
+          public float GetRot() {
             return UnityEngine.Random.Range(this.minRot, this.maxRot);
           }
 
-          public float MinScale{
+          public float MinScale {
             get { return this.minScale; }
           }
 
-          public float MaxScale{
+          public float MaxScale {
             get { return this.maxScale; }
           }
 
-          public float GetScale(){
+          public float GetScale() {
             return UnityEngine.Random.Range(this.minScale, this.maxScale);
           }
         }
 
-        private static readonly List<SeiekiInfo> KaoMarks = new List<SeiekiInfo>(){
+        private static readonly List<SeiekiInfo> KaoMarks = new List<SeiekiInfo>() {
             new SeiekiInfo("head", 5, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe003", 378, 452, 628, 820, 330, 360, 1.5f, 1.5f),
             new SeiekiInfo("head", 5, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe003r", 572, 646, 628, 820, 0, 30, 1.5f, 1.5f),
             new SeiekiInfo("head", 5, 18, "Seieki/spe004:Seieki/spe005", 429, 593, 575, 672, 340, 380, 1.5f, 1.5f),
@@ -7312,7 +7512,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
             new SeiekiInfo("head", 5, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe003r", 572, 646, 628, 820, 315, 405, 1.5f, 1.5f),
         };
 
-        private static readonly List<SeiekiInfo> MuneMarks = new List<SeiekiInfo>(){
+        private static readonly List<SeiekiInfo> MuneMarks = new List<SeiekiInfo>() {
             new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe007:Seieki/spe008:Seieki/spe009", 412, 449, 428, 470, 10, 20, 0.5f, 0.5f),
             new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe007:Seieki/spe008:Seieki/spe009", 397, 404, 444, 487, 340, 350, 0.5f, 0.5f),
             new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe007r:Seieki/spe008r:Seieki/spe009r", 455, 492, 428, 470, 340, 350, 0.5f, 0.5f),
@@ -7331,7 +7531,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
             new SeiekiInfo("body", 0, 18, "Seieki/spe004:Seieki/spe005:Seieki/spe008:Seieki/spe008r:Seieki/spe010:Seieki/spe012:Seieki/spe012r", 509, 515, 420, 479, 350, 370, 0.5f, 0.5f),
         };
 
-        private static readonly List<SeiekiInfo> KuchimotoMarks = new List<SeiekiInfo>(){
+        private static readonly List<SeiekiInfo> KuchimotoMarks = new List<SeiekiInfo>() {
             new SeiekiInfo("head", 5, 18, "Seieki/spe001:Seieki/spe008:Seieki/spe009", 438, 483, 742, 857, 350, 360, 1.5f, 1.5f),
             new SeiekiInfo("head", 5, 18, "Seieki/spe001:Seieki/spe008:Seieki/spe009", 398, 442, 768, 876, 350, 360, 1.5f, 1.5f),
             new SeiekiInfo("head", 5, 18, "Seieki/spe001r:Seieki/spe008r:Seieki/spe009r", 541, 586, 742, 857, 0, 10, 1.5f, 1.5f),
@@ -7339,7 +7539,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
             new SeiekiInfo("head", 5, 18, "Seieki/spe006:Seieki/spe007", 473, 550, 826, 861, 0, 0, 1.5f, 1.5f),
         };
 
-        private static readonly List<SeiekiInfo> SenakaMarks = new List<SeiekiInfo>(){
+        private static readonly List<SeiekiInfo> SenakaMarks = new List<SeiekiInfo>() {
             new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe003r:Seieki/spe006r:Seieki/spe007r:Seieki/spe008r:Seieki/spe009r:Seieki/spe014r", 424, 479, 183, 236, 170, 210, 0.7f, 0.7f),
             new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe003r:Seieki/spe006r:Seieki/spe007r:Seieki/spe008r:Seieki/spe009r:Seieki/spe014r", 414, 469, 256, 314, 170, 210, 0.7f, 0.7f),
             new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe003r:Seieki/spe006r:Seieki/spe007r:Seieki/spe008r:Seieki/spe009r:Seieki/spe014r", 483, 503, 248, 318, 170, 190, 0.7f, 0.7f),
@@ -7358,7 +7558,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
             new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe003:Seieki/spe006:Seieki/spe007:Seieki/spe008:Seieki/spe009:Seieki/spe014", 525, 554, 77, 169, 170, 190, 0.7f, 0.7f),
         };
 
-        private static readonly List<SeiekiInfo> SiriMarks = new List<SeiekiInfo>(){
+        private static readonly List<SeiekiInfo> SiriMarks = new List<SeiekiInfo>() {
             new SeiekiInfo("body", 0, 18, "Seieki/spe004:Seieki/spe005:Seieki/spe010:Seieki/spe012:Seieki/spe013", 229, 240, 870, 877, 325, 345, 0.6f, 0.6f),
             new SeiekiInfo("body", 0, 18, "Seieki/spe004:Seieki/spe005r:Seieki/spe010r:Seieki/spe012:Seieki/spe013:Seieki/spe014", 215, 243, 836, 847, 0, 30, 0.4f, 0.4f),
             new SeiekiInfo("body", 0, 18, "Seieki/spe004r:Seieki/spe005r:Seieki/spe010r:Seieki/spe012r:Seieki/spe013r:Seieki/spe014r", 257, 285, 828, 839, 330, 360, 0.4f, 0.4f),
@@ -7385,7 +7585,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
             new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe003:Seieki/spe006:Seieki/spe007:Seieki/spe008:Seieki/spe009:Seieki/spe011:Seieki/spe014r", 771, 806, 778, 823, 0, 30, 0.5f, 0.5f),
         };
 
-        private static readonly List<SeiekiInfo> HaraMarks = new List<SeiekiInfo>(){
+        private static readonly List<SeiekiInfo> HaraMarks = new List<SeiekiInfo>() {
             new SeiekiInfo("body", 0, 18, "Seieki/spe004:Seieki/spe004r:Seieki/spe005:Seieki/spe005r:Seieki/spe010:Seieki/spe010r:Seieki/spe012:Seieki/spe012r:Seieki/spe013:Seieki/spe013r", 466, 558, 712, 774, 350, 370, 1.0f, 1.0f),
             new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe007:Seieki/spe008:Seieki/spe009:Seieki/spe011:Seieki/spe014", 458, 489, 735, 801, 350, 370, 0.7f, 0.7f),
             new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe007:Seieki/spe008:Seieki/spe009:Seieki/spe011:Seieki/spe014", 412, 441, 722, 774, 350, 370, 0.7f, 0.7f),
@@ -7399,7 +7599,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
             new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe007r:Seieki/spe008r:Seieki/spe009r:Seieki/spe011r:Seieki/spe014r", 530, 552, 609, 648, 350, 370, 0.7f, 0.7f),
         };
 
-        private static readonly List<SeiekiInfo> HutomomoMarks = new List<SeiekiInfo>(){
+        private static readonly List<SeiekiInfo> HutomomoMarks = new List<SeiekiInfo>() {
             new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe003:Seieki/spe007:Seieki/spe009:Seieki/spe014", 97, 110, 73, 124, 0, 10, 0.6f, 0.6f),
             new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe003:Seieki/spe006:Seieki/spe007:Seieki/spe008:Seieki/spe009:Seieki/spe011:Seieki/spe013:Seieki/spe014", 117, 130, 68, 119, 350, 360, 0.6f, 0.6f),
             new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe003r:Seieki/spe006r:Seieki/spe007r:Seieki/spe008r:Seieki/spe009r:Seieki/spe011r:Seieki/spe013r:Seieki/spe014r", 137, 150, 68, 119, 350, 370, 0.6f, 0.6f),
@@ -7450,19 +7650,19 @@ namespace CM3D2.VibeYourMaid.Plugin {
             new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe007r:Seieki/spe008r:Seieki/spe014r", 995, 1002, 66, 122, 0, 20, 0.5f, 0.5f),
         };
 
-        private static readonly List<SeiekiInfo> HibuMarks = new List<SeiekiInfo>(){
+        private static readonly List<SeiekiInfo> HibuMarks = new List<SeiekiInfo>() {
             new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe002:Seieki/spe009:Seieki/spe014", 472, 497, 874, 921, 355, 365, 0.5f, 0.5f),
             new SeiekiInfo("body", 0, 18, "Seieki/spe001r:Seieki/spe002r:Seieki/spe009r:Seieki/spe014r", 527, 552, 874, 921, 355, 365, 0.5f, 0.5f),
             new SeiekiInfo("body", 0, 18, "Seieki/spe001:Seieki/spe001r:Seieki/spe002:Seieki/spe002r:Seieki/spe009:Seieki/spe009r:Seieki/spe014:Seieki/spe014r", 503, 520, 866, 906, 355, 365, 0.5f, 0.5f),
         };
-        
-        private void EffectSeieki(int maidID, string marks){
-          
+
+        private void EffectSeieki(int maidID, string marks) {
+
           int random;
           SeiekiInfo info = null;
           Maid maid = stockMaids[maidID].mem;
-          
-          switch(marks){
+
+          switch (marks) {
               case "顔":
                    random = UnityEngine.Random.Range(0, KaoMarks.Count);
                    info = KaoMarks[random];
@@ -7502,12 +7702,12 @@ namespace CM3D2.VibeYourMaid.Plugin {
                    random = UnityEngine.Random.Range(0, HibuMarks.Count);
                    info = HibuMarks[random];
                    break;
-                   
+
               default:
                    return;
           }
-          
-        
+
+
           int x = info.GetX();
           int y = info.GetY();
           float r = info.GetRot();
@@ -7530,7 +7730,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
               null,
               1f,
               1024);
-              
+
           maid.body0.MulTexSet(
               info.SlotName,
               info.MatNo,
@@ -7547,9 +7747,9 @@ namespace CM3D2.VibeYourMaid.Plugin {
               null,
               1f,
               1024);
-          
+
           maid.body0.MulTexProc(info.SlotName);
-        
+
         }
 
         //精液除去 顔
@@ -7575,14 +7775,14 @@ namespace CM3D2.VibeYourMaid.Plugin {
 
 
         //瞳操作
-        private void EffectAhe(Maid maid, MaidState maidState, float sp){
-          
+        private void EffectAhe(Maid maid, MaidState maidState, float sp) {
+
           Vector3 vl;
           Vector3 vr;
           float aheValue3 = maidState.aheValue2;
-          
-          if(!cfgw.AheEnabled || maidState.vStateMajor == 10){
-            if(maidState.aheResetFlag){
+
+          if (!cfgw.AheEnabled || maidState.vStateMajor == 10) {
+            if (maidState.aheResetFlag) {
               vl = maid.body0.trsEyeL.localPosition;
               vr = maid.body0.trsEyeR.localPosition;
               maid.body0.trsEyeL.localPosition = new Vector3(vl.x, Math.Max((maidState.fAheDefEyeL + 0f)/fEyePosToSliderMul, 0f), vl.z);
@@ -7593,194 +7793,194 @@ namespace CM3D2.VibeYourMaid.Plugin {
             }
             return;
           }
-          
-          if(maidState.fAheDefEyeL < -1000)maidState.fAheDefEyeL = maid.body0.trsEyeL.localPosition.y * fEyePosToSliderMul;
-          if(maidState.fAheDefEyeR < -1000)maidState.fAheDefEyeR = maid.body0.trsEyeR.localPosition.y * fEyePosToSliderMul;
-          
-          if(maidState.orgasmCmb > 0){
-            if(maidState.boostValue - 15 > 0 && maidState.exciteLevel >= 2){
+
+          if (maidState.fAheDefEyeL < -1000) maidState.fAheDefEyeL = maid.body0.trsEyeL.localPosition.y * fEyePosToSliderMul;
+          if (maidState.fAheDefEyeR < -1000) maidState.fAheDefEyeR = maid.body0.trsEyeR.localPosition.y * fEyePosToSliderMul;
+
+          if (maidState.orgasmCmb > 0) {
+            if (maidState.boostValue - 15 > 0 && maidState.exciteLevel >= 2) {
               aheValue3 = maidState.aheValue2 + maidState.boostValue / 3;
-              if(maidState.stunFlag) aheValue3 += 25;
+              if (maidState.stunFlag) aheValue3 += 25;
             }
-            if(aheValue3 > 60)aheValue3 = 60;
+            if (aheValue3 > 60) aheValue3 = 60;
 
-            if(maidState.aheValue < aheValue3){
+            if (maidState.aheValue < aheValue3) {
               maidState.aheValue += 0.1f * timerRate * sp;
-            }else if(maidState.aheValue > aheValue3){
+            } else if (maidState.aheValue > aheValue3) {
               maidState.aheValue -= 0.1f * timerRate * sp;
             }
-          }else if((maidState.boostValue - 15 > 0 && maidState.exciteLevel >= 2) || maidState.stunFlag){
+          } else if ((maidState.boostValue - 15 > 0 && maidState.exciteLevel >= 2) || maidState.stunFlag) {
             aheValue3 = maidState.boostValue / 2;
-            if(maidState.stunFlag) aheValue3 += 25;
+            if (maidState.stunFlag) aheValue3 += 25;
 
-            if(maidState.aheValue < aheValue3){
+            if (maidState.aheValue < aheValue3) {
               maidState.aheValue += 0.1f * timerRate * sp;
-            }else if(maidState.aheValue > aheValue3){
+            } else if (maidState.aheValue > aheValue3) {
               maidState.aheValue -= 0.1f * timerRate * sp;
             }
-          }else if(maidState.aheValue > 0){
+          } else if (maidState.aheValue > 0) {
             maidState.aheValue -= 0.05f * timerRate * sp;
           }
-          
-          if (maidState.aheValue < 0f)maidState.aheValue = 0f;
-          
+
+          if (maidState.aheValue < 0f) maidState.aheValue = 0f;
+
           vl = maid.body0.trsEyeL.localPosition;
           vr = maid.body0.trsEyeR.localPosition;
           maid.body0.trsEyeL.localPosition = new Vector3(vl.x, Math.Max((maidState.fAheDefEyeL + maidState.aheValue)/fEyePosToSliderMul, 0f), vl.z);
           maid.body0.trsEyeR.localPosition = new Vector3(vr.x, Math.Min((maidState.fAheDefEyeR - maidState.aheValue)/fEyePosToSliderMul, 0f), vr.z);
 
-          if(!maidState.aheResetFlag)maidState.aheResetFlag = true;
+          if (!maidState.aheResetFlag) maidState.aheResetFlag = true;
 
         }
-        
-        
+
+
         //痙攣操作
-        private void EffectGakupiku(Maid maid, MaidState maidState){
-        
+        private void EffectGakupiku(Maid maid, MaidState maidState) {
+
           //リセットフラグが立っていて、痙攣中でなければ痙攣シェイプキーをリセット
-          if(maidState.gakupikuResetFlag && (!maidState.gakupikuOn || !cfgw.OrgsmAnimeEnabled)){
+          if (maidState.gakupikuResetFlag && (!maidState.gakupikuOn || !cfgw.OrgsmAnimeEnabled)) {
             try { VertexMorph_FromProcItem(maid.body0, "orgasm", 0f); } catch { /*LogError(ex);*/ }
             maidState.gakupikuResetFlag = false;
             maidState.gakupikuOn = false;
             maidState.gakupikuValue = 0f;
             return;
           }
-          
-          if (!cfgw.OrgsmAnimeEnabled)return;
-          
-          if(maidState.orgasmCmb > 3){ //絶頂痙攣 強
-            if(!maidState.gakupikuOn)maidState.gakupikuOn = true;
-            
-            if(maidState.gakupikuTime <= 0){
+
+          if (!cfgw.OrgsmAnimeEnabled) return;
+
+          if (maidState.orgasmCmb > 3) { //絶頂痙攣 強
+            if (!maidState.gakupikuOn) maidState.gakupikuOn = true;
+
+            if (maidState.gakupikuTime <= 0){
               maidState.gakupikuFlag = !maidState.gakupikuFlag;
-              if(maidState.gakupikuFlag){
+              if (maidState.gakupikuFlag) {
                 maidState.gakupikuTime = UnityEngine.Random.Range(0, 120);
-              }else{
+              } else {
                 maidState.gakupikuTime = UnityEngine.Random.Range(0, 30);
               }
-              
+
             } else {
-              if(maidState.gakupikuFlag){
+              if (maidState.gakupikuFlag) {
                 maidState.gakupikuValue = UnityEngine.Random.Range(-cfgw.orgasmValue3, cfgw.orgasmValue3);
               }
               maidState.gakupikuTime -= timerRate;
             }
 
-          }else if(maidState.orgasmCmb > 0){ //絶頂痙攣 弱
-            if(!maidState.gakupikuOn)maidState.gakupikuOn = true;
-            
-            if(maidState.gakupikuTime <= 0){
+          } else if (maidState.orgasmCmb > 0) { //絶頂痙攣 弱
+            if (!maidState.gakupikuOn) maidState.gakupikuOn = true;
+
+            if (maidState.gakupikuTime <= 0) {
               maidState.gakupikuFlag = !maidState.gakupikuFlag;
-              if(maidState.gakupikuFlag){
+              if (maidState.gakupikuFlag) {
                 maidState.gakupikuTime = UnityEngine.Random.Range(0, 120);
-              }else{
+              } else {
                 maidState.gakupikuTime = UnityEngine.Random.Range(0, 30);
               }
-              
+
             } else {
-              if(maidState.gakupikuFlag){
+              if (maidState.gakupikuFlag) {
                 maidState.gakupikuValue = UnityEngine.Random.Range(-cfgw.orgasmValue2, cfgw.orgasmValue2);
               }
               maidState.gakupikuTime -= timerRate;
             }
 
-          }else if(maidState.stunFlag){ //痙攣 放心中
-            if(!maidState.gakupikuOn)maidState.gakupikuOn = true;
-            
-            if(maidState.gakupikuTime <= 0){
+          } else if (maidState.stunFlag) { //痙攣 放心中
+            if (!maidState.gakupikuOn)maidState.gakupikuOn = true;
+
+            if (maidState.gakupikuTime <= 0) {
               maidState.gakupikuFlag = !maidState.gakupikuFlag;
-              if(maidState.gakupikuFlag){
+              if (maidState.gakupikuFlag) {
                 maidState.gakupikuTime = UnityEngine.Random.Range(0, 40);
-              }else{
+              } else {
                 maidState.gakupikuTime = UnityEngine.Random.Range(0, 300);
               }
-              
+
             } else {
-              if(maidState.gakupikuFlag){
+              if (maidState.gakupikuFlag) {
                 maidState.gakupikuValue = UnityEngine.Random.Range(-cfgw.orgasmValue3, cfgw.orgasmValue3);
               }
               maidState.gakupikuTime -= timerRate;
             }
 
-          }else if(maidState.orgasmValue > 90){ //絶頂前痙攣
-            if(!maidState.gakupikuOn)maidState.gakupikuOn = true;
+          } else if (maidState.orgasmValue > 90) { //絶頂前痙攣
+            if (!maidState.gakupikuOn) maidState.gakupikuOn = true;
             maidState.gakupikuValue = UnityEngine.Random.Range(-cfgw.orgasmValue1, cfgw.orgasmValue1);
 
-          }else if(maidState.gakupikuOn){ //痙攣終了時の処理
+          } else if (maidState.gakupikuOn) { //痙攣終了時の処理
             maidState.gakupikuOn = false;
-            
+
           }
-          
+
           //痙攣のシェイプキー操作を実行
-          if(maidState.gakupikuOn){
-            try { VertexMorph_FromProcItem(maid.body0, "orgasm", maidState.gakupikuValue/100f); } catch { /*LogError(ex);*/ }
-            if(!maidState.gakupikuResetFlag)maidState.gakupikuResetFlag = true;
+          if (maidState.gakupikuOn) {
+            try { VertexMorph_FromProcItem(maid.body0, "orgasm", maidState.gakupikuValue*0.01f); } catch { /*LogError(ex);*/ }
+            if (!maidState.gakupikuResetFlag) maidState.gakupikuResetFlag = true;
           }
-        
+
         }
-        
-        
+
+
         //勃起操作
-        private void EffectBokki(Maid maid, MaidState maidState){
-          
-          if(!cfgw.CliAnimeEnabled){
-            if(maidState.bokkiResetFlag){
+        private void EffectBokki(Maid maid, MaidState maidState) {
+
+          if (!cfgw.CliAnimeEnabled) {
+            if (maidState.bokkiResetFlag) {
               try { VertexMorph_FromProcItem(maid.body0, "clitoris", 0f); } catch { /*LogError(ex);*/ }
               try { VertexMorph_FromProcItem(maid.body0, "pussy_clitoris_large", 0f); } catch { /*LogError(ex);*/ }
               try { VertexMorph_FromProcItem(maid.body0, "pussy_clitoris_penis", 0f); } catch { /*LogError(ex);*/ }
-                
+
               try { VertexMorph_FromProcItem(maid.body0, "pussy_bira1", 0f); } catch { /*LogError(ex);*/ }
               try { VertexMorph_FromProcItem(maid.body0, "pussy_bira2", 0f); } catch { /*LogError(ex);*/ }
               try { VertexMorph_FromProcItem(maid.body0, "labiakupa", 0f); } catch { /*LogError(ex);*/ }
               try { VertexMorph_FromProcItem(maid.body0, "chikubi_bokki", 0f); } catch { /*LogError(ex);*/ }
-              
+
               maidState.bokkiResetFlag = false;
             }
             return;
           }
-          //if(maidState.vStateMajor == 10)return;
+          //if (maidState.vStateMajor == 10) return;
           if (maidState.bokkiValue1 == 0) return; //bokkiValue1は時間経過で0になる
 
           float bokkiValue2 = 25 + maidState.boostValue * 3 + maidState.orgasmCount * 3;
-          if(bokkiValue2 > 100)bokkiValue2 = 100;
-          if (maidState.bokkiValue1 > bokkiValue2)maidState.bokkiValue1 = bokkiValue2;
-          float bokki = maidState.bokkiValue1 * cfgw.clitorisMax / 100f;
+          if (bokkiValue2 > 100) bokkiValue2 = 100;
+          if (maidState.bokkiValue1 > bokkiValue2) maidState.bokkiValue1 = bokkiValue2;
+          float bokki = maidState.bokkiValue1 * cfgw.clitorisMax * 0.01f;
 
           //一時変更の値が大きければそちらに合わせる
           bokki = Math.Max(bokki, maidState.bokkiTempValue);
 
           maidState.labiaValue = bokki;
-          if(maidState.labiaValue > 40f)maidState.labiaValue = 40f;
+          if (maidState.labiaValue > 40f) maidState.labiaValue = 40f;
 
 
-          if(maidState.cliMode== 2){
+          if (maidState.cliMode== 2) {
             try { VertexMorph_FromProcItem(maid.body0, "pussy_clitoris_penis", (bokki*0.01f + maidState.gakupikuValue/2000f) * maidState.cliScale); } catch { /*LogError(ex);*/ }
-          }else if(maidState.cliMode== 1){
+          } else if (maidState.cliMode== 1) {
             try { VertexMorph_FromProcItem(maid.body0, "pussy_clitoris_large", (bokki*0.01f + maidState.gakupikuValue/600f) * maidState.cliScale); } catch { /*LogError(ex);*/ }
-          }else{
+          } else {
             try { VertexMorph_FromProcItem(maid.body0, "clitoris", (bokki*0.01f * (1f - maidState.cliHidai*0.01f) + maidState.gakupikuValue/400f) * maidState.cliScale); } catch { /*LogError(ex);*/ }
             try { VertexMorph_FromProcItem(maid.body0, "pussy_clitoris_large", bokki*0.01f * maidState.cliHidai*0.01f); } catch { /*LogError(ex);*/ }
           }
-          
+
           try { VertexMorph_FromProcItem(maid.body0, "labiakupa", maidState.labiaValue/200f); } catch { /*LogError(ex);*/ }
           try { VertexMorph_FromProcItem(maid.body0, "pussy_bira1", bokki/200f + maidState.gakupikuValue/400f); } catch { /*LogError(ex);*/ }
           try { VertexMorph_FromProcItem(maid.body0, "pussy_bira2", maidState.gakupikuValue/400f + (1f + maidState.kupaWaveValue/10000f) * bokki/300f); } catch { /*LogError(ex);*/ }
-          if(maid.body0.GetMask(TBody.SlotID.bra)){
+          if (maid.body0.GetMask(TBody.SlotID.bra)) {
             try { VertexMorph_FromProcItem(maid.body0, "chikubi_bokki", 0f); } catch { /*LogError(ex);*/ }
-          }else{
+          } else {
             try { VertexMorph_FromProcItem(maid.body0, "chikubi_bokki", bokki*0.01f * maidState.chikubiHidai + maidState.gakupikuValue/2000f); } catch { /*LogError(ex);*/ }
           }
-          if(!maidState.bokkiResetFlag)maidState.bokkiResetFlag = true;
+          if (!maidState.bokkiResetFlag) maidState.bokkiResetFlag = true;
         }
 
         //汗かき処理 0.5秒ごとに実行
-        private void EffectAse(Maid maid, MaidState maidState){
+        private void EffectAse(Maid maid, MaidState maidState) {
 
           if (maidState.aseTime >= Time.time) return;
           maidState.aseTime = Time.time + 0.5f; //0.5秒後
-        
-          if (!cfgw.aseAnimeEnabled){
-            if(maidState.aseResetFlag){
+
+          if (!cfgw.aseAnimeEnabled) {
+            if (maidState.aseResetFlag) {
               try { VertexMorph_FromProcItem(maid.body0, "dry", 1f); } catch { /*LogError(ex);*/ }
               try { VertexMorph_FromProcItem(maid.body0, "swet", 0f); } catch { /*LogError(ex);*/ }
               try { VertexMorph_FromProcItem(maid.body0, "swet_small", 0f); } catch { /*LogError(ex);*/ }
@@ -7790,14 +7990,16 @@ namespace CM3D2.VibeYourMaid.Plugin {
             }
             return;
           }
-          //if(maidState.vStateMajor == 10)return;
-          
+          //if (maidState.vStateMajor == 10) return;
+
           //aseValue1 = (float)Math.Floor(110 - ((maidState.boostValue * 2) + (maidState.exciteValue / 360)));
           //dryが0だと大きすぎるので30程度になるように調整 boostValue:0～50 exciteValue:0～18000
           float aseValue1 = (float)Math.Floor(101 - ((maidState.boostValue * 0.6f) + (maidState.exciteValue / 450)));
           float aseValue2 = (float)Math.Floor(Math.Sqrt((3000 - maidState.maidStamina) / 30f)*10f); //低い時の上昇量を上げる
           float aseValue3 = (float)Math.Floor(maidState.orgasmValue);
-          if(lifeStart > 0 && (bgID == 11 || bgID == 22 || bgID == 23) && aseValue1 > 20)aseValue1 = 20;
+          #if EmpiresLife
+          if (lifeStart > 0 && (bgID == 11 || bgID == 22 || bgID == 23) && aseValue1 > 20) aseValue1 = 20;
+          #endif
 
           //一時変更の値が大きければそちらに合わせる
           aseValue1 = Math.Min(aseValue1, 100f-maidState.aseTempValue*0.7f); //100～30
@@ -7810,30 +8012,30 @@ namespace CM3D2.VibeYourMaid.Plugin {
           //#if DEBUG
           //Console.WriteLine("["+maidID+"] aseValue1="+aseValue1+" aseValue2="+aseValue2+" aseValue3="+aseValue3);
           //#endif
-          try { VertexMorph_FromProcItem(maid.body0, "dry", aseValue1/100f); } catch { /*LogError(ex);*/ }
-          try { VertexMorph_FromProcItem(maid.body0, "swet", aseValue2/100f * cfgw.aseSwet); } catch { /*LogError(ex);*/ }
-          try { VertexMorph_FromProcItem(maid.body0, "swet_small", aseValue2/100f * cfgw.aseSwet); } catch { /*LogError(ex);*/ } //swetに連動させる
-          try { VertexMorph_FromProcItem(maid.body0, "swet_tare", aseValue3/100f * cfgw.aseSwetTare); } catch { /*LogError(ex);*/ }
-          try { VertexMorph_FromProcItem(maid.body0, "swet_big", aseValue3/100f * cfgw.aseSwetBig); } catch { /*LogError(ex);*/ }
-          
-          if(!maidState.aseResetFlag)maidState.aseResetFlag = true;
+          try { VertexMorph_FromProcItem(maid.body0, "dry", aseValue1*0.01f); } catch { /*LogError(ex);*/ }
+          try { VertexMorph_FromProcItem(maid.body0, "swet", aseValue2*0.01f * cfgw.aseSwet); } catch { /*LogError(ex);*/ }
+          try { VertexMorph_FromProcItem(maid.body0, "swet_small", aseValue2*0.01f * cfgw.aseSwet); } catch { /*LogError(ex);*/ } //swetに連動させる
+          try { VertexMorph_FromProcItem(maid.body0, "swet_tare", aseValue3*0.01f * cfgw.aseSwetTare); } catch { /*LogError(ex);*/ }
+          try { VertexMorph_FromProcItem(maid.body0, "swet_big", aseValue3*0.01f * cfgw.aseSwetBig); } catch { /*LogError(ex);*/ }
+
+          if (!maidState.aseResetFlag) maidState.aseResetFlag = true;
           //maidState.aseTime = UnityEngine.Random.Range(5, 10);
         }
 
 
         //秘部アニメ処理
-        private bool EffectHibuAnime(int maidID, Maid maid, MaidState maidState, float sp){
-          
-          if(!cfgw.hibuAnime1Enabled && (maidState.vStateMajor == 20 || maidState.vStateMajor == 30))return false;
-          if(!cfgw.hibuAnime2Enabled && maidState.vStateMajor == 40)return false;
-          if(maidState.vStateMajor == 10 || maidState.vStateMajor == 50)return false;
-          
+        private bool EffectHibuAnime(int maidID, Maid maid, MaidState maidState, float sp) {
+
+          if (!cfgw.hibuAnime1Enabled && (maidState.vStateMajor == 20 || maidState.vStateMajor == 30)) return false;
+          if (!cfgw.hibuAnime2Enabled && maidState.vStateMajor == 40) return false;
+          if (maidState.vStateMajor == 10 || maidState.vStateMajor == 50) return false;
+
           float hValue = maidState.hibuValue; //メイドの値を設定
           float aValue = maidState.analValue; //メイドの値を設定
           float uValue = 0f;
           float pikuValue = 0f;
           float pikuValue2 = 0f;
-          
+
           float hibuSlider1Value = maidState.hibuSlider1Value;
           float analSlider1Value = maidState.analSlider1Value;
           float hibuSlider2Value = maidState.hibuSlider2Value;
@@ -7841,241 +8043,240 @@ namespace CM3D2.VibeYourMaid.Plugin {
 
           bool bOsawariVA = osawari.isOsawari(maidID, "VA_");
           bool bOsawariAN = osawari.isOsawari(maidID, "AN_");
-          if(bOsawariVA){
-              if(hibuSlider1Value < 20f)hibuSlider1Value = 20f;
-              if(hibuSlider2Value < 20f)hibuSlider2Value = 20f;
+          if (bOsawariVA) {
+              if (hibuSlider1Value < 20f) hibuSlider1Value = 20f;
+              if (hibuSlider2Value < 20f) hibuSlider2Value = 20f;
           }
           if (bOsawariAN) {
               if (analSlider1Value < 10f) analSlider1Value = 10f;
               if (analSlider2Value < 10f) analSlider2Value = 10f;
           }
-          
-          if(maidState.pikuTime <= 0){
+
+          if (maidState.pikuTime <= 0) {
             maidState.pikuFlag = !maidState.pikuFlag;
-            if(maidState.pikuFlag){ //ピク実行時間設定
-              if(maidState.vStateMajor == 20 || maidState.vStateMajor == 30)maidState.pikuTime = UnityEngine.Random.Range(0, 90);
-              if(maidState.vStateMajor == 40)maidState.pikuTime = UnityEngine.Random.Range(0, 60);
-            }else{ //ピク待機時間設定
-              if(maidState.vStateMajor == 20 || maidState.vStateMajor == 30)maidState.pikuTime = UnityEngine.Random.Range(30, 210);
-              if(maidState.vStateMajor == 40)maidState.pikuTime = UnityEngine.Random.Range(30, 90);
+            if (maidState.pikuFlag) { //ピク実行時間設定
+              if (maidState.vStateMajor == 20 || maidState.vStateMajor == 30) maidState.pikuTime = UnityEngine.Random.Range(0, 90);
+              if (maidState.vStateMajor == 40) maidState.pikuTime = UnityEngine.Random.Range(0, 60);
+            } else { //ピク待機時間設定
+              if (maidState.vStateMajor == 20 || maidState.vStateMajor == 30) maidState.pikuTime = UnityEngine.Random.Range(30, 210);
+              if (maidState.vStateMajor == 40) maidState.pikuTime = UnityEngine.Random.Range(30, 90);
             }
-          }else{
+          } else {
             maidState.pikuTime -= timerRate;
           }
-          
-          if( cfgw.hibuAnime1Enabled && (maidState.vStateMajor == 20 || maidState.vStateMajor == 30) ){
-            if(maidState.hibuValue < hibuSlider1Value){
+
+          if (cfgw.hibuAnime1Enabled && (maidState.vStateMajor == 20 || maidState.vStateMajor == 30)) {
+            if (maidState.hibuValue < hibuSlider1Value) {
               maidState.hibuValue += 2f * sp;
-              if(maidState.hibuValue > hibuSlider1Value)maidState.hibuValue = hibuSlider1Value;
+              if (maidState.hibuValue > hibuSlider1Value) maidState.hibuValue = hibuSlider1Value;
             }
-            if(maidState.hibuValue > hibuSlider1Value){
+            if (maidState.hibuValue > hibuSlider1Value) {
               maidState.hibuValue -= 0.7f * sp;
-              if(maidState.hibuValue < hibuSlider1Value)maidState.hibuValue = hibuSlider1Value;
+              if (maidState.hibuValue < hibuSlider1Value) maidState.hibuValue = hibuSlider1Value;
             }
-            
-            if(maidState.uDatsu != 0){ //子宮脱時
+
+            if (maidState.uDatsu != 0) { //子宮脱時
               maidState.hibuValue -= maidState.uDatsuValue1;
-              if(maidState.hibuValue < 0)maidState.hibuValue = 0;
+              if (maidState.hibuValue < 0) maidState.hibuValue = 0;
             }
-            hValue = maidState.hibuValue + maidState.kupaWaveValue/100f * cfgw.kupaWave;
+            hValue = maidState.hibuValue + maidState.kupaWaveValue*0.01f * cfgw.kupaWave;
             hValue = maidState.hibuValue + Math.Max(0, osawari.getMoveAtpY(maidID, "VA_")) * 20f; //お触り時の処理
 
-            if(maidState.analValue < analSlider1Value){
+            if (maidState.analValue < analSlider1Value) {
               maidState.analValue += 2f * sp;
-              if(maidState.analValue > analSlider1Value)maidState.analValue = analSlider1Value;
+              if (maidState.analValue > analSlider1Value) maidState.analValue = analSlider1Value;
             }
             if (!bOsawariAN) { //お触り時はスライダーに併せて縮めない
-            if(maidState.analValue > analSlider1Value){
+            if (maidState.analValue > analSlider1Value) {
               maidState.analValue -= 0.7f * sp;
-              if(maidState.analValue < analSlider1Value)maidState.analValue = analSlider1Value;
+              if (maidState.analValue < analSlider1Value) maidState.analValue = analSlider1Value;
             }
             }
-            aValue = maidState.analValue + maidState.kupaWaveValue/100f * cfgw.kupaWave;
+            aValue = maidState.analValue + maidState.kupaWaveValue*0.01f * cfgw.kupaWave;
             aValue = maidState.analValue + Math.Max(0, osawari.getMoveAtpY(maidID, "AN_")) * 30f; //お触り時の処理 初期値-15f分を加算
-            
-            if(maidState.pikuFlag)pikuValue2 = UnityEngine.Random.Range(0, 20);
-            uValue = maidState.hibuValue / 2 + maidState.kupaWaveValue/100f * cfgw.kupaWave + pikuValue2;
-            
-          
-          }else if(cfgw.hibuAnime2Enabled && maidState.vStateMajor == 40){
-            if(maidState.uDatsu == 0){
-              if(maidState.hibuValue > hibuSlider2Value){
+
+            if (maidState.pikuFlag) pikuValue2 = UnityEngine.Random.Range(0, 20);
+            uValue = maidState.hibuValue * 0.5f + maidState.kupaWaveValue*0.01f * cfgw.kupaWave + pikuValue2;
+
+
+          } else if (cfgw.hibuAnime2Enabled && maidState.vStateMajor == 40) {
+            if (maidState.uDatsu == 0) {
+              if (maidState.hibuValue > hibuSlider2Value) {
                 maidState.hibuValue -= 0.7f * sp;
-                if(maidState.hibuValue < hibuSlider2Value)maidState.hibuValue = hibuSlider2Value;
+                if (maidState.hibuValue < hibuSlider2Value) maidState.hibuValue = hibuSlider2Value;
               }
-              if(maidState.hibuValue < hibuSlider2Value){
+              if (maidState.hibuValue < hibuSlider2Value) {
                 maidState.hibuValue += 2f * sp;
-                if(maidState.hibuValue > hibuSlider2Value)maidState.hibuValue = hibuSlider2Value;
+                if (maidState.hibuValue > hibuSlider2Value) maidState.hibuValue = hibuSlider2Value;
               }
-            }else{
-              if(maidState.hibuValue > 0f)maidState.hibuValue -= 0.7f * sp;
-              if(maidState.hibuValue < 0f)maidState.hibuValue = 0f;
+            } else {
+              if (maidState.hibuValue > 0f) maidState.hibuValue -= 0.7f * sp;
+              if (maidState.hibuValue < 0f) maidState.hibuValue = 0f;
             }
             if (!bOsawariAN) { //お触り時はスライダーに併せて縮めない
-            if(maidState.analValue > analSlider2Value){
+            if (maidState.analValue > analSlider2Value) {
               maidState.analValue -= 0.7f * sp;
-              if(maidState.analValue < analSlider2Value)maidState.analValue = analSlider2Value;
+              if (maidState.analValue < analSlider2Value) maidState.analValue = analSlider2Value;
             }
             }
-            if(maidState.analValue < analSlider2Value){
+            if (maidState.analValue < analSlider2Value) {
               maidState.analValue += 2f * sp;
-              if(maidState.analValue > analSlider2Value)maidState.analValue = analSlider2Value;
+              if (maidState.analValue > analSlider2Value) maidState.analValue = analSlider2Value;
             }
-            
-            if(maidState.pikuFlag){
+
+            if (maidState.pikuFlag) {
               pikuValue = UnityEngine.Random.Range(0, 5);
               pikuValue2 = UnityEngine.Random.Range(0, 20);
             }
             hValue = maidState.hibuValue + pikuValue;
             hValue = maidState.hibuValue + Math.Max(0, osawari.getMoveAtpY(maidID, "VA_")) * 20f; //お触り時の処理
-            
+
             aValue = maidState.analValue + pikuValue;
             aValue = maidState.analValue + Math.Max(0, osawari.getMoveAtpY(maidID, "AN_")) * 30f; //お触り時の処理 初期値-15f分を加算
-            
-            uValue = maidState.hibuValue / 2 + pikuValue2;
-            
+
+            uValue = maidState.hibuValue * 0.5f + pikuValue2;
+
           }
-          
+
           //一時変更の値が大きければそちらに合わせる
           if (!bOsawariVA) hValue = Math.Max(hValue, maidState.hibuTempValue);
           if (!bOsawariAN) aValue = Math.Max(aValue, maidState.analTempValue);
 
-          try { VertexMorph_FromProcItem(maid.body0, "kupa", hValue/100f); } catch { /*LogError(ex);*/ }
-          try { VertexMorph_FromProcItem(maid.body0, "analkupa", aValue/100f); } catch { /*LogError(ex);*/ }
-          try { VertexMorph_FromProcItem(maid.body0, "pussy_uterus_piku", uValue/100f); } catch { /*LogError(ex);*/ }
+          try { VertexMorph_FromProcItem(maid.body0, "kupa", hValue*0.01f); } catch { /*LogError(ex);*/ }
+          try { VertexMorph_FromProcItem(maid.body0, "analkupa", aValue*0.01f); } catch { /*LogError(ex);*/ }
+          try { VertexMorph_FromProcItem(maid.body0, "pussy_uterus_piku", uValue*0.01f); } catch { /*LogError(ex);*/ }
 
           return true;
         }
-        
-        
+
+
         //子宮脱アニメ処理
-        private void EffectUterusDatsu(int maidID, Maid maid, MaidState maidState){
-          if(maidState.uDatsu == 0)return;
-          
-          if(maidState.uDatsu == 1){ //子宮脱判定
-            if(maidState.boostBase + maidState.uDatsuStock < 65 || !cfgw.uDatsuEnabled){ //65以下なら子宮脱しない
+        private void EffectUterusDatsu(int maidID, Maid maid, MaidState maidState) {
+          if (maidState.uDatsu == 0) return;
+
+          if (maidState.uDatsu == 1) { //子宮脱判定
+            if (maidState.boostBase + maidState.uDatsuStock < 65 || !cfgw.uDatsuEnabled) { //65以下なら子宮脱しない
               maidState.uDatsu = 3;
-              
-            }else if(maidState.uDatsuWait < 0){ //子宮脱開始
-              Console.WriteLine("子宮脱開始");
+
+            } else if (maidState.uDatsuWait < 0) { //子宮脱開始
+              Console.WriteLine("子宮脱開始"); //#109
               maidState.uDatsuValue2 = maidState.boostBase + maidState.uDatsuStock;
-              if(maidState.uDatsuValue2 > 100f)maidState.uDatsuValue2 = 100f;
+              if (maidState.uDatsuValue2 > 100f) maidState.uDatsuValue2 = 100f;
               maidState.uDatsuStock = 0;
               maidState.uDatsu = 2;
               maidState.uDatsuWait = 90f;
               maidState.uDatsuTotal += 1; //子宮脱回数
-              
-            }else{
+
+            } else {
               maidState.uDatsuWait -= timerRate;
-              Console.WriteLine("now uDatsuWait is：" + maidsState[maidID].uDatsuWait);
             }
           }
-          
-          if(maidState.uDatsu == 2){ //子宮脱アニメ処理
-            if(maidState.uDatsuValue1 < maidState.uDatsuValue2){
+
+          if (maidState.uDatsu == 2) { //子宮脱アニメ処理
+            if (maidState.uDatsuValue1 < maidState.uDatsuValue2) {
               maidState.uDatsuValue1 += (maidState.uDatsuValue2 - maidState.uDatsuValue1) * 0.015f + 0.001f;
-              if(maidState.uDatsuValue1 > 90f)maidState.uDatsuValue1 = 90f;
-              try { VertexMorph_FromProcItem(maid.body0, "pussy_uterus_prolapse", maidState.uDatsuValue1/100f + maidState.kupaWaveValue/10000f * 3 - osawari.getMoveAtpY(maidID, "VA_") * 0.1f); } catch { /*LogError(ex);*/ }
-            
-              if(maidState.uDatsuValue1 >= maidState.uDatsuValue2){
-                if(maidState.uDatsuValue2 > 20f){
+              if (maidState.uDatsuValue1 > 90f) maidState.uDatsuValue1 = 90f;
+              try { VertexMorph_FromProcItem(maid.body0, "pussy_uterus_prolapse", maidState.uDatsuValue1*0.01f + maidState.kupaWaveValue/10000f * 3 - osawari.getMoveAtpY(maidID, "VA_") * 0.1f); } catch { /*LogError(ex);*/ }
+
+              if (maidState.uDatsuValue1 >= maidState.uDatsuValue2) {
+                if (maidState.uDatsuValue2 > 20f) {
                   maidState.uDatsuValue2 -= UnityEngine.Random.Range(5, 10);
                 }
               }
-          
-            }else if(maidState.uDatsuValue1 > maidState.uDatsuValue2){
+
+            } else if (maidState.uDatsuValue1 > maidState.uDatsuValue2) {
               maidState.uDatsuValue1 -= (maidState.uDatsuValue1 - maidState.uDatsuValue2) * 0.015f + 0.001f;
-              try { VertexMorph_FromProcItem(maid.body0, "pussy_uterus_prolapse", maidState.uDatsuValue1/100f + maidState.kupaWaveValue/10000f * 3 - osawari.getMoveAtpY(maidID, "VA_") * 0.1f); } catch { /*LogError(ex);*/ }
-  
-              if(maidState.uDatsuValue1 <= maidState.uDatsuValue2){
-                if(maidState.uDatsuValue2 > 20f){
+              try { VertexMorph_FromProcItem(maid.body0, "pussy_uterus_prolapse", maidState.uDatsuValue1*0.01f + maidState.kupaWaveValue/10000f * 3 - osawari.getMoveAtpY(maidID, "VA_") * 0.1f); } catch { /*LogError(ex);*/ }
+
+              if (maidState.uDatsuValue1 <= maidState.uDatsuValue2) {
+                if (maidState.uDatsuValue2 > 20f) {
                   maidState.uDatsuValue2 += UnityEngine.Random.Range(5, 10);
                 }
               }
             }
           }
-          
+
         }
-        
+
 
 
         //メイドの口元変更
         private void MouthChange(Maid maid, MaidState maidState) {
-        
-          if(cfgw.MouthNomalEnabled || cfgw.MouthKissEnabled || cfgw.MouthFeraEnabled || cfgw.MouthZeccyouEnabled){
-            if(maidState.vStateMajor == 20 || maidState.vStateMajor == 30){
-              if(!cfgw.MouthKissEnabled && maidState.MouthMode == 1) maidState.MouthMode = 0;
-              if(!cfgw.MouthFeraEnabled && maidState.MouthMode == 2) maidState.MouthMode = 0;
-              if(!cfgw.MouthZeccyouEnabled && maidState.MouthMode >= 3) maidState.MouthMode = 0;
-            } else if(maidState.vStateMajor == 40 && cfgw.MouthNomalEnabled){
-              if(maidState.stunFlag)maidState.MouthMode = 3;
-              if(!maidState.stunFlag)maidState.MouthMode = 5;
-            }else{
+
+          if (cfgw.MouthNomalEnabled || cfgw.MouthKissEnabled || cfgw.MouthFeraEnabled || cfgw.MouthZeccyouEnabled) {
+            if (maidState.vStateMajor == 20 || maidState.vStateMajor == 30) {
+              if (!cfgw.MouthKissEnabled && maidState.MouthMode == 1) maidState.MouthMode = 0;
+              if (!cfgw.MouthFeraEnabled && maidState.MouthMode == 2) maidState.MouthMode = 0;
+              if (!cfgw.MouthZeccyouEnabled && maidState.MouthMode >= 3) maidState.MouthMode = 0;
+            } else if (maidState.vStateMajor == 40 && cfgw.MouthNomalEnabled) {
+              if (maidState.stunFlag) maidState.MouthMode = 3;
+              if (!maidState.stunFlag) maidState.MouthMode = 5;
+            } else {
               return;
             }
-          }else{
+          } else {
             return;
           }
-          
+
           if (maid.body0.Face.morph == null) return; //エラー対策
 
-          if(maidState.MouthMode != maidState.OldMode){
+          if (maidState.MouthMode != maidState.OldMode) {
             maidState.MouthHoldTime = 0;
             maidState.OldMode = maidState.MouthMode;
           }
-          
+
           float maV = maid.body0.Face.morph.GetBlendValues((int) maid.body0.Face.morph.hash[(object) "moutha"]); //口あ
           float miV = maid.body0.Face.morph.GetBlendValues((int) maid.body0.Face.morph.hash[(object) "mouthi"]); //口い
           float mcV; //口う
           float msV; //笑顔
           float mdwV = maid.body0.Face.morph.GetBlendValues((int) maid.body0.Face.morph.hash[(object) "mouthdw"]); //口角上げ
           float mupV; //口角下げ
-          
-          
-          if(maidState.MouthHoldTime <= 0){
-            maidState.MouthHoldTime = UnityEngine.Random.Range(180f,360f);
-            
-            if(maidState.MouthMode == 0){  //通常時
-              maidState.MaValue = UnityEngine.Random.Range(0f,30f) / 100f;
-              maidState.MdwValue = UnityEngine.Random.Range(0f,30f) / 100f;
-            }
-            if(maidState.MouthMode == 1){  //キス時
-              maidState.MaValue = UnityEngine.Random.Range(20f,60f) / 100f;
-              maidState.MdwValue = UnityEngine.Random.Range(0f,50f) / 100f;
-            }
-            if(maidState.MouthMode == 2){  //フェラ時
-              maidState.MaValue = UnityEngine.Random.Range(80f,100f) / 100f;
-            }
-            if(maidState.MouthMode == 3){  //連続絶頂時１
-              maidState.MaValue = UnityEngine.Random.Range(70f,90f) / 100f;
-              maidState.MdwValue = UnityEngine.Random.Range(30f,90f) / 100f;
-            }
-            if(maidState.MouthMode == 4){  //連続絶頂時２
-              maidState.MiValue = UnityEngine.Random.Range(40f,60f) / 100f;
-              maidState.MdwValue = UnityEngine.Random.Range(20f,40f) / 100f;
-            }
-            if(maidState.MouthMode == 5){  //余韻時
-              maidState.MaValue = UnityEngine.Random.Range(10f,40f) / 100f;
-              maidState.MdwValue = UnityEngine.Random.Range(0f,30f) / 100f;
-            }
-            
-          }
-          
-          maidState.MouthHoldTime -= timerRate;
-          if(maidState.MouthMode == 0 && !cfgw.MouthNomalEnabled)return;
 
-          if(maidState.maVBack > maV){
+
+          if (maidState.MouthHoldTime <= 0) {
+            maidState.MouthHoldTime = UnityEngine.Random.Range(180f,360f);
+
+            if (maidState.MouthMode == 0) {  //通常時
+              maidState.MaValue = UnityEngine.Random.Range(0f,30f) * 0.01f;
+              maidState.MdwValue = UnityEngine.Random.Range(0f,30f) * 0.01f;
+            }
+            if (maidState.MouthMode == 1) {  //キス時
+              maidState.MaValue = UnityEngine.Random.Range(20f,60f) * 0.01f;
+              maidState.MdwValue = UnityEngine.Random.Range(0f,50f) * 0.01f;
+            }
+            if (maidState.MouthMode == 2) {  //フェラ時
+              maidState.MaValue = UnityEngine.Random.Range(80f,100f) * 0.01f;
+            }
+            if (maidState.MouthMode == 3) {  //連続絶頂時１
+              maidState.MaValue = UnityEngine.Random.Range(70f,90f) * 0.01f;
+              maidState.MdwValue = UnityEngine.Random.Range(30f,90f) * 0.01f;
+            }
+            if (maidState.MouthMode == 4) {  //連続絶頂時２
+              maidState.MiValue = UnityEngine.Random.Range(40f,60f) * 0.01f;
+              maidState.MdwValue = UnityEngine.Random.Range(20f,40f) * 0.01f;
+            }
+            if (maidState.MouthMode == 5) {  //余韻時
+              maidState.MaValue = UnityEngine.Random.Range(10f,40f) * 0.01f;
+              maidState.MdwValue = UnityEngine.Random.Range(0f,30f) * 0.01f;
+            }
+
+          }
+
+          maidState.MouthHoldTime -= timerRate;
+          if (maidState.MouthMode == 0 && !cfgw.MouthNomalEnabled) return;
+
+          if (maidState.maVBack > maV) {
             maV += maidState.MaValue;
             maidState.maVBack = maV;
           }
-          if(maidState.miVBack > miV){
+          if (maidState.miVBack > miV) {
             miV += maidState.MiValue;
             maidState.miVBack = miV;
           }
-          
+
           mcV = maid.body0.Face.morph.GetBlendValues((int) maid.body0.Face.morph.hash[(object) "mouthc"]);
           msV = maid.body0.Face.morph.GetBlendValues((int) maid.body0.Face.morph.hash[(object) "mouths"]);
-          if(maidState.mdwVBack > mdwV){
+          if (maidState.mdwVBack > mdwV) {
             mdwV += maidState.MdwValue;
             maidState.mdwVBack = mdwV;
           }
@@ -8084,68 +8285,68 @@ namespace CM3D2.VibeYourMaid.Plugin {
 
           //舌の動き処理
           //キス時とフェラ時
-          if(maidState.MouthMode == 1 || maidState.MouthMode == 2){
-            if(maidState.TupValue < maidState.TupValue2){
+          if (maidState.MouthMode == 1 || maidState.MouthMode == 2) {
+            if (maidState.TupValue < maidState.TupValue2) {
               maidState.TupValue += Time.deltaTime * 0.5f;
-              if(maidState.TupValue >= maidState.TupValue2)maidState.TupValue2 = UnityEngine.Random.Range(0f,60f) / 100f;
+              if (maidState.TupValue >= maidState.TupValue2) maidState.TupValue2 = UnityEngine.Random.Range(0f,60f) * 0.01f;
             } else {
               maidState.TupValue -= Time.deltaTime * 0.5f;
-              if(maidState.TupValue <= maidState.TupValue2)maidState.TupValue2 = UnityEngine.Random.Range(0f,60f) / 100f;
+              if (maidState.TupValue <= maidState.TupValue2 ) maidState.TupValue2 = UnityEngine.Random.Range(0f,60f) * 0.01f;
             }
 
-            if(maidState.ToutValue < maidState.ToutValue2){
+            if (maidState.ToutValue < maidState.ToutValue2) {
               maidState.ToutValue += Time.deltaTime * 0.8f;
-              if(maidState.ToutValue >= maidState.ToutValue2)maidState.ToutValue2 = UnityEngine.Random.Range(-20f,70f) / 100f;
+              if (maidState.ToutValue >= maidState.ToutValue2) maidState.ToutValue2 = UnityEngine.Random.Range(-20f,70f) * 0.01f;
             } else {
               maidState.ToutValue -= Time.deltaTime * 0.8f;
-              if(maidState.ToutValue <= maidState.ToutValue2)maidState.ToutValue2 = UnityEngine.Random.Range(-20f,70f) / 100f;
+              if (maidState.ToutValue <= maidState.ToutValue2) maidState.ToutValue2 = UnityEngine.Random.Range(-20f,70f) * 0.01f;
             }
 
-            if(maidState.TopenValue < maidState.TopenValue2){
+            if (maidState.TopenValue < maidState.TopenValue2) {
               maidState.TopenValue += Time.deltaTime * 0.5f;
-              if(maidState.TopenValue >= maidState.TopenValue2)maidState.TopenValue2 = UnityEngine.Random.Range(0f,40f) / 100f;
+              if (maidState.TopenValue >= maidState.TopenValue2) maidState.TopenValue2 = UnityEngine.Random.Range(0f,40f) * 0.01f;
             } else {
               maidState.TopenValue -= Time.deltaTime * 0.5f;
-              if(maidState.TopenValue <= maidState.TopenValue2)maidState.TopenValue2 = UnityEngine.Random.Range(0f,40f) / 100f;
+              if (maidState.TopenValue <= maidState.TopenValue2) maidState.TopenValue2 = UnityEngine.Random.Range(0f,40f) * 0.01f;
             }
           }
           //連続絶頂時
-          if(maidState.MouthMode == 3){
-            if(maidState.TupValue < maidState.TupValue2){
+          if (maidState.MouthMode == 3) {
+            if (maidState.TupValue < maidState.TupValue2){
               maidState.TupValue += Time.deltaTime * 0.5f;
-              if(maidState.TupValue >= maidState.TupValue2)maidState.TupValue2 = UnityEngine.Random.Range(0f,40f) / 100f;
+              if (maidState.TupValue >= maidState.TupValue2) maidState.TupValue2 = UnityEngine.Random.Range(0f,40f) * 0.01f;
             } else {
               maidState.TupValue -= Time.deltaTime * 0.5f;
-              if(maidState.TupValue <= maidState.TupValue2)maidState.TupValue2 = UnityEngine.Random.Range(0f,40f) / 100f;
+              if (maidState.TupValue <= maidState.TupValue2) maidState.TupValue2 = UnityEngine.Random.Range(0f,40f) * 0.01f;
             }
 
-            if(maidState.ToutValue < maidState.ToutValue2){
+            if (maidState.ToutValue < maidState.ToutValue2) {
               maidState.ToutValue += Time.deltaTime * 0.5f;
-              if(maidState.ToutValue >= maidState.ToutValue2)maidState.ToutValue2 = UnityEngine.Random.Range(60f,100f) / 100f;
+              if (maidState.ToutValue >= maidState.ToutValue2) maidState.ToutValue2 = UnityEngine.Random.Range(60f,100f) * 0.01f;
             } else {
               maidState.ToutValue -= Time.deltaTime * 0.5f;
-              if(maidState.ToutValue <= maidState.ToutValue2)maidState.ToutValue2 = UnityEngine.Random.Range(60f,100f) / 100f;
+              if (maidState.ToutValue <= maidState.ToutValue2) maidState.ToutValue2 = UnityEngine.Random.Range(60f,100f) * 0.01f;
             }
 
-            if(maidState.TopenValue < maidState.TopenValue2){
+            if (maidState.TopenValue < maidState.TopenValue2) {
               maidState.TopenValue += Time.deltaTime * 0.5f;
-              if(maidState.TopenValue >= maidState.TopenValue2)maidState.TopenValue2 = UnityEngine.Random.Range(0f,60f) / 100f;
+              if (maidState.TopenValue >= maidState.TopenValue2) maidState.TopenValue2 = UnityEngine.Random.Range(0f,60f) * 0.01f;
             } else {
               maidState.TopenValue -= Time.deltaTime * 0.5f;
-              if(maidState.TopenValue <= maidState.TopenValue2)maidState.TopenValue2 = UnityEngine.Random.Range(0f,60f) / 100f;
+              if (maidState.TopenValue <= maidState.TopenValue2) maidState.TopenValue2 = UnityEngine.Random.Range(0f,60f) * 0.01f;
             }
           }
 
 
           //口元破綻の抑制とシェイプキー操作
-          if(maidState.MouthMode == 0){  //通常時
+          if (maidState.MouthMode == 0) {  //通常時
             try { VertexMorph_FromProcItem(maid.body0, "moutha", maV); } catch { }
             try { VertexMorph_FromProcItem(maid.body0, "mouthdw", mdwV); } catch { }
-            
+
           }
-          if(maidState.MouthMode == 1){  //キス時
-            if(miV > 0.1f) try { VertexMorph_FromProcItem(maid.body0, "mouthi", 0.1f); } catch { }
-            if(maV > 0.6f) maV = 0.6f;
+          if (maidState.MouthMode == 1) {  //キス時
+            if (miV > 0.1f) try { VertexMorph_FromProcItem(maid.body0, "mouthi", 0.1f); } catch { }
+            if (maV > 0.6f) maV = 0.6f;
               try { VertexMorph_FromProcItem(maid.body0, "moutha", maV); } catch { }
               try { VertexMorph_FromProcItem(maid.body0, "mouthdw", mdwV); } catch { }
               try { VertexMorph_FromProcItem(maid.body0, "tangup", maidState.TupValue); } catch { }
@@ -8153,12 +8354,12 @@ namespace CM3D2.VibeYourMaid.Plugin {
               try { VertexMorph_FromProcItem(maid.body0, "tangopen", maidState.TopenValue); } catch { }
 
           }
-          if(maidState.MouthMode == 2){  //フェラ時
-            if(miV > 0.1f) try { VertexMorph_FromProcItem(maid.body0, "mouthi", 0.1f); } catch { }
-            if(mcV > 0.2f) try { VertexMorph_FromProcItem(maid.body0, "mouthc", 0.2f); } catch { }
-            if(msV > 0.1f) try { VertexMorph_FromProcItem(maid.body0, "mouths", 0.1f); } catch { }
-            if(mupV > 0.1f) try { VertexMorph_FromProcItem(maid.body0, "mouthup", 0.1f); } catch { }
-            if(maV > 1.0f) maV = 1.0f;
+          if (maidState.MouthMode == 2) {  //フェラ時
+            if (miV > 0.1f) try { VertexMorph_FromProcItem(maid.body0, "mouthi", 0.1f); } catch { }
+            if (mcV > 0.2f) try { VertexMorph_FromProcItem(maid.body0, "mouthc", 0.2f); } catch { }
+            if (msV > 0.1f) try { VertexMorph_FromProcItem(maid.body0, "mouths", 0.1f); } catch { }
+            if (mupV > 0.1f) try { VertexMorph_FromProcItem(maid.body0, "mouthup", 0.1f); } catch { }
+            if (maV > 1.0f) maV = 1.0f;
               try { VertexMorph_FromProcItem(maid.body0, "moutha", maV); } catch { }
               try { VertexMorph_FromProcItem(maid.body0, "mouthdw", mdwV); } catch { }
               try { VertexMorph_FromProcItem(maid.body0, "tangup", maidState.TupValue); } catch { }
@@ -8166,12 +8367,12 @@ namespace CM3D2.VibeYourMaid.Plugin {
               try { VertexMorph_FromProcItem(maid.body0, "tangopen", maidState.TopenValue); } catch { }
 
           }
-          if(maidState.MouthMode == 3){  //連続絶頂時１
-            if(miV > 0.1f) try { VertexMorph_FromProcItem(maid.body0, "mouthi", 0.1f); } catch { }
-            if(mcV > 0.2f) try { VertexMorph_FromProcItem(maid.body0, "mouthc", 0.2f); } catch { }
-            if(msV > 0.1f) try { VertexMorph_FromProcItem(maid.body0, "mouths", 0.1f); } catch { }
-            if(mupV > 0.1f) try { VertexMorph_FromProcItem(maid.body0, "mouthup", 0.1f); } catch { }
-            if(maV > 1.0f) maV = 1.0f;
+          if (maidState.MouthMode == 3) {  //連続絶頂時１
+            if (miV > 0.1f) try { VertexMorph_FromProcItem(maid.body0, "mouthi", 0.1f); } catch { }
+            if (mcV > 0.2f) try { VertexMorph_FromProcItem(maid.body0, "mouthc", 0.2f); } catch { }
+            if (msV > 0.1f) try { VertexMorph_FromProcItem(maid.body0, "mouths", 0.1f); } catch { }
+            if (mupV > 0.1f) try { VertexMorph_FromProcItem(maid.body0, "mouthup", 0.1f); } catch { }
+            if (maV > 1.0f) maV = 1.0f;
               try { VertexMorph_FromProcItem(maid.body0, "moutha", maV); } catch { }
               try { VertexMorph_FromProcItem(maid.body0, "mouthdw", mdwV); } catch { }
               try { VertexMorph_FromProcItem(maid.body0, "tangup", maidState.TupValue); } catch { }
@@ -8179,9 +8380,9 @@ namespace CM3D2.VibeYourMaid.Plugin {
               try { VertexMorph_FromProcItem(maid.body0, "tangopen", maidState.TopenValue); } catch { }
 
           }
-          if(maidState.MouthMode == 4){  //連続絶頂時２
-            if(mupV > 0f) try { VertexMorph_FromProcItem(maid.body0, "mouthup", 0f); } catch { }
-            if(msV > 0.1f) try { VertexMorph_FromProcItem(maid.body0, "mouths", 0f); } catch { }
+          if (maidState.MouthMode == 4) {  //連続絶頂時２
+            if (mupV > 0f) try { VertexMorph_FromProcItem(maid.body0, "mouthup", 0f); } catch { }
+            if (msV > 0.1f) try { VertexMorph_FromProcItem(maid.body0, "mouths", 0f); } catch { }
               try { VertexMorph_FromProcItem(maid.body0, "moutha", maV / 4 + 0.05f); } catch { }
               try { VertexMorph_FromProcItem(maid.body0, "mouthc", mcV / 4); } catch { }
               try { VertexMorph_FromProcItem(maid.body0, "mouthi", miV); } catch { }
@@ -8190,7 +8391,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
               try { VertexMorph_FromProcItem(maid.body0, "toothoff", 0f); } catch { }
 
           }
-          if(maidState.MouthMode == 5){  //余韻時
+          if (maidState.MouthMode == 5) {  //余韻時
               try { VertexMorph_FromProcItem(maid.body0, "moutha", maV); } catch { }
               try { VertexMorph_FromProcItem(maid.body0, "mouthdw", mdwV); } catch { }
 
@@ -8208,35 +8409,35 @@ namespace CM3D2.VibeYourMaid.Plugin {
       //乳首設定関係---------------------------------
 
         //服装と乳首のチェック
-        private int ChikubiCheck(Maid maid){
+        private int ChikubiCheck(Maid maid) {
           bool isWear = true;
           bool isOnepiece = true;
           bool isMizugi = true;
           bool isBra = true;
-          
-          
+
+
           //服装の状態チェック
-          if(!maid.body0.GetMask(TBody.SlotID.wear) || maid.GetProp(MPN.wear).strTempFileName == "_I_wear_del.menu" || ( maid.GetProp(MPN.wear).strTempFileName == "" && maid.GetProp(MPN.wear).strFileName == "_I_wear_del.menu") )isWear = false;
-          if(!maid.body0.GetMask(TBody.SlotID.onepiece) || maid.GetProp(MPN.onepiece).strTempFileName == "_I_onepiece_del.menu" || ( maid.GetProp(MPN.onepiece).strTempFileName == "" && maid.GetProp(MPN.onepiece).strFileName == "_I_onepiece_del.menu") )isOnepiece = false;
-          if(!maid.body0.GetMask(TBody.SlotID.mizugi) || maid.GetProp(MPN.mizugi).strTempFileName == "_I_mizugi_del.menu" || ( maid.GetProp(MPN.mizugi).strTempFileName == "" && maid.GetProp(MPN.mizugi).strFileName == "_I_mizugi_del.menu") )isMizugi = false;
-          if(!maid.body0.GetMask(TBody.SlotID.bra) || maid.GetProp(MPN.bra).strTempFileName == "_i_bra_del.menu" || ( maid.GetProp(MPN.bra).strTempFileName == "" && maid.GetProp(MPN.bra).strFileName == "_i_bra_del.menu") )isBra = false;
-          
-          if(isWear || isOnepiece || isMizugi || isBra){
+          if (!maid.body0.GetMask(TBody.SlotID.wear) || maid.GetProp(MPN.wear).strTempFileName == "_I_wear_del.menu" || ( maid.GetProp(MPN.wear).strTempFileName == "" && maid.GetProp(MPN.wear).strFileName == "_I_wear_del.menu") ) isWear = false;
+          if (!maid.body0.GetMask(TBody.SlotID.onepiece) || maid.GetProp(MPN.onepiece).strTempFileName == "_I_onepiece_del.menu" || ( maid.GetProp(MPN.onepiece).strTempFileName == "" && maid.GetProp(MPN.onepiece).strFileName == "_I_onepiece_del.menu") ) isOnepiece = false;
+          if (!maid.body0.GetMask(TBody.SlotID.mizugi) || maid.GetProp(MPN.mizugi).strTempFileName == "_I_mizugi_del.menu" || ( maid.GetProp(MPN.mizugi).strTempFileName == "" && maid.GetProp(MPN.mizugi).strFileName == "_I_mizugi_del.menu") ) isMizugi = false;
+          if (!maid.body0.GetMask(TBody.SlotID.bra) || maid.GetProp(MPN.bra).strTempFileName == "_i_bra_del.menu" || ( maid.GetProp(MPN.bra).strTempFileName == "" && maid.GetProp(MPN.bra).strFileName == "_i_bra_del.menu") ) isBra = false;
+
+          if (isWear || isOnepiece || isMizugi || isBra) {
             return 0;
-          }else{
+          } else {
             return 1;
           }
         }
 
         // 乳首設定反映
-        void ChikubiSet(Maid maid, MaidState maidState, int cv){
-          
+        void ChikubiSet(Maid maid, MaidState maidState, int cv) {
+
           float n_def = maidState.tits_nipple_def[cv];
           float kanbotsu_n = maidState.tits_chikubi_kanbotsu_n[cv];
           float kanbotsu_s = maidState.tits_chikubi_kanbotsu_s[cv];
           float kanbotsu_p = maidState.tits_chikubi_kanbotsu_p[cv];
           float bokki2 = 1f;
-          if(cv == 1 && maidState.chikubiBokkiEnabled){
+          if (cv == 1 && maidState.chikubiBokkiEnabled) {
             float bokki = maidState.bokkiValue1 * 0.01f;
             bokki2 += bokki * 0.4f;
             n_def += bokki * 1.4f;
@@ -8244,7 +8445,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
             kanbotsu_s -= bokki * maidState.tits_chikubi_kanbotsu_s[cv];
             kanbotsu_p -= bokki * maidState.tits_chikubi_kanbotsu_p[cv];
           }
-          
+
           try { VertexMorph_FromProcItem(maid.body0, "tits_chikubi_cow", maidState.tits_chikubi_cow[cv]); } catch { /*LogError(ex);*/ }
           try { VertexMorph_FromProcItem(maid.body0, "tits_chikubi_observe", maidState.tits_chikubi_observe[cv]); } catch { /*LogError(ex);*/ }
           try { VertexMorph_FromProcItem(maid.body0, "tits_chikubi_wide", maidState.tits_chikubi_wide[cv]); } catch { /*LogError(ex);*/ }
@@ -8262,25 +8463,25 @@ namespace CM3D2.VibeYourMaid.Plugin {
           try { VertexMorph_FromProcItem(maid.body0, "tits_chikubi_kanbotsu_s", kanbotsu_s); } catch { /*LogError(ex);*/ }
           try { VertexMorph_FromProcItem(maid.body0, "tits_chikubi_kanbotsu_p", kanbotsu_p); } catch { /*LogError(ex);*/ }
           try { VertexMorph_FromProcItem(maid.body0, "tits_nipple_def", n_def); } catch { /*LogError(ex);*/ }
-        
+
           try { VertexMorph_FromProcItem(maid.body0, "tits_chikubi_def", maidState.tits_chikubi_def[cv] * bokki2); } catch { /*LogError(ex);*/ }
           try { VertexMorph_FromProcItem(maid.body0, "tits_chikubi_perky", maidState.tits_chikubi_perky[cv] * bokki2); } catch { /*LogError(ex);*/ }
           try { VertexMorph_FromProcItem(maid.body0, "tits_nipple_perky1", maidState.tits_nipple_perky1[cv] * bokki2); } catch { /*LogError(ex);*/ }
           try { VertexMorph_FromProcItem(maid.body0, "tits_nipple_perky2", maidState.tits_nipple_perky2[cv] * bokki2); } catch { /*LogError(ex);*/ }
           try { VertexMorph_FromProcItem(maid.body0, "tits_nipple_puffy", maidState.tits_nipple_puffy[cv] * bokki2); } catch { /*LogError(ex);*/ }
         }
-        
+
         // 乳首設定の保存
-        void ChikubiSave(int maidID, int cv){
+        void ChikubiSave(int maidID, int cv) {
           Maid maid = stockMaids[maidID].mem;
           MaidState maidState = maidsState[maidID];
-          
-          if(maidState.chikubiEnabled){
+
+          if (maidState.chikubiEnabled) {
             ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "chikubiEnabled", "1", true);
-          }else{
+          } else {
             ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "chikubiEnabled", "0", true);
           }
-          
+
           ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "tits_chikubi_def[" + cv + "]" , maidState.tits_chikubi_def[cv].ToString(), true);
           ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "tits_chikubi_perky[" + cv + "]" , maidState.tits_chikubi_perky[cv].ToString(), true);
           ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "tits_chikubi_cow[" + cv + "]" , maidState.tits_chikubi_cow[cv].ToString(), true);
@@ -8301,22 +8502,22 @@ namespace CM3D2.VibeYourMaid.Plugin {
           ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "tits_nipple_puffy[" + cv + "]" , maidState.tits_nipple_puffy[cv].ToString(), true);
           ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "tits_nipple_kupa[" + cv + "]" , maidState.tits_nipple_kupa[cv].ToString(), true);
           ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "tits_munel_chippai[" + cv + "]" , maidState.tits_munel_chippai[cv].ToString(), true);
-        
+
         }
 
         // 乳首設定の読込
-        void ChikubiLoad(int maidID, int cv){
+        void ChikubiLoad(int maidID, int cv) {
           Maid maid = stockMaids[maidID].mem;
           MaidState maidState = maidsState[maidID];
-          
-          if(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "chikubiEnabled", "0") == "0"){
+
+          if (ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "chikubiEnabled", "0") == "0") {
             maidState.chikubiEnabled = false;
-          }else{
+          } else {
             maidState.chikubiEnabled = true;
           }
-          
-          if(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "tits_chikubi_def[" + cv + "]", "0") != ""){
-          
+
+          if (ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "tits_chikubi_def[" + cv + "]", "0") != "") {
+
             maidState.tits_chikubi_def[cv] = floatCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "tits_chikubi_def[" + cv + "]", "0"));
             maidState.tits_chikubi_perky[cv] = floatCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "tits_chikubi_perky[" + cv + "]", "0"));
             maidState.tits_chikubi_cow[cv] = floatCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "tits_chikubi_cow[" + cv + "]", "0"));
@@ -8337,16 +8538,16 @@ namespace CM3D2.VibeYourMaid.Plugin {
             maidState.tits_nipple_puffy[cv] = floatCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "tits_nipple_puffy[" + cv + "]", "0"));
             maidState.tits_nipple_kupa[cv] = floatCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "tits_nipple_kupa[" + cv + "]", "0"));
             maidState.tits_munel_chippai[cv] = floatCnv(ExSaveData.Get(maid, "CM3D2.VibeYourMaid.Plugin", "tits_munel_chippai[" + cv + "]", "0"));
-          
+
           }
-        
+
         }
 
 
         // 乳首設定のリセット
-        void ChikubiReset(int maidID, int cv){
+        void ChikubiReset(int maidID, int cv) {
             MaidState maidState = maidsState[maidID];
-          
+
             maidState.tits_chikubi_def[cv] = 0;
             maidState.tits_chikubi_perky[cv] = 0;
             maidState.tits_chikubi_cow[cv] = 0;
@@ -8367,12 +8568,12 @@ namespace CM3D2.VibeYourMaid.Plugin {
             maidState.tits_nipple_puffy[cv] = 0;
             maidState.tits_nipple_kupa[cv] = 0;
             maidState.tits_nipple_kupa[cv] = 0;
-            
+
         }
 
 
         // 乳首設定のコピー
-        void ChikubiCopy(int maidID, int a, int b){
+        void ChikubiCopy(int maidID, int a, int b) {
             MaidState maidState = maidsState[maidID];
 
             maidState.tits_chikubi_def[a] = maidState.tits_chikubi_def[b];
@@ -8395,7 +8596,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
             maidState.tits_nipple_puffy[a] = maidState.tits_nipple_puffy[b];
             maidState.tits_nipple_kupa[a] = maidState.tits_nipple_kupa[b];
             maidState.tits_munel_chippai[a] = maidState.tits_munel_chippai[b];
-            
+
 
         }
 
@@ -8409,130 +8610,132 @@ namespace CM3D2.VibeYourMaid.Plugin {
       //シェイプキー関係---------------------------------
 
         static HashSet<TMorph> m_NeedFixTMorphs = new HashSet<TMorph>();
-        
+
         //シェイプキー操作
         //戻り値はsTagの存在有無にしているので必要に応じて変更してください
-        static public bool VertexMorph_FromProcItem(TBody body, string sTag, float f) {
-          bool result = false;
-          if (!body || sTag == null || sTag == "") {
-            return false;
-          }
-          for (int i = body.goSlot.Count-1; i >= 0; i--) {
+        static public void VertexMorph_FromProcItem(TBody body, string sTag, float f)
+        {
+          if (!body || sTag == null || sTag == "") return;
+
+          //bool result = false;
+          for (int i = 0, cnt = body.goSlot.Count; i < cnt; i++) {
             TMorph morph = body.goSlot[i].morph;
             if (morph != null && morph.Contains(sTag)) {
-              result = true;
-              int f_nIdx = (int)morph.hash[sTag];
-              morph.SetBlendValues(f_nIdx, f);
+              //result = true;
+              morph.SetBlendValues((int)morph.hash[sTag], f);
               if (!VibeYourMaid.m_NeedFixTMorphs.Contains(morph)) {
                 VibeYourMaid.m_NeedFixTMorphs.Add(morph);
               }
             }
           }
-          return result;
+          //return result;
         }
 
         //シェイプキー操作Fix(基本はUpdate等の最後に一度呼ぶだけで良いはず）
-        public void VertexMorph_FixBlendValues(){
-            
-            foreach (TMorph tm in m_NeedFixTMorphs){
-                tm.FixBlendValues();
-            }
-            m_NeedFixTMorphs.Clear();
+        public void VertexMorph_FixBlendValues()
+        {
+          foreach (TMorph tm in m_NeedFixTMorphs) {
+            tm.FixBlendValues();
+          }
+          m_NeedFixTMorphs.Clear();
         }
 
+        //シェイプキー取得
+        public float GetBlendValues(TBody body, string slot, string sTag)
+        {
+          TBodySkin skin = body.GetSlot(slot);
+          if (skin != null) {
+            TMorph morph = skin.morph;
+            if (morph != null && morph.Contains(sTag)) {
+              return morph.GetBlendValues((int)morph.hash[sTag]);
+            }
+          }
+          return 0f;
+        }
 
 	      //シェイプキーが存在するかのチェック
         private bool isExistVertexMorph(TBody body, string sTag) {
             
-            for (int i = 0; i < body.goSlot.Count; i++){
-                TMorph morph = body.goSlot[i].morph;
-                if (morph != null){
-                    if (morph.Contains(sTag)){
-                        return true;
-                    }
-                }
+          for (int i = 0, cnt = body.goSlot.Count; i < cnt; i++) {
+            TMorph morph = body.goSlot[i].morph;
+            if (morph != null) {
+              if (morph.Contains(sTag)) {
+                return true;
+              }
             }
-            return false;
+          }
+          return false;
         }
-        
-        
+
         //kupaウェイブ
-        private void ShapeKeyKupaWave(int maidID, MaidState maidState, float min, float max, float sp){
-        
+        private void ShapeKeyKupaWave(MaidState maidState, float min, float max, float sp) {
+
           sp *= Time.deltaTime * ShapeKeySpeedRate;
-          
-          if(maidState.kupaWaveValue > max ){
+
+          if (maidState.kupaWaveValue > max) {
             maidState.kupaWaveRe = -1f;
-          }else if(maidState.kupaWaveValue < min){
+          } else if (maidState.kupaWaveValue < min) {
             maidState.kupaWaveRe = 1f;
           }
-          
+
           maidState.kupaWaveValue = maidState.kupaWaveValue + sp * maidState.kupaWaveRe;
         }
 
-
         //シェイプウェイブ
-        private void ShapeKeyWave(int maidID, Maid maid, MaidState maidState, string[] name, string[] name2, float min, float max, float sp){
-          
+        private void ShapeKeyWave(Maid maid, MaidState maidState, string[] name, string[] name2, float min, float max, float sp) {
+
           sp *= Time.deltaTime * ShapeKeySpeedRate;
-          
-          if(maidState.shapeKeyWaveValue > max ){
+
+          if (maidState.shapeKeyWaveValue > max) {
             maidState.shapeKeyWaveRe = -1f;
-          }else if(maidState.shapeKeyWaveValue < min){
+          } else if (maidState.shapeKeyWaveValue < min) {
             maidState.shapeKeyWaveRe = 1f;
           }
-          
+
           maidState.shapeKeyWaveValue = maidState.shapeKeyWaveValue + sp * maidState.shapeKeyWaveRe;
 
-          for (int i=0; i < name.Length; i++){
-            try { VertexMorph_FromProcItem(maid.body0, name[i], maidState.shapeKeyWaveValue/100f); } catch { /*LogError(ex);*/ }
+          foreach (string n in name) {
+            try { VertexMorph_FromProcItem(maid.body0, n, maidState.shapeKeyWaveValue*0.01f); } catch { /*LogError(ex);*/ }
           }
 
           float rValue = max - maidState.shapeKeyWaveValue;
-          for (int i=0; i<name2.Length; i++){
-            try { VertexMorph_FromProcItem(maid.body0, name2[i], rValue/100f); } catch { /*LogError(ex);*/ }
+          foreach (string n2 in name2) {
+            try { VertexMorph_FromProcItem(maid.body0, n2, rValue*0.01f); } catch { /*LogError(ex);*/ }
           }
         }
 
-
         //シェイプ増加
-        private void ShapeKeyIncrease(int maidID, MaidState maidState, string[] name, float max, float sp){
-          
-          Maid maid = stockMaids[maidID].mem;
+        private void ShapeKeyIncrease(Maid maid, MaidState maidState, string[] name, float max, float sp) {
+
           sp *= Time.deltaTime * ShapeKeySpeedRate;
 
           maidState.shapeKeyIncreaseValue = maidState.shapeKeyIncreaseValue + sp;
 
-          if(maidState.shapeKeyIncreaseValue > max ){
+          if (maidState.shapeKeyIncreaseValue > max) {
             maidState.shapeKeyIncreaseValue = 0f;
-          }else if(maidState.shapeKeyIncreaseValue < 0f ){
+          } else if (maidState.shapeKeyIncreaseValue < 0f) {
             maidState.shapeKeyIncreaseValue = max;
           }
-          
-          for (int i=0; i<name.Length; i++){
-            try { VertexMorph_FromProcItem(maid.body0, name[i], maidState.shapeKeyIncreaseValue/100f); } catch { /*LogError(ex);*/ }
+
+          foreach (string n in name) {
+            try { VertexMorph_FromProcItem(maid.body0, n, maidState.shapeKeyIncreaseValue*0.01f); } catch { /*LogError(ex);*/ }
           }
         }
-
 
         //シェイプランダム
-        private void ShapeKeyRandam(int maidID, Maid maid, MaidState maidState, string[] name, float min, float max){
-          
+        private void ShapeKeyRandam(int maidID, Maid maid, MaidState maidState, string[] name, float min, float max) {
+
           maidState.shapeKeyRandomDelta -= timerRate;
-          
-          if (maidState.shapeKeyRandomDelta > 0)return;
+
+          if (maidState.shapeKeyRandomDelta > 0) return;
           maidState.shapeKeyRandomDelta = 0.1f;
 
-          for (int i=0; i<name.Length; i++){
-            float value = UnityEngine.Random.Range(min, max);
-            try { VertexMorph_FromProcItem(maid.body0, name[i], value/100f); } catch { /*LogError(ex);*/ }
+          foreach (string n in name) {
+            try { VertexMorph_FromProcItem(maid.body0, n, UnityEngine.Random.Range(min, max)*0.01f); } catch { /*LogError(ex);*/ }
           }
         }
 
-
       //シェイプキー関係終了------------------------------
-
-
 
 
       //--------------------------------------------------
@@ -8540,171 +8743,164 @@ namespace CM3D2.VibeYourMaid.Plugin {
 
         //責めの激しさを自動で変える
         public string[] autoSelectList = new string[]{ "オート無効" , "じっくり" , "激しく" , "ほどほど"};
+
         private void PowerAutoChange(int maidID, MaidState maidState) {
-        
-          if(maidState.pAutoSelect == 0)return;
-          if(maidState.pAutoTime > 0 || (maidState.orgasmCmb != 0 && maidState.pAutoSelect == 2)){
+
+          if (maidState.pAutoSelect == 0) return;
+          if (maidState.pAutoTime > 0 || (maidState.orgasmCmb != 0 && maidState.pAutoSelect == 2)) {
             maidState.pAutoTime -=  timerRate;
             return;
           }
-          
-          if(maidState.vLevel == 0 || maidState.vLevel == 2){
+
+          if (maidState.vLevel == 0 || maidState.vLevel == 2) {
             maidState.vLevel = 1;
-            
-            if(maidState.pAutoSelect == 1){//じっくりモード
+
+            if (maidState.pAutoSelect == 1) { //じっくりモード
               maidState.pAutoTime = UnityEngine.Random.Range(600, 1000);
             }
-            if(maidState.pAutoSelect == 2){//激しくモード
+            else if (maidState.pAutoSelect == 2) { //激しくモード
               maidState.pAutoTime = UnityEngine.Random.Range(250, 400);
             }
-            if(maidState.pAutoSelect == 3){//ほどほどモード
+            else if (maidState.pAutoSelect == 3) { //ほどほどモード
               maidState.pAutoTime = UnityEngine.Random.Range(400, 700);
             }
 
-          }else if(maidState.vLevel == 1){
+          } else if (maidState.vLevel == 1) {
             maidState.vLevel = 2;
-            
-            if(maidState.pAutoSelect == 1){//じっくりモード
-              if(UnityEngine.Random.Range(0, 100) < 15){
+
+            if (maidState.pAutoSelect == 1) { //じっくりモード
+              if (UnityEngine.Random.Range(0, 100) < 15) {
                 maidState.vLevel = 0;
                 maidState.pAutoTime = UnityEngine.Random.Range(250, 600);
-              }else{
+              } else {
                 maidState.pAutoTime = UnityEngine.Random.Range(300, 480);
               }
             }
-            if(maidState.pAutoSelect == 2){//激しくモード
+            else if (maidState.pAutoSelect == 2) { //激しくモード
               maidState.pAutoTime = UnityEngine.Random.Range(600, 1000);
             }
-            if(maidState.pAutoSelect == 3){//ほどほどりモード
-              if(UnityEngine.Random.Range(0, 100) < 15){
+            else if (maidState.pAutoSelect == 3) { //ほどほどモード
+              if (UnityEngine.Random.Range(0, 100) < 15) {
                 maidState.vLevel = 0;
               }
               maidState.pAutoTime = UnityEngine.Random.Range(400, 700);
             }
           }
-          
-          /*if(maidID == tgID){
-            foreach(int id in vmId){
-              if(id == tgID || !maidsState[id].linkEnabled)continue;
+
+          /*if (maidID == tgID) {
+            foreach (int id in vmId) {
+              if ( id == tgID || !maidsState[id].linkEnabled) continue;
               maidsState[id].vLevel = maidsState[tgID].vLevel;
             }
           }*/
-          
-          foreach(int id in vmId){
-            if(id == maidID || !LinkMaidCheck(maidID, id))continue;
+
+          foreach (int id in vmId) {
+            if (id == maidID || !LinkMaidCheck(maidID, id)) continue;
             maidsState[id].vLevel = maidState.vLevel;
             maidsState[id].pAutoTime = maidState.pAutoTime;
           }
-          
+
         }
 
         //顔と目線の向きを自動で変える
         private void EyeAutoChange(Maid maid, MaidState maidState) {
-        
-          if(!maidState.eAutoSelect)return;
-          if(maidState.eAutoTime > 0){
+
+          if (!maidState.eAutoSelect) return;
+          if (maidState.eAutoTime > 0) {
             maidState.eAutoTime -=  timerRate;
             return;
           }
-          
-          if(!DistanceToMaid(maid, maidState, 8f)){
+
+          if (!DistanceToMaid(maid, maidState, 8f)) {
             maid.body0.boEyeToCam = false;
             maid.body0.boHeadToCam = false;
             return;
           }
-          
-          if(UnityEngine.Random.Range(0, 100) < 50)maid.body0.boEyeToCam = !maid.body0.boEyeToCam;
-          if(maid.body0.boHeadToCam){
-            if(UnityEngine.Random.Range(0, 100) < 70)maid.body0.boHeadToCam = !maid.body0.boHeadToCam;
-          }else{
-            if(UnityEngine.Random.Range(0, 100) < 30)maid.body0.boHeadToCam = !maid.body0.boHeadToCam;
+
+          if (UnityEngine.Random.Range(0, 100) < 50) maid.body0.boEyeToCam = !maid.body0.boEyeToCam;
+          if (maid.body0.boHeadToCam) {
+            if (UnityEngine.Random.Range(0, 100) < 70) maid.body0.boHeadToCam = !maid.body0.boHeadToCam;
+          } else {
+            if (UnityEngine.Random.Range(0, 100) < 30) maid.body0.boHeadToCam = !maid.body0.boHeadToCam;
           }
-          
-          if(maidState.stunFlag)maid.body0.boEyeToCam = false;
-          if(maidState.stunFlag || maidState.bIsBlowjobing == 2 || maidState.bIsBlowjobing == 1)maid.body0.boHeadToCam = false;
+
+          if (maidState.stunFlag) maid.body0.boEyeToCam = false;
+          if (maidState.stunFlag || maidState.bIsBlowjobing == 2 || maidState.bIsBlowjobing == 1) maid.body0.boHeadToCam = false;
 
           maidState.eAutoTime = UnityEngine.Random.Range(400, 600);
-          
-        }
-        
-        
 
+        }
 
       //オートモード関係終了------------------------------
 
 
-
-
-
-
       //-------------------------------------------------
       //外部データ読み込み関係---------------------------------
-      
+
         //XMLファイルのリストアップ処理
         private List<string> bvsFiles = new List<string>();
         private List<string> evsFiles = new List<string>();
         private List<string> emsFiles = new List<string>();
         private List<string> cdsFiles = new List<string>();
         private void XmlFilesCheck(){
-          
+
           List<string> _files = new List<string>();
           string fileName = "";
           string[] files;
-          
+
           //基本ボイスセットのフォルダ確認
-          if (System.IO.Directory.Exists(@"Sybaris\UnityInjector\Config\VibeYourMaid\BasicVoiseSet\")){
+          if (System.IO.Directory.Exists(@"Sybaris\UnityInjector\Config\VibeYourMaid\BasicVoiseSet\")) {
             _files.Clear();
             files = Directory.GetFiles(@"Sybaris\UnityInjector\Config\VibeYourMaid\BasicVoiseSet\", "*.xml");
-            
-            foreach (string file in files){
+
+            foreach (string file in files) {
               fileName = Path.GetFileName(file);
-              if(Regex.IsMatch(fileName, "^bvs_"))_files.Add(fileName);
+              if (Regex.IsMatch(fileName, "^bvs_")) _files.Add(fileName);
             }
             bvsFiles = new List<string>(_files);
           }
-          
+
           //エディットボイスセットのフォルダ確認
-          if (System.IO.Directory.Exists(@"Sybaris\UnityInjector\Config\VibeYourMaid\EditVoiseSet\")){
+          if (System.IO.Directory.Exists(@"Sybaris\UnityInjector\Config\VibeYourMaid\EditVoiseSet\")) {
             _files.Clear();
             files = Directory.GetFiles(@"Sybaris\UnityInjector\Config\VibeYourMaid\EditVoiseSet\", "*.xml");
-            
-            foreach (string file in files){
+
+            foreach (string file in files) {
               fileName = Path.GetFileName(file);
-              if(Regex.IsMatch(fileName, "^evs_"))_files.Add(fileName);
+              if (Regex.IsMatch(fileName, "^evs_")) _files.Add(fileName);
             }
             evsFiles = new List<string>(_files);
           }
 
           //エディットモーションセットのフォルダ確認
-          if (System.IO.Directory.Exists(@"Sybaris\UnityInjector\Config\VibeYourMaid\EditMotionSet\")){
+          if (System.IO.Directory.Exists(@"Sybaris\UnityInjector\Config\VibeYourMaid\EditMotionSet\")) {
             _files.Clear();
             files = Directory.GetFiles(@"Sybaris\UnityInjector\Config\VibeYourMaid\EditMotionSet\", "*.xml");
-            
-            foreach (string file in files){
+
+            foreach (string file in files) {
               fileName = Path.GetFileName(file);
-              if(Regex.IsMatch(fileName, "^ems_"))_files.Add(fileName);
+              if (Regex.IsMatch(fileName, "^ems_")) _files.Add(fileName);
             }
             emsFiles = new List<string>(_files);
           }
-          
+
           //共通衣装セットのフォルダ確認
-          if (System.IO.Directory.Exists(@"Sybaris\UnityInjector\Config\VibeYourMaid\CommonDressSet\")){
+          if (System.IO.Directory.Exists(@"Sybaris\UnityInjector\Config\VibeYourMaid\CommonDressSet\")) {
             _files.Clear();
             files = Directory.GetFiles(@"Sybaris\UnityInjector\Config\VibeYourMaid\CommonDressSet\", "*.xml");
-            
-            foreach (string file in files){
+
+            foreach (string file in files) {
               fileName = Path.GetFileName(file);
-              if(Regex.IsMatch(fileName, "^cds_"))_files.Add(fileName);
+              if (Regex.IsMatch(fileName, "^cds_")) _files.Add(fileName);
             }
             cdsFiles = new List<string>(_files);
           }
-          
+
         }
 
-
         //テキストファイル読み込み処理
-        private List<string> ReadTextFaile(string file , string section){
-          
+        /*private List<string> ReadTextFaile(string file , string section) {
+
             System.IO.StreamReader sr = new System.IO.StreamReader(file);
             bool ReadFlag = false;
             List<string> _ListData = new List<string>();
@@ -8716,22 +8912,57 @@ namespace CM3D2.VibeYourMaid.Plugin {
                 ReadFlag = true;
                 continue;
               }
-              if(ReadFlag && m == "[end]"){
+              if (ReadFlag && m == "[end]") {
                 ReadFlag = false;
                 break;
               }
-              
-              if(ReadFlag){
+
+              if (ReadFlag) {
                 _ListData.Add(m);
               }
-              
+
             }
             return _ListData;
+        }*/
+
+        // MList.txt読み込み sectionsと同じ配列順で返す 設定がなくても空のListを返す
+        private List<string>[] ReadListFile(string file , string[] sections)
+        {
+            List<string>[] motionList = new List<string>[sections.Length];
+            for (int i=0; i<sections.Length; i++) {
+              motionList[i] = new List<string>();
+            }
+
+            int readIdx = -1;
+
+            System.IO.StreamReader sr = new System.IO.StreamReader(file);
+            while (sr.Peek() > -1) {
+              string m = sr.ReadLine();
+
+              if (m == "" || m.StartsWith("//")) continue;
+
+              if (readIdx == -1) {
+                if (m.StartsWith("[")) {
+                  for (int i=0; i<sections.Length; i++) {
+                    if (m == "["+sections[i]+"]") {
+                      readIdx = i;
+                      break;
+                    }
+                  }
+                }
+              } else {
+                if (m == "[end]") {
+                  readIdx = -1;
+                } else {
+                  motionList[readIdx].Add(m);
+                }
+              }
+            }
+            return motionList;
         }
-        
-        
+
         //ConfigXMLファイルの保存・読み込み
-        private void ConfigFileSave(){
+        private void ConfigFileSave() {
           string fileName = @"Sybaris\UnityInjector\Config\VibeYourMaid\config.xml"; //保存先のファイル名
           System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(VibeYourMaidCfgWriting)); //XmlSerializerオブジェクトを作成。オブジェクトの型を指定する
           System.IO.StreamWriter sw = new System.IO.StreamWriter(fileName, false, new System.Text.UTF8Encoding(false)); //書き込むファイルを開く（UTF-8 BOM無し）
@@ -8739,7 +8970,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
           sw.Close(); //ファイルを閉じる
           Console.WriteLine("[VibeYourMaid] 保存完了: "+fileName);
         }
-        private bool ConfigFileLoad(){
+        private bool ConfigFileLoad() {
           string fileName = @"Sybaris\UnityInjector\Config\VibeYourMaid\config.xml"; //保存先のファイル名
           if (!System.IO.File.Exists(fileName)) return false;
           System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(VibeYourMaidCfgWriting)); //XmlSerializerオブジェクトを作成
@@ -8749,20 +8980,20 @@ namespace CM3D2.VibeYourMaid.Plugin {
           Console.WriteLine("[VibeYourMaid] 読込完了: "+fileName);
           return true;
         }
-        
+
         //脱衣ボイスファイルの保存・読み込み
-        private void UndressingVoiceSave(){
-         
+        private void UndressingVoiceSave()
+        {
           string fileName = @"Sybaris\UnityInjector\Config\VibeYourMaid\UndressingVoice.xml"; //保存先のファイル名
-          
+
           System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(string[][])); //XmlSerializerオブジェクトを作成。オブジェクトの型を指定する
           System.IO.StreamWriter sw = new System.IO.StreamWriter(fileName, false, new System.Text.UTF8Encoding(false)); //書き込むファイルを開く（UTF-8 BOM無し）
           serializer.Serialize(sw, UndressingVoice); //シリアル化し、XMLファイルに保存する
           sw.Close(); //ファイルを閉じる
         }
         //セーブが必要ならtrue
-        private bool UndressingVoiceLoad(){
-          
+        private bool UndressingVoiceLoad()
+        {
           string fileName = @"Sybaris\UnityInjector\Config\VibeYourMaid\UndressingVoice.xml"; //保存先のファイル名
           if (!System.IO.File.Exists(fileName)) return true;
           System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(string[][])); //XmlSerializerオブジェクトを作成
@@ -8778,62 +9009,67 @@ namespace CM3D2.VibeYourMaid.Plugin {
               UndressingVoice[21] = loadedVoice[20];
               changed = true;
             } else {
-              UndressingVoice[i] = loadedVoice[i];
+              if (loadedVoice[i].Length == 1) { //設定が空文字1つの場合はデフォルト側を利用 2.0.5.8のパッチで発生 しばらく後のバージョンで削除する
+                changed = true;
+              } else {
+                //設定ファイルを反映
+                UndressingVoice[i] = loadedVoice[i];
+              }
             }
           }
           return changed; //キャラが増えたか入れ替えたらロード
         }
-        
+
         //基本ボイスセットの保存・読み込み
         //画面からの変更はないのでファイルが存在しない場合のみ保存
-        private void BvsFileSave(){
-          
-          for (int i = 0; i < personalList[1].Length; i++){
+        private void BvsFileSave() {
+
+          for (int i = 0; i < personalList[1].Length; i++) {
             string fileName = @"Sybaris\UnityInjector\Config\VibeYourMaid\BasicVoiseSet\bvs_" + i.ToString("d2") + personalList[1][i] + ".xml";  //保存先のファイル名
             //ファイルが存在したら書き込みしない
             if (System.IO.File.Exists(fileName)) continue;
 
             System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(BasicVoiceSet));  //XmlSerializerオブジェクトを作成。オブジェクトの型を指定する
-            
+
             System.IO.StreamWriter sw = new System.IO.StreamWriter(fileName, false, new System.Text.UTF8Encoding(false));  //書き込むファイルを開く（UTF-8 BOM無し）
-            
+
             serializer.Serialize(sw, bvs[i]);  //シリアル化し、XMLファイルに保存する
-            
+
             Console.WriteLine("[VibeYourMaid] ボイスセット保存完了: " + personalList[1][i]);
             sw.Close(); //ファイルを閉じる
           }
         }
-        private void BvsFileLoad(){
-          
-          for (int i = 0; i < personalList[1].Length; i++){
-            string fileName = @"Sybaris\UnityInjector\Config\VibeYourMaid\BasicVoiseSet\bvs_" + i.ToString("d2") + personalList[1][i] + ".xml";  //保存先のファイル名
-            if(!System.IO.File.Exists(fileName))continue;
+        private void BvsFileLoad() {
 
-            System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(BasicVoiceSet));  //XmlSerializerオブジェクトを作成。オブジェクトの型を指定する            
-            
+          for (int i = 0; i < personalList[1].Length; i++) {
+            string fileName = @"Sybaris\UnityInjector\Config\VibeYourMaid\BasicVoiseSet\bvs_" + i.ToString("d2") + personalList[1][i] + ".xml";  //保存先のファイル名
+            if (!System.IO.File.Exists(fileName)) continue;
+
+            System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(BasicVoiceSet));  //XmlSerializerオブジェクトを作成。オブジェクトの型を指定する
+
             System.IO.StreamReader sr = new System.IO.StreamReader(fileName, new System.Text.UTF8Encoding(false));  //読み込むファイルを開く
-            
+
             //XMLファイルから読み込み、逆シリアル化する
             bvs[i] = (BasicVoiceSet)serializer.Deserialize(sr);
-            
+
             sr.Close(); //ファイルを閉じる
           }
-          
+
         }
-        
+
         //基本ボイスセットから、存在しないファイルを除外
-        private void BvsCheck(){
-        
+        private void BvsCheck() {
+
           var _vf = new List<string>();
-          for (int i = 0; i < bvs.Length; i++){
+          for (int i = 0; i < bvs.Length; i++) {
 
             System.Text.StringBuilder buf = new System.Text.StringBuilder();
 
-            for (int i2 = 0; i2 < 5; i2++){
+            for (int i2 = 0; i2 < 5; i2++) {
               _vf = new List<string>();
               _vf.AddRange(bvs[i].sLoopVoice20Vibe[i2]);
-              for (int i3 = 0; i3 < _vf.Count; i3++){
-                if(!GameUty.FileSystem.IsExistentFile(_vf[i3]) && !GameUty.FileSystemOld.IsExistentFile(_vf[i3]) && _vf[i3] != "" && _vf[i3] != ".ogg"){
+              for (int i3 = 0; i3 < _vf.Count; i3++) {
+                if (!GameUty.FileSystem.IsExistentFile(_vf[i3]) && !GameUty.FileSystemOld.IsExistentFile(_vf[i3]) && _vf[i3] != "" && _vf[i3] != ".ogg") {
                   buf.Append(" " + _vf[i3]);
                   _vf.RemoveAt(i3);
                   i3--;
@@ -8841,12 +9077,12 @@ namespace CM3D2.VibeYourMaid.Plugin {
               }
               bvs[i].sLoopVoice20Vibe[i2] = _vf.ToArray();
             }
-            
-            for (int i2 = 0; i2 < 5; i2++){
+
+            for (int i2 = 0; i2 < 5; i2++) {
               _vf = new List<string>();
               _vf.AddRange(bvs[i].sLoopVoice20Fera[i2]);
-              for (int i3 = 0; i3 < _vf.Count; i3++){
-                if(!GameUty.FileSystem.IsExistentFile(_vf[i3]) && !GameUty.FileSystemOld.IsExistentFile(_vf[i3]) && _vf[i3] != "" && _vf[i3] != ".ogg"){
+              for (int i3 = 0; i3 < _vf.Count; i3++) {
+                if (!GameUty.FileSystem.IsExistentFile(_vf[i3]) && !GameUty.FileSystemOld.IsExistentFile(_vf[i3]) && _vf[i3] != "" && _vf[i3] != ".ogg") {
                   buf.Append(" " + _vf[i3]);
                   _vf.RemoveAt(i3);
                   i3--;
@@ -8855,11 +9091,11 @@ namespace CM3D2.VibeYourMaid.Plugin {
               bvs[i].sLoopVoice20Fera[i2] = _vf.ToArray();
             }
 
-            for (int i2 = 0; i2 < 5; i2++){
+            for (int i2 = 0; i2 < 5; i2++) {
               _vf = new List<string>();
               _vf.AddRange(bvs[i].sLoopVoice30Vibe[i2]);
-              for (int i3 = 0; i3 < _vf.Count; i3++){
-                if(!GameUty.FileSystem.IsExistentFile(_vf[i3]) && !GameUty.FileSystemOld.IsExistentFile(_vf[i3]) && _vf[i3] != "" && _vf[i3] != ".ogg"){
+              for (int i3 = 0; i3 < _vf.Count; i3++) {
+                if (!GameUty.FileSystem.IsExistentFile(_vf[i3]) && !GameUty.FileSystemOld.IsExistentFile(_vf[i3]) && _vf[i3] != "" && _vf[i3] != ".ogg") {
                   buf.Append(" " + _vf[i3]);
                   _vf.RemoveAt(i3);
                   i3--;
@@ -8868,11 +9104,11 @@ namespace CM3D2.VibeYourMaid.Plugin {
               bvs[i].sLoopVoice30Vibe[i2] = _vf.ToArray();
             }
 
-            for (int i2 = 0; i2 < 5; i2++){
+            for (int i2 = 0; i2 < 5; i2++) {
               _vf = new List<string>();
               _vf.AddRange(bvs[i].sLoopVoice30Fera[i2]);
-              for (int i3 = 0; i3 < _vf.Count; i3++){
-                if(!GameUty.FileSystem.IsExistentFile(_vf[i3]) && !GameUty.FileSystemOld.IsExistentFile(_vf[i3]) && _vf[i3] != "" && _vf[i3] != ".ogg"){
+              for (int i3 = 0; i3 < _vf.Count; i3++) {
+                if (!GameUty.FileSystem.IsExistentFile(_vf[i3]) && !GameUty.FileSystemOld.IsExistentFile(_vf[i3]) && _vf[i3] != "" && _vf[i3] != ".ogg") {
                   buf.Append(" " + _vf[i3]);
                   _vf.RemoveAt(i3);
                   i3--;
@@ -8881,11 +9117,11 @@ namespace CM3D2.VibeYourMaid.Plugin {
               bvs[i].sLoopVoice30Fera[i2] = _vf.ToArray();
             }
 
-            for (int i2 = 0; i2 < 5; i2++){
+            for (int i2 = 0; i2 < 5; i2++) {
               _vf = new List<string>();
               _vf.AddRange(bvs[i].sOrgasmVoice30Vibe[i2]);
-              for (int i3 = 0; i3 < _vf.Count; i3++){
-                if(!GameUty.FileSystem.IsExistentFile(_vf[i3]) && !GameUty.FileSystemOld.IsExistentFile(_vf[i3]) && _vf[i3] != "" && _vf[i3] != ".ogg"){
+              for (int i3 = 0; i3 < _vf.Count; i3++) {
+                if (!GameUty.FileSystem.IsExistentFile(_vf[i3]) && !GameUty.FileSystemOld.IsExistentFile(_vf[i3]) && _vf[i3] != "" && _vf[i3] != ".ogg") {
                   buf.Append(" " + _vf[i3]);
                   _vf.RemoveAt(i3);
                   i3--;
@@ -8894,11 +9130,11 @@ namespace CM3D2.VibeYourMaid.Plugin {
               bvs[i].sOrgasmVoice30Vibe[i2] = _vf.ToArray();
             }
 
-            for (int i2 = 0; i2 < 5; i2++){
+            for (int i2 = 0; i2 < 5; i2++) {
               _vf = new List<string>();
               _vf.AddRange(bvs[i].sOrgasmVoice30Fera[i2]);
-              for (int i3 = 0; i3 < _vf.Count; i3++){
-                if(!GameUty.FileSystem.IsExistentFile(_vf[i3]) && !GameUty.FileSystemOld.IsExistentFile(_vf[i3]) && _vf[i3] != "" && _vf[i3] != ".ogg"){
+              for (int i3 = 0; i3 < _vf.Count; i3++) {
+                if (!GameUty.FileSystem.IsExistentFile(_vf[i3]) && !GameUty.FileSystemOld.IsExistentFile(_vf[i3]) && _vf[i3] != "" && _vf[i3] != ".ogg") {
                   buf.Append(" " + _vf[i3]);
                   _vf.RemoveAt(i3);
                   i3--;
@@ -8906,66 +9142,66 @@ namespace CM3D2.VibeYourMaid.Plugin {
               }
               bvs[i].sOrgasmVoice30Fera[i2] = _vf.ToArray();
             }
-            
-            
+
+
             _vf = new List<string>();
             _vf.AddRange(bvs[i].sLoopVoice40Vibe);
-            for (int i3 = 0; i3 < _vf.Count; i3++){
-              if(!GameUty.FileSystem.IsExistentFile(_vf[i3]) && !GameUty.FileSystemOld.IsExistentFile(_vf[i3]) && _vf[i3] != "" && _vf[i3] != ".ogg"){
+            for (int i3 = 0; i3 < _vf.Count; i3++) {
+              if (!GameUty.FileSystem.IsExistentFile(_vf[i3]) && !GameUty.FileSystemOld.IsExistentFile(_vf[i3]) && _vf[i3] != "" && _vf[i3] != ".ogg") {
                 buf.Append(" " + _vf[i3]);
                 _vf.RemoveAt(i3);
                 i3--;
               }
             }
             bvs[i].sLoopVoice40Vibe = _vf.ToArray();
-          
+
             if (buf.Length > 0) {
               Console.WriteLine("音声ファイルが存在しないため除外 :"+buf);
-              
+
             }
           }
-        
+
         }
 
-
         //MotionAdjustXMLファイルの保存・読み込み
-        private void MajFileSave(bool overwrite){
-          
+        private void MajFileSave(bool overwrite) {
+
           string fileName = @"Sybaris\UnityInjector\Config\VibeYourMaid\MotionAdjust.xml"; //保存先のファイル名
           //上書きしない
           if (!overwrite && System.IO.File.Exists(fileName)) return;
-          
+
           System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(MotionAdjust)); //XmlSerializerオブジェクトを作成。オブジェクトの型を指定する
-          
+
           System.IO.StreamWriter sw = new System.IO.StreamWriter(fileName, false, new System.Text.UTF8Encoding(false)); //書き込むファイルを開く（UTF-8 BOM無し）
-         
+
           serializer.Serialize(sw, maj); //シリアル化し、XMLファイルに保存する
-         
+
           sw.Close(); //ファイルを閉じる
         }
-        private void MajFileLoad(){
+
+        private void MajFileLoad() {
           System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
           sw.Start();
 
           string fileName = @"Sybaris\UnityInjector\Config\VibeYourMaid\MotionAdjust.xml"; //保存先のファイル名
-          Console.WriteLine(fileName);
-          if(!System.IO.File.Exists(fileName))return;
-         
+          //Console.WriteLine(fileName);
+          if (!System.IO.File.Exists(fileName)) return; 
+
           System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(MotionAdjust)); //XmlSerializerオブジェクトを作成
-         
+
           System.IO.StreamReader sr = new System.IO.StreamReader(fileName, new System.Text.UTF8Encoding(false)); //読み込むファイルを開く
-         
+
           maj = (MotionAdjust)serializer.Deserialize(sr); //XMLファイルから読み込み、逆シリアル化する
-         
+
           sr.Close(); //ファイルを閉じる
           sw.Stop();
           Console.WriteLine("MotionAdjust.xml 読み込み完了 : "+sw.ElapsedMilliseconds+"ms");
-          
+
           //新規に追加された項目があれば初期値を設定
           int nameC = maj.motionName.Count;
           //for (int i = maj.iTargetLH.Count; i < nameC; i++) maj.iTargetLH.Add(0);
           //for (int i = maj.iTargetRH.Count; i < nameC; i++) maj.iTargetRH.Add(0);
-          
+
           for (int i = maj.syaseiMarks.Count; i < nameC; i++) maj.syaseiMarks.Add(new int[]{0, 0, 0, 0, 0});
           for (int i = maj.giveSexual.Count; i < nameC; i++) maj.giveSexual.Add(new bool[]{true, false, false, false, false, false, false, false, false, false});
           for (int i = maj.itemSet.Count; i < nameC; i++) maj.itemSet.Add(new bool[]{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false});
@@ -9006,187 +9242,160 @@ namespace CM3D2.VibeYourMaid.Plugin {
           for (int i = maj.maidToCam.Count; i < nameC; i++) maj.maidToCam.Add(-1);
         }
 
-
         //共通衣装データ
         public CommonDressSet cds = new CommonDressSet();
-        public class CommonDressSet {
-          public CommonDressSet(){
-            acchat = "";
-            headset = "";
-            wear = "";
-            skirt = "";
-            onepiece = "";
-            mizugi = "";
-            bra = "";
-            panz = "";
-            stkg = "";
-            shoes = "";
-            megane = "";
-            acchead = "";
-            glove = "";
-            accude = "";
-            acchana = "";
-            accmimi = "";
-            accnip = "";
-            acckubi = "";
-            acckubiwa = "";
-            accheso = "";
-            accashi = "";
-            accsenaka = "";
-            accshippo = "";
-            accxxx = "";
-          }
-          public string acchat;
-          public string headset;
-          public string wear;
-          public string skirt;
-          public string onepiece;
-          public string mizugi;
-          public string bra;
-          public string panz;
-          public string stkg;
-          public string shoes;
-          public string megane;
-          public string acchead;
-          public string glove;
-          public string accude;
-          public string acchana;
-          public string accmimi;
-          public string accnip;
-          public string acckubi;
-          public string acckubiwa;
-          public string accheso;
-          public string accashi;
-          public string accsenaka;
-          public string accshippo;
-          public string accxxx;
+        public class CommonDressSet
+        {
+          public string acchat = "";
+          public string headset = "";
+          public string wear = "";
+          public string skirt = "";
+          public string onepiece = "";
+          public string mizugi = "";
+          public string bra = "";
+          public string panz = "";
+          public string stkg = "";
+          public string shoes = "";
+          public string megane = "";
+          public string acchead = "";
+          public string glove = "";
+          public string accude = "";
+          public string acchana = "";
+          public string accmimi = "";
+          public string accnip = "";
+          public string acckubi = "";
+          public string acckubiwa = "";
+          public string accheso = "";
+          public string accashi = "";
+          public string accsenaka = "";
+          public string accshippo = "";
+          public string accxxx = "";
         }
-        
+
         //共通衣装XMLファイルの保存・読み込み
-        private void CdsFileSave(string name){
+        private void CdsFileSave(string name) {
 
             Maid maid = stockMaids[tgID].mem;
-            
+
             string fileName = @"Sybaris\UnityInjector\Config\VibeYourMaid\CommonDressSet\cds_" + name + ".xml";  //保存先のファイル名
-            if(name == ""){
+            if (name == "") {
               dsErrer = 1;
               return;
             }
-            if (System.IO.File.Exists(fileName) && !ds_Overwrite[4]){
+            if (System.IO.File.Exists(fileName) && !ds_Overwrite[4]) {
               dsErrer = 2;
               return;
             }
-            
+
             //現在の衣装データを読み込み
-            if(setAcchat)cds.acchat = maid.GetProp(MPN.acchat).strFileName;
-            if(setHeadset)cds.headset = maid.GetProp(MPN.headset).strFileName;
-            if(setWear)cds.wear = maid.GetProp(MPN.wear).strFileName;
-            if(setSkirt)cds.skirt = maid.GetProp(MPN.skirt).strFileName;
-            if(setOnepiece)cds.onepiece = maid.GetProp(MPN.onepiece).strFileName;
-            if(setMizugi)cds.mizugi = maid.GetProp(MPN.mizugi).strFileName;
-            if(setBra)cds.bra = maid.GetProp(MPN.bra).strFileName;
-            if(setPanz)cds.panz = maid.GetProp(MPN.panz).strFileName;
-            if(setStkg)cds.stkg = maid.GetProp(MPN.stkg).strFileName;
-            if(setShoes)cds.shoes = maid.GetProp(MPN.shoes).strFileName;
-            if(setMegane)cds.megane = maid.GetProp(MPN.megane).strFileName;
-            if(setAcchead)cds.acchead = maid.GetProp(MPN.acchead).strFileName;
-            if(setGlove)cds.glove = maid.GetProp(MPN.glove).strFileName;
-            if(setAccude)cds.accude = maid.GetProp(MPN.accude).strFileName;
-            if(setAcchana)cds.acchana = maid.GetProp(MPN.acchana).strFileName;
-            if(setAccmimi)cds.accmimi = maid.GetProp(MPN.accmimi).strFileName;
-            if(setAccnip)cds.accnip = maid.GetProp(MPN.accnip).strFileName;
-            if(setAcckubi)cds.acckubi = maid.GetProp(MPN.acckubi).strFileName;
-            if(setAcckubiwa)cds.acckubiwa = maid.GetProp(MPN.acckubiwa).strFileName;
-            if(setAccheso)cds.accheso = maid.GetProp(MPN.accheso).strFileName;
-            if(setAccashi)cds.accashi = maid.GetProp(MPN.accashi).strFileName;
-            if(setAccsenaka)cds.accsenaka = maid.GetProp(MPN.accsenaka).strFileName;
-            if(setAccshippo)cds.accshippo = maid.GetProp(MPN.accshippo).strFileName;
-            if(setAccxxx)cds.accxxx = maid.GetProp(MPN.accxxx).strFileName;
-            if(!setAcchat)cds.acchat = "";
-            if(!setHeadset)cds.headset = "";
-            if(!setWear)cds.wear = "";
-            if(!setSkirt)cds.skirt = "";
-            if(!setOnepiece)cds.onepiece = "";
-            if(!setMizugi)cds.mizugi = "";
-            if(!setBra)cds.bra = "";
-            if(!setPanz)cds.panz = "";
-            if(!setStkg)cds.stkg = "";
-            if(!setShoes)cds.shoes = "";
-            if(!setMegane)cds.megane = "";
-            if(!setAcchead)cds.acchead = "";
-            if(!setGlove)cds.glove = "";
-            if(!setAccude)cds.accude = "";
-            if(!setAcchana)cds.acchana = "";
-            if(!setAccmimi)cds.accmimi = "";
-            if(!setAccnip)cds.accnip = "";
-            if(!setAcckubi)cds.acckubi = "";
-            if(!setAcckubiwa)cds.acckubiwa = "";
-            if(!setAccheso)cds.accheso = "";
-            if(!setAccashi)cds.accashi = "";
-            if(!setAccsenaka)cds.accsenaka = "";
-            if(!setAccshippo)cds.accshippo = "";
-            if(!setAccxxx)cds.accxxx = "";
+            if (setAcchat) cds.acchat = maid.GetProp(MPN.acchat) .strFileName;
+            if (setHeadset) cds.headset = maid.GetProp(MPN.headset) .strFileName;
+            if (setWear) cds.wear = maid.GetProp(MPN.wear) .strFileName;
+            if (setSkirt) cds.skirt = maid.GetProp(MPN.skirt) .strFileName;
+            if (setOnepiece) cds.onepiece = maid.GetProp(MPN.onepiece) .strFileName;
+            if (setMizugi) cds.mizugi = maid.GetProp(MPN.mizugi) .strFileName;
+            if (setBra) cds.bra = maid.GetProp(MPN.bra) .strFileName;
+            if (setPanz) cds.panz = maid.GetProp(MPN.panz) .strFileName;
+            if (setStkg) cds.stkg = maid.GetProp(MPN.stkg) .strFileName;
+            if (setShoes) cds.shoes = maid.GetProp(MPN.shoes) .strFileName;
+            if (setMegane) cds.megane = maid.GetProp(MPN.megane) .strFileName;
+            if (setAcchead) cds.acchead = maid.GetProp(MPN.acchead) .strFileName;
+            if (setGlove) cds.glove = maid.GetProp(MPN.glove) .strFileName;
+            if (setAccude) cds.accude = maid.GetProp(MPN.accude) .strFileName;
+            if (setAcchana) cds.acchana = maid.GetProp(MPN.acchana) .strFileName;
+            if (setAccmimi) cds.accmimi = maid.GetProp(MPN.accmimi) .strFileName;
+            if (setAccnip) cds.accnip = maid.GetProp(MPN.accnip) .strFileName;
+            if (setAcckubi) cds.acckubi = maid.GetProp(MPN.acckubi) .strFileName;
+            if (setAcckubiwa) cds.acckubiwa = maid.GetProp(MPN.acckubiwa) .strFileName;
+            if (setAccheso) cds.accheso = maid.GetProp(MPN.accheso) .strFileName;
+            if (setAccashi) cds.accashi = maid.GetProp(MPN.accashi) .strFileName;
+            if (setAccsenaka) cds.accsenaka = maid.GetProp(MPN.accsenaka) .strFileName;
+            if (setAccshippo) cds.accshippo = maid.GetProp(MPN.accshippo) .strFileName;
+            if (setAccxxx) cds.accxxx = maid.GetProp(MPN.accxxx) .strFileName;
+            if (!setAcchat) cds.acchat = "";
+            if (!setHeadset) cds.headset = "";
+            if (!setWear) cds.wear = "";
+            if (!setSkirt) cds.skirt = "";
+            if (!setOnepiece) cds.onepiece = "";
+            if (!setMizugi) cds.mizugi = "";
+            if (!setBra) cds.bra = "";
+            if (!setPanz) cds.panz = "";
+            if (!setStkg) cds.stkg = "";
+            if (!setShoes) cds.shoes = "";
+            if (!setMegane) cds.megane = "";
+            if (!setAcchead) cds.acchead = "";
+            if (!setGlove) cds.glove = "";
+            if (!setAccude) cds.accude = "";
+            if (!setAcchana) cds.acchana = "";
+            if (!setAccmimi) cds.accmimi = "";
+            if (!setAccnip) cds.accnip = "";
+            if (!setAcckubi) cds.acckubi = "";
+            if (!setAcckubiwa) cds.acckubiwa = "";
+            if (!setAccheso) cds.accheso = "";
+            if (!setAccashi) cds.accashi = "";
+            if (!setAccsenaka) cds.accsenaka = "";
+            if (!setAccshippo) cds.accshippo = "";
+            if (!setAccxxx) cds.accxxx = ""; 
 
             System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(CommonDressSet));  //XmlSerializerオブジェクトを作成。オブジェクトの型を指定する
-            
+
             System.IO.StreamWriter sw = new System.IO.StreamWriter(fileName, false, new System.Text.UTF8Encoding(false));  //書き込むファイルを開く（UTF-8 BOM無し）
-            
+
             serializer.Serialize(sw, cds);  //シリアル化し、XMLファイルに保存する
-            
+
             Console.WriteLine("共通衣装セット保存完了：" + name);
             dsErrer = 0;
         }
-        private void CdsFileLoad(string xml){
-          
-            string fileName = @"Sybaris\UnityInjector\Config\VibeYourMaid\CommonDressSet\" + xml;  //保存先のファイル名
-            if(!System.IO.File.Exists(fileName))return;
+        private void CdsFileLoad(string xml) {
 
-            System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(CommonDressSet));  //XmlSerializerオブジェクトを作成。オブジェクトの型を指定する            
-            
+            string fileName = @"Sybaris\UnityInjector\Config\VibeYourMaid\CommonDressSet\" + xml;  //保存先のファイル名
+            if (!System.IO.File.Exists(fileName)) return;
+
+            System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(CommonDressSet));  //XmlSerializerオブジェクトを作成。オブジェクトの型を指定する
+
             System.IO.StreamReader sr = new System.IO.StreamReader(fileName, new System.Text.UTF8Encoding(false));  //読み込むファイルを開く
-            
+
             //XMLファイルから読み込み、逆シリアル化する
             cds = (CommonDressSet)serializer.Deserialize(sr);
-            
+
             sr.Close(); //ファイルを閉じる
 
             //衣装データを適用
             Maid maid = stockMaids[tgID].mem;
-            if(cds.acchat != "")maid.SetProp(MPN.acchat, cds.acchat, 0, true, false);
-            if(cds.headset != "")maid.SetProp(MPN.headset, cds.headset, 0, true, false);
-            if(cds.wear != "")maid.SetProp(MPN.wear, cds.wear, 0, true, false);
-            if(cds.skirt != "")maid.SetProp(MPN.skirt, cds.skirt, 0, true, false);
-            if(cds.onepiece != "")maid.SetProp(MPN.onepiece, cds.onepiece, 0, true, false);
-            if(cds.mizugi != "")maid.SetProp(MPN.mizugi, cds.mizugi, 0, true, false);
-            if(cds.bra != "")maid.SetProp(MPN.bra, cds.bra, 0, true, false);
-            if(cds.panz != "")maid.SetProp(MPN.panz, cds.panz, 0, true, false);
-            if(cds.stkg != "")maid.SetProp(MPN.stkg, cds.stkg, 0, true, false);
-            if(cds.shoes != "")maid.SetProp(MPN.shoes, cds.shoes, 0, true, false);
-            if(cds.megane != "")maid.SetProp(MPN.megane, cds.megane, 0, true, false);
-            if(cds.acchead != "")maid.SetProp(MPN.acchead, cds.acchead, 0, true, false);
-            if(cds.glove != "")maid.SetProp(MPN.glove, cds.glove, 0, true, false);
-            if(cds.accude != "")maid.SetProp(MPN.accude, cds.accude, 0, true, false);
-            if(cds.acchana != "")maid.SetProp(MPN.acchana, cds.acchana, 0, true, false);
-            if(cds.accmimi != "")maid.SetProp(MPN.accmimi, cds.accmimi, 0, true, false);
-            if(cds.accnip != "")maid.SetProp(MPN.accnip, cds.accnip, 0, true, false);
-            if(cds.acckubi != "")maid.SetProp(MPN.acckubi, cds.acckubi, 0, true, false);
-            if(cds.acckubiwa != "")maid.SetProp(MPN.acckubiwa, cds.acckubiwa, 0, true, false);
-            if(cds.accheso != "")maid.SetProp(MPN.accheso, cds.accheso, 0, true, false);
-            if(cds.accashi != "")maid.SetProp(MPN.accashi, cds.accashi, 0, true, false);
-            if(cds.accsenaka != "")maid.SetProp(MPN.accsenaka, cds.accsenaka, 0, true, false);
-            if(cds.accshippo != "")maid.SetProp(MPN.accshippo, cds.accshippo, 0, true, false);
-            if(cds.accxxx != "")maid.SetProp(MPN.accxxx, cds.accxxx, 0, true, false);
-            
+            if (cds.acchat != "") maid.SetProp(MPN.acchat, cds.acchat, 0, true, false);
+            if (cds.headset != "") maid.SetProp(MPN.headset, cds.headset, 0, true, false);
+            if (cds.wear != "") maid.SetProp(MPN.wear, cds.wear, 0, true, false);
+            if (cds.skirt != "") maid.SetProp(MPN.skirt, cds.skirt, 0, true, false);
+            if (cds.onepiece != "") maid.SetProp(MPN.onepiece, cds.onepiece, 0, true, false);
+            if (cds.mizugi != "") maid.SetProp(MPN.mizugi, cds.mizugi, 0, true, false);
+            if (cds.bra != "") maid.SetProp(MPN.bra, cds.bra, 0, true, false);
+            if (cds.panz != "") maid.SetProp(MPN.panz, cds.panz, 0, true, false);
+            if (cds.stkg != "") maid.SetProp(MPN.stkg, cds.stkg, 0, true, false);
+            if (cds.shoes != "") maid.SetProp(MPN.shoes, cds.shoes, 0, true, false);
+            if (cds.megane != "") maid.SetProp(MPN.megane, cds.megane, 0, true, false);
+            if (cds.acchead != "") maid.SetProp(MPN.acchead, cds.acchead, 0, true, false);
+            if (cds.glove != "") maid.SetProp(MPN.glove, cds.glove, 0, true, false);
+            if (cds.accude != "") maid.SetProp(MPN.accude, cds.accude, 0, true, false);
+            if (cds.acchana != "") maid.SetProp(MPN.acchana, cds.acchana, 0, true, false);
+            if (cds.accmimi != "") maid.SetProp(MPN.accmimi, cds.accmimi, 0, true, false);
+            if (cds.accnip != "") maid.SetProp(MPN.accnip, cds.accnip, 0, true, false);
+            if (cds.acckubi != "") maid.SetProp(MPN.acckubi, cds.acckubi, 0, true, false);
+            if (cds.acckubiwa != "") maid.SetProp(MPN.acckubiwa, cds.acckubiwa, 0, true, false);
+            if (cds.accheso != "") maid.SetProp(MPN.accheso, cds.accheso, 0, true, false);
+            if (cds.accashi != "") maid.SetProp(MPN.accashi, cds.accashi, 0, true, false);
+            if (cds.accsenaka != "") maid.SetProp(MPN.accsenaka, cds.accsenaka, 0, true, false);
+            if (cds.accshippo != "") maid.SetProp(MPN.accshippo, cds.accshippo, 0, true, false);
+            if (cds.accxxx != "") maid.SetProp(MPN.accxxx, cds.accxxx, 0, true, false);
+
             AllDressVisible(tgID, true);
             maid.AllProcPropSeqStart();
             Console.WriteLine("共通衣装 セット完了");
         }
-        
-        
-        private void AllDressVisible(int maidID, bool b){
-        
+
+        private void AllDressVisible(int maidID, bool b) {
+
           Maid maid = stockMaids[maidID].mem;
-          
+
           maid.body0.SetMask(TBody.SlotID.headset, b);
           maid.body0.SetMask(TBody.SlotID.hairAho, b);
           maid.body0.SetMask(TBody.SlotID.accHana, b);
@@ -9215,10 +9424,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
           maid.body0.SetMask(TBody.SlotID.accKubiwa, b);
         }
 
-
       //外部データ読み込み関係終了----------------------------
-
-
 
 
       //-------------------------------------------------
@@ -9232,14 +9438,15 @@ namespace CM3D2.VibeYourMaid.Plugin {
         private string[] vsLevel = new string[] { "0" , "1" , "2" , "3" , "－" };
         private int[] fVoiceSet = new int[]{ 15, 4, 4, 4, 5 };
         private int[] fVoiceSet2 = new int[]{ 0, 0 };
-        
+
         VoiceSet_Xml VSX = new VoiceSet_Xml();
-        public class VoiceSet_Xml{
+        public class VoiceSet_Xml
+        {
           public string saveVoiceSetName = "";
           public List<string[]> saveVoiceSet = new List<string[]>{
             new string[] { "" , "0" , "0" , "3" , "0" , "3" , "0" , "0" } //ファイル名、性格、興奮低、興奮高、絶頂低、絶頂高、強度、メイド状態
           };
-        
+
         }
 
         //ボイスセットをロード
@@ -9287,13 +9494,13 @@ namespace CM3D2.VibeYourMaid.Plugin {
           //保存先のファイル名
           string fileName = @"Sybaris\UnityInjector\Config\VibeYourMaid\EditVoiseSet\" + xml;
           Console.WriteLine(fileName);
-          
+
           if (System.IO.File.Exists(fileName)){
             //XmlSerializerオブジェクトを作成
             System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(VoiceSet_Xml));
             //読み込むファイルを開く
             System.IO.StreamReader sr = new System.IO.StreamReader(fileName, new System.Text.UTF8Encoding(false));
-            
+
             //XMLファイルから読み込み、逆シリアル化する
             VoiceSet_Xml voiceSet = (VoiceSet_Xml)serializer.Deserialize(sr);
 
@@ -9306,39 +9513,39 @@ namespace CM3D2.VibeYourMaid.Plugin {
         }
 
         //ボイスセットをXMLファイルに保存する
-        private void voiceSetSave(){
+        private void voiceSetSave() {
 
           // フォルダ確認
           if (!System.IO.Directory.Exists(@"Sybaris\UnityInjector\Config\VibeYourMaid\EditVoiseSet\")) {
             //ない場合はフォルダ作成
             System.IO.DirectoryInfo di = System.IO.Directory.CreateDirectory(@"Sybaris\UnityInjector\Config\VibeYourMaid\EditVoiseSet");
           }
-          
-          
-          if(VSX.saveVoiceSetName == ""){  //ボイスセット名が空白の場合保存しない
+
+
+          if (VSX.saveVoiceSetName == "") {  //ボイスセット名が空白の場合保存しない
             vsErrer = 1;
-            
+
           } else {
             //保存先のファイル名
             string fileName = @"Sybaris\UnityInjector\Config\VibeYourMaid\EditVoiseSet\evs_" + VSX.saveVoiceSetName + @".xml";
-            
+
             if (System.IO.File.Exists(fileName) && !vs_Overwrite){  //上書きのチェック
               vsErrer = 2;
 
             } else {
-            
+
               //XmlSerializerオブジェクトを作成
               //オブジェクトの型を指定する
               System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(VoiceSet_Xml));
-              
+
               //書き込むファイルを開く（UTF-8 BOM無し）
               System.IO.StreamWriter sw = new System.IO.StreamWriter(fileName, false, new System.Text.UTF8Encoding(false));
-              
+
               //シリアル化し、XMLファイルに保存する
               serializer.Serialize(sw, VSX);
               //ファイルを閉じる
               sw.Close();
-              
+
               vs_Overwrite = false;
               vsErrer = 0;
             }
@@ -9347,7 +9554,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
 
         //ボイスセット再生処理 開始秒のリセットも行う
         private void VoiceSetPlay(int maidID, Maid maid, MaidState maidState) {
-        
+
           //音声が終わった時の処理 キスのループボイスからの切り替わり漏れがあるので同一音声かもチェック
           if (maidState.vsFlag == 2 && (!maid.AudioMan.audiosource.isPlaying || maidState.playedVoiceName != maid.AudioMan.FileName)) {
             maid.AudioMan.audiosource.time = 0; //開始秒は別のボイスに影響するのでリセット
@@ -9358,7 +9565,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
           //絶頂中は処理しない
           if (maidState.orgasmVoice != 0) return;
           //ボイスセットが設定されていない
-          if (maidsState[maidID].editVoiceSetName == "" && maidState.kissVoiceSetName == "") return;
+          if (maidState.editVoiceSetName == "" && maidState.kissVoiceSetName == "") return;
 
           if (maidState.vsFlag == 0) maidState.vsTime -= Time.deltaTime; //再生していないときだけタイマーを動かす
 
@@ -9385,13 +9592,16 @@ namespace CM3D2.VibeYourMaid.Plugin {
               maidState.playedVoiceName = vs[0];
 
               float start = 0;
-              if (vs.Length >= 9) float.TryParse(vs[8], out start);
-              if (start > 0) maid.AudioMan.LoadPlay(vs[0], 0f, false, false); //初回再生時時はtimeが設定されないため先に再生してclipを設定
-              maid.AudioMan.audiosource.time = start; //他の音声にも影響するので終了時に0に戻す必要がある
+              if (vs.Length > 8) float.TryParse(vs[8], out start);
+              if (start > 0) {
+                maid.AudioMan.LoadPlay(vs[0], 0f, false, false); //初回再生時時はtimeが設定されないため先に再生してclipを設定
+                maid.AudioMan.Stop(); //停止
+              }
+              maid.AudioMan.audiosource.time = start; //※他の音声にも影響するので次の再生前に0に戻す必要がある
               maid.AudioMan.LoadPlay(vs[0], 0f, false, false);
               Console.WriteLine("ボイスセット再生開始：" + vs[0]);
 
-              if(maid.AudioMan.FileName == vs[0]){
+              if (maid.AudioMan.FileName == vs[0]) {
                 maidState.vsFlag = 2; //再生中フラグON
               } else {
                 maidState.vsFlag = 0; //再生フラグOFF
@@ -9399,24 +9609,23 @@ namespace CM3D2.VibeYourMaid.Plugin {
             }
             //maidState.vsTime = UnityEngine.Random.Range(maidState.vsInterval - 200f, maidState.vsInterval + 200f);
             maidState.vsTime = UnityEngine.Random.Range(cfgw.voiceSetInterval-cfgw.voiceSetIntervalRange*0.5f, cfgw.voiceSetInterval+cfgw.voiceSetIntervalRange*0.5f);
-            
+
           }
         }
-        
-        
+
         //ボイスセットの該当チェック 開始時間指定があれば返す
         private string[][] VoiceSetCheck(int maidID, Maid maid, MaidState maidState, List<string[]> editVoiceSet) {
           int iPersonal = Array.IndexOf(personalList[1], stockMaids[maidID].personal);
-          if(maidState.voiceMode2 > 0)iPersonal = maidState.voiceMode2 - 1;
+          //if (maidState.voiceMode2 > 0) iPersonal = maidState.voiceMode2 - 1;
 
           int eLevel = maidState.exciteLevel - 1;
 
           int oLevel;
-          if (Math.Floor(maidState.orgasmValue) < 30){
+          if (Math.Floor(maidState.orgasmValue) < 30) {
             oLevel = 0;
-          } else if(Math.Floor(maidState.orgasmValue) < 50){
+          } else if (Math.Floor(maidState.orgasmValue) < 50) {
             oLevel = 1;
-          } else if(Math.Floor(maidState.orgasmValue) < 80){
+          } else if (Math.Floor(maidState.orgasmValue) < 80) {
             oLevel = 2;
           } else {
             oLevel = 3;
@@ -9428,12 +9637,12 @@ namespace CM3D2.VibeYourMaid.Plugin {
           else if (maid.status.currentExcite > 50) maidExciteLevel = 1;
           if (cfgw.maidStatusLinkVoiceSetExite) eLevel = Math.Max(eLevel, maidExciteLevel);
           if (cfgw.maidStatusLinkVoiceSetOrgasm) oLevel = Math.Max(oLevel, maidExciteLevel);
-          
+
           int iState = -1;
-          if(maidState.vStateMajor == 20) iState = 0;
-          if(maidState.vStateMajor == 30) iState = 1;
-          if(maidState.vStateMajor == 40) iState = 2;
-          if(maidState.vStateMajor == 10) iState = 3;
+          if (maidState.vStateMajor == 20) iState = 0;
+          if (maidState.vStateMajor == 30) iState = 1;
+          if (maidState.vStateMajor == 40) iState = 2;
+          if (maidState.vStateMajor == 10) iState = 3;
 
           checkBlowjobing(maidID, maid, maidState);
           int iCondition = maidState.bIsBlowjobing;
@@ -9441,58 +9650,60 @@ namespace CM3D2.VibeYourMaid.Plugin {
           if (maidState.stunFlag) iCondition = 4;
 
           List<string[]> _vsList = new List<string[]>();
-          foreach(string[] vs in editVoiceSet){
-            if(Regex.IsMatch(vs[2], "[^0-3]"))vs[2] = "0";
-            if(Regex.IsMatch(vs[3], "[^0-3]"))vs[3] = "3";
-            if(Regex.IsMatch(vs[4], "[^0-3]"))vs[4] = "0";
-            if(Regex.IsMatch(vs[5], "[^0-3]"))vs[5] = "3";
+          foreach (string[] vs in editVoiceSet) {
+            if (Regex.IsMatch(vs[2], "[^0-3]")) vs[2] = "0";
+            if (Regex.IsMatch(vs[3], "[^0-3]")) vs[3] = "3";
+            if (Regex.IsMatch(vs[4], "[^0-3]")) vs[4] = "0";
+            if (Regex.IsMatch(vs[5], "[^0-3]")) vs[5] = "3";
             int vsPersonal = intCnv(vs[1]);
 
-            if( vs[0] != "" && (vsPersonal == -1 || vsPersonal == iPersonal || vsPersonal == personalList[0].Length - 1) //-1は指定なし
+            if (vs[0] != "" && (vsPersonal == -1 || vsPersonal == iPersonal || vsPersonal == personalList[0].Length - 1) //-1は指定なし
                && (intCnv(vs[2]) <= eLevel && eLevel <= intCnv(vs[3]))
                && (intCnv(vs[4]) <= oLevel && oLevel <= intCnv(vs[5]))
                && (intCnv(vs[6]) == iState || intCnv(vs[6]) == 4)
-               && (intCnv(vs[7]) == iCondition || intCnv(vs[7]) == 5) )
-            {
+               && (intCnv(vs[7]) == iCondition || intCnv(vs[7]) == 5)
+            ) {
               _vsList.Add(vs);
-              if(maidState.vsFlag == 0)maidState.vsFlag = 1;
+              if (maidState.vsFlag == 0) maidState.vsFlag = 1;
             }
           }
           return _vsList.ToArray();
         }
 
-
-
       //ボイスセット関係終了----------------------------
-
-
 
 
       //-------------------------------------------------
       //データ変換関係---------------------------------
 
         //int変換
-        private int intCnv(string s){
-          if(Regex.IsMatch(s, "[^0-9]")) return 0;
+        /*private int intCnv(string s) {
+          if (Regex.IsMatch(s, "[^0-9]")) return 0;
           int i = int.Parse(s);
-          
+
           return i;
+        }*/
+        private int intCnv(string s) {
+          int i;
+          if (int.TryParse(s, out i)) return i;
+          else return 0;
         }
 
         //float変換
-        private Regex floatRegex = new Regex(@"^[-+]?[0-9]*\.?[0-9]+$", RegexOptions.Compiled);
-        private float floatCnv(string s){
-          if(!floatRegex.IsMatch(s)) return 0f;
+        /*private Regex floatRegex = new Regex(@"^[-+]?[0-9]*\.?[0-9]+$", RegexOptions.Compiled);
+        private float floatCnv(string s) {
+          if (!floatRegex.IsMatch(s)) return 0f;
           float i = float.Parse(s);
-          
+
           return i;
+        }*/
+        private float floatCnv(string s) {
+          float f;
+          if (float.TryParse(s, out f)) return f;
+          else return 0f;
         }
 
-
       //データ変換関係終了----------------------------
-
-
-
 
 
       //-------------------------------------------------
@@ -9526,7 +9737,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
             {
                 if (GameMain.Instance.MainCamera.IsFadeProc())
                     isFade = true;
-                else if(isFade && !GameMain.Instance.MainCamera.IsFadeProc())
+                else if (isFade && !GameMain.Instance.MainCamera.IsFadeProc())
                 {
                     isFade = false;
                     return true;
@@ -9535,33 +9746,68 @@ namespace CM3D2.VibeYourMaid.Plugin {
             }
         }
 
-
         //ダブルクリック判定処理
         private bool dClickL = false;
         private bool dClickR = false;
         private float delayTime1 = 0f;
         private float delayTime2 = 0f;
-        private void DClicCheck(){
-          if(delayTime1 > 0 && Input.GetMouseButtonDown(0))dClickL = true;
-          if(delayTime2 > 0 && Input.GetMouseButtonDown(1))dClickR = true;
+        private void DClicCheck() {
+          if (delayTime1 > 0 && Input.GetMouseButtonDown(0)) dClickL = true;
+          if (delayTime2 > 0 && Input.GetMouseButtonDown(1)) dClickR = true;
 
-          if(delayTime1 <= 0 && Input.GetMouseButtonDown(0))delayTime1 = 0.15f;
-          if(delayTime2 <= 0 && Input.GetMouseButtonDown(1))delayTime2 = 0.15f;
-          
-          if(!Input.GetMouseButtonDown(0) && dClickL)dClickL = false;
-          if(!Input.GetMouseButtonDown(1) && dClickR)dClickR = false;
-          if(delayTime1 > 0)delayTime1 -= Time.deltaTime;
-          if(delayTime2 > 0)delayTime2 -= Time.deltaTime;
+          if (delayTime1 <= 0 && Input.GetMouseButtonDown(0)) delayTime1 = 0.15f;
+          if (delayTime2 <= 0 && Input.GetMouseButtonDown(1)) delayTime2 = 0.15f;
+
+          if (!Input.GetMouseButtonDown(0) && dClickL) dClickL = false;
+          if (!Input.GetMouseButtonDown(1) && dClickR) dClickR = false;
+          if (delayTime1 > 0) delayTime1 -= Time.deltaTime;
+          if (delayTime2 > 0) delayTime2 -= Time.deltaTime;
         }
 
+        //男の自動表示 モーションの有無で人数を切り替え
+        private void AutoMansVisible(int maidID, string t) {
+          if (cfgw.autoManEnabled) {
+            int manNum = 0; //男無し
+            //6pまでチェック mとm2がない場合がある
+            string mamMotion = Regex.Replace(t.Replace(".anm", ""), @"_f\d?$", "_m");
+            if (MotionOldCheck(mamMotion) != -1) manNum++;
+            if (MotionOldCheck(mamMotion+"2") != -1) manNum++;
+            if (MotionOldCheck(mamMotion+"3") != -1) manNum++;
+            if (MotionOldCheck(mamMotion+"4") != -1) manNum++;
+            if (MotionOldCheck(mamMotion+"5") != -1) manNum++;
+            //Console.WriteLine("AutoMansVisible "+mamMotion+" manNum="+manNum);
+
+            //現在の人数カウント 余分な男は減らす
+            for (int im = 0; im < SubMans.Length; im++) {
+              if (!SubMans[im]) SubMans[im] = GameMain.Instance.CharacterMgr.GetMan(im);
+              if (SubMans[im].Visible && MansTg[im] == maidID) {
+                //不要なリンクしている男を非表示
+                if (manNum <= 0) {
+                  SubMans[im].Visible = false;
+                  MansTg[im] = -1;
+                }
+                //表示済みならカウントを減らす
+                else manNum--;
+              }
+            }
+            for (int im = 0; im < SubMans.Length; im++) {
+              if (manNum == 0) break;
+              if (!SubMans[im].Visible) {
+                //非表示の男を追加表示
+                MansVisible(im);
+                //maid.EyeToCamera((Maid.EyeMoveType)0, 0.8f);
+                manNum--;
+              }
+            }
+          }
+        }
 
 	      //男表示切替
-        private IEnumerator MansVisible(int i) {  
-          SubMans[i].Visible = !SubMans[i].Visible;
-
-          if(SubMans[i].Visible){
-            yield return new WaitForSeconds (1f);  // 1秒待つ
-            
+        private void MansVisible(int i) {
+          if (SubMans[i].Visible) {
+            SubMans[i].Visible = false;
+          } else {
+            SubMans[i].Visible = true; //読み込み開始させる
             MansTg[i] = tgID;
             SubMans[i].transform.position = stockMaids[MansTg[i]].mem.transform.position;
             SubMans[i].transform.eulerAngles = stockMaids[MansTg[i]].mem.transform.eulerAngles;
@@ -9570,62 +9816,62 @@ namespace CM3D2.VibeYourMaid.Plugin {
             setManMotionPosition(tgID, i);
           }
         }
+
         //メイドが対象になっている男の人数を取得
-        private int MansTgCheck(int maidID){
+        private int MansTgCheck(int maidID) {
           int count = 0;
-          for (int im = 0; im < SubMans.Length; im++){
-            if(!SubMans[im])SubMans[im] = GameMain.Instance.CharacterMgr.GetMan(im);
-            if(MansTg[im] == maidID && SubMans[im].Visible) count++;
+          for (int im = 0; im < SubMans.Length; im++) {
+            if (!SubMans[im]) SubMans[im] = GameMain.Instance.CharacterMgr.GetMan(im);
+            if (MansTg[im] == maidID && SubMans[im].Visible) count++;
           }
           return count;
         }
 
-
-        private bool AndKey(){
+        private bool AndKey() {
           bool andKey = false;
           int index1 = Array.IndexOf(cfgw.andKeyEnabled, true);
-          if(index1 == -1){
-            if(!Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.RightControl) && !Input.GetKey(KeyCode.LeftAlt) && !Input.GetKey(KeyCode.RightAlt) && !Input.GetKey(KeyCode.LeftShift) && !Input.GetKey(KeyCode.RightShift))andKey = true;
-          }else if(index1 == 0){
-            if(Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))andKey = true;
-          }else if(index1 == 1){
-            if(Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt))andKey = true;
-          }else if(index1 == 2){
-            if(Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))andKey = true;
+          if (index1 == -1) {
+            if (!Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.RightControl) && !Input.GetKey(KeyCode.LeftAlt) && !Input.GetKey(KeyCode.RightAlt) && !Input.GetKey(KeyCode.LeftShift) && !Input.GetKey(KeyCode.RightShift)) andKey = true;
+          } else if (index1 == 0) {
+            if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) andKey = true;
+          } else if (index1 == 1) {
+            if (Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt)) andKey = true;
+          } else if (index1 == 2) {
+            if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) andKey = true;
           }
-          
+
           return andKey;
         }
-        
-        //ショートカットキー
-        private void ShortCutKey(){
-        
-          if((ConfigFlag == 0 || ConfigFlag == 1 || !cfgw.configGuiFlag) && scKeyOff )scKeyOff = false;
 
-          if(!scKeyOff && AndKey()){
+        //ショートカットキー
+        private void ShortCutKey() {
+
+          if ((ConfigFlag == 0 || ConfigFlag == 1 || !cfgw.configGuiFlag) && scKeyOff) scKeyOff = false;
+
+          if (!scKeyOff && AndKey()) {
 
             //　バイブの切替
-            if(Input.GetKeyDown(cfgw.keyPluginToggleV4)) {
-              foreach(int maidID in vmId){
-                if(maidID != tgID && !LinkMaidCheck(tgID, maidID))continue;
+            if (Input.GetKeyDown(cfgw.keyPluginToggleV4)) {
+              foreach (int maidID in vmId) {
+                if (maidID != tgID && !LinkMaidCheck(tgID, maidID)) continue;
                 maidsState[maidID].vLevel = 2;
                 maidsState[maidID].pAutoSelect = 0;
               }
               Console.WriteLine("バイブ強");
             }
-            
-            if(Input.GetKeyDown(cfgw.keyPluginToggleV3)) {
-              foreach(int maidID in vmId){
-                if(maidID != tgID && !LinkMaidCheck(tgID, maidID))continue;
+
+            if (Input.GetKeyDown(cfgw.keyPluginToggleV3)) {
+              foreach (int maidID in vmId) {
+                if (maidID != tgID && !LinkMaidCheck(tgID, maidID)) continue;
                 maidsState[maidID].vLevel = 1;
                 maidsState[maidID].pAutoSelect = 0;
               }
               Console.WriteLine("バイブ弱");
             }
-            
-            if(Input.GetKeyDown(cfgw.keyPluginToggleV2)) {
-              foreach(int maidID in vmId){
-                if(maidID != tgID && !LinkMaidCheck(tgID, maidID))continue;
+
+            if (Input.GetKeyDown(cfgw.keyPluginToggleV2)) {
+              foreach (int maidID in vmId) {
+                if (maidID != tgID && !LinkMaidCheck(tgID, maidID)) continue;
                 maidsState[maidID].vLevel = 0;
                 maidsState[maidID].pAutoSelect = 0;
               }
@@ -9633,20 +9879,20 @@ namespace CM3D2.VibeYourMaid.Plugin {
             }
 
             //　メイド切替
-            if(Input.GetKeyDown(cfgw.keyPluginToggleV5)) {
+            if (Input.GetKeyDown(cfgw.keyPluginToggleV5)) {
               changeTargetMaid(getNextMaid());
               CameraChange(tgID);
             }
-            
+
             //　男表示切替
-            if(Input.GetKeyDown(cfgw.keyPluginToggleV6)) {
-              if(!man)man = GameMain.Instance.CharacterMgr.GetMan(0);
-              if(man)StartCoroutine ("MansVisible", 0);
+            if (Input.GetKeyDown(cfgw.keyPluginToggleV6)) {
+              if (!man) man = GameMain.Instance.CharacterMgr.GetMan(0);
+              if (man) MansVisible(0);
             }
-            
-            
+
+
             //　感度全開（デバッグ用）
-            if(Input.GetKeyDown(KeyCode.Z)) {
+            if (Input.GetKeyDown(KeyCode.Z)) {
               if (maidsState[tgID].exciteValue < 12000) maidsState[tgID].exciteValue = 12000;
               if (maidsState[tgID].orgasmValue < 80) maidsState[tgID].orgasmValue = 80;
               maidsState[tgID].boostValue = 50;
@@ -9659,68 +9905,68 @@ namespace CM3D2.VibeYourMaid.Plugin {
               Console.WriteLine("感度全開 : スタミナ="+maidsState[tgID].maidStamina);
             }
 
-            
+
             //　GUI表示の切り替え
-            if(Input.GetKeyDown(cfgw.keyPluginToggleV1)){
+            if (Input.GetKeyDown(cfgw.keyPluginToggleV1)) {
               cfgw.mainGuiFlag = cfgw.mainGuiFlag + 1;
-              if(cfgw.mainGuiFlag > 2)cfgw.mainGuiFlag = 0;
+              if (cfgw.mainGuiFlag > 2) cfgw.mainGuiFlag = 0;
             }
-            
+
             //　一人称視点切り替え
-            if(Input.GetKeyDown(cfgw.keyPluginToggleV7)){
+            if (Input.GetKeyDown(cfgw.keyPluginToggleV7)) {
               fpsModeEnabled = !fpsModeEnabled;
             }
-            
+
             //マウスホイールによる高さ調整
-            if(!fpsModeEnabled){
-              if (Input.GetMouseButton(0)){
-                foreach(int maidID in vmId){
-                  if(tgID != maidID && !LinkMaidCheck(tgID, maidID))continue;
+            if (!fpsModeEnabled) {
+              if (Input.GetMouseButton(0)) {
+                foreach (int maidID in vmId) {
+                  if (tgID != maidID && !LinkMaidCheck(tgID, maidID)) continue;
                   Vector3 vm = stockMaids[maidID].mem.transform.position;
                   stockMaids[maidID].mem.transform.position = new Vector3(vm.x, vm.y + Input.GetAxis("Mouse ScrollWheel") / 10, vm.z);
                 }
-                for (int i = 0; i < SubMans.Length; i++){
-                  if(!SubMans[i].Visible || MansTg[i] != tgID)continue;
+                for (int i = 0; i < SubMans.Length; i++) {
+                  if (!SubMans[i].Visible || MansTg[i] != tgID) continue;
                   Vector3 vm = SubMans[i].transform.position;
                   SubMans[i].transform.position = new Vector3(vm.x, vm.y + Input.GetAxis("Mouse ScrollWheel") / 10, vm.z);
                 }
               }
-              
-              if (Input.GetMouseButton(1)){
-                for (int i = 0; i < SubMans.Length; i++){
-                  if(!SubMans[i].Visible || MansTg[i] != tgID)continue;
+
+              if (Input.GetMouseButton(1)) {
+                for (int i = 0; i < SubMans.Length; i++) {
+                  if (!SubMans[i].Visible || MansTg[i] != tgID) continue;
                   Vector3 vm = SubMans[i].transform.position;
                   SubMans[i].transform.position = new Vector3(vm.x, vm.y + Input.GetAxis("Mouse ScrollWheel") / 20, vm.z);
                 }
               }
             }
-            
+
             //　快感値ロック
-            if(Input.GetKeyDown(cfgw.keyPluginToggleV8))ExciteLock = !ExciteLock;
-            
+            if (Input.GetKeyDown(cfgw.keyPluginToggleV8)) ExciteLock = !ExciteLock;
+
             //　絶頂値ロック
-            if(Input.GetKeyDown(cfgw.keyPluginToggleV9))OrgasmLock = !OrgasmLock;
-            
+            if (Input.GetKeyDown(cfgw.keyPluginToggleV9)) OrgasmLock = !OrgasmLock;
+
             //　オートモード切り替え
-            if(Input.GetKeyDown(cfgw.keyPluginToggleV10)){
-              
+            if (Input.GetKeyDown(cfgw.keyPluginToggleV10)) {
+
             }
-            
+
             //ランダムモーション変更
-            if(maidsState[tgID].editMotionSetName != ""){
-              if(dClickL)maidsState[tgID].msTime1 = 0;  //左ダブルクリックでカテゴリチェンジ
-              if(dClickR)maidsState[tgID].msTime2 = 0;  //右ダブルクリックでモーションチェンジ
+            if (maidsState[tgID].editMotionSetName != "") {
+              if (dClickL) maidsState[tgID].msTime1 = 0;  //左ダブルクリックでカテゴリチェンジ
+              if (dClickR) maidsState[tgID].msTime2 = 0;  //右ダブルクリックでモーションチェンジ
             }
-            
-            /*if(Input.GetKeyDown(KeyCode.UpArrow)) {
+
+            /*if (Input.GetKeyDown(KeyCode.UpArrow)) {
               StartPrevMotion();
             }
-            if(Input.GetKeyDown(KeyCode.DownArrow)) {
+            if (Input.GetKeyDown(KeyCode.DownArrow)) {
               StartNextMotion();
             }*/
 
           }
-        
+
         }
 
         //VR用ショートカットキー用コントローラー状態 Start()で初期化
@@ -9828,6 +10074,8 @@ namespace CM3D2.VibeYourMaid.Plugin {
               setDirectionTransform(cfgw.vrCameraMoveHeadDirection);
             }
           }
+
+          //進行方向の設定変更
           public void setDirectionTransform(bool vrCameraMoveHeadDirection)
           {
             directionTransform = vrCameraMoveHeadDirection ? headTransform : vrCameraOrigin;
@@ -10001,11 +10249,13 @@ namespace CM3D2.VibeYourMaid.Plugin {
                         targetID = GetLookingkMaid(); //正面にいるメイド
                       }
                       if (maidsState[targetID].vLevel > 0) {
-                        foreach(int maidID in vmId){
+                        maidsState[targetID].vLevel -= 1;
+                        maidsState[targetID].pAutoSelect = 0;
+                        /*foreach (int maidID in vmId) {
                           if (maidID != targetID && !LinkMaidCheck(targetID, maidID)) continue;
                           maidsState[maidID].vLevel -= 1;
                           maidsState[maidID].pAutoSelect = 0;
-                        }
+                        }*/
                       }
                     }
                   } else if (xy.y > 0.8f) {
@@ -10016,11 +10266,13 @@ namespace CM3D2.VibeYourMaid.Plugin {
                         targetID = GetLookingkMaid(); //正面にいるメイド
                       }
                       if (maidsState[targetID].vLevel < 2) {
-                        foreach(int maidID in vmId){
-                          if(maidID != targetID && !LinkMaidCheck(targetID, maidID))continue;
+                        maidsState[targetID].vLevel += 1;
+                        maidsState[targetID].pAutoSelect = 0;
+                        /*foreach (int maidID in vmId) {
+                          if (maidID != targetID && !LinkMaidCheck(targetID, maidID)) continue;
                           maidsState[maidID].vLevel += 1;
                           maidsState[maidID].pAutoSelect = 0;
-                        }
+                        }*/
                       }
                     }
                   }
@@ -10073,7 +10325,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
 
             //移動 Updateで実行する場合
             //ShortCutVRMove(vrCtrl);
-          
+
           } else if (bVR) { //SteamVR
 
             OvrMgr OvrMgr = GameMain.Instance.OvrMgr;
@@ -10133,11 +10385,13 @@ namespace CM3D2.VibeYourMaid.Plugin {
                         targetID = GetLookingkMaid(); //正面にいるメイド
                       }
                       if (maidsState[targetID].vLevel > 0) {
-                        foreach(int maidID in vmId){
+                        maidsState[targetID].vLevel -= 1;
+                        maidsState[targetID].pAutoSelect = 0;
+                        /*foreach (int maidID in vmId) {
                           if (maidID != targetID && !LinkMaidCheck(targetID, maidID)) continue;
                           maidsState[maidID].vLevel -= 1;
                           maidsState[maidID].pAutoSelect = 0;
-                        }
+                        }*/
                       }
                     }
                   } else if (xy.y > 0.8f) {
@@ -10148,11 +10402,13 @@ namespace CM3D2.VibeYourMaid.Plugin {
                         targetID = GetLookingkMaid(); //正面にいるメイド
                       }
                       if (maidsState[targetID].vLevel < 2) {
-                        foreach(int maidID in vmId){
-                          if(maidID != targetID && !LinkMaidCheck(targetID, maidID))continue;
+                        maidsState[targetID].vLevel += 1;
+                        maidsState[targetID].pAutoSelect = 0;
+                        /*foreach (int maidID in vmId) {
+                          if (maidID != targetID && !LinkMaidCheck(targetID, maidID)) continue;
                           maidsState[maidID].vLevel += 1;
                           maidsState[maidID].pAutoSelect = 0;
-                        }
+                        }*/
                       }
                     }
                   }
@@ -10328,7 +10584,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
         {
           //ダンスかスタジオのみ
           //if (RhythmAction_Mgr.Instance == null && vSceneLevel != 26) return false;
-          
+
           Transform roomTm = vrShortCutController.vrCameraOrigin; //GripMove移動用
           Transform headTm = vrShortCutController.headTransform; //HMD位置と無機
           Vector3 maidPos = maidsState[tgID].maidHead.transform.position;
@@ -10391,10 +10647,10 @@ namespace CM3D2.VibeYourMaid.Plugin {
         private float fieldOfViewBack = 35.0f;
         private bool vacationEnabled = false;
 
-        private void FpsModeChange(){
-        
-          if(!fpsModeEnabled || !man.Visible){
-            if(bfpsMode){
+        private void FpsModeChange() {
+
+          if (!fpsModeEnabled || !man.Visible) {
+            if (bfpsMode) {
               bfpsMode = false;
               fpsModeEnabled = false;
               if (!bVR)Camera.main.fieldOfView = fieldOfViewBack;
@@ -10402,98 +10658,98 @@ namespace CM3D2.VibeYourMaid.Plugin {
             }
             return;
           }
-          if(!bfpsMode){
+          if (!bfpsMode) {
             bfpsMode = true;
-            if (!bVR){
+            if (!bVR) {
               fieldOfViewBack = Camera.main.fieldOfView;
               Camera.main.fieldOfView = 60.0f;
             }
             frameCount = 0;
           }
-          
+
           Vector3 vNewPosition = Vector3.zero;
-          
-          if (frameCount <= 0){
-            
+
+          if (frameCount <= 0) {
+
             //ご主人様の頭を取得する
             ManHeadGet();
-            
+
             //ご主人様の頭を消す
-            if(manHeadRen.enabled)manHeadRen.enabled = false;
+            if (manHeadRen.enabled) manHeadRen.enabled = false;
 
             //カメラの移動チェック
             float fDistanceToMandHead = Vector3.Distance(bManHeadPos, mainCamera.transform.position);
-            
+
             //大きく移動していれば向きを調整
             if (fDistanceToMandHead > 0.3f) {
-              if(100 < manHead.transform.eulerAngles.z && manHead.transform.eulerAngles.z < 260 ){
+              if (100 < manHead.transform.eulerAngles.z && manHead.transform.eulerAngles.z < 260 ) {
                 float cy = manHead.transform.eulerAngles.y + 180f;
-                if(cy >= 360)cy -= 360;
+                if (cy >= 360) cy -= 360;
                 mainCamera.transform.eulerAngles = new Vector3(manHead.transform.eulerAngles.x, cy, 0.0f);
-              }else{
+              } else {
                 float cx = manHead.transform.eulerAngles.x + 90f;
-                if(cx >= 360)cx -= 360;
+                if (cx >= 360) cx -= 360;
                 mainCamera.transform.eulerAngles = new Vector3(cx, manHead.transform.eulerAngles.y, 0.0f);
               }
               Console.WriteLine("カメラ向き変更");
-              
+
               scrollValue = 0f;  //ホイール値リセット
             }
-            
+
             bManHeadPos = mainCamera.transform.position;
 
             frameCount = 30;
-          }else{
+          } else {
             --frameCount;
           }
-          
-          
+
+
           //頭の位置を挿入
           vNewPosition = manHead.transform.position;
 
           //マウスホイールでカメラ位置の前後調整
-          if (Input.GetMouseButton(0))scrollValue += Input.GetAxis("Mouse ScrollWheel") / 10;
-          if (Input.GetMouseButton(1))scrollValue2 += Input.GetAxis("Mouse ScrollWheel") / 10;
-          if(scrollValue > 0.2f)scrollValue = 0.2f;
-          if(scrollValue < -0.2f)scrollValue = -0.2f;
-          if (Input.GetMouseButtonDown(2)){
+          if (Input.GetMouseButton(0)) scrollValue += Input.GetAxis("Mouse ScrollWheel") / 10;
+          if (Input.GetMouseButton(1)) scrollValue2 += Input.GetAxis("Mouse ScrollWheel") / 10;
+          if (scrollValue > 0.2f) scrollValue = 0.2f;
+          if (scrollValue < -0.2f) scrollValue = -0.2f;
+          if (Input.GetMouseButtonDown(2)) {
             scrollValue = 0f;
             scrollValue2 = 0f;
           }
-          if(scrollValue != 0 || scrollValue2 != 0){
+          if (scrollValue != 0 || scrollValue2 != 0) {
             Vector3 cameraForward = Vector3.Scale(Camera.main.transform.forward, new Vector3(1, 1, 1)).normalized;
             Vector3 moveForward = cameraForward * scrollValue + Camera.main.transform.up * scrollValue2;
             vNewPosition += moveForward;
           }
-          
+
           //カメラ位置の移動
-          if(!bVR){
+          if (!bVR) {
             mainCamera.SetPos(vNewPosition);
-            if(!vacationEnabled){
+            if (!vacationEnabled) {
               mainCamera.SetTargetPos(vNewPosition, true);
               mainCamera.SetDistance(0f, true);
             }
-          }else{
+          } else {
             mainCamera.SetPos(vNewPosition);
           }
         }
 
         //ご主人様の頭取得
-        private void ManHeadGet(){
-          if (!manHead){
-            
+        private void ManHeadGet() {
+          if (!manHead) {
+
             Transform[] objList = man.transform.GetComponentsInChildren<Transform>();
-            if (objList.Count() != 0){
+            if (objList.Count() != 0) {
               manHead = null;
-              foreach (var gameobject in objList){
-                if (gameobject.name == "ManBip Head" && manHead == null){
+              foreach (var gameobject in objList) {
+                if (gameobject.name == "ManBip Head" && manHead == null) {
                   manBipHead = gameobject;
-                  
-                  foreach (Transform mh in manBipHead){
-                    if (mh.name.Contains("_SM_mhead")){
+
+                  foreach (Transform mh in manBipHead) {
+                    if (mh.name.Contains("_SM_mhead")) {
                       GameObject smManHead = mh.gameObject;
-                      foreach (Transform smmh in smManHead.transform){
-                        if (smmh.name.Contains("ManHead")){
+                      foreach (Transform smmh in smManHead.transform) {
+                        if (smmh.name.Contains("ManHead")) {
                           manHead = smmh.gameObject;
                           manHeadRen = manHead.GetComponent<Renderer>();
                         }
@@ -10507,20 +10763,20 @@ namespace CM3D2.VibeYourMaid.Plugin {
         }
 
         //メイド切替時にカメラ追従
-        private void CameraChange(int maidID){
+        private void CameraChange(int maidID) {
 
-          if(!fpsModeEnabled){
+          if (!fpsModeEnabled) {
             Vector3 vNewPosition = Vector3.zero;
 
             //カメラの移動先決定
             Transform maidObj = maidsState[maidID].maidMune;
-            if(lookPoint == 1)maidObj = maidsState[maidID].maidHead;
-            else if(lookPoint == 2)maidObj = maidsState[maidID].maidXxx;
+            if (lookPoint == 1) maidObj = maidsState[maidID].maidHead;
+            else if (lookPoint == 2) maidObj = maidsState[maidID].maidXxx;
 
             if (!maidObj) return;
 
             vNewPosition = maidObj.transform.position;
-            
+
             //オフセットがあればそれに合わせる
             if (maidFollowHeightOffset != 0f) vNewPosition.y += maidFollowHeightOffset;
 
@@ -10548,19 +10804,19 @@ namespace CM3D2.VibeYourMaid.Plugin {
           return false;
         }
 
-        //カメラが近すぎる場合は距離を修正 プライベートモードでは0.1になってしまうので1.7に強制変更
+        //カメラが近すぎる場合は距離を修正 プライベートモードでは0.1になってしまうためメイドの距離に強制変更
         private void adjustCameraDistance()
         {
           //シナリオ再生時は無効
           if (vSceneLevel == 15) return;
 
-          //メインメイドがいればメイドとの距離を取得
-          if (tgID != -1 && maidsState[tgID].maidHead != null) {
-            if (mainCamera.GetDistance() <= 0.1f) {
+          //メインメイドがいればメイドとの距離を取得 VRはメイド固定時のみ
+          if ((maidFollowEnabled || !bVR) && tgID != -1 && maidsState[tgID].maidHead != null) {
+            if (mainCamera.GetDistance() == 0.1f) {
               Vector3 pos = maidsState[tgID].maidHead.position;
               Vector3 cameraPos = mainCamera.GetBaseHeadTransform().position;
               float dist = Mathf.Sqrt((pos.x-cameraPos.x)*(pos.x-cameraPos.x)+(pos.z-cameraPos.z)*(pos.z-cameraPos.z));
-              if (dist > 3) return; //メイドとの距離が3m以上の場合も処理しない
+              if (dist > 2.5) return; //メイドとの実距離が2.5m以上の場合は処理しない
               if (bVR) {
                 if (bOculusVR) dist *= 2.0f; //Questは実座標の距離の2倍にする 原因不明
                 //else return; //SteamVRは処理しない
@@ -10640,7 +10896,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
         //カメラを常にメイドに追従させる
         private bool maidFollowEnabled = false;
         private Vector3 vNewPosition = Vector3.zero;
-	
+
 	      private int lookPoint = 0;
         private string[] lookList = new string[]{ "胸" , "顔" , "股" };
         private bool aoutLook = false;
@@ -10672,8 +10928,8 @@ namespace CM3D2.VibeYourMaid.Plugin {
           //VRのみ HMDの現在位置に合わせてメイド固定開始
           if (bOculusVR) {
             Transform maidObj = maidsState[maidID].maidMune;
-            if(lookPoint == 1)maidObj = maidsState[maidID].maidHead;
-            if(lookPoint == 2)maidObj = maidsState[maidID].maidXxx;
+            if (lookPoint == 1) maidObj = maidsState[maidID].maidHead;
+            if (lookPoint == 2) maidObj = maidsState[maidID].maidXxx;
             if (maidObj == null) return; //エラー対策
             Transform maidTm = maidObj.transform;
 
@@ -10707,61 +10963,61 @@ namespace CM3D2.VibeYourMaid.Plugin {
           }
         }
 
-        private void MaidFollowingCamera(int maidID){
-          if(fpsModeEnabled || !maidFollowEnabled) return;
+        private void MaidFollowingCamera(int maidID) {
+          if (fpsModeEnabled || !maidFollowEnabled) return;
 
           var cameraTm = mainCamera.transform;
-          
+
           //視点の設定
-          if(aoutLook){ //オート変更
-            if(lookTime <= 0f){
+          if (aoutLook) { //オート変更
+            if (lookTime <= 0f) {
               lookPoint = UnityEngine.Random.Range(0, lookList.Length);
               lookTime = UnityEngine.Random.Range(240f,480f);
-            }else{
+            } else {
               lookTime -= timerRate;
             }
           }
 
 
           Transform maidObj = maidsState[maidID].maidMune;
-          if(lookPoint == 1)maidObj = maidsState[maidID].maidHead;
-          if(lookPoint == 2)maidObj = maidsState[maidID].maidXxx;
+          if (lookPoint == 1) maidObj = maidsState[maidID].maidHead;
+          if (lookPoint == 2) maidObj = maidsState[maidID].maidXxx;
           if (maidObj == null) return; //エラー対策
           Transform maidTm = maidObj.transform;
 
           //ターゲットメイドのオート変更
-          if(aoutTarget){
-            if(targetTime <= 0f){
+          if (aoutTarget) {
+            if (targetTime <= 0f) {
               int ti = UnityEngine.Random.Range(0, vmId.Count);
               changeTargetMaid(vmId[ti]);
               targetTime = UnityEngine.Random.Range(600f,1200f);
-            }else{
+            } else {
               targetTime -= timerRate;
             }
           }
-          
-          
+
+
           //カメラアングルのオート変更
-          if(aoutAngle){
+          if (aoutAngle) {
             var angleY = 360 - maidTm.rotation.eulerAngles.y;
             var angleZ = 360 - maidTm.rotation.eulerAngles.z;
             var x = 0f;
             var y = 0f;
             var z = 0f;
-            
-            if(lookPoint >= 1)angleZ += 90f;
+
+            if (lookPoint >= 1) angleZ += 90f;
             x = Mathf.Cos(angleY * Mathf.Deg2Rad);
             y = Mathf.Cos(angleZ * Mathf.Deg2Rad);
             z = Mathf.Sin(angleY * Mathf.Deg2Rad);
-            
-            
-            if(lookPoint == 0)cameraTm.position = new Vector3(maidTm.position.x + x, maidTm.position.y + y, maidTm.position.z + z);
-            if(lookPoint == 1)cameraTm.position = new Vector3(maidTm.position.x - x, maidTm.position.y - y, maidTm.position.z - z);
-            if(lookPoint == 2){
-              if(xi == 1){
-                if(130f < maidTm.rotation.eulerAngles.z && maidTm.rotation.eulerAngles.z < 200f)xi = -1;
-              }else{
-                if(50f > maidTm.rotation.eulerAngles.z || maidTm.rotation.eulerAngles.z > 280f)xi = 1;
+
+
+            if (lookPoint == 0) cameraTm.position = new Vector3(maidTm.position.x + x, maidTm.position.y + y, maidTm.position.z + z);
+            if (lookPoint == 1) cameraTm.position = new Vector3(maidTm.position.x - x, maidTm.position.y - y, maidTm.position.z - z);
+            if (lookPoint == 2) {
+              if (xi == 1) {
+                if (130f < maidTm.rotation.eulerAngles.z && maidTm.rotation.eulerAngles.z < 200f) xi = -1;
+              } else {
+                if (50f > maidTm.rotation.eulerAngles.z || maidTm.rotation.eulerAngles.z > 280f) xi = 1;
               }
               cameraTm.position = new Vector3(maidTm.position.x + x * xi, maidTm.position.y + y, maidTm.position.z + z * xi);
             }
@@ -10774,16 +11030,16 @@ namespace CM3D2.VibeYourMaid.Plugin {
 
 
           //ズームのオート変更
-          if(aoutZoom){
+          if (aoutZoom) {
             zoomValue = Mathf.SmoothDamp(mainCamera.GetDistance(), zoomTg, ref zoomVelocity , zoomTime);
             mainCamera.SetDistance(zoomValue, true);
             float d = Mathf.Abs(zoomTg - mainCamera.GetDistance());
-            if(d < 0.01){
+            if (d < 0.01) {
               zoomTg = UnityEngine.Random.Range(0.22f,2f);
               zoomTime = UnityEngine.Random.Range(0.7f,2.8f) * timerRate;
             }
           }
-          
+
           //カメラの移動先決定
           float targetY = mainCamera.GetTargetPos().y;
           float maidY = maidTm.position.y;
@@ -10811,35 +11067,35 @@ namespace CM3D2.VibeYourMaid.Plugin {
           //mainCamera.SetPos(vNewPosition); //不要
           mainCamera.SetTargetPos(vNewPosition, true);
         }
-        
+
         //メイドの移動処理
-        private void MaidMove(int maidID, string mode, float move, bool all){
-          foreach(int ID in vmId){
-            if(ID == maidID || (maidID == tgID && LinkMaidCheck(maidID, ID) && all)){
+        private void MaidMove(int maidID, string mode, float move, bool all) {
+          foreach (int ID in vmId) {
+            if (ID == maidID || (maidID == tgID && LinkMaidCheck(maidID, ID) && all)) {
               Vector3 vm = stockMaids[ID].mem.transform.position;
               Vector3 em = stockMaids[ID].mem.transform.eulerAngles;
-              if(mode == "px")stockMaids[ID].mem.transform.position = new Vector3(vm.x + move, vm.y, vm.z);
-              if(mode == "py")stockMaids[ID].mem.transform.position = new Vector3(vm.x, vm.y + move, vm.z);
-              if(mode == "pz")stockMaids[ID].mem.transform.position = new Vector3(vm.x, vm.y, vm.z + move);
-              
-              if(mode == "ex")stockMaids[ID].mem.transform.eulerAngles = new Vector3(move, em.y, em.z);
-              if(mode == "ey")stockMaids[ID].mem.transform.eulerAngles = new Vector3(em.x, move, em.z);
-              if(mode == "ez")stockMaids[ID].mem.transform.eulerAngles = new Vector3(em.x, em.y, move);
+              if (mode == "px") stockMaids[ID].mem.transform.position = new Vector3(vm.x + move, vm.y, vm.z);
+              if (mode == "py") stockMaids[ID].mem.transform.position = new Vector3(vm.x, vm.y + move, vm.z);
+              if (mode == "pz") stockMaids[ID].mem.transform.position = new Vector3(vm.x, vm.y, vm.z + move);
+
+              if (mode == "ex") stockMaids[ID].mem.transform.eulerAngles = new Vector3(move, em.y, em.z);
+              if (mode == "ey") stockMaids[ID].mem.transform.eulerAngles = new Vector3(em.x, move, em.z);
+              if (mode == "ez") stockMaids[ID].mem.transform.eulerAngles = new Vector3(em.x, em.y, move);
             }
           }
-          
-          if(all){
-            for (int i = 0; i < SubMans.Length; i++){
-              if(!SubMans[i].Visible || MansTg[i] != maidID)continue;
+
+          if (all) {
+            for (int i = 0; i < SubMans.Length; i++) {
+              if (!SubMans[i].Visible || MansTg[i] != maidID) continue;
               Vector3 vm = SubMans[i].transform.position;
               Vector3 em = SubMans[i].transform.eulerAngles;
-              if(mode == "px")SubMans[i].transform.position = new Vector3(vm.x + move, vm.y, vm.z);
-              if(mode == "py")SubMans[i].transform.position = new Vector3(vm.x, vm.y + move, vm.z);
-              if(mode == "pz")SubMans[i].transform.position = new Vector3(vm.x, vm.y, vm.z + move);
-              
-              if(mode == "ex")SubMans[i].transform.eulerAngles = new Vector3(move, em.y, em.z);
-              if(mode == "ey")SubMans[i].transform.eulerAngles = new Vector3(em.x, move, em.z);
-              if(mode == "ez")SubMans[i].transform.eulerAngles = new Vector3(em.x, em.y, move);
+              if (mode == "px") SubMans[i].transform.position = new Vector3(vm.x + move, vm.y, vm.z);
+              if (mode == "py") SubMans[i].transform.position = new Vector3(vm.x, vm.y + move, vm.z);
+              if (mode == "pz") SubMans[i].transform.position = new Vector3(vm.x, vm.y, vm.z + move);
+
+              if (mode == "ex") SubMans[i].transform.eulerAngles = new Vector3(move, em.y, em.z);
+              if (mode == "ey") SubMans[i].transform.eulerAngles = new Vector3(em.x, move, em.z);
+              if (mode == "ez") SubMans[i].transform.eulerAngles = new Vector3(em.x, em.y, move);
             }
           }
         }
@@ -10897,38 +11153,33 @@ namespace CM3D2.VibeYourMaid.Plugin {
           return vmId[i];
         }
 
-
-
       //その他処理終了----------------------------------
-
-
-
 
 
       //-------------------------------------------------
       //GUI関係------------------------------------------
 
         //リモコンスイッチGUI---------------
-        void WindowCallback(int id){
+        void WindowCallback(int id) {
 
                 //現在ステータス表示
                 int SucoreLevel2 = 0;
-                if (Math.Floor(maidsState[tgID].orgasmValue) < 30){
+                if (Math.Floor(maidsState[tgID].orgasmValue) < 30) {
                   SucoreLevel2 = 0;
-                } else if(Math.Floor(maidsState[tgID].orgasmValue) < 50){
+                } else if (Math.Floor(maidsState[tgID].orgasmValue) < 50) {
                   SucoreLevel2 = 1;
-                } else if(Math.Floor(maidsState[tgID].orgasmValue) < 80){
+                } else if (Math.Floor(maidsState[tgID].orgasmValue) < 80) {
                   SucoreLevel2 = 2;
                 } else {
                   SucoreLevel2 = 3;
                 }
 
                 int SucoreLevel3 = 0;
-                if (Math.Floor(maidsState[tgID].resistValue) < 6){
+                if (Math.Floor(maidsState[tgID].resistValue) < 6) {
                   SucoreLevel3 = 0;
-                } else if(Math.Floor(maidsState[tgID].resistValue) < 13){
+                } else if (Math.Floor(maidsState[tgID].resistValue) < 13) {
                   SucoreLevel3 = 1;
-                } else if(Math.Floor(maidsState[tgID].resistValue) < 20){
+                } else if (Math.Floor(maidsState[tgID].resistValue) < 20) {
                   SucoreLevel3 = 2;
                 } else {
                   SucoreLevel3 = 3;
@@ -10939,7 +11190,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                   Console.WriteLine("GUI非表示");
                 }
 
-                if (cfgw.mainGuiFlag == 1){
+                if (cfgw.mainGuiFlag == 1) {
                   if (GUI.Button(new Rect (172, 0, 24, 20), "－", gsButton)) {
                     cfgw.mainGuiFlag = 2;
                     Console.WriteLine("GUI最小化");
@@ -10958,13 +11209,13 @@ namespace CM3D2.VibeYourMaid.Plugin {
                   if (!maidFollowEnabled && cfgw.CamChangeEnabled) CameraChange(tgID);
                   else followReturnSpeedY = -1f; //縦移動速度は標準に戻す
                 }
-                
+
                 string MaidName = stockMaids[tgID].lName + " " + stockMaids[tgID].fName;
                 GUI.Label(new Rect (75, 25, 140, 20), MaidName, gsLabel);
 
                   if (GUI.Button(new Rect (150, 50, 60, 20), "設定", gsButton)) {
                     cfgw.configGuiFlag = !cfgw.configGuiFlag;
-                    if(cfgw.configGuiFlag){
+                    if (cfgw.configGuiFlag) {
                       node3.x = node.x - 620 + cfgw.guiOffsetXConfig;
                       node3.y = node.y - 450 + cfgw.guiOffsetYConfig;
                     }
@@ -10973,27 +11224,27 @@ namespace CM3D2.VibeYourMaid.Plugin {
 
                   if (GUI.Button(new Rect (150, 75, 60, 20), "UNZIP!", gsButton)) {
                     cfgw.unzipGuiFlag = !cfgw.unzipGuiFlag;
-                    if(cfgw.unzipGuiFlag){
+                    if (cfgw.unzipGuiFlag) {
                       node4.x = node.x - 620 + cfgw.guiOffsetXUnzip;
                       node4.y = node.y + cfgw.guiOffsetYUnzip;
                     }
                   }
 
 
-                  if(!ExciteLock){
+                  if (!ExciteLock) {
                     GUI.Label(new Rect (5, 50, 190, 20), "【 快 感 】 " + SucoreText1[maidsState[tgID].exciteLevel - 1], gsLabel);
-                  }else{
+                  } else {
                     GUI.Label(new Rect (5, 50, 190, 20), "【 Lock 】 " + SucoreText1[maidsState[tgID].exciteLevel - 1], gsLabel);
                   }
 
-                  if(!OrgasmLock){
+                  if (!OrgasmLock) {
                     GUI.Label(new Rect (5, 70, 190, 20), "【 絶 頂 】 " + SucoreText2[SucoreLevel2], gsLabel);
-                  }else{
+                  } else {
                     GUI.Label(new Rect (5, 70, 190, 20), "【 Lock 】 " + SucoreText2[SucoreLevel2], gsLabel);
                   }
 
                   GUI.Label(new Rect (5, 90, 190, 20), "【 抵 抗 】 " + SucoreText3[SucoreLevel3], gsLabel);
-                  
+
                   if (GUI.Button(new Rect (112, 52, 18, 16), "L", gsButton2)) {
                     ExciteLock = !ExciteLock;
                   }
@@ -11002,16 +11253,16 @@ namespace CM3D2.VibeYourMaid.Plugin {
                   }
 
                   if (GUI.Button(new Rect (10, 115, 95, 20), "弱　[ " + cfgw.keyPluginToggleV3 + " ]", gsButton)) {
-                    foreach(int maidID in vmId){
-                      if(maidID != tgID && !LinkMaidCheck(tgID, maidID))continue;
+                    foreach (int maidID in vmId) {
+                      if (maidID != tgID && !LinkMaidCheck(tgID, maidID)) continue;
                       maidsState[maidID].vLevel = 1;
                       maidsState[maidID].pAutoSelect = 0;
                     }
                     Console.WriteLine("バイブ弱");
                   }
                   if (GUI.Button(new Rect (115, 115, 95, 20), "強　[ " + cfgw.keyPluginToggleV4 + " ]", gsButton)) {
-                    foreach(int maidID in vmId){
-                      if(maidID != tgID && !LinkMaidCheck(tgID, maidID))continue;
+                    foreach (int maidID in vmId) {
+                      if (maidID != tgID && !LinkMaidCheck(tgID, maidID)) continue;
                       maidsState[maidID].vLevel = 2;
                       maidsState[maidID].pAutoSelect = 0;
                     }
@@ -11019,68 +11270,68 @@ namespace CM3D2.VibeYourMaid.Plugin {
                   }
 
                   if (GUI.Button(new Rect (10, 140, 200, 20), "停　止　[ " + cfgw.keyPluginToggleV2 + " ]", gsButton)) {
-                    foreach(int maidID in vmId){
-                      if(maidID == tgID || LinkMaidCheck(tgID, maidID))
+                    foreach (int maidID in vmId) {
+                      if (maidID != tgID && !LinkMaidCheck(tgID, maidID)) continue;
                       maidsState[maidID].vLevel = 0;
                       maidsState[maidID].pAutoSelect = 0;
                     }
                     Console.WriteLine("バイブ停止");
                   }
-                  
-                  if (GUI.Button(new Rect (125, 165, 85, 20), autoSelectList[maidsState[tgID].pAutoSelect], gsButton)) {
-                    if(maidsState[tgID].pAutoSelect == 0)maidsState[tgID].pAutoTime = 0f;
-                    ++maidsState[tgID].pAutoSelect;
-                    if(maidsState[tgID].pAutoSelect > 3)maidsState[tgID].pAutoSelect = 0;
-                  }
-                  
 
-                  if(stockMaids[tgID].mem.body0.LastAnimeFN != null && stockMaids[tgID].mem.body0.LastAnimeFN.Contains( "_shaseigo_" ) ){ //エラー対策
+                  if (GUI.Button(new Rect (125, 165, 85, 20), autoSelectList[maidsState[tgID].pAutoSelect], gsButton)) {
+                    if (maidsState[tgID].pAutoSelect == 0) maidsState[tgID].pAutoTime = 0f;
+                    ++maidsState[tgID].pAutoSelect;
+                    if (maidsState[tgID].pAutoSelect > 3) maidsState[tgID].pAutoSelect = 0;
+                  }
+
+
+                  if (stockMaids[tgID].mem.body0.LastAnimeFN != null && stockMaids[tgID].mem.body0.LastAnimeFN.Contains( "_shaseigo_" ) ) { //エラー対策
                     if (GUI.Button(new Rect (125, 190, 40, 20), "挿入", gsButton)) {
                       string baseMotion = maj.motionName[maidsState[tgID].motionID];
-                      
-                      if(maidsState[tgID].inMotion == "Non"){
+
+                      if (maidsState[tgID].inMotion == "Non") {
                         MotionChange(stockMaids[tgID].mem, baseMotion + ".anm", true, 0.7f, 1f);
-                      }else{
+                      } else {
                         MotionChange(stockMaids[tgID].mem, maidsState[tgID].inMotion + ".anm", false, 0.7f, 1f);
                         MotionChangeAf(stockMaids[tgID].mem, baseMotion + ".anm", true, 0.7f, 1f); // 終わったら再生する
                       }
-                      
-                      if(!maidsState[tgID].analMode){
+
+                      if (!maidsState[tgID].analMode) {
                         maidsState[tgID].uDatsuValue1 = 0f;
                         maidsState[tgID].uDatsu = 0;
                         try { VertexMorph_FromProcItem(stockMaids[tgID].mem.body0, "pussy_uterus_prolapse", 0f); } catch { /*LogError(ex);*/ }
                       }
-                      
+
                       //男のモーション変更
-                      if(maidsState[tgID].inMotion == "Non"){
+                      if (maidsState[tgID].inMotion == "Non") {
                         ManMotionChange(tgID, true, 0.7f, 1.0f);
-                      }else{
+                      } else {
                         ManMotionChange(maidsState[tgID].inMotion + ".anm", tgID, false, 0.7f, 1f);
                         ManMotionChangeAf(baseMotion + ".anm", tgID, true, 0.7f, 1f); // 終わったら再生する
-                      
+
                       }
                     }
-                    
-                  }else if(maidsState[tgID].outMotion != "Non" && SyaseiCheck(tgID, 85f)){
+
+                  } else if (maidsState[tgID].outMotion != "Non" && SyaseiCheck(tgID, 85f)) {
                     if (GUI.Button(new Rect (125, 190, 40, 20), "抜く", gsButton)) {
-                      
+
                       MotionChange(stockMaids[tgID].mem, maidsState[tgID].outMotion + ".anm", false, 0.7f, 1f);
                       MotionChangeAf(stockMaids[tgID].mem, maidsState[tgID].outMotion.Replace("_shasei_soto_f_once_", "_shaseigo_soto_f").Replace("_shasei_kao_f_once_", "_shaseigo_kao_f") + ".anm", true, 0.5f, 1f); // 終わったら再生する
-                      
+
                       ManMotionChange(maidsState[tgID].outMotion + ".anm", tgID, false, 0.7f, 1f);
                       ManMotionChangeAf(maidsState[tgID].outMotion.Replace("_shasei_soto_f_once_", "_shaseigo_soto_f").Replace("_shasei_kao_f_once_", "_shaseigo_kao_f") + ".anm", tgID, true, 0.5f, 1f); // 終わったら再生する
-                      
+
                       ReactionPlay(tgID);
-                      
-                      if(!maidsState[tgID].analMode){
+
+                      if (!maidsState[tgID].analMode) {
                         maidsState[tgID].vLevel = 0;
                         maidsState[tgID].pAutoSelect = 0;
                         maidsState[tgID].uDatsu = 1;
                       }
                     }
-                  }else if(maidsState[tgID].motionID != -1 && maj.analEnabled[maidsState[tgID].motionID] && !maidsState[tgID].stunFlag){
+                  } else if (maidsState[tgID].motionID != -1 && maj.analEnabled[maidsState[tgID].motionID] && !maidsState[tgID].stunFlag) {
                     string bName = "後ろを使う";
-                    if(maidsState[tgID].analMode)bName = "前を使う";
+                    if (maidsState[tgID].analMode) bName = "前を使う";
                     if (GUI.Button(new Rect (125, 190, 85, 20), bName, gsButton)) {
                       maidsState[tgID].analMode = !maidsState[tgID].analMode;
                       analMotionChange();
@@ -11088,13 +11339,13 @@ namespace CM3D2.VibeYourMaid.Plugin {
                   }
 
 
-                  if(maidsState[tgID].stunFlag){
+                  if (maidsState[tgID].stunFlag) {
                     if (GUI.Button(new Rect (170, 190, 40, 20), "叩く", gsButton)) {
                       maidsState[tgID].stunFlag = false;
                       maidsState[tgID].maidStamina = 3000;
                       GameMain.Instance.SoundMgr.PlaySe("se013.ogg", false);
                       ReactionPlay(tgID);
-                      
+
                       stockMaids[tgID].mem.ResetProp("eye_hi", false);//ハイライトを戻す
                       stockMaids[tgID].mem.ResetProp("eye_hi_r", false);
                       stockMaids[tgID].mem.AllProcPropSeqStart();
@@ -11104,16 +11355,17 @@ namespace CM3D2.VibeYourMaid.Plugin {
 
                   //GUI.Label(new Rect (5, 165, 210, 20), " ﾌﾟﾗｸﾞｲﾝ無効： [ " + cfgw.keyPluginToggleV0 + " ]", gsLabel);
                   //GUI.Label(new Rect (5, 185, 210, 20), " GUI表示切替： [ " + cfgw.keyPluginToggleV1 + " ]", gsLabel);
-                  
+
                   bool bToggle = GUI.Toggle(new Rect (5, 165, 120, 20), maidFollowEnabled, "メイド固定" , gsToggle );
                   if (maidFollowEnabled != bToggle) {
                     maidFollowEnabled = bToggle;
                     followReturnSpeedY = -1f; //縦移動速度は標準に戻す
                     //if (maidFollowEnabled) MaidFollowingCameraStart(tgID); //視点の向きを正面にしてメイド固定
+                    if (maidFollowEnabled) adjustCameraDistance(); //距離補正
                   }
                   cfgw.osawariEnabled = GUI.Toggle(new Rect (5, 190, 120, 20), cfgw.osawariEnabled, "お触り有効" , gsToggle );
 
-                }else if (cfgw.mainGuiFlag == 2){
+                } else if (cfgw.mainGuiFlag == 2) {
                   if (GUI.Button(new Rect (172, 0, 24, 20), "+", gsButton)) {
                     cfgw.mainGuiFlag = 1;
                     Console.WriteLine("GUI表示");
@@ -11124,30 +11376,29 @@ namespace CM3D2.VibeYourMaid.Plugin {
           GUI.DragWindow();
         }
 
-        private void analMotionChange()
-        {
+        private void analMotionChange() {
           string baseMotion = maj.motionName[maidsState[tgID].motionID];
           MotionAdjustDo(tgID, baseMotion, true, -1);
-          
-          if(maidsState[tgID].inMotion == "Non"){
+
+          if (maidsState[tgID].inMotion == "Non") {
             MotionChange(stockMaids[tgID].mem, baseMotion + ".anm", true, 0.7f, 1f);
-          }else{
+          } else {
             MotionChange(stockMaids[tgID].mem, maidsState[tgID].inMotion + ".anm", false, 0.7f, 1f);
             MotionChangeAf(stockMaids[tgID].mem, baseMotion + ".anm", true, 0.7f, 1f); // 終わったら再生する
           }
-          
+
           //男のモーション変更
-          if(maidsState[tgID].inMotion == "Non"){
+          if (maidsState[tgID].inMotion == "Non") {
             ManMotionChange(tgID, true, 0.7f, 1.0f);
-          }else{
+          } else {
             ManMotionChange(maidsState[tgID].inMotion + ".anm", tgID, false, 0.7f, 1f);
             ManMotionChangeAf(baseMotion + ".anm", tgID, true, 0.7f, 1f); // 終わったら再生する
           }
-          
-          if(maidsState[tgID].analMode){
+
+          if (maidsState[tgID].analMode) {
             maidsState[tgID].pAutoSelect = 0;
             maidsState[tgID].uDatsu = 1;
-          }else{
+          } else {
             maidsState[tgID].uDatsuValue1 = 0f;
             maidsState[tgID].uDatsu = 0;
             try { VertexMorph_FromProcItem(stockMaids[tgID].mem.body0, "pussy_uterus_prolapse", 0f); } catch { /*LogError(ex);*/ }
@@ -11163,34 +11414,34 @@ namespace CM3D2.VibeYourMaid.Plugin {
 
         //サブキャラ操作GUI---------------
         Vector2 subGUIScrollPos = Vector2.zero;
-        
-        void WindowCallback2a(int id){
+
+        void WindowCallback2a(int id) {
 
           Vector3 vm;
           int y = 0;
           int h = 0;
-          
-          for (int i = 0; i < SubMans.Length; i++){
-            if(tgID != -1){
-              if (!vmId.Contains(MansTg[i]))MansTg[i] = tgID;
-            }else{
+
+          for (int i = 0; i < SubMans.Length; i++) {
+            if (tgID != -1) {
+              if (!vmId.Contains(MansTg[i])) MansTg[i] = tgID;
+            } else {
               MansTg[i] = -1;
             }
           }
-          
 
-          if (cfgw.subGuiFlag != 0){
+
+          if (cfgw.subGuiFlag != 0) {
             if (GUI.Button(new Rect (200, 0, 20, 20), "－", gsButton)) {
               cfgw.subGuiFlag = 0;
               node2.height = 20;
               if (cfgw.guiOffsetYSub < 450) node2.y += 430; //上にある場合
             }
-            
+
             if (GUI.Button(new Rect (105, 5, 85, 20), "メイド呼出", gsButton)) {
               cfgw.subGuiFlag = 2;
             }
             y += 30;
-            
+
             //移動距離スライダー
             GUI.Label(new Rect (10, y, 80, 20), "移動距離：" + moveValue * 100 , gsLabel);
             float _moveValue = GUI.HorizontalSlider(new Rect(90, y+5, 120, 20), moveValue, 0.001f, 0.3f);
@@ -11204,12 +11455,12 @@ namespace CM3D2.VibeYourMaid.Plugin {
             vm = SubMans[0].transform.position;
 
             if (GUI.Button(new Rect (105, y, 85, 20), "表示切替", gsButton)) {
-              if(!SubMans[0])SubMans[0] = GameMain.Instance.CharacterMgr.GetMan(0);
-              if(SubMans[0])StartCoroutine ("MansVisible", 0);
+              if (!SubMans[0]) SubMans[0] = GameMain.Instance.CharacterMgr.GetMan(0);
+              if (SubMans[0]) MansVisible(0);
             }
             y += 25;
 
-            if(SubMans[0].Visible){
+            if (SubMans[0].Visible) {
 
               if (GUI.Button(new Rect (5, y, 25, 20), "X↑", gsButton)) {
                 SubMans[0].transform.position = new Vector3(vm.x + moveValue, vm.y, vm.z);
@@ -11247,15 +11498,15 @@ namespace CM3D2.VibeYourMaid.Plugin {
               if (GUI.Button(new Rect (150, y, 25, 20), "前", gsButton)) {
                 Vector3 em = SubMans[0].transform.eulerAngles;
                 float emValue = em.x + 2.5f;
-                if(emValue >= 360f)emValue -= 360f;
-                if(emValue > 90f && emValue < 270f)emValue = 90f;
+                if (emValue >= 360f) emValue -= 360f;
+                if (emValue > 90f && emValue < 270f) emValue = 90f;
                 SubMans[0].transform.eulerAngles = new Vector3(emValue, em.y, em.z);
               }
               if (GUI.Button(new Rect (175, y, 25, 20), "後", gsButton)) {
                 Vector3 em = SubMans[0].transform.eulerAngles;
                 float emValue = em.x - 2.5f;
-                if(emValue < 0f)emValue += 360f;
-                if(emValue > 90f && emValue < 270f)emValue = 270f;
+                if (emValue < 0f) emValue += 360f;
+                if (emValue > 90f && emValue < 270f) emValue = 270f;
                 SubMans[0].transform.eulerAngles = new Vector3(emValue, em.y, em.z);
               }
               y += 25;
@@ -11268,37 +11519,37 @@ namespace CM3D2.VibeYourMaid.Plugin {
               y += 25;
 
               if (GUI.Button(new Rect (5, y, 50, 20), "対象", gsButton)) {
-                if(cfgw.autoMoveEnabled)cfgw.autoMoveEnabled = false;
+                if (cfgw.autoMoveEnabled) cfgw.autoMoveEnabled = false;
                 int mi = vmId.IndexOf(MansTg[0]) + 1;
-                if(mi >= vmId.Count)mi = 0;
+                if (mi >= vmId.Count) mi = 0;
                 MansTg[0] = vmId[mi];
-                
+
                 SubMans[0].transform.position = stockMaids[MansTg[0]].mem.transform.position;
                 SubMans[0].transform.eulerAngles = stockMaids[MansTg[0]].mem.transform.eulerAngles;
-                
+
                 //男のモーション変更
                 ManMotionChange(MansTg[0], true, 0.5f, 1.0f);
               }
               string TargetName = "対象無し";
-              if (MansTg[0] != -1)TargetName = stockMaids[MansTg[0]].lName + " " + stockMaids[MansTg[0]].fName;
+              if (MansTg[0] != -1) TargetName = stockMaids[MansTg[0]].lName + " " + stockMaids[MansTg[0]].fName;
               GUI.Label(new Rect (60, y, 160, 20), TargetName, gsLabel);
               y += 20;
 
               cfgw.autoMoveEnabled = GUI.Toggle(new Rect (15, y, 190, 20), cfgw.autoMoveEnabled, "メインメイド変更に連動" , gsToggle );
               y += 25;
             }
-            
+
             GUI.DrawTexture(new Rect(1, y, 218, 1), guiLineTexture, ScaleMode.StretchToFill, true, 0);
             y += 1;
 
             h += 125; //メインメイド表示分
             h += (vmId.Count - 1) * 129;
-            for (int i = 1; i < SubMans.Length; i++){
-              if(SubMans[i].Visible)h += 104;
+            for (int i = 1; i < SubMans.Length; i++) {
+              if (SubMans[i].Visible) h += 104;
               h += 52;
             }
-            if(h < 450 - y)h = 450 - y;
-            
+            if (h < 450 - y) h = 450 - y;
+
             Rect scrlRect    = new Rect(0, y, 220, 445 - y);
             Rect contentRect = new Rect(0, 0, 195, h);
             subGUIScrollPos = GUI.BeginScrollView( scrlRect, subGUIScrollPos, contentRect, false, true );
@@ -11308,7 +11559,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
             GUI.Label(new Rect (5, y, 190, 20), "【 " + stockMaids[tgID].lName + " " + stockMaids[tgID].fName + " 】", gsLabel3);
 
             Maid maid = stockMaids[tgID].mem;
-              
+
                   y += 25;
                   if (GUI.Button(new Rect (5, y, 25, 20), "X↑", gsButton)) {
                     MaidMove(tgID, "px", moveValue, true);
@@ -11347,15 +11598,15 @@ namespace CM3D2.VibeYourMaid.Plugin {
                   if (GUI.Button(new Rect (100, y, 25, 20), "前", gsButton)) {
                     Vector3 em = maid.transform.eulerAngles;
                     float emValue = em.x + 2.5f;
-                    if(emValue >= 360f)emValue -= 360f;
-                    if(emValue > 90f && emValue < 270f)emValue = 90f;
+                    if (emValue >= 360f) emValue -= 360f;
+                    if (emValue > 90f && emValue < 270f) emValue = 90f;
                     MaidMove(tgID, "ex", emValue, true);
                   }
                   if (GUI.Button(new Rect (125, y, 25, 20), "後", gsButton)) {
                     Vector3 em = maid.transform.eulerAngles;
                     float emValue = em.x - 2.5f;
-                    if(emValue < 0f)emValue += 360f;
-                    if(emValue > 90f && emValue < 270f)emValue = 270f;
+                    if (emValue < 0f) emValue += 360f;
+                    if (emValue > 90f && emValue < 270f) emValue = 270f;
                     MaidMove(tgID, "ex", emValue, true);
                   }
                   if (GUI.Button(new Rect (155, y, 46, 20), "ﾘｾｯﾄ", gsButton)) {
@@ -11364,21 +11615,21 @@ namespace CM3D2.VibeYourMaid.Plugin {
                   y += 25;
 
                   if (GUI.Button(new Rect (5, y, 40, 20), "原点", gsButton)) {
-                    foreach(int maidID in vmId){
-                      if(maidID != tgID && !LinkMaidCheck(tgID, maidID))continue;
+                    foreach (int maidID in vmId) {
+                      if (maidID != tgID && !LinkMaidCheck(tgID, maidID)) continue;
                       stockMaids[maidID].mem.transform.position = new Vector3(0f, 0f, 0f);
                       maidsState[maidID].majPositionBak.x = 0f;
                       maidsState[maidID].majPositionBak.y = 0f;
                       maidsState[maidID].majPositionBak.z = 0f;
                     }
-                    for (int i = 0; i < SubMans.Length; i++){
-                      if(!SubMans[i].Visible || MansTg[i] != tgID)continue;
+                    for (int i = 0; i < SubMans.Length; i++) {
+                      if (!SubMans[i].Visible || MansTg[i] != tgID) continue;
                       SubMans[i].transform.position = new Vector3(0f, 0f, 0f);
                     }
                   }
                   if (GUI.Button(new Rect (50, y, 40, 20), "集合", gsButton)) {
-                    foreach(int maidID in vmId){
-                      if(maidID != tgID && LinkMaidCheck(tgID, maidID)){
+                    foreach (int maidID in vmId) {
+                      if (maidID != tgID && LinkMaidCheck(tgID, maidID)) {
                         stockMaids[maidID].mem.transform.position = maid.transform.position;
                         stockMaids[maidID].mem.transform.eulerAngles = maid.transform.eulerAngles;
                         maidsState[maidID].majPositionBak.x = maidsState[tgID].majPositionBak.x;
@@ -11387,8 +11638,8 @@ namespace CM3D2.VibeYourMaid.Plugin {
                         maidsState[maidID].majAngleYBak = maidsState[tgID].majAngleYBak;
                       }
                     }
-                    for (int i = 0; i < SubMans.Length; i++){
-                      if(!SubMans[i].Visible || MansTg[i] != tgID)continue;
+                    for (int i = 0; i < SubMans.Length; i++) {
+                      if (!SubMans[i].Visible || MansTg[i] != tgID) continue;
                       SubMans[i].transform.position = maid.transform.position;
                       SubMans[i].transform.eulerAngles = maid.transform.eulerAngles;
                     }
@@ -11417,9 +11668,9 @@ namespace CM3D2.VibeYourMaid.Plugin {
                   maidsState[tgID].eAutoSelect = GUI.Toggle(new Rect(115, y, 90, 20), maidsState[tgID].eAutoSelect, "自動変更", gsToggle);
                   y += 25;
 
-              foreach(int maidID in vmId){
-                if(maidID == tgID)continue;
-                
+              foreach (int maidID in vmId) {
+                if (maidID == tgID) continue;
+
                 y += 2;
                 GUI.DrawTexture(new Rect(5, y, 195, 1), guiLineTexture, ScaleMode.StretchToFill, true, 0);
                 y += 2;
@@ -11452,18 +11703,18 @@ namespace CM3D2.VibeYourMaid.Plugin {
                 }
                 y += 25;
 
-                if(maidsState[maidID].linkEnabled){
+                if (maidsState[maidID].linkEnabled) {
                   maidsState[maidID].pAutoSelect = 0;
                   maidsState[maidID].pAutoTime = 0f;
                   GUI.Label(new Rect (105, y, 85, 20), "リンク中", gsLabel);
-                }else{
+                } else {
                   if (GUI.Button(new Rect (105, y, 85, 20), autoSelectList[maidsState[maidID].pAutoSelect], gsButton)) {
-                    if(maidsState[maidID].pAutoSelect == 0)maidsState[maidID].pAutoTime = 0f;
+                    if (maidsState[maidID].pAutoSelect == 0)maidsState[maidID].pAutoTime = 0f;
                     ++maidsState[maidID].pAutoSelect;
-                    if(maidsState[maidID].pAutoSelect > 3)maidsState[maidID].pAutoSelect = 0;
+                    if (maidsState[maidID].pAutoSelect > 3)maidsState[maidID].pAutoSelect = 0;
                   }
                 }
-                
+
                 if (GUI.Button(new Rect (5, y, 25, 20), "X↓", gsButton)) {
                   stockMaids[maidID].mem.transform.position = new Vector3(vm.x - moveValue, vm.y, vm.z);
                 }
@@ -11478,17 +11729,17 @@ namespace CM3D2.VibeYourMaid.Plugin {
                 //maidsState[maidID].linkEnabled = GUI.Toggle(new Rect(5, y, 190, 20), maidsState[maidID].linkEnabled, "メインメイドとリンクさせる", gsToggle);
                 if (GUI.Button(new Rect (5, y, 60, 20), "リンク", gsButton)) {
                   int mi = vmId.IndexOf(maidsState[maidID].linkID) + 1;
-                  if(mi >= vmId.Count)mi = 0;
-                  if(maidID == vmId[mi]){
+                  if (mi >= vmId.Count) mi = 0;
+                  if (maidID == vmId[mi]) {
                     ++mi;
-                    if(mi >= vmId.Count)mi = 0;
+                    if (mi >= vmId.Count) mi = 0;
                   }
                   maidsState[maidID].linkID = vmId[mi];
                   //stockMaids[maidID].mem.transform.position = stockMaids[maidsState[maidID].linkID].mem.transform.position;
                   //stockMaids[maidID].mem.transform.eulerAngles = stockMaids[maidsState[maidID].linkID].mem.transform.eulerAngles;
                 }
                 string TargetName = "対象無し";
-                if (maidsState[maidID].linkID != -1){
+                if (maidsState[maidID].linkID != -1) {
                   TargetName = stockMaids[maidsState[maidID].linkID].lName + " " + stockMaids[maidsState[maidID].linkID].fName;
                   if (GUI.Button(new Rect (170, y, 25, 20), "解", gsButton)) { maidsState[maidID].linkID = -1; }
                 }
@@ -11500,24 +11751,24 @@ namespace CM3D2.VibeYourMaid.Plugin {
                 maidsState[maidID].eAutoSelect = GUI.Toggle(new Rect(115, y, 90, 20), maidsState[maidID].eAutoSelect, "自動変更", gsToggle);
                 y += 25;
               }
-              
-              
-              for (int i = 1; i < SubMans.Length; i++){
-              
+
+
+              for (int i = 1; i < SubMans.Length; i++) {
+
                 y += 2;
                 GUI.DrawTexture(new Rect(5, y, 195, 1), guiLineTexture, ScaleMode.StretchToFill, true, 0);
                 y += 2;
 
                 GUI.Label(new Rect(5, y, 95, 20), "【 " + SubMansName[i] + " 】", gsLabel3);
                 vm = SubMans[i].transform.position;
-                
+
                 if (GUI.Button(new Rect (105, y, 85, 20), "表示切替", gsButton)) {
-                  if(!SubMans[i])SubMans[i] = GameMain.Instance.CharacterMgr.GetMan(i);
-                  if(SubMans[i])StartCoroutine ("MansVisible", i);
+                  if (!SubMans[i]) SubMans[i] = GameMain.Instance.CharacterMgr.GetMan(i);
+                  if (SubMans[i]) MansVisible(i);
                 }
                 y += 25;
 
-                if(SubMans[i].Visible){
+                if (SubMans[i].Visible) {
                   if (GUI.Button(new Rect (105, y, 85, 20), "位置合せ", gsButton)) {
                     SubMans[i].transform.position = stockMaids[MansTg[i]].mem.transform.position;
                     SubMans[i].transform.eulerAngles = stockMaids[MansTg[i]].mem.transform.eulerAngles;
@@ -11554,15 +11805,15 @@ namespace CM3D2.VibeYourMaid.Plugin {
                   if (GUI.Button(new Rect (150, y, 25, 20), "前", gsButton)) {
                     Vector3 em = SubMans[i].transform.eulerAngles;
                     float emValue = em.x + 2.5f;
-                    if(emValue >= 360f)emValue -= 360f;
-                    if(emValue > 90f && emValue < 270f)emValue = 90f;
+                    if (emValue >= 360f) emValue -= 360f;
+                    if (emValue > 90f && emValue < 270f) emValue = 90f;
                     SubMans[i].transform.eulerAngles = new Vector3(emValue, em.y, em.z);
                   }
                   if (GUI.Button(new Rect (175, y, 25, 20), "後", gsButton)) {
                     Vector3 em = SubMans[i].transform.eulerAngles;
                     float emValue = em.x - 2.5f;
-                    if(emValue < 0f)emValue += 360f;
-                    if(emValue > 90f && emValue < 270f)emValue = 270f;
+                    if (emValue < 0f) emValue += 360f;
+                    if (emValue > 90f && emValue < 270f) emValue = 270f;
                     SubMans[i].transform.eulerAngles = new Vector3(emValue, em.y, em.z);
                   }
                   y += 25;
@@ -11576,29 +11827,29 @@ namespace CM3D2.VibeYourMaid.Plugin {
 
                   if (GUI.Button(new Rect (5, y, 50, 20), "対象", gsButton)) {
                     int mi = vmId.IndexOf(MansTg[i]) + 1;
-                    if(mi >= vmId.Count)mi = 0;
+                    if (mi >= vmId.Count) mi = 0;
                     MansTg[i] = vmId[mi];
-                    
+
                     SubMans[i].transform.position = stockMaids[MansTg[i]].mem.transform.position;
                     SubMans[i].transform.eulerAngles = stockMaids[MansTg[i]].mem.transform.eulerAngles;
-                    
+
                     //男のモーション変更
                     ManMotionChange(MansTg[i], true, 0.5f, 1.0f);
                     maidsState[MansTg[i]].motionHoldTime = 0f; //モーションタイマーリセット
                   }
-                  
+
                   string TargetName = "対象無し";
-                  if (MansTg[i] != -1)TargetName = stockMaids[MansTg[i]].lName + " " + stockMaids[MansTg[i]].fName;
+                  if (MansTg[i] != -1) TargetName = stockMaids[MansTg[i]].lName + " " + stockMaids[MansTg[i]].fName;
                   GUI.Label(new Rect (60, y, 135, 20), TargetName, gsLabel);
                   y += 25;
                 }
               }
-              
-              
+
+
             GUI.EndScrollView();
             GUI.DragWindow();
-            
-          }else{
+
+          } else {
             //メインパネルに追従する
             node2.x = node.x + cfgw.guiOffsetXSub;
             if (cfgw.guiOffsetYSub < 450) node2.y = node.y - 20 + cfgw.guiOffsetYSub; //上にある場合
@@ -11609,29 +11860,29 @@ namespace CM3D2.VibeYourMaid.Plugin {
               cfgw.subGuiFlag = 1;
               node2.height = 450;
               if (cfgw.guiOffsetYSub < 450) node2.y -= 430; //上にある場合
-              if(node5.y > node2.y - 170){
+              if (node5.y > node2.y - 170) {
                 node5.y = node2.y - 170;
-                if(node5.y < 0)node5.y = 0;
+                if (node5.y < 0) node5.y = 0;
               }
             }
           }
         }
-        
-        void WindowCallback2b(int id){
 
-          if (cfgw.subGuiFlag != 0){
+        void WindowCallback2b(int id) {
+
+          if (cfgw.subGuiFlag != 0) {
             if (GUI.Button(new Rect (200, 0, 20, 20), "－", gsButton)) {
               cfgw.subGuiFlag = 0;
               node2.height = 20;
               if (cfgw.guiOffsetYSub < 450) node2.y += 430; //上にある場合
             }
-            
+
             if (GUI.Button(new Rect (105, 5, 85, 20), "ｻﾌﾞｷｬﾗ操作", gsButton)) {
               cfgw.subGuiFlag = 1;
             }
 
             Maid maid = null;
-            if(tgID != -1)maid = stockMaids[tgID].mem;
+            if (tgID != -1) maid = stockMaids[tgID].mem;
 
             int y = 35;
             int h = 65 * stockMaids.Count + 20;
@@ -11640,11 +11891,11 @@ namespace CM3D2.VibeYourMaid.Plugin {
             subGUIScrollPos = GUI.BeginScrollView( scrlRect, subGUIScrollPos, contentRect, false, true );
             y = 0;
 
-            foreach(var sm in stockMaids){
+            foreach (var sm in stockMaids) {
               Maid getmaid = sm.mem;
-              if(getmaid.Visible){
+              if (getmaid.Visible) {
                 string MaidName = getmaid.status.lastName + " " + getmaid.status.firstName;
-                
+
                 GUI.Label(new Rect (5, y, 125, 20), MaidName, gsLabel);
                 if (GUI.Button(new Rect (130, y, 65, 20), "非表示", gsButton)) {
                   getmaid.Visible = false;
@@ -11652,32 +11903,32 @@ namespace CM3D2.VibeYourMaid.Plugin {
                 y += 22;
               }
             }
-            
+
             //GUI.Label(new Rect (0, y, 195, 20), "―――――――――――", gsLabel2);
             GUI.DrawTexture(new Rect(5, y+8, 195, 1), guiLineTexture, ScaleMode.StretchToFill, true, 0);
             y += 16;
 
-            foreach(var sm in stockMaids){
+            foreach (var sm in stockMaids) {
               Maid getmaid = sm.mem;
-              if(!getmaid.Visible){
-              
+              if (!getmaid.Visible) {
+
                 GUI.DrawTexture(new Rect(0, y, 50, 60), getmaid.GetThumIcon());
-                
+
                 string MaidName = getmaid.status.lastName + " " + getmaid.status.firstName;
                 if (GUI.Button(new Rect (50, y, 145, 60), MaidName, gsButton)) {
                   LoadMaid(getmaid);
                   GameMain.Instance.MainCamera.FadeOut(0f, false, null, true, default(Color)); //NormalizeVoice.Pluginにメイドチェック処理をさせるため一旦フェードアウトさせる
                   GameMain.Instance.MainCamera.FadeIn(1f, false, null, true, true, default(Color));
-                  
+
                 }
                 y += 65;
               }
             }
-            
+
             GUI.EndScrollView();
             GUI.DragWindow();
-          
-          }else{
+
+          } else {
             //メインパネルに追従する
             node2.x = node.x + cfgw.guiOffsetXSub;
             if (cfgw.guiOffsetYSub < 450) node2.y = node.y - 20 + cfgw.guiOffsetYSub; //上にある場合
@@ -11688,16 +11939,16 @@ namespace CM3D2.VibeYourMaid.Plugin {
               cfgw.subGuiFlag = 1;
               node2.height = 450;
               if (cfgw.guiOffsetYSub < 450) node2.y -= 430; //上にある場合
-              if(node5.y > node2.y - 170){
+              if (node5.y > node2.y - 170) {
                 node5.y = node2.y - 170;
-                if(node5.y < 0)node5.y = 0;
+                if (node5.y < 0) node5.y = 0;
               }
             }
           }
         }
-        
-        
-        
+
+
+
         //設定画面GUI---------------
         private int ConfigFlag = 0;
         private int cv = 0;
@@ -11756,7 +12007,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
             }
 
             y = 5;
-            if(ConfigFlag == 0 || ConfigFlag == 1){
+            if (ConfigFlag == 0 || ConfigFlag == 1) {
               if (GUI.Button(new Rect (445, y, 60, 20), "再読込", gsButton)) {
                 //cfg = ReadConfig<VibeYourMaidConfig>("Config");
                 //cfgw = ReadConfig<VibeYourMaidCfgWriting>("CfgWriting");
@@ -11786,9 +12037,9 @@ namespace CM3D2.VibeYourMaid.Plugin {
               case 4: WindowCallback3_4(maid); break;
               case 5: WindowCallback3_5(maid); break;
               case 6: WindowCallback3_6(maid); break;
-#if EmpiresLife
+              #if EmpiresLife
               case 7: WindowCallback3_7(maid); break;
-#endif
+              #endif
               case 8: WindowCallback3_8(maid); break;
               case 9: WindowCallback3_9(maid); break;
             }
@@ -11858,7 +12109,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                       maid.body0.SetMask(TBody.SlotID.wear, !maid.body0.GetMask(TBody.SlotID.wear));
                       dCheck = true;
                     }
-                    
+
                     if (GUI.Button(new Rect (110, y+25, 80, 20), "ワンピース", gsButton)){
                       if (maid.body0.GetSlotVisible(TBody.SlotID.onepiece)) UndressingReaction(tgID, 1);
                       maid.body0.SetMask(TBody.SlotID.onepiece, !maid.body0.GetMask(TBody.SlotID.onepiece));
@@ -11946,7 +12197,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                       maid.body0.SetMask(TBody.SlotID.underhair, !maid.body0.GetMask(TBody.SlotID.underhair));
                       dCheck = true;
 		                }
-		    
+
                     if (GUI.Button(new Rect (295, y+50, 55, 20), "靴", gsButton)){
                       maid.body0.SetMask(TBody.SlotID.shoes, !maid.body0.GetMask(TBody.SlotID.shoes));
                       dCheck = true;
@@ -11976,7 +12227,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                       maid.body0.SetMask(TBody.SlotID.accHeso, !isAccSonota);
                       dCheck = true;
 		                }
-		    
+
                     y = 120;
                     if (GUI.Button(new Rect (110, y, 38, 20), "前", gsButton)){
                       if (maid.body0.GetSlotVisible(TBody.SlotID.skirt) && !isPropChanged(tgID, "skirt").Contains("めくれ前")
@@ -12037,15 +12288,15 @@ namespace CM3D2.VibeYourMaid.Plugin {
                     GUI.Label(new Rect (560, y, 55, 20), "【吹き】" , gsLabel);
                     if (GUI.Button(new Rect (565, y+20, 45, 20), "尿", gsButton)) {
                       float nr = UnityEngine.Random.Range(50f, maidsState[tgID].nyoVolume);
-                      EffectNyo(tgID, maidsState[tgID], nr);
+                      EffectNyo(maid, maidsState[tgID], nr, true);
                     }
                     if (GUI.Button(new Rect (565, y+45, 45, 20), "潮", gsButton)) {
-                      float sr = UnityEngine.Random.Range(30f, maidsState[tgID].sioVolume);
                       maidsState[tgID].fSio = true;
-                      maidsState[tgID].sioTime = Time.time + sr * 0.1f;
-                      maidsState[tgID].sioTime2 = 0f;
-                      maidsState[tgID].sioVolume -= sr;
-                      EffectSio(tgID, maid, maidsState[tgID]);
+                      maidsState[tgID].fSio2 = true; //カウントはしない
+                      maidsState[tgID].sioTime = Time.time + 0.5f; //潮吹き終了時間 0.5秒後
+                      maidsState[tgID].sioTime2 = 0; //待ち時間なし
+                      maidsState[tgID].sioVolume = 0;  //潮吹き判定チェック用
+                      EffectSio(maid, maidsState[tgID]); //Updateから呼ばれる
                     }
 
                   y = 145;
@@ -12058,7 +12309,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                         maidsState[maidID].hibuTempValue = hibuTempValue;
                         if (!EffectHibuAnime(maidID, stockMaids[maidID].mem, maidsState[maidID], 1)) {
                           //バイブ中以外は処理されないので直接変更
-                          try { VertexMorph_FromProcItem(stockMaids[maidID].mem.body0, "kupa", hibuTempValue/100f); } catch { /*LogError(ex);*/ }
+                          try { VertexMorph_FromProcItem(stockMaids[maidID].mem.body0, "kupa", hibuTempValue*0.01f); } catch { /*LogError(ex);*/ }
                         }
                       }
                     }
@@ -12071,7 +12322,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                         maidsState[maidID].analTempValue = analTempValue;
                         if (!EffectHibuAnime(maidID, stockMaids[maidID].mem, maidsState[maidID], 1)) {
                           //バイブ中以外は処理されないので直接変更
-                          try { VertexMorph_FromProcItem(stockMaids[maidID].mem.body0, "analkupa", analTempValue/100f); } catch { /*LogError(ex);*/ }
+                          try { VertexMorph_FromProcItem(stockMaids[maidID].mem.body0, "analkupa", analTempValue*0.01f); } catch { /*LogError(ex);*/ }
                         }
                       }
                     }
@@ -12131,27 +12382,27 @@ namespace CM3D2.VibeYourMaid.Plugin {
                   y = 220;
                   GUI.Label(new Rect (5, y, 190, 20), "【視点変更】" , gsLabel);
                   GUI.Label(new Rect (10, y+20, 90, 20), "視野角：" + Math.Floor(Camera.main.fieldOfView) , gsLabel);
-                  if(!bVR)Camera.main.fieldOfView = GUI.HorizontalSlider(new Rect(90, y+25, 100, 15), Camera.main.fieldOfView, 35.0F, 90.0F);
-                  //if(bVR)/*Camera.main.fieldOfView =*/ GUI.HorizontalSlider(new Rect(90, y+25, 100, 20), Camera.main.fieldOfView, 90.0F, 130.0F);
+                  if (!bVR) Camera.main.fieldOfView = GUI.HorizontalSlider(new Rect(90, y+25, 100, 15), Camera.main.fieldOfView, 35.0F, 90.0F);
                   y += 40;
 
-                  if(man.Visible)fpsModeEnabled = GUI.Toggle(new Rect (10, y, 95, 20), fpsModeEnabled, "一人称視点" , gsToggle );
+                  if (man.Visible) fpsModeEnabled = GUI.Toggle(new Rect (10, y, 95, 20), fpsModeEnabled, "一人称視点" , gsToggle );
                   else GUI.Label(new Rect(10, y+2, 95, 20), "× 一人称視点", gsLabel);
-                  
+
                   bool bToggle = GUI.Toggle(new Rect (105, y, 95, 20), maidFollowEnabled, "メイド固定" , gsToggle );
                   if (maidFollowEnabled != bToggle) {
                     maidFollowEnabled = bToggle;
                     followReturnSpeedY = -1f; //縦移動速度は標準に戻す
                     //if (maidFollowEnabled) MaidFollowingCameraStart(tgID); //視点の向きを正面にしてメイド固定
+                    if (maidFollowEnabled) adjustCameraDistance(); //距離補正
                   }
                   y += 25;
-                  
-                  if(maidFollowEnabled){
+
+                  if (maidFollowEnabled) {
                     if (GUI.Button(new Rect (100, y, 100, 20), "注視点 : "+lookList[lookPoint], gsButton)) {
                       lookPoint += 1;
-                      if(lookPoint >= lookList.Length)lookPoint = 0;
+                      if (lookPoint >= lookList.Length) lookPoint = 0;
                     }
-                    
+
                     GUI.Label(new Rect (15, y, 190, 20), "▼オート変更" , gsLabel);
                     y += 20;
                     aoutLook = GUI.Toggle(new Rect (15, y, 85, 20), aoutLook, "注視点" , gsToggle );
@@ -12165,7 +12416,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                   GUI.Label(new Rect (5, y, 40, 20), "【SE】" , gsLabel);
                   if (GUI.Button(new Rect (50, y, 60, 20), "切替", gsButton)) {
                     cfgw.SelectSE += 1;
-                    if(cfgw.SelectSE >= SeFileList[0].Length)cfgw.SelectSE = 0;
+                    if (cfgw.SelectSE >= SeFileList[0].Length) cfgw.SelectSE = 0;
                   }
                   GUI.Label(new Rect (115, y, 90, 20), SeFileList[0][cfgw.SelectSE] , gsLabel);
                   y += 25;
@@ -12176,7 +12427,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                   y += 22;
 
                   if (vsNormalMode) {
-                    if(maidsState[tgID].editVoiceSetName != ""){
+                    if (maidsState[tgID].editVoiceSetName != "") {
                       if (GUI.Button(new Rect (10, y, 40, 20), "解除", gsButton)) {
                         maidsState[tgID].editVoiceSetName = "";
                         maidsState[tgID].editVoiceSet = new List<string[]>();
@@ -12185,7 +12436,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                       y += 22;
                     }
                   } else {
-                    if(maidsState[tgID].kissVoiceSetName != ""){
+                    if (maidsState[tgID].kissVoiceSetName != "") {
                       if (GUI.Button(new Rect (10, y, 40, 20), "解除", gsButton)) {
                         maidsState[tgID].kissVoiceSetName = "";
                         maidsState[tgID].kissVoiceSet = null;
@@ -12196,15 +12447,15 @@ namespace CM3D2.VibeYourMaid.Plugin {
                   }
 
                   int h1 = evsFiles.Count * 22  + 10 ;
-                  //if(maidsState[tgID].editVoiceSetName != "") h1 += 22;
-                  if(h1 < 445 - y)h1 = 445 - y;
+                  //if (maidsState[tgID].editVoiceSetName != "") h1 += 22;
+                  if (h1 < 445 - y) h1 = 445 - y;
                   Rect scrlRect1    = new Rect(10, y, 190, 445 - y);
                   Rect contentRect1 = new Rect(0, 0, 170, h1);
                   vsScrollPos1 = GUI.BeginScrollView(scrlRect1, vsScrollPos1, contentRect1, false, true );
 
                   y = 0;
                   //通常とキスモードで表示順を切り替え
-                  foreach(string f in evsFiles){
+                  foreach (string f in evsFiles) {
                     string FileName = f.Replace("evs_", "").Replace(".xml", "");
                     bool isKiss = FileName.StartsWith("キス");
                     if (vsNormalMode) {
@@ -12215,7 +12466,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                         y += 22;
                       }
                     } else {
-                      if (isKiss){
+                      if (isKiss) {
                         if (GUI.Button(new Rect (0, y, 170, 20), FileName, maidsState[tgID].kissVoiceSetName==FileName ? gsButtonY : gsButton)) {
                           kissVoiceSetLoad(f,tgID);
                         }
@@ -12224,7 +12475,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                     }
                   }
                   y += 10;
-                  foreach(string f in evsFiles){
+                  foreach (string f in evsFiles) {
                     string FileName = f.Replace("evs_", "").Replace(".xml", "");
                     bool isKiss = FileName.Contains("キス");
                     if (vsNormalMode) {
@@ -12235,7 +12486,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                         y += 22;
                       }
                     } else {
-                      if (!isKiss){
+                      if (!isKiss) {
                         if (GUI.Button(new Rect (0, y, 170, 20), FileName, maidsState[tgID].kissVoiceSetName==FileName ? gsButtonY : gsButton)) {
                           kissVoiceSetLoad(f,tgID);
                         }
@@ -12244,13 +12495,13 @@ namespace CM3D2.VibeYourMaid.Plugin {
                     }
                   }
                   GUI.EndScrollView();
-                  
-                  
+
+
 
                   //音声モード切替
                   /*
                   GUI.Label(new Rect (5, 370, 190, 20), "【音声モード切替】" , gsLabel);
-                  if(maidsState[tgID].autoVoiceEnabled){
+                  if (maidsState[tgID].autoVoiceEnabled) {
                     if (GUI.Button(new Rect (10, 395, 85, 20), "オートモード", gsButton)) {
                       maidsState[tgID].autoVoiceEnabled = false;
                       maidsState[tgID].voiceMode = 0;
@@ -12258,12 +12509,12 @@ namespace CM3D2.VibeYourMaid.Plugin {
                   } else {
                     if (GUI.Button(new Rect (10, 395, 85, 20), ModeSelectList[maidsState[tgID].voiceMode], gsButton)) {
                       ++maidsState[tgID].voiceMode;
-                      if(maidsState[tgID].voiceMode > 5)maidsState[tgID].autoVoiceEnabled = true;
+                      if (maidsState[tgID].voiceMode > 5) maidsState[tgID].autoVoiceEnabled = true;
                     }
                   }
                   if (GUI.Button(new Rect (105, 395, 85, 20), ModeSelectList2[0][maidsState[tgID].voiceMode2], gsButton)) {
                     ++maidsState[tgID].voiceMode2;
-                    if(maidsState[tgID].voiceMode2 >= ModeSelectList2[0].Length)maidsState[tgID].voiceMode2 = 0;
+                    if (maidsState[tgID].voiceMode2 >= ModeSelectList2[0].Length) maidsState[tgID].voiceMode2 = 0;
                   }
                   */
 
@@ -12277,137 +12528,137 @@ namespace CM3D2.VibeYourMaid.Plugin {
                   if (GUI.Button(new Rect (350, y, 20, 20), "-", gsButton)) excite -= 50;
                   if (GUI.Button(new Rect (375, y, 20, 20), "+", gsButton)) excite += 50;
                   excite = (int)Math.Round(GUI.HorizontalSlider(new Rect(245, y+5, 100, 20), excite, -100, 300)/10)*10;
-                  if (excite != stockMaids[tgID].mem.status.currentExcite) setExcite(tgID, excite);
+                  if (excite != stockMaids[tgID].mem.status.currentExcite) setExcite(tgID, maid, excite);
 
 
                   y = 253;
                   GUI.Label(new Rect (205, y, 200, 20), "【Hアイテム装着】" , gsLabel);
-                  
-                  if (GUI.Button(new Rect (210, y+20, 80, 20), "バイブ", gsButton)){
-                    if(maid.GetProp(MPN.accvag).strTempFileName == "accVag_VibePink_I_.menu"){
+
+                  if (GUI.Button(new Rect (210, y+20, 80, 20), "バイブ", gsButton)) {
+                    if (maid.GetProp(MPN.accvag).strTempFileName == "accVag_VibePink_I_.menu") {
                       maid.DelProp(MPN.accvag, true);
                       maidsState[tgID].itemV = "";
-                    }else{
+                    } else {
                       maid.SetProp("accvag" , "accVag_VibePink_I_.menu", 0, true, false);
                       maid.body0.SetMask(TBody.SlotID.accVag, true);
                       try { VertexMorph_FromProcItem(maid.body0, "kupa", 0.6f); } catch { /*LogError(ex);*/ }
-                      if(maidsState[tgID].hibuSlider1Value < 60f)maidsState[tgID].hibuSlider1Value = 60f;
-                      if(maidsState[tgID].hibuSlider2Value < 60f)maidsState[tgID].hibuSlider2Value = 60f;
+                      if (maidsState[tgID].hibuSlider1Value < 60f) maidsState[tgID].hibuSlider1Value = 60f;
+                      if (maidsState[tgID].hibuSlider2Value < 60f) maidsState[tgID].hibuSlider2Value = 60f;
                       MekureChanged(tgID, "ずらし", false);
                       ReactionPlay(tgID);
                       maidsState[tgID].itemV = "accVag_VibePink_I_.menu";
                     }
                     maid.AllProcPropSeqStart();
                   }
-                  if (GUI.Button(new Rect (300, y+20, 40, 20), "手", gsButton)){
-                    if(maid.GetProp(MPN.handitem).strTempFileName == "HandItemR_VibePink_I_.menu"){
+                  if (GUI.Button(new Rect (300, y+20, 40, 20), "手", gsButton)) {
+                    if (maid.GetProp(MPN.handitem).strTempFileName == "HandItemR_VibePink_I_.menu") {
                       maid.DelProp(MPN.handitem, true);
-                    }else{
+                    } else {
                       maid.SetProp("handitem" , "HandItemR_VibePink_I_.menu", 0, true, false);
                       maid.body0.SetMask(TBody.SlotID.HandItemR, true);
                     }
                     maid.AllProcPropSeqStart();
                   }
-                  if (GUI.Button(new Rect (350, y+20, 40, 20), "男", gsButton)){
-                    if(man.GetProp(MPN.handitem).strTempFileName == "HandItemR_VibePink_I_.menu"){
+                  if (GUI.Button(new Rect (350, y+20, 40, 20), "男", gsButton)) {
+                    if (man.GetProp(MPN.handitem).strTempFileName == "HandItemR_VibePink_I_.menu") {
                       man.DelProp(MPN.handitem, true);
-                    }else{
+                    } else {
                       man.SetProp("handitem" , "HandItemR_VibePink_I_.menu", 0, true, false);
                     }
                     man.AllProcPropSeqStart();
                   }
-                  
-                  if (GUI.Button(new Rect (210, y+45, 80, 20), "Aバイブ", gsButton)){
-                    if(maid.GetProp(MPN.accanl).strTempFileName == "accAnl_AnalVibe_I_.menu"){
+
+                  if (GUI.Button(new Rect (210, y+45, 80, 20), "Aバイブ", gsButton)) {
+                    if (maid.GetProp(MPN.accanl).strTempFileName == "accAnl_AnalVibe_I_.menu") {
                       maid.DelProp(MPN.accanl, true);
                       maidsState[tgID].itemA = "";
-                    }else{
+                    } else {
                       maid.SetProp("accanl" , "accAnl_AnalVibe_I_.menu", 0, true, false);
                       maid.body0.SetMask(TBody.SlotID.accAnl, true);
                       try { VertexMorph_FromProcItem(maid.body0, "analkupa", 0.3f); } catch { /*LogError(ex);*/ }
-                      if(maidsState[tgID].analSlider1Value < 30f)maidsState[tgID].analSlider1Value = 30f;
-                      if(maidsState[tgID].analSlider2Value < 30f)maidsState[tgID].analSlider2Value = 30f;
+                      if (maidsState[tgID].analSlider1Value < 30f) maidsState[tgID].analSlider1Value = 30f;
+                      if (maidsState[tgID].analSlider2Value < 30f) maidsState[tgID].analSlider2Value = 30f;
                       MekureChanged(tgID, "ずらし", false);
                       ReactionPlay(tgID);
                       maidsState[tgID].itemA = "accAnl_AnalVibe_I_.menu";
                     }
                     maid.AllProcPropSeqStart();
                   }
-                  if (GUI.Button(new Rect (300, y+45, 40, 20), "手", gsButton)){
-                    if(maid.GetProp(MPN.handitem).strTempFileName == "HandItemR_AnalVibe_I_.menu"){
+                  if (GUI.Button(new Rect (300, y+45, 40, 20), "手", gsButton)) {
+                    if (maid.GetProp(MPN.handitem).strTempFileName == "HandItemR_AnalVibe_I_.menu") {
                       maid.DelProp(MPN.handitem, true);
-                    }else{
+                    } else {
                       maid.SetProp("handitem" , "HandItemR_AnalVibe_I_.menu", 0, true, false);
                       maid.body0.SetMask(TBody.SlotID.HandItemR, true);
                     }
                     maid.AllProcPropSeqStart();
                   }
-                  if (GUI.Button(new Rect (350, y+45, 40, 20), "男", gsButton)){
-                    if(man.GetProp(MPN.handitem).strTempFileName == "HandItemR_AnalVibe_I_.menu"){
+                  if (GUI.Button(new Rect (350, y+45, 40, 20), "男", gsButton)) {
+                    if (man.GetProp(MPN.handitem).strTempFileName == "HandItemR_AnalVibe_I_.menu") {
                       man.DelProp(MPN.handitem, true);
-                    }else{
+                    } else {
                       man.SetProp("handitem" , "HandItemR_AnalVibe_I_.menu", 0, true, false);
                     }
                     man.AllProcPropSeqStart();
                   }
-                  
-                  if (GUI.Button(new Rect (210, y+70, 85, 20), "双頭バイブ", gsButton)){
-                    if(maid.GetProp(MPN.handitem).strTempFileName == "HandItemH_SoutouVibe_I_.menu"){
+
+                  if (GUI.Button(new Rect (210, y+70, 85, 20), "双頭バイブ", gsButton)) {
+                    if (maid.GetProp(MPN.handitem).strTempFileName == "HandItemH_SoutouVibe_I_.menu") {
                       maid.DelProp(MPN.handitem, true);
-                    }else{
+                    } else {
                       maid.SetProp("handitem" , "HandItemH_SoutouVibe_I_.menu", 0, true, false);
                       maid.body0.SetMask(TBody.SlotID.HandItemR, true);
                       try { VertexMorph_FromProcItem(maid.body0, "kupa", 0.6f); } catch { /*LogError(ex);*/ }
-                      if(maidsState[tgID].hibuSlider1Value < 60f)maidsState[tgID].hibuSlider1Value = 60f;
-                      if(maidsState[tgID].hibuSlider2Value < 60f)maidsState[tgID].hibuSlider2Value = 60f;
+                      if (maidsState[tgID].hibuSlider1Value < 60f) maidsState[tgID].hibuSlider1Value = 60f;
+                      if (maidsState[tgID].hibuSlider2Value < 60f) maidsState[tgID].hibuSlider2Value = 60f;
                       MekureChanged(tgID, "ずらし", false);
                       ReactionPlay(tgID);
                     }
                     maid.AllProcPropSeqStart();
                   }
-                  if (GUI.Button(new Rect (305, y+70, 85, 20), "電マ", gsButton)){
-                    if(man.GetProp(MPN.handitem).strTempFileName == "HandItemR_Denma_I_.menu"){
+                  if (GUI.Button(new Rect (305, y+70, 85, 20), "電マ", gsButton)) {
+                    if (man.GetProp(MPN.handitem).strTempFileName == "HandItemR_Denma_I_.menu") {
                       man.DelProp(MPN.handitem, true);
-                    }else{
+                    } else {
                       man.SetProp("handitem" , "HandItemR_Denma_I_.menu", 0, true, false);
                     }
                     man.AllProcPropSeqStart();
                   }
-                  
-                  if (GUI.Button(new Rect (210, y+95, 85, 20), "拘束(手)", gsButton)){
-                    if(maid.GetProp(MPN.kousoku_upper).strTempFileName == "KousokuU_TekaseOne_I_.menu"){
+
+                  if (GUI.Button(new Rect (210, y+95, 85, 20), "拘束(手)", gsButton)) {
+                    if (maid.GetProp(MPN.kousoku_upper).strTempFileName == "KousokuU_TekaseOne_I_.menu") {
                       maid.DelProp(MPN.kousoku_upper, true);
-                    }else{
+                    } else {
                       maid.SetProp("kousoku_upper" , "KousokuU_TekaseOne_I_.menu", 0, true, false);
                       maid.body0.SetMask(TBody.SlotID.kousoku_upper, true);
                     }
                     maid.AllProcPropSeqStart();
                   }
-                  if (GUI.Button(new Rect (305, y+95, 85, 20), "拘束(足)", gsButton)){
-                    if(maid.GetProp(MPN.kousoku_lower).strTempFileName == "KousokuL_AshikaseUp_I_.menu"){
+                  if (GUI.Button(new Rect (305, y+95, 85, 20), "拘束(足)", gsButton)) {
+                    if (maid.GetProp(MPN.kousoku_lower).strTempFileName == "KousokuL_AshikaseUp_I_.menu") {
                       maid.DelProp(MPN.kousoku_lower, true);
-                    }else{
+                    } else {
                       maid.SetProp("kousoku_lower" , "KousokuL_AshikaseUp_I_.menu", 0, true, false);
                       maid.body0.SetMask(TBody.SlotID.kousoku_lower, true);
                     }
                     maid.AllProcPropSeqStart();
                   }
 
-                  if (GUI.Button(new Rect (210, y+120, 85, 20), "磔", gsButton)){
-                    if(maid.GetProp(MPN.kousoku_upper).strTempFileName == "KousokuU_SMRoom_Haritsuke_I_.menu"){
+                  if (GUI.Button(new Rect (210, y+120, 85, 20), "磔", gsButton)) {
+                    if (maid.GetProp(MPN.kousoku_upper).strTempFileName == "KousokuU_SMRoom_Haritsuke_I_.menu") {
                       maid.DelProp(MPN.kousoku_upper, true);
-                    }else{
+                    } else {
                       maid.SetProp("kousoku_upper" , "KousokuU_SMRoom_Haritsuke_I_.menu", 0, true, false);
                       maid.body0.SetMask(TBody.SlotID.kousoku_upper, true);
                     }
                     maid.AllProcPropSeqStart();
                   }
 
-                  if (GUI.Button(new Rect (210, y+145, 85, 20), "ディルド台", gsButton)){
+                  if (GUI.Button(new Rect (210, y+145, 85, 20), "ディルド台", gsButton)) {
                     GameObject prefabFromBg = GameObject.Find( "ディルド＆台" );
-                    if(prefabFromBg != null){
+                    if (prefabFromBg != null) {
                       GameMain.Instance.BgMgr.DelPrefabFromBg("ディルド＆台");
-                    }else{
+                    } else {
                       Vector3 zero = maid.transform.position;
                       zero.y = zero.y - 0.0007f * (50 - maid.GetProp(MPN.sintyou).value);
                       Vector3 zero2 = maid.transform.eulerAngles;
@@ -12415,14 +12666,14 @@ namespace CM3D2.VibeYourMaid.Plugin {
                       GameMain.Instance.BgMgr.AddPrefabToBg("Odogu_DildoBox", "ディルド＆台", null, zero, zero2);
                     }
                   }
-                  
-                  if (GUI.Button(new Rect (305, y+145, 85, 20), "三角木馬", gsButton)){
-                  
+
+                  if (GUI.Button(new Rect (305, y+145, 85, 20), "三角木馬", gsButton)) {
+
                     GameObject prefabFromBg = GameObject.Find( "三角木馬" );
-                    if(prefabFromBg != null){
+                    if (prefabFromBg != null) {
                       Console.WriteLine("Odogu_SankakuMokuba有り");
                       GameMain.Instance.BgMgr.DelPrefabFromBg("三角木馬");
-                    }else{ 
+                    } else {
                       Console.WriteLine("Odogu_SankakuMokuba無し");
                       Vector3 zero = maid.transform.position;
                       zero.y = zero.y - 0.00185f * (50 - maid.GetProp(MPN.sintyou).value);
@@ -12431,9 +12682,9 @@ namespace CM3D2.VibeYourMaid.Plugin {
                       GameMain.Instance.BgMgr.AddPrefabToBg("Odogu_SankakuMokuba", "三角木馬", null, zero, zero2);
                     }
                   }
-                  
-                  
-                  if (GUI.Button(new Rect (305, y+170, 85, 20), "全て外す", gsButton)){
+
+
+                  if (GUI.Button(new Rect (305, y+170, 85, 20), "全て外す", gsButton)) {
                     maid.DelProp(MPN.accvag, true);
                     maid.DelProp(MPN.accanl, true);
                     maid.DelProp(MPN.handitem, true);
@@ -12441,30 +12692,30 @@ namespace CM3D2.VibeYourMaid.Plugin {
                     maid.DelProp(MPN.kousoku_lower, true);
                     maid.DelProp(MPN.accxxx, true);//自分用
                     maid.AllProcPropSeqStart();
-                    
+
                     man.DelProp(MPN.handitem, true);
                     man.AllProcPropSeqStart();
-                    
+
                     GameMain.Instance.BgMgr.DelPrefabFromBgAll();
                   }
-                  
+
                   //自分用
-                  if (GUI.Button(new Rect (210, y+170, 85, 20), "ふたなり", gsButton)){
-                    if(maid.GetProp(MPN.accxxx).strTempFileName == "chinko_nae_m.menu"){
+                  if (GUI.Button(new Rect (210, y+170, 85, 20), "ふたなり", gsButton)) {
+                    if (maid.GetProp(MPN.accxxx).strTempFileName == "chinko_nae_m.menu") {
                       maid.DelProp(MPN.accxxx, true);
-                    }else{
+                    } else {
                       maid.SetProp("accxxx" , "chinko_nae_m.menu", 0, true, false);
                       maid.body0.SetMask(TBody.SlotID.accXXX, true);
                     }
                     maid.AllProcPropSeqStart();
                   }
-                  
-                  
+
+
                   //三列目
                   y = 235;
                     GUI.Label(new Rect (400, y, 120, 20), "【髪型・衣装の変更】" , gsLabel);
 
-                  if (GUI.Button(new Rect (410, y+20, 190, 20), "髪型と衣装を基本に戻す", gsButton)){
+                  if (GUI.Button(new Rect (410, y+20, 190, 20), "髪型と衣装を基本に戻す", gsButton)) {
                     maid.ResetProp("hairf", false);
                     maid.ResetProp("hairr", false);
                     maid.ResetProp("hairs", false);
@@ -12497,16 +12748,16 @@ namespace CM3D2.VibeYourMaid.Plugin {
                     maid.ResetProp("accxxx", false);
                     maid.AllProcPropSeqStart();
                   }
-                    
+
                     h1 = cdsFiles.Count * 22 + 55 + 55;
                     scrlRect1    = new Rect(405, y+45, 215, 165);
                     contentRect1 = new Rect(0, 0, 190, Math.Max(120, h1));
                     dsScrollPos = GUI.BeginScrollView(scrlRect1, dsScrollPos, contentRect1, false, true );
-                    
+
                     y = 0;
                     int btnCount = 0;
 
-                    if(ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "1_hairF")){
+                    if (ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "1_hairF")) {
                       if (GUI.Button(new Rect (5, y, 85, 20), "髪型１", gsButton)){
                         ExLoadHair(maid, "1");
                         Console.WriteLine("髪型１ セット完了");
@@ -12514,7 +12765,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                       btnCount++;
                       if (btnCount%2 == 0) y += 25;
                     }
-                    if(ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "2_hairF")){
+                    if (ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "2_hairF")) {
                       if (GUI.Button(new Rect (5+95*(btnCount%2), y, 85, 20), "髪型２", gsButton)){
                         ExLoadHair(maid, "2");
                         Console.WriteLine("髪型２ セット完了");
@@ -12522,7 +12773,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                       btnCount++;
                       if (btnCount%2 == 0) y += 25;
                     }
-                    if(ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "3_hairF")){
+                    if (ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "3_hairF")) {
                       if (GUI.Button(new Rect (5+95*(btnCount%2), y, 85, 20), "髪型３", gsButton)){
                         ExLoadHair(maid, "3");
                         Console.WriteLine("髪型３ セット完了");
@@ -12530,7 +12781,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                       btnCount++;
                       if (btnCount%2 == 0) y += 25;
                     }
-                    if(ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "4_hairF")){
+                    if (ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "4_hairF")) {
                       if (GUI.Button(new Rect (5+95*(btnCount%2), y, 85, 20), "髪型４", gsButton)){
                         ExLoadHair(maid, "4");
                         Console.WriteLine("髪型４ セット完了");
@@ -12544,7 +12795,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                     if (btnCount > 0) y += 3;
 
                     btnCount = 0;
-                    if(ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "1_acchat")){
+                    if (ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "1_acchat")) {
                       if (GUI.Button(new Rect (5, y, 85, 20), "衣装１", gsButton)){
                         ExLoadWear(maid, "1");
                         Console.WriteLine("衣装１ セット完了");
@@ -12552,7 +12803,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                       btnCount++;
                       if (btnCount%2 == 0) y += 25;
                     }
-                    if(ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "2_acchat")){
+                    if (ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "2_acchat")) {
                       if (GUI.Button(new Rect (5+95*(btnCount%2), y, 85, 20), "衣装２", gsButton)){
                         ExLoadWear(maid, "2");
                         Console.WriteLine("衣装２ セット完了");
@@ -12560,7 +12811,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                       btnCount++;
                       if (btnCount%2 == 0) y += 25;
                     }
-                    if(ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "3_acchat")){
+                    if (ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "3_acchat")) {
                       if (GUI.Button(new Rect (5+95*(btnCount%2), y, 85, 20), "衣装３", gsButton)){
                         ExLoadWear(maid, "3");
                         AllDressVisible(tgID, true);
@@ -12570,7 +12821,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                       btnCount++;
                       if (btnCount%2 == 0) y += 25;
                     }
-                    if(ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "4_acchat")){
+                    if (ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "4_acchat")) {
                       if (GUI.Button(new Rect (5+95*(btnCount%2), y, 85, 20), "衣装４", gsButton)){
                         ExLoadWear(maid, "4");
                         Console.WriteLine("衣装４ セット完了");
@@ -12582,8 +12833,8 @@ namespace CM3D2.VibeYourMaid.Plugin {
                     if (btnCount%2 == 1) y += 25;
                     //ボタンがあれば間をあける
                     //if (btnCount > 0) y += 5;
-                    
-                    foreach(string f in cdsFiles){
+
+                    foreach (string f in cdsFiles) {
                       string FileName = f.Replace("cds_", "").Replace(".xml", "");
                       if (GUI.Button(new Rect (5, y, 190, 20), FileName, gsButton)) {
                         CdsFileLoad(f);
@@ -12600,7 +12851,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
 
                   //一列目
                   GUI.Label(new Rect (5, 25, 190, 20), "【各演出の有無】" , gsLabel);
-                  
+
                   bool toggle = GUI.Toggle(new Rect (5, 45, 55, 20), cfgw.ToikiEnabled, "吐息" , gsToggle );
                   if (cfgw.ToikiEnabled != toggle) {
                     cfgw.ToikiEnabled = toggle;
@@ -12628,7 +12879,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                   cfgw.OrgsmAnimeEnabled = GUI.Toggle(new Rect (5, 125, 75, 20), cfgw.OrgsmAnimeEnabled, "痙攣動作" , gsToggle );
                   cfgw.AheEnabled = GUI.Toggle(new Rect (80, 125, 115, 20), cfgw.AheEnabled, "瞳上昇（アヘ）" , gsToggle );
                   cfgw.zViceWaitEnabled = GUI.Toggle(new Rect (5, 145, 190, 20), cfgw.zViceWaitEnabled, "絶頂時に音声終了を待つ" , gsToggle );
-                  
+
                   GUI.Label(new Rect (5, 170, 190, 20), "【口元の変更】" , gsLabel);
                   cfgw.MouthNomalEnabled = GUI.Toggle(new Rect (5, 190, 90, 20), cfgw.MouthNomalEnabled, "通常時" , gsToggle );
                   cfgw.MouthKissEnabled = GUI.Toggle(new Rect (95, 190, 90, 20), cfgw.MouthKissEnabled, "キス" , gsToggle );
@@ -12638,7 +12889,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                   GUI.Label(new Rect(5, 235, 190, 20), "【メイド切替時の設定】", gsLabel);
                   cfgw.TaikiEnabled = GUI.Toggle(new Rect(5, 255, 190, 20), cfgw.TaikiEnabled, "余韻状態にする", gsToggle);
                   cfgw.CamChangeEnabled = GUI.Toggle(new Rect(5, 275, 190, 20), cfgw.CamChangeEnabled, "カメラを切り替える", gsToggle);
-                  
+
                   GUI.Label(new Rect (5, 300, 190, 20), "【カメラの距離判定機能】" , gsLabel);
                   cfgw.camCheckEnabled = GUI.Toggle(new Rect (10, 320, 190, 20), cfgw.camCheckEnabled, "自動でキスに変更する" , gsToggle );
                   cfgw.camCheckVoiceEnabled = GUI.Toggle(new Rect (10, 340, 190, 20), cfgw.camCheckVoiceEnabled, "距離とボイスセットを連動" , gsToggle );
@@ -12647,11 +12898,11 @@ namespace CM3D2.VibeYourMaid.Plugin {
 
                   GUI.Label(new Rect (5, 385, 190, 20), "【ショートカットの同時押し】" , gsLabel);
                   cfgw.andKeyEnabled[0] = GUI.Toggle(new Rect (5, 405, 55, 20), cfgw.andKeyEnabled[0], " Ctrl" , gsToggle );
-                  if(cfgw.andKeyEnabled[0])cfgw.andKeyEnabled = new bool[]{true , false , false};
+                  if (cfgw.andKeyEnabled[0]) cfgw.andKeyEnabled = new bool[]{true , false , false};
                   cfgw.andKeyEnabled[1] = GUI.Toggle(new Rect (65, 405, 55, 20), cfgw.andKeyEnabled[1], " Alt" , gsToggle );
-                  if(cfgw.andKeyEnabled[1])cfgw.andKeyEnabled = new bool[]{false , true , false};
+                  if (cfgw.andKeyEnabled[1]) cfgw.andKeyEnabled = new bool[]{false , true , false};
                   cfgw.andKeyEnabled[2] = GUI.Toggle(new Rect (125, 405, 70, 20), cfgw.andKeyEnabled[2], " Shift" , gsToggle );
-                  if(cfgw.andKeyEnabled[2])cfgw.andKeyEnabled = new bool[]{false , false , true};
+                  if (cfgw.andKeyEnabled[2]) cfgw.andKeyEnabled = new bool[]{false , false , true};
 
                   cfgw.vrShortCut = GUI.Toggle(new Rect (5, 425, 190, 20), cfgw.vrShortCut, "VRショートカット有効" , gsToggle );
 
@@ -12674,12 +12925,12 @@ namespace CM3D2.VibeYourMaid.Plugin {
                   cfgw.majEnabled = GUI.Toggle(new Rect (205, 205, 190, 20), cfgw.majEnabled, "モーションアジャスト有効" , gsToggle );
                   cfgw.majItemClear = GUI.Toggle(new Rect (215, 225, 190, 20), cfgw.majItemClear, "実行時にアイテムをクリア" , gsToggle );
                   cfgw.majKupaEnabled = GUI.Toggle(new Rect (215, 245, 190, 20), cfgw.majKupaEnabled, "kupa値変更を有効" , gsToggle );
-                  
-                  
+
+
                   GUI.Label(new Rect (205, 270, 210, 20), "【マニアック演出】※要セーブ" , gsLabel);
                   if (GUI.Button(new Rect (205, 290, 70, 20), "クリ属性", gsButton)) {
                     ++maidsState[tgID].cliMode;
-                    if(maidsState[tgID].cliMode > 2)maidsState[tgID].cliMode = 0;
+                    if (maidsState[tgID].cliMode > 2) maidsState[tgID].cliMode = 0;
                     ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "cliMode", maidsState[tgID].cliMode.ToString(), true);
 
                     try { VertexMorph_FromProcItem(maid.body0, "clitoris", 0f); } catch { /*LogError(ex);*/ }
@@ -12689,7 +12940,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                     EffectBokki(maid, maidsState[tgID]);
                   }
                   GUI.Label(new Rect (290, 290, 70, 20), cliModeText[maidsState[tgID].cliMode] , gsLabel);
-                  
+
                   GUI.Label(new Rect (215, 312, 150, 20), "クリ縮小: " + Math.Round(maidsState[tgID].cliScale*100.0) +"%" , gsLabel);
                   if (GUI.Button(new Rect (325, 312, 25, 20), "-", gsButton)) {
                     if (maidsState[tgID].cliScale <= 0.1f) return;
@@ -12707,7 +12958,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                     if (maidsState[tgID].bokkiValue1 == 0) maidsState[tgID].bokkiValue1++; //0以外ならEffectBokkiで処理されるので値を設定
                     EffectBokki(maid, maidsState[tgID]);
                   }
-                  
+
                   cfgw.uDatsuEnabled = GUI.Toggle(new Rect (205, 330, 100, 20), cfgw.uDatsuEnabled, "子宮脱" , gsToggle );
 
                   GUI.Label(new Rect (205, 355, 190, 20), "【お触り設定】" , gsLabel);
@@ -12716,8 +12967,8 @@ namespace CM3D2.VibeYourMaid.Plugin {
                   GUI.Label(new Rect (205, 420, 90, 20), "移動倍率: " + cfgw.osawariMoveRate , gsLabel);
                   cfgw.osawariMoveRate = GUI.HorizontalSlider(new Rect(295, 425, 100, 20), cfgw.osawariMoveRate, 0.1f, 5.0f);
                   cfgw.osawariMoveRate = (float)(Math.Round(cfgw.osawariMoveRate*10)*0.1);
-                  
-                  
+
+
                   //三列目
                   y = 35;
                   GUI.Label(new Rect (415, y, 150, 20), "【各EDIT画面を表示】" , gsLabel);
@@ -12725,7 +12976,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
 
                   /*if (GUI.Button(new Rect (420, y, 190, 20), "基本ボイスセット", gsButton)) { ConfigFlag = 2; }
                   y += 30; */
-                  
+
                   if (GUI.Button(new Rect (420, y, 190, 20), "オリジナルボイスセット", gsButton)) { ConfigFlag = 3; }
                   y += 25;
                   GUI.Label(new Rect (420, y, 95, 20), "再生間隔: " + cfgw.voiceSetInterval , gsLabel);
@@ -12735,41 +12986,37 @@ namespace CM3D2.VibeYourMaid.Plugin {
 
                   if (GUI.Button(new Rect (420, y, 190, 20), "ランダムモーションセット", gsButton)) { ConfigFlag = 4; }
                   y += 30;
-                  
+
                   if (GUI.Button(new Rect (420, y, 190, 20), "モーションアジャスト詳細設定", gsButton)) { ConfigFlag = 6; }
                   y += 30;
-                  
+
                   if (GUI.Button(new Rect (420, y, 190, 20), "髪型・服装の登録", gsButton)) { ConfigFlag = 5; }
                   y += 30;
-                  
+
                   if (GUI.Button(new Rect (420, y, 190, 20), "乳首設定の登録", gsButton)) { ConfigFlag = 9; }
                   y += 30;
-                  
+
                   /*
                   if (GUI.Button(new Rect (420, y, 190, 20), "エンパイアズライフ設定", gsButton)) {
                     LifeSceneLoad();
                     ConfigFlag = 7;
                   }
                   y += 30; */
-                  
+
                   if (GUI.Button(new Rect (420, y, 190, 20), "エロステータス表示", gsButton)) { ConfigFlag = 8; }
                   y += 30;
 
-
-                  //子宫脱按钮
+                  //子宫脱按钮 #109
                   if (GUI.Button(new Rect(420, 355, 190, 20), "に押します子宮脱", gsButton))
                   {
                     manualTriggeredUterusDatsu = true;
                   }
-
-
-
-                  /*if(vSceneLevel == 3){
+                  /*if (vSceneLevel == 3) {
                     if (GUI.Button(new Rect (420, y, 150, 20), "UI表示切り替え", gsButton)) {
                       gameObject_ui.SetActive(!gameObject_ui.activeSelf);
                     }
                   }*/
-                  
+
                   GUI.Label(new Rect (415, y, 150, 20), "【移動速度】" , gsLabel);
                   y += 20;
 
@@ -12811,16 +13058,16 @@ namespace CM3D2.VibeYourMaid.Plugin {
                   if (GUI.Button(new Rect (460, 380, 150, 20), "性格チェック", gsButton)) {
                     Console.WriteLine(stockMaids[tgID].personal);
                   }
-                  
+
                   if (GUI.Button(new Rect (460, 405, 150, 20), "MAJ 一括初期設定", gsButton)) {
-                    for (int i = 0; i < maj.motionName.Count; i++){
-                      if(!maj.giveSexual[i][9]){
+                    for (int i = 0; i < maj.motionName.Count; i++) {
+                      if (!maj.giveSexual[i][9]) {
                         maj.giveSexual[i] = GiveSexualSet(maj.motionName[i]);
                       }
                     }
                   }
                   */
-                  
+
         }
 
             /*
@@ -12828,72 +13075,72 @@ namespace CM3D2.VibeYourMaid.Plugin {
         private void WindowCallback3_2(Maid maid) {
             int x = 0;
             int y = 0;
-            
+
               x = 0;
               y = 0;
               scKeyOff = GUI.Toggle(new Rect(420, 5, 140, 20), scKeyOff, "ショートカット無効", gsToggle);
-              
+
               x = 5;
               y = 40;
               GUI.Label(new Rect (x, y, 400, 20), "基本ボイス編集画面　現在準備中" , gsLabel3);
-              
-              
+
+
               //性格選択メニュー
-              for (int i = 0; i < personalList[0].Length; i++){
-                if(fVoiceSet2[0] == i){
+              for (int i = 0; i < personalList[0].Length; i++) {
+                if (fVoiceSet2[0] == i) {
                   GUI.Label(new Rect (x, y, 60, 20), personalList[0][i] , gsLabel3);
-                }else{
+                } else {
                   if (GUI.Button(new Rect (x, y, 60, 20), personalList[0][i], gsButton)) {
                     fVoiceSet2[0] = i;
                   }
                 }
                 x += 65;
-                if(x + 60 > 620){
+                if (x + 60 > 620) {
                   x = 5;
                   y += 25;
                 }
-                
+
               }
-              
+
               //音声種類選択
               x = 10;
               y += 35;
-              for (int i = 0; i < bvsText1.Length; i++){
-                if(fVoiceSet2[1] == i){
+              for (int i = 0; i < bvsText1.Length; i++) {
+                if (fVoiceSet2[1] == i) {
                   GUI.Label(new Rect (x, y, 60, 20), bvsText1[i] , gsLabel3);
-                }else{
+                } else {
                   if (GUI.Button(new Rect (x, y, 60, 20), bvsText1[i], gsButton)) {
                     fVoiceSet2[1] = i;
                   }
                 }
               }
-              
+
               x = 220;
               y -= 180;
               int h2 = VSX.saveVoiceSet.Count * 65 + 30;
-              if(h2 < 445 - y)h2 = 445 - y;
+              if (h2 < 445 - y) h2 = 445 - y;
 
               Rect scrlRect2    = new Rect(x, y, 400, 445 - y);
               Rect contentRect2 = new Rect(0, 0, 380, h2);
               vsScrollPos2 = GUI.BeginScrollView( scrlRect2, vsScrollPos2, contentRect2, false, true );
-              
+
               y = 0;
               int iv;
               var _vf = new List<List<string>>();
-              
-              if(fVoiceSet2[1] != 6){
+
+              if (fVoiceSet2[1] != 6) {
                 _vf = new List<List<string>>();
-                if(fVoiceSet2[1] == 0)_vf.AddRange(bvs[i].sLoopVoice20Vibe);
-                if(fVoiceSet2[1] == 1)_vf.AddRange(bvs[i].sLoopVoice20Fera);
-                if(fVoiceSet2[1] == 2)_vf.AddRange(bvs[i].sLoopVoice30Vibe);
-                if(fVoiceSet2[1] == 3)_vf.AddRange(bvs[i].sLoopVoice30Fera);
-                if(fVoiceSet2[1] == 4)_vf.AddRange(bvs[i].sOrgasmVoice30Vibe);
-                if(fVoiceSet2[1] == 5)_vf.AddRange(bvs[i].sOrgasmVoice30Fera);
-                
-              
-                for (int i2 = 0; i2 < 5; i2++){
-                  for (int i3 = 0; i3 < _vf.Count; i3++){
-                    if(!GameUty.FileSystem.IsExistentFile(_vf[i3]) && !GameUty.FileSystemOld.IsExistentFile(_vf[i3]) && _vf[i3] != "" && _vf[i3] != ".ogg"){
+                if (fVoiceSet2[1] == 0) _vf.AddRange(bvs[i].sLoopVoice20Vibe);
+                if (fVoiceSet2[1] == 1) _vf.AddRange(bvs[i].sLoopVoice20Fera);
+                if (fVoiceSet2[1] == 2) _vf.AddRange(bvs[i].sLoopVoice30Vibe);
+                if (fVoiceSet2[1] == 3) _vf.AddRange(bvs[i].sLoopVoice30Fera);
+                if (fVoiceSet2[1] == 4) _vf.AddRange(bvs[i].sOrgasmVoice30Vibe);
+                if (fVoiceSet2[1] == 5) _vf.AddRange(bvs[i].sOrgasmVoice30Fera);
+
+
+                for (int i2 = 0; i2 < 5; i2++) {
+                  for (int i3 = 0; i3 < _vf.Count; i3++) {
+                    if (!GameUty.FileSystem.IsExistentFile(_vf[i3]) && !GameUty.FileSystemOld.IsExistentFile(_vf[i3]) && _vf[i3] != "" && _vf[i3] != ".ogg") {
                       Console.WriteLine("音声ファイルが存在しないため除外：" + _vf[i3]);
                       _vf.RemoveAt(i3);
                       i3--;
@@ -12902,28 +13149,28 @@ namespace CM3D2.VibeYourMaid.Plugin {
                   bvs[i].sLoopVoice20Vibe[i2] = _vf.ToArray();
                 }
               }
-              
-              for (int r = 0; r < 5; r++){
-                for (int i = 0; i < bvs[fVoiceSet2[0]].sLoopVoice20Vibe[i].Length; i++){
-                  
+
+              for (int r = 0; r < 5; r++) {
+                for (int i = 0; i < bvs[fVoiceSet2[0]].sLoopVoice20Vibe[i].Length; i++) {
+
                   GUI.Label(new Rect (0, 0 + y, 30, 20), "音声" , gsLabel);
                   VSX.saveVoiceSet[i][0] = GUI.TextField(new Rect(30, 0 + y, 110, 20), VSX.saveVoiceSet[i][0]);
-                  
+
                   if (GUI.Button(new Rect (220, 25 + y, 80, 20), "テスト再生", gsButton)) {
-                    if(!Regex.IsMatch(VSX.saveVoiceSet[i][0],@"\.[a-zA-Z][a-zA-Z]"))VSX.saveVoiceSet[i][0] = VSX.saveVoiceSet[i][0] + ".ogg";
+                    if (!Regex.IsMatch(VSX.saveVoiceSet[i][0],@"\.[a-zA-Z][a-zA-Z]")) VSX.saveVoiceSet[i][0] = VSX.saveVoiceSet[i][0] + ".ogg";
                     stockMaids[tgID].mem.AudioMan.LoadPlay(VSX.saveVoiceSet[i][0], 0f, false, false);
                   }
 
                   if (GUI.Button(new Rect (310, 25 + y, 60, 20), "削除", gsButton)) {
                     VSX.saveVoiceSet.RemoveAt(i);
                   }
-                
+
                   GUI.Label(new Rect (5, 45 + y, 370, 20), "―――――――――――――――――――――――――――――", gsLabel2);
 
                   y += 65;
                 }
               }
-              
+
               if (GUI.Button(new Rect (315, 0 + y, 60, 20), "追加", gsButton)) {
                 string[] set = new string[]{ "" , fVoiceSet[0].ToString() , "0" , "3" , "0" , "3" , fVoiceSet[3].ToString() , fVoiceSet[4].ToString() };
                 VSX.saveVoiceSet.Add(set);
@@ -12941,46 +13188,46 @@ namespace CM3D2.VibeYourMaid.Plugin {
               x = 0;
               y = 0;
               scKeyOff = GUI.Toggle(new Rect(420, 2, 140, 20), scKeyOff, "ショートカット無効", gsToggle);
-              
+
               y += 40;
               GUI.Label(new Rect (5, y, 90, 20), "ボイスセット名" , gsLabel);
               vs_Overwrite = GUI.Toggle(new Rect(105, y, 70, 20), vs_Overwrite, "上書／ｸﾘｱ", gsToggle);
-              
+
               y += 20;
               VSX.saveVoiceSetName = GUI.TextField(new Rect(5, y, 170, 20), VSX.saveVoiceSetName);
 
               y += 25;
-              
+
               if (GUI.Button(new Rect (5, y, 40, 20), "振分", gsButton)) {
-                for (int i = 0; i < VSX.saveVoiceSet.Count; i++){
-                  if(VSX.saveVoiceSet[i][0] == "")VSX.saveVoiceSet.RemoveAt(i);
-                  if(Regex.IsMatch(VSX.saveVoiceSet[i][0], "^s0_", RegexOptions.IgnoreCase))VSX.saveVoiceSet[i][1] = "0";
-                  if(Regex.IsMatch(VSX.saveVoiceSet[i][0], "^s1_", RegexOptions.IgnoreCase))VSX.saveVoiceSet[i][1] = "1";
-                  if(Regex.IsMatch(VSX.saveVoiceSet[i][0], "^s2_", RegexOptions.IgnoreCase))VSX.saveVoiceSet[i][1] = "2";
-                  if(Regex.IsMatch(VSX.saveVoiceSet[i][0], "^s3_", RegexOptions.IgnoreCase))VSX.saveVoiceSet[i][1] = "3";
-                  if(Regex.IsMatch(VSX.saveVoiceSet[i][0], "^s4_", RegexOptions.IgnoreCase))VSX.saveVoiceSet[i][1] = "4";
-                  if(Regex.IsMatch(VSX.saveVoiceSet[i][0], "^s5_", RegexOptions.IgnoreCase))VSX.saveVoiceSet[i][1] = "5";
-                  if(Regex.IsMatch(VSX.saveVoiceSet[i][0], "^s6_", RegexOptions.IgnoreCase))VSX.saveVoiceSet[i][1] = "6";
-                  if(Regex.IsMatch(VSX.saveVoiceSet[i][0], "^h0_", RegexOptions.IgnoreCase))VSX.saveVoiceSet[i][1] = "7";
-                  if(Regex.IsMatch(VSX.saveVoiceSet[i][0], "^h1_", RegexOptions.IgnoreCase))VSX.saveVoiceSet[i][1] = "8";
-                  if(Regex.IsMatch(VSX.saveVoiceSet[i][0], "^h2_", RegexOptions.IgnoreCase))VSX.saveVoiceSet[i][1] = "9";
-                  if(Regex.IsMatch(VSX.saveVoiceSet[i][0], "^h3_", RegexOptions.IgnoreCase))VSX.saveVoiceSet[i][1] = "10";
-                  if(Regex.IsMatch(VSX.saveVoiceSet[i][0], "^h4_", RegexOptions.IgnoreCase))VSX.saveVoiceSet[i][1] = "11";
-                  if(Regex.IsMatch(VSX.saveVoiceSet[i][0], "^h5_", RegexOptions.IgnoreCase))VSX.saveVoiceSet[i][1] = "12";
-                  if(Regex.IsMatch(VSX.saveVoiceSet[i][0], "^h6_", RegexOptions.IgnoreCase))VSX.saveVoiceSet[i][1] = "13";
-                  if(Regex.IsMatch(VSX.saveVoiceSet[i][0], "^h7_", RegexOptions.IgnoreCase))VSX.saveVoiceSet[i][1] = "14";
-                  if(Regex.IsMatch(VSX.saveVoiceSet[i][0], "^h7_", RegexOptions.IgnoreCase))VSX.saveVoiceSet[i][1] = "15";
-                  if(Regex.IsMatch(VSX.saveVoiceSet[i][0], "^h8_", RegexOptions.IgnoreCase))VSX.saveVoiceSet[i][1] = "16";
-                  if(Regex.IsMatch(VSX.saveVoiceSet[i][0], "^h9_", RegexOptions.IgnoreCase))VSX.saveVoiceSet[i][1] = "17";
-                  if(Regex.IsMatch(VSX.saveVoiceSet[i][0], "^h10_", RegexOptions.IgnoreCase))VSX.saveVoiceSet[i][1] = "18";
-                  if(Regex.IsMatch(VSX.saveVoiceSet[i][0], "^h11_", RegexOptions.IgnoreCase))VSX.saveVoiceSet[i][1] = "19";
-                  if(Regex.IsMatch(VSX.saveVoiceSet[i][0], "^v1_", RegexOptions.IgnoreCase))VSX.saveVoiceSet[i][1] = "20"; //きさく
-                  if(Regex.IsMatch(VSX.saveVoiceSet[i][0], "^v0_", RegexOptions.IgnoreCase))VSX.saveVoiceSet[i][1] = "21"; //淑女
+                for (int i = 0; i < VSX.saveVoiceSet.Count; i++) {
+                  if (VSX.saveVoiceSet[i][0] == "")VSX.saveVoiceSet.RemoveAt(i);
+                  if (Regex.IsMatch(VSX.saveVoiceSet[i][0], "^s0_", RegexOptions.IgnoreCase)) VSX.saveVoiceSet[i][1] = "0";
+                  if (Regex.IsMatch(VSX.saveVoiceSet[i][0], "^s1_", RegexOptions.IgnoreCase)) VSX.saveVoiceSet[i][1] = "1";
+                  if (Regex.IsMatch(VSX.saveVoiceSet[i][0], "^s2_", RegexOptions.IgnoreCase)) VSX.saveVoiceSet[i][1] = "2";
+                  if (Regex.IsMatch(VSX.saveVoiceSet[i][0], "^s3_", RegexOptions.IgnoreCase)) VSX.saveVoiceSet[i][1] = "3";
+                  if (Regex.IsMatch(VSX.saveVoiceSet[i][0], "^s4_", RegexOptions.IgnoreCase)) VSX.saveVoiceSet[i][1] = "4";
+                  if (Regex.IsMatch(VSX.saveVoiceSet[i][0], "^s5_", RegexOptions.IgnoreCase)) VSX.saveVoiceSet[i][1] = "5";
+                  if (Regex.IsMatch(VSX.saveVoiceSet[i][0], "^s6_", RegexOptions.IgnoreCase)) VSX.saveVoiceSet[i][1] = "6";
+                  if (Regex.IsMatch(VSX.saveVoiceSet[i][0], "^h0_", RegexOptions.IgnoreCase)) VSX.saveVoiceSet[i][1] = "7";
+                  if (Regex.IsMatch(VSX.saveVoiceSet[i][0], "^h1_", RegexOptions.IgnoreCase)) VSX.saveVoiceSet[i][1] = "8";
+                  if (Regex.IsMatch(VSX.saveVoiceSet[i][0], "^h2_", RegexOptions.IgnoreCase)) VSX.saveVoiceSet[i][1] = "9";
+                  if (Regex.IsMatch(VSX.saveVoiceSet[i][0], "^h3_", RegexOptions.IgnoreCase)) VSX.saveVoiceSet[i][1] = "10";
+                  if (Regex.IsMatch(VSX.saveVoiceSet[i][0], "^h4_", RegexOptions.IgnoreCase)) VSX.saveVoiceSet[i][1] = "11";
+                  if (Regex.IsMatch(VSX.saveVoiceSet[i][0], "^h5_", RegexOptions.IgnoreCase)) VSX.saveVoiceSet[i][1] = "12";
+                  if (Regex.IsMatch(VSX.saveVoiceSet[i][0], "^h6_", RegexOptions.IgnoreCase)) VSX.saveVoiceSet[i][1] = "13";
+                  if (Regex.IsMatch(VSX.saveVoiceSet[i][0], "^h7_", RegexOptions.IgnoreCase)) VSX.saveVoiceSet[i][1] = "14";
+                  if (Regex.IsMatch(VSX.saveVoiceSet[i][0], "^h7_", RegexOptions.IgnoreCase)) VSX.saveVoiceSet[i][1] = "15";
+                  if (Regex.IsMatch(VSX.saveVoiceSet[i][0], "^h8_", RegexOptions.IgnoreCase)) VSX.saveVoiceSet[i][1] = "16";
+                  if (Regex.IsMatch(VSX.saveVoiceSet[i][0], "^h9_", RegexOptions.IgnoreCase)) VSX.saveVoiceSet[i][1] = "17";
+                  if (Regex.IsMatch(VSX.saveVoiceSet[i][0], "^h10_", RegexOptions.IgnoreCase)) VSX.saveVoiceSet[i][1] = "18";
+                  if (Regex.IsMatch(VSX.saveVoiceSet[i][0], "^h11_", RegexOptions.IgnoreCase)) VSX.saveVoiceSet[i][1] = "19";
+                  if (Regex.IsMatch(VSX.saveVoiceSet[i][0], "^v1_", RegexOptions.IgnoreCase)) VSX.saveVoiceSet[i][1] = "20"; //きさく
+                  if (Regex.IsMatch(VSX.saveVoiceSet[i][0], "^v0_", RegexOptions.IgnoreCase)) VSX.saveVoiceSet[i][1] = "21"; //淑女
                 }
               }
-              
+
               if (GUI.Button(new Rect (55, y, 55, 20), "クリア", gsButton)) {
-                if(vs_Overwrite){
+                if (vs_Overwrite) {
                   VSX.saveVoiceSet = new List<string[]>{
                     new string[] { "" , "0" , "0" , "3" , "0" , "3" , "0" , "0" }
                   };
@@ -12988,7 +13235,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                   maidsState[tgID].editVoiceSetName = "";
                   maidsState[tgID].editVoiceSet = new List<string[]>();
                   vs_Overwrite = false;
-                }else{
+                } else {
                   vsErrer = 3;
                 }
               }
@@ -12997,34 +13244,34 @@ namespace CM3D2.VibeYourMaid.Plugin {
                 voiceSetSave();
                 XmlFilesCheck();
               }
-              
+
               y += 30;
-              if(vsErrer != 0){
+              if (vsErrer != 0) {
                 if (GUI.Button(new Rect (5, y, 20, 20), "x", gsButton)) {
                   vsErrer = 0;
                 }
                 GUI.Label(new Rect (30, y, 170, 60), vsErrerText[vsErrer], gsLabelErr);
                 y += 45;
-              }else{
-              
-              
+              } else {
+
+
                 //フィルタ機能
                 GUI.Label(new Rect (5, y, 145, 20), "【フィルタリング機能】" , gsLabel);
 
                 y += 20;
                 if (GUI.Button(new Rect (5, y, 70, 20), personalList[0][fVoiceSet[0]], gsButton)) {
                   ++fVoiceSet[0];
-                  if(fVoiceSet[0] >= personalList[0].Length)fVoiceSet[0] = 0;
+                  if (fVoiceSet[0] >= personalList[0].Length) fVoiceSet[0] = 0;
                 }
 
                 if (GUI.Button(new Rect (80, y, 55, 20), vsState[fVoiceSet[3]], gsButton)) {
                   ++fVoiceSet[3];
-                  if(fVoiceSet[3] >= vsState.Length)fVoiceSet[3] = 0;
+                  if (fVoiceSet[3] >= vsState.Length) fVoiceSet[3] = 0;
                 }
 
                 if (GUI.Button(new Rect (140, y, 55, 20), vsCondition[fVoiceSet[4]], gsButton)) {
                   ++fVoiceSet[4];
-                  if(fVoiceSet[4] >= vsCondition.Length)fVoiceSet[4] = 0;
+                  if (fVoiceSet[4] >= vsCondition.Length) fVoiceSet[4] = 0;
                 }
 
 
@@ -13032,35 +13279,35 @@ namespace CM3D2.VibeYourMaid.Plugin {
                 GUI.Label(new Rect (5, y, 30, 20), "興奮", gsLabel);
                 if (GUI.Button(new Rect (35, y, 20, 20), vsLevel[fVoiceSet[1]], gsButton)) {
                   ++fVoiceSet[1];
-                  if(fVoiceSet[1] > 4)fVoiceSet[1] = 0;
+                  if (fVoiceSet[1] > 4) fVoiceSet[1] = 0;
                 }
-                
+
                 GUI.Label(new Rect (65, y, 30, 20), "絶頂", gsLabel);
                 if (GUI.Button(new Rect (95, y, 20, 20), vsLevel[fVoiceSet[2]], gsButton)) {
                   ++fVoiceSet[2];
-                  if(fVoiceSet[2] > 4)fVoiceSet[2] = 0;
+                  if (fVoiceSet[2] > 4) fVoiceSet[2] = 0;
                 }
 
                 if (GUI.Button(new Rect (125, y, 70, 20), "リセット", gsButton)) {
                   fVoiceSet = new int[]{ 15, 4, 4, 4, 5 };
                 }
               }
-              
-              
-              
+
+
+
               //ボイスセット一覧
               y += 35;
               GUI.Label(new Rect (5, y, 145, 20), "【ボイスセット読み込み】" , gsLabel);
-              
+
               y += 20;
               int h1 = evsFiles.Count * 22;
-              if(h1 < 445 - y)h1 = 445 - y;
+              if (h1 < 445 - y) h1 = 445 - y;
               Rect scrlRect1    = new Rect(5, y, 200, 445 - y);
               Rect contentRect1 = new Rect(0, 0, 175, h1);
               vsScrollPos1 = GUI.BeginScrollView(scrlRect1, vsScrollPos1, contentRect1, false, true );
 
               y = 0;
-              foreach(string f in evsFiles){
+              foreach (string f in evsFiles) {
                 string FileName = f.Replace("evs_", "").Replace(".xml", "");
                 if (GUI.Button(new Rect (0, y, 175, 20), FileName, gsButton)) {
                   voiceSetLoad(f,tgID);
@@ -13068,47 +13315,47 @@ namespace CM3D2.VibeYourMaid.Plugin {
                 y += 22;
               }
               GUI.EndScrollView();
-              
-              
+
+
               //ボイスセット編集画面
               x = 205;
               y = 40;
-              
+
               //性格選択メニュー
-              for (int i = 0; i < personalList[0].Length; i++){
+              for (int i = 0; i < personalList[0].Length; i++) {
                 if (GUI.Button(new Rect (x, y, 60, 20), personalList[0][i], gsButton)) {
                   fVoiceSet[0] = i;
                 }
                 x += 65;
-                if(x + 60 > 620){
+                if (x + 60 > 620) {
                   x = 205;
                   y += 25;
                 }
               }
-              
+
               x = 220;
               y += 35;
               int h2 = VSX.saveVoiceSet.Count * 65 + 30;
-              if(h2 < 445 - y)h2 = 445 - y;
+              if (h2 < 445 - y) h2 = 445 - y;
 
               Rect scrlRect2    = new Rect(x, y, 400, 445 - y);
               Rect contentRect2 = new Rect(0, 0, 380, h2);
               vsScrollPos2 = GUI.BeginScrollView( scrlRect2, vsScrollPos2, contentRect2, false, true );
-              
+
               y = 0;
               int iv;
-              for (int i = 0; i < VSX.saveVoiceSet.Count; i++){
+              for (int i = 0; i < VSX.saveVoiceSet.Count; i++) {
 
-                if((fVoiceSet[0] == intCnv(VSX.saveVoiceSet[i][1]) || fVoiceSet[0] == personalList[0].Length - 1 || intCnv(VSX.saveVoiceSet[i][1]) == personalList[0].Length - 1)
+                if ((fVoiceSet[0] == intCnv(VSX.saveVoiceSet[i][1]) || fVoiceSet[0] == personalList[0].Length - 1 || intCnv(VSX.saveVoiceSet[i][1]) == personalList[0].Length - 1)
                    && (intCnv(VSX.saveVoiceSet[i][2]) <= fVoiceSet[1] && fVoiceSet[1] <= intCnv(VSX.saveVoiceSet[i][3]) || fVoiceSet[1] == 4 )
                    && (intCnv(VSX.saveVoiceSet[i][4]) <= fVoiceSet[2] && fVoiceSet[2] <= intCnv(VSX.saveVoiceSet[i][5]) || fVoiceSet[2] == 4 )
                    && (fVoiceSet[3] == intCnv(VSX.saveVoiceSet[i][6]) || fVoiceSet[3] == 4 || intCnv(VSX.saveVoiceSet[i][6]) == 4)
                    && (fVoiceSet[4] == intCnv(VSX.saveVoiceSet[i][7]) || fVoiceSet[4] == 5 || intCnv(VSX.saveVoiceSet[i][7]) == 5) )
                 {
-                  
+
                   GUI.Label(new Rect (0, y, 30, 20), "音声" , gsLabel);
                   VSX.saveVoiceSet[i][0] = GUI.TextField(new Rect(30, 0 + y, 110, 20), VSX.saveVoiceSet[i][0]);
-                  
+
                   //開始秒
                   GUI.Label(new Rect (145, y, 30, 20), "開始" , gsLabel);
                   String startStr = GUI.TextField(new Rect(175, 0 + y, 30, 20), VSX.saveVoiceSet[i].Length <= 8 ? "0.0" : VSX.saveVoiceSet[i][8]+(VSX.saveVoiceSet[i][8].IndexOf('.')>=0?"":".0"));
@@ -13121,7 +13368,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                   }
 
                   if (GUI.Button(new Rect (210, y, 60, 20), "▶ 再生", gsButton)) {
-                    if(!Regex.IsMatch(VSX.saveVoiceSet[i][0],@"\.[a-zA-Z][a-zA-Z]"))VSX.saveVoiceSet[i][0] = VSX.saveVoiceSet[i][0] + ".ogg";
+                    if (!Regex.IsMatch(VSX.saveVoiceSet[i][0],@"\.[a-zA-Z][a-zA-Z]")) VSX.saveVoiceSet[i][0] = VSX.saveVoiceSet[i][0] + ".ogg";
                     stockMaids[tgID].mem.AudioMan.audiosource.time = Math.Max(0, start);
                     stockMaids[tgID].mem.AudioMan.LoadPlay(VSX.saveVoiceSet[i][0], 0f, false, false);
                   }
@@ -13137,7 +13384,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                   iv = intCnv(VSX.saveVoiceSet[i][2]);
                   if (GUI.Button(new Rect (30, y, 20, 20), VSX.saveVoiceSet[i][2], gsButton)) {
                     ++iv;
-                    if(iv >= 4)iv = 0;
+                    if (iv >= 4) iv = 0;
                     VSX.saveVoiceSet[i][2] = iv.ToString();
                   }
 
@@ -13146,18 +13393,18 @@ namespace CM3D2.VibeYourMaid.Plugin {
                   iv = intCnv(VSX.saveVoiceSet[i][3]);
                   if (GUI.Button(new Rect (65, y, 20, 20), VSX.saveVoiceSet[i][3], gsButton)) {
                     ++iv;
-                    if(iv >= 4)iv = 0;
+                    if (iv >= 4) iv = 0;
                     VSX.saveVoiceSet[i][3] = iv.ToString();
                   }
 
-                  if(intCnv(VSX.saveVoiceSet[i][2]) > intCnv(VSX.saveVoiceSet[i][3]))VSX.saveVoiceSet[i][3] = VSX.saveVoiceSet[i][2];
+                  if (intCnv(VSX.saveVoiceSet[i][2]) > intCnv(VSX.saveVoiceSet[i][3])) VSX.saveVoiceSet[i][3] = VSX.saveVoiceSet[i][2];
 
                   //絶頂度指定
                   GUI.Label(new Rect (95, y, 30, 20), "絶頂", gsLabel);
                   iv = intCnv(VSX.saveVoiceSet[i][4]);
                   if (GUI.Button(new Rect (125, y, 20, 20), VSX.saveVoiceSet[i][4], gsButton)) {
                     ++iv;
-                    if(iv >= 4)iv = 0;
+                    if (iv >= 4) iv = 0;
                     VSX.saveVoiceSet[i][4] = iv.ToString();
                   }
 
@@ -13166,17 +13413,17 @@ namespace CM3D2.VibeYourMaid.Plugin {
                   iv = intCnv(VSX.saveVoiceSet[i][5]);
                   if (GUI.Button(new Rect (160, y, 20, 20), VSX.saveVoiceSet[i][5], gsButton)) {
                     ++iv;
-                    if(iv >= 4)iv = 0;
+                    if (iv >= 4) iv = 0;
                     VSX.saveVoiceSet[i][5] = iv.ToString();
                   }
 
-                  if(intCnv(VSX.saveVoiceSet[i][4]) > intCnv(VSX.saveVoiceSet[i][5]))VSX.saveVoiceSet[i][5] = VSX.saveVoiceSet[i][4];
-                  
+                  if (intCnv(VSX.saveVoiceSet[i][4]) > intCnv(VSX.saveVoiceSet[i][5])) VSX.saveVoiceSet[i][5] = VSX.saveVoiceSet[i][4];
+
                   //強度選択
                   iv = intCnv(VSX.saveVoiceSet[i][6]);
                   if (GUI.Button(new Rect (190, y, 60, 20), vsState[iv], gsButton)) {
                     ++iv;
-                    if(iv >= vsState.Length)iv = 0;
+                    if (iv >= vsState.Length) iv = 0;
                     VSX.saveVoiceSet[i][6] = iv.ToString();
                   }
 
@@ -13184,7 +13431,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                   iv = intCnv(VSX.saveVoiceSet[i][7]);
                   if (GUI.Button(new Rect (260, y, 60, 20), vsCondition[iv], gsButton)) {
                     ++iv;
-                    if(iv >= vsCondition.Length)iv = 0;
+                    if (iv >= vsCondition.Length) iv = 0;
                     VSX.saveVoiceSet[i][7] = iv.ToString();
                   }
 
@@ -13192,7 +13439,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                   if (GUI.Button(new Rect (330, y, 50, 20), "削除", gsButton)) {
                     VSX.saveVoiceSet.RemoveAt(i);
                   }
-                
+
                   //GUI.Label(new Rect (5, 20 + y, 370, 15), "―――――――――――――――――――――――――――――", gsLabel2);
                   GUI.DrawTexture(new Rect(5, 24 + y, 370, 1), guiLineTexture, ScaleMode.StretchToFill, true, 0);
 
@@ -13200,7 +13447,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                 }
 
               }
-              
+
               if (GUI.Button(new Rect (320, 0 + y, 60, 20), "追加", gsButton)) {
                 string[] set = new string[]{ "" , fVoiceSet[0].ToString() , "0" , "3" , "0" , "3" , fVoiceSet[3].ToString() , fVoiceSet[4].ToString() };
                 VSX.saveVoiceSet.Add(set);
@@ -13217,24 +13464,24 @@ namespace CM3D2.VibeYourMaid.Plugin {
               x = 0;
               y = 0;
               scKeyOff = GUI.Toggle(new Rect(420, 2, 140, 20), scKeyOff, "ショートカット無効", gsToggle);
-              
+
               //モーションセット編集画面
               x = 5;
               y = 40;
               GUI.Label(new Rect (5, y, 120, 20), "モーションセット名" , gsLabel);
               ms_Overwrite = GUI.Toggle(new Rect(125, y, 70, 20), ms_Overwrite, "上書／ｸﾘｱ", gsToggle);
-              
+
               y += 20;
               MSX.saveMotionSetName = GUI.TextField(new Rect(5, y, 170, 20), MSX.saveMotionSetName);
 
               y += 25;
               if (GUI.Button(new Rect (55, y, 55, 20), "クリア", gsButton)) {
-                if(ms_Overwrite){
+                if (ms_Overwrite) {
                   MSX.saveMotionSet = new List<List<string>>();
                   MSX.saveMotionSetName = "";
                   ms_Overwrite = false;
                   msCategory = 0;
-                }else{
+                } else {
                   msErrer = 3;
                 }
               }
@@ -13243,9 +13490,9 @@ namespace CM3D2.VibeYourMaid.Plugin {
                 MotionSetSave();
                 XmlFilesCheck();
               }
-              
+
               y += 30;
-              if(msErrer != 0){
+              if (msErrer != 0) {
                 if (GUI.Button(new Rect (5, y, 20, 20), "x", gsButton)) {
                   msErrer = 0;
                 }
@@ -13253,20 +13500,20 @@ namespace CM3D2.VibeYourMaid.Plugin {
               }
               y += 45;
 
-              
+
               //モーションセット一覧
               y += 35;
               GUI.Label(new Rect (5, y, 200, 20), "【モーションセット読み込み】" , gsLabel);
-              
+
               y += 20;
               int h1 = emsFiles.Count * 22;
-              if(h1 < 445 - y)h1 = 445 - y;
+              if (h1 < 445 - y) h1 = 445 - y;
               Rect scrlRect1    = new Rect(5, y, 200, 445 - y);
               Rect contentRect1 = new Rect(0, 0, 175, h1);
               vsScrollPos1 = GUI.BeginScrollView(scrlRect1, vsScrollPos1, contentRect1, false, true );
 
               y = 0;
-              foreach(string f in emsFiles){
+              foreach (string f in emsFiles) {
                 string FileName = f.Replace("ems_", "").Replace(".xml", "");
                 if (GUI.Button(new Rect (0, y, 175, 20), FileName, gsButton)) {
                   MotionSetLoad(f);
@@ -13274,15 +13521,15 @@ namespace CM3D2.VibeYourMaid.Plugin {
                 y += 22;
               }
               GUI.EndScrollView();
-              
-              
+
+
               //ボイスセット編集画面
               x = 210;
               y = 50;
-              
+
               //カテゴリ切り替え
               GUI.Label(new Rect (x, y, 120, 20), "【カテゴリ " + msCategory + " 】" , gsLabel);
-              if(MSX.saveMotionSet.Count == 0){
+              if (MSX.saveMotionSet.Count == 0) {
                 List<string> nm = new List<string>(){""};
                 MSX.saveMotionSet.Add(nm);
               }
@@ -13291,40 +13538,40 @@ namespace CM3D2.VibeYourMaid.Plugin {
                 MSX.saveMotionSet.Add(nm);
                 msCategory = MSX.saveMotionSet.Count - 1;
               }
-              if(MSX.saveMotionSet.Count > 1){
+              if (MSX.saveMotionSet.Count > 1) {
                 if (GUI.Button(new Rect (x + 235, y, 100, 20), "カテゴリ削除", gsButton)) {
                   MSX.saveMotionSet.RemoveAt(msCategory);
-                  if(msCategory >= MSX.saveMotionSet.Count)msCategory = MSX.saveMotionSet.Count - 1;
+                  if (msCategory >= MSX.saveMotionSet.Count) msCategory = MSX.saveMotionSet.Count - 1;
                 }
               }
-              
+
               x = 220;
               y += 30;
-              
-              for (int i = 0; i < MSX.saveMotionSet.Count; i++){
+
+              for (int i = 0; i < MSX.saveMotionSet.Count; i++) {
                 if (GUI.Button(new Rect (x, y, 30, 20), i.ToString(), gsButton)) {
                   msCategory = i;
                 }
                 x += 35;
-                if(x + 30 > 620){
+                if (x + 30 > 620) {
                   x = 220;
                   y += 25;
                 }
               }
-              
-              
+
+
               x = 220;
               y += 40;
               int h2 = MSX.saveMotionSet[msCategory].Count * 65 + 30;
-              if(h2 < 445 - y)h2 = 445 - y;
+              if (h2 < 445 - y) h2 = 445 - y;
 
               Rect scrlRect2    = new Rect(x, y, 400, 445 - y);
               Rect contentRect2 = new Rect(0, 0, 380, h2);
               vsScrollPos2 = GUI.BeginScrollView( scrlRect2, vsScrollPos2, contentRect2, false, true );
-              
+
               y = 0;
-              for (int i = 0; i < MSX.saveMotionSet[msCategory].Count; i++){
-                
+              for (int i = 0; i < MSX.saveMotionSet[msCategory].Count; i++) {
+
                 GUI.Label(new Rect (0, 0 + y, 70, 20), "モーション" , gsLabel);
                 MSX.saveMotionSet[msCategory][i] = GUI.TextField(new Rect(70, 0 + y, 300, 20), MSX.saveMotionSet[msCategory][i]);
 
@@ -13348,7 +13595,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
 
                 y += 65;
               }
-              
+
               if (GUI.Button(new Rect (315, 0 + y, 60, 20), "追加", gsButton)) {
                 MSX.saveMotionSet[msCategory].Add("");
               }
@@ -13360,7 +13607,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
         private void WindowCallback3_5(Maid maid) {
 
               scKeyOff = GUI.Toggle(new Rect(420, 2, 140, 20), scKeyOff, "ショートカット無効", gsToggle);
-            
+
                     GUI.Label(new Rect (5, 35, 190, 20), "【髪型】" , gsLabel);
                     GUI.Label(new Rect (5, 55, 190, 20), "前髪：" + maid.GetProp(MPN.hairf).strFileName.Replace("_i_", "").Replace("_I_", "").Replace("del.menu", "無し").Replace(".menu", "") , gsLabel );
                     GUI.Label(new Rect (5, 75, 190, 20), "後髪：" + maid.GetProp(MPN.hairr).strFileName.Replace("_i_", "").Replace("_I_", "").Replace("del.menu", "無し").Replace(".menu", "") , gsLabel );
@@ -13369,7 +13616,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                     GUI.Label(new Rect (5, 135, 190, 20), "アホ毛：" + maid.GetProp(MPN.hairaho).strFileName.Replace("_i_", "").Replace("_I_", "").Replace("del.menu", "無し").Replace(".menu", "") , gsLabel );
                     GUI.Label(new Rect (5, 155, 190, 20), "リボン：" + maid.GetProp(MPN.acckamisub).strFileName.Replace("_i_", "").Replace("_I_", "").Replace("del.menu", "無し").Replace(".menu", "") , gsLabel );
                     GUI.Label(new Rect (5, 175, 190, 20), "髪ｱｸｾ：" + maid.GetProp(MPN.acckami).strFileName.Replace("_i_", "").Replace("_I_", "").Replace("del.menu", "無し").Replace(".menu", "") , gsLabel );
-                    
+
                     GUI.Label(new Rect (5, 205, 190, 20), "【服装】" , gsLabel);
                     setAcchat = GUI.Toggle(new Rect (5, 225, 190, 20), setAcchat, "帽子：" + maid.GetProp(MPN.acchat).strFileName.Replace("_i_", "").Replace("_I_", "").Replace("del.menu", "無し").Replace(".menu", "") , gsToggle );
                     setHeadset = GUI.Toggle(new Rect (5, 245, 190, 20), setHeadset, "ﾍｯﾄﾞﾄﾞﾚｽ：" + maid.GetProp(MPN.headset).strFileName.Replace("_i_", "").Replace("_I_", "").Replace("del.menu", "無し").Replace(".menu", "") , gsToggle );
@@ -13381,7 +13628,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                     setPanz = GUI.Toggle(new Rect (5, 365, 190, 20), setPanz, "パンツ：" + maid.GetProp(MPN.panz).strFileName.Replace("_i_", "").Replace("_I_", "").Replace("del.menu", "無し").Replace(".menu", "") , gsToggle );
                     setStkg = GUI.Toggle(new Rect (5, 385, 190, 20), setStkg, "靴下：" + maid.GetProp(MPN.stkg).strFileName.Replace("_i_", "").Replace("_I_", "").Replace("del.menu", "無し").Replace(".menu", "") , gsToggle );
                     setShoes = GUI.Toggle(new Rect (5, 405, 190, 20), setShoes, "靴：" + maid.GetProp(MPN.shoes).strFileName.Replace("_i_", "").Replace("_I_", "").Replace("del.menu", "無し").Replace(".menu", "") , gsToggle );
-                    
+
                     GUI.Label(new Rect (205, 35, 190, 20), "【アクセサリーその他】" , gsLabel);
                     setMegane = GUI.Toggle(new Rect (205, 55, 190, 20), setMegane, "メガネ：" + maid.GetProp(MPN.megane).strFileName.Replace("_i_", "").Replace("_I_", "").Replace("del.menu", "無し").Replace(".menu", "") , gsToggle );
                     setAcchead = GUI.Toggle(new Rect (205, 75, 190, 20), setAcchead, "ｱｲﾏｽｸ：" + maid.GetProp(MPN.acchead).strFileName.Replace("_i_", "").Replace("_I_", "").Replace("del.menu", "無し").Replace(".menu", "") , gsToggle );
@@ -13397,109 +13644,109 @@ namespace CM3D2.VibeYourMaid.Plugin {
                     setAccsenaka = GUI.Toggle(new Rect (205, 275, 190, 20), setAccsenaka, "背中：" + maid.GetProp(MPN.accsenaka).strFileName.Replace("_i_", "").Replace("_I_", "").Replace("del.menu", "無し").Replace(".menu", "") , gsToggle );
                     setAccshippo = GUI.Toggle(new Rect (205, 295, 190, 20), setAccshippo, "しっぽ：" + maid.GetProp(MPN.accshippo).strFileName.Replace("_i_", "").Replace("_I_", "").Replace("del.menu", "無し").Replace(".menu", "") , gsToggle );
                     setAccxxx = GUI.Toggle(new Rect (205, 315, 190, 20), setAccxxx, "前穴：" + maid.GetProp(MPN.accxxx).strFileName.Replace("_i_", "").Replace("_I_", "").Replace("del.menu", "無し").Replace(".menu", "") , gsToggle );
-                    
+
                     GUI.Label(new Rect (205, 350, 190, 20), maid.GetProp(MPN.skirt).strTempFileName , gsLabel);
-            
-            
+
+
                     GUI.Label(new Rect (405, 35, 190, 20), "【現在の髪型を登録（個別）】" , gsLabel);
                     if (GUI.Button(new Rect (410, 60, 85, 20), "髪型１", gsButton)){
-                      if(ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "1_hairF") && !hs_Overwrite[0]){
+                      if (ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "1_hairF") && !hs_Overwrite[0]) {
                         dsErrer = 2;
-                      }else{
+                      } else {
                         ExSaveHair(maid, "1");
                         Console.WriteLine("髪型１ 登録完了");
                         hs_Overwrite[0] = false;
                         dsErrer = 0;
                       }
                     }
-                    if(ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "1_hairF"))hs_Overwrite[0] = GUI.Toggle(new Rect(505, 60, 70, 20), hs_Overwrite[0], "上書", gsToggle);
-                    
+                    if (ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "1_hairF")) hs_Overwrite[0] = GUI.Toggle(new Rect(505, 60, 70, 20), hs_Overwrite[0], "上書", gsToggle);
+
                     if (GUI.Button(new Rect (410, 85, 85, 20), "髪型２", gsButton)){
-                      if(ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "2_hairF") && !hs_Overwrite[1]){
+                      if (ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "2_hairF") && !hs_Overwrite[1]) {
                         dsErrer = 2;
-                      }else{
+                      } else {
                         ExSaveHair(maid, "2");
                         Console.WriteLine("髪型２ 登録完了");
                         hs_Overwrite[1] = false;
                         dsErrer = 0;
                       }
                     }
-                    if(ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "2_hairF"))hs_Overwrite[1] = GUI.Toggle(new Rect(505, 85, 70, 20), hs_Overwrite[1], "上書", gsToggle);
+                    if (ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "2_hairF")) hs_Overwrite[1] = GUI.Toggle(new Rect(505, 85, 70, 20), hs_Overwrite[1], "上書", gsToggle);
 
                     if (GUI.Button(new Rect (410, 110, 85, 20), "髪型３", gsButton)){
-                      if(ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "3_hairF") && !hs_Overwrite[2]){
+                      if (ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "3_hairF") && !hs_Overwrite[2]) {
                         dsErrer = 2;
-                      }else{
+                      } else {
                         ExSaveHair(maid, "3");
                         Console.WriteLine("髪型３ 登録完了");
                         hs_Overwrite[2] = false;
                         dsErrer = 0;
                       }
                     }
-                    if(ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "3_hairF"))hs_Overwrite[2] = GUI.Toggle(new Rect(505, 110, 70, 20), hs_Overwrite[2], "上書", gsToggle);
+                    if (ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "3_hairF")) hs_Overwrite[2] = GUI.Toggle(new Rect(505, 110, 70, 20), hs_Overwrite[2], "上書", gsToggle);
 
                     if (GUI.Button(new Rect (410, 135, 85, 20), "髪型４", gsButton)){
-                      if(ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "4_hairF") && !hs_Overwrite[3]){
+                      if (ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "4_hairF") && !hs_Overwrite[3]) {
                         dsErrer = 2;
-                      }else{
+                      } else {
                         ExSaveHair(maid, "4");
                         Console.WriteLine("髪型４ 登録完了");
                         hs_Overwrite[3] = false;
                         dsErrer = 0;
                       }
                     }
-                    if(ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "4_hairF"))hs_Overwrite[3] = GUI.Toggle(new Rect(505, 135, 70, 20), hs_Overwrite[3], "上書", gsToggle);
+                    if (ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "4_hairF")) hs_Overwrite[3] = GUI.Toggle(new Rect(505, 135, 70, 20), hs_Overwrite[3], "上書", gsToggle);
 
-                    
+
                     GUI.Label(new Rect (405, 165, 190, 20), "【現在の衣装を登録（個別）】" , gsLabel);
                     if (GUI.Button(new Rect (410, 190, 85, 20), "衣装１", gsButton)){
-                      if(ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "1_acchat") && !ds_Overwrite[0]){
+                      if (ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "1_acchat") && !ds_Overwrite[0]) {
                         dsErrer = 2;
-                      }else{
+                      } else {
                         ExSaveWear(maid, "1");
                         Console.WriteLine("衣装１ 登録完了");
                         ds_Overwrite[0] = false;
                         dsErrer = 0;
                       }
                     }
-                    if(ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "1_acchat"))ds_Overwrite[0] = GUI.Toggle(new Rect(505, 190, 70, 20), ds_Overwrite[0], "上書", gsToggle);
-                    
+                    if (ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "1_acchat")) ds_Overwrite[0] = GUI.Toggle(new Rect(505, 190, 70, 20), ds_Overwrite[0], "上書", gsToggle);
+
                     if (GUI.Button(new Rect (410, 215, 85, 20), "衣装２", gsButton)){
-                      if(ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "2_acchat") && !ds_Overwrite[1]){
+                      if (ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "2_acchat") && !ds_Overwrite[1]) {
                         dsErrer = 2;
-                      }else{
+                      } else {
                         ExSaveWear(maid, "2");
                         Console.WriteLine("衣装２ 登録完了");
                         ds_Overwrite[1] = false;
                         dsErrer = 0;
                       }
                     }
-                    if(ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "2_acchat"))ds_Overwrite[1] = GUI.Toggle(new Rect(505, 215, 70, 20), ds_Overwrite[1], "上書", gsToggle);
-                    
+                    if (ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "2_acchat")) ds_Overwrite[1] = GUI.Toggle(new Rect(505, 215, 70, 20), ds_Overwrite[1], "上書", gsToggle);
+
                     if (GUI.Button(new Rect (410, 240, 85, 20), "衣装３", gsButton)){
-                      if(ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "3_acchat") && !ds_Overwrite[2]){
+                      if (ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "3_acchat") && !ds_Overwrite[2]) {
                         dsErrer = 2;
-                      }else{
+                      } else {
                         ExSaveWear(maid, "3");
                         Console.WriteLine("衣装３ 登録完了");
                         ds_Overwrite[2] = false;
                         dsErrer = 0;
                       }
                     }
-                    if(ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "3_acchat"))ds_Overwrite[2] = GUI.Toggle(new Rect(505, 240, 70, 20), ds_Overwrite[2], "上書", gsToggle);
-                    
+                    if (ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "3_acchat")) ds_Overwrite[2] = GUI.Toggle(new Rect(505, 240, 70, 20), ds_Overwrite[2], "上書", gsToggle);
+
                     if (GUI.Button(new Rect (410, 265, 85, 20), "衣装４", gsButton)){
-                      if(ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "4_acchat") && !ds_Overwrite[3]){
+                      if (ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "4_acchat") && !ds_Overwrite[3]) {
                         dsErrer = 2;
-                      }else{
+                      } else {
                         ExSaveWear(maid, "4");
                         Console.WriteLine("衣装４ 登録完了");
                         ds_Overwrite[3] = false;
                         dsErrer = 0;
                       }
                     }
-                    if(ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "4_acchat"))ds_Overwrite[3] = GUI.Toggle(new Rect(505, 265, 70, 20), ds_Overwrite[3], "上書", gsToggle);
-                    
+                    if (ExSaveData.Contains(maid, "CM3D2.VibeYourMaid.Plugin", "4_acchat")) ds_Overwrite[3] = GUI.Toggle(new Rect(505, 265, 70, 20), ds_Overwrite[3], "上書", gsToggle);
+
                     GUI.Label(new Rect (405, 295, 190, 20), "【現在の衣装を登録（共通）】" , gsLabel);
                     GUI.Label(new Rect (405, 320, 90, 20), "衣装セット名" , gsLabel);
                     ds_Overwrite[4] = GUI.Toggle(new Rect(530, 320, 70, 20), ds_Overwrite[4], "上書", gsToggle);
@@ -13513,7 +13760,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                       ds_Overwrite[4] = false;
                     }
 
-                    if(dsErrer != 0){
+                    if (dsErrer != 0) {
                       if (GUI.Button(new Rect (405, 400, 20, 20), "x", gsButton)) {
                         dsErrer = 0;
                       }
@@ -13538,22 +13785,22 @@ namespace CM3D2.VibeYourMaid.Plugin {
               }
 
               scKeyOff = GUI.Toggle(new Rect(420, 2, 140, 20), scKeyOff, "ショートカット無効", gsToggle);
-                    
+
                   GUI.Label(new Rect (10, 30, 400, 20), MotionNameChange(maj.motionName[maidsState[tgID].motionID]) + "　/　" + maj.motionName[maidsState[tgID].motionID] , gsLabel);
-                  
+
                   if (GUI.Button(new Rect (420, 30, 180, 25), "調整値保存", gsButton)) {
                     MajFileSave(true);
                   }
                   GUI.DrawTexture(new Rect(1, 58, 618, 1), guiLineTexture, ScaleMode.StretchToFill, true, 0);
 
-                  if(maidsState[tgID].motionID >= 0){
+                  if (maidsState[tgID].motionID >= 0) {
                     Rect scrlRect2    = new Rect(0, 60, 620, 260);
                     Rect contentRect2 = new Rect(0, 0, 600, 430);
                     vsScrollPos2 = GUI.BeginScrollView(scrlRect2, vsScrollPos2, contentRect2, false, true );
 
                     float sliderValue;
 
-                    
+
                     x = 10; y = 0;
                     GUI.Label(new Rect (x-5, y, 100, 20), "【基本位置】", gsLabel);
 
@@ -13916,7 +14163,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                       maj.mVoiceSet[maidsState[motionMaidID].motionID] = maidsState[motionMaidID].editVoiceSetName;
                     }
                     maj.mVoiceSet[maidsState[motionMaidID].motionID] = GUI.TextField(new Rect(x+5, y+22, 175, 20), maj.mVoiceSet[maidsState[motionMaidID].motionID]);
-                    
+
                     GUI.Label(new Rect (x, y+45, 140, 20), "【ベースモーション】" , gsLabel);
                     /*if (GUI.Button(new Rect (x+110, y+45, 40, 20), "再生", gsButton)) {
                       MotionChange(maid, maj.baceMotion[maidsState[motionMaidID].motionID] + ".anm", true, 0.7f, 1f);
@@ -13974,20 +14221,20 @@ namespace CM3D2.VibeYourMaid.Plugin {
                     maj.giveSexual[maidsState[tgID].motionID][3] = GUI.Toggle(new Rect (x+5, y+40, 60, 20), maj.giveSexual[maidsState[tgID].motionID][3], "男３" , gsToggle );
                     maj.giveSexual[maidsState[tgID].motionID][4] = GUI.Toggle(new Rect (x+65, y+40, 60, 20), maj.giveSexual[maidsState[tgID].motionID][4], "男４" , gsToggle );
                     maj.giveSexual[maidsState[tgID].motionID][5] = GUI.Toggle(new Rect (x+125, y+40, 60, 20), maj.giveSexual[maidsState[tgID].motionID][5], "男５" , gsToggle );
-                    
+
                     x = 5;
                     y = 290;
                     GUI.Label(new Rect (x, y, 190, 20), "【射精タイプ設定】" , gsLabel);
-                    for (int i = 0; i < SubMans.Length; i++){
+                    for (int i = 0; i < SubMans.Length; i++) {
                       int m = i + 1;
                       GUI.Label(new Rect (x+10, y+20 + i*24, 190, 20), "男" + m + "：" + marksList[maj.syaseiMarks[maidsState[tgID].motionID][i]] , gsLabel);
                       if (GUI.Button(new Rect (x+105, y+20 + i*24, 20, 20), "<", gsButton)) {
                         --maj.syaseiMarks[maidsState[tgID].motionID][i];
-                        if(maj.syaseiMarks[maidsState[tgID].motionID][i] < 0)maj.syaseiMarks[maidsState[tgID].motionID][i] = marksList.Length - 1;
+                        if (maj.syaseiMarks[maidsState[tgID].motionID][i] < 0) maj.syaseiMarks[maidsState[tgID].motionID][i] = marksList.Length - 1;
                       }
                       if (GUI.Button(new Rect (x+130, y+20 + i*24, 20, 20), ">", gsButton)) {
                         ++maj.syaseiMarks[maidsState[tgID].motionID][i];
-                        if(maj.syaseiMarks[maidsState[tgID].motionID][i] >= marksList.Length)maj.syaseiMarks[maidsState[tgID].motionID][i] = 0;
+                        if (maj.syaseiMarks[maidsState[tgID].motionID][i] >= marksList.Length) maj.syaseiMarks[maidsState[tgID].motionID][i] = 0;
                       }
                     }
 
@@ -13999,7 +14246,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                     if (maj.itemSet[maidsState[tgID].motionID][0] != bItem) { maj.itemSet[maidsState[tgID].motionID][0] = bItem; setMotionItem(tgID); }
                     bItem = GUI.Toggle(new Rect (x+110, y+20, 90, 20), maj.itemSet[maidsState[tgID].motionID][1], "バイブ(手)" , gsToggle );
                     if (maj.itemSet[maidsState[tgID].motionID][1] != bItem) { maj.itemSet[maidsState[tgID].motionID][1] = bItem; setMotionItem(tgID); }
-                    
+
                     bItem = GUI.Toggle(new Rect (x+10, y+40, 70, 20), maj.itemSet[maidsState[tgID].motionID][2], "Aバイブ" , gsToggle );
                     if (maj.itemSet[maidsState[tgID].motionID][2] != bItem) { maj.itemSet[maidsState[tgID].motionID][2] = bItem; setMotionItem(tgID); }
                     bItem = GUI.Toggle(new Rect (x+110, y+40, 90, 20), maj.itemSet[maidsState[tgID].motionID][3], "Aバイブ(手)" , gsToggle );
@@ -14010,7 +14257,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                     if (maj.itemSet[maidsState[tgID].motionID][5] != bItem) { maj.itemSet[maidsState[tgID].motionID][5] = bItem; setMotionItem(tgID); }
                     bItem = GUI.Toggle(new Rect (x+110, y+60, 80, 20), maj.itemSet[maidsState[tgID].motionID][6], "拘束(足)" , gsToggle );
                     if (maj.itemSet[maidsState[tgID].motionID][6] != bItem) { maj.itemSet[maidsState[tgID].motionID][6] = bItem; setMotionItem(tgID); }
-                    
+
                     bItem = GUI.Toggle(new Rect (x+10, y+80, 100, 20), maj.itemSet[maidsState[tgID].motionID][4], "双頭バイブ" , gsToggle );
                     if (maj.itemSet[maidsState[tgID].motionID][4] != bItem) { maj.itemSet[maidsState[tgID].motionID][4] = bItem; setMotionItem(tgID); }
                     bItem = GUI.Toggle(new Rect (x+110, y+80, 60, 20), maj.itemSet[maidsState[tgID].motionID][7], "磔" , gsToggle );
@@ -14020,7 +14267,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                     maj.itemSet[maidsState[tgID].motionID][8] = GUI.Toggle(new Rect (380, y+80, 100, 20), maj.itemSet[maidsState[tgID].motionID][8], "ディルド台" , gsToggle );
                     maj.itemSet[maidsState[tgID].motionID][9] = GUI.Toggle(new Rect (480, y+80, 100, 20), maj.itemSet[maidsState[tgID].motionID][9], "三角木馬" , gsToggle );
                     */
-                    
+
                     x = 185;
                     y = 345;
                     GUI.Label(new Rect (x, y, 190, 20), "【男1】" , gsLabel);
@@ -14030,7 +14277,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                     if (maj.itemSet[maidsState[tgID].motionID][11] != bItem) { maj.itemSet[maidsState[tgID].motionID][11] = bItem; setManMotionItem(tgID); }
                     bItem = GUI.Toggle(new Rect (x+145, y+20, 70, 20), maj.itemSet[maidsState[tgID].motionID][12], "電マ" , gsToggle );
                     if (maj.itemSet[maidsState[tgID].motionID][12] != bItem) { maj.itemSet[maidsState[tgID].motionID][12] = bItem; setManMotionItem(tgID); }
-                    
+
                     GUI.Label(new Rect (x, y+40, 190, 20), "【男2】" , gsLabel);
                     bItem = GUI.Toggle(new Rect (x+10, y+60, 70, 20), maj.itemSet[maidsState[tgID].motionID][15], "バイブ" , gsToggle );
                     if (maj.itemSet[maidsState[tgID].motionID][15] != bItem) { maj.itemSet[maidsState[tgID].motionID][15] = bItem; setManMotionItem(tgID); }
@@ -14038,20 +14285,20 @@ namespace CM3D2.VibeYourMaid.Plugin {
                     if (maj.itemSet[maidsState[tgID].motionID][16] != bItem) { maj.itemSet[maidsState[tgID].motionID][16] = bItem; setManMotionItem(tgID); }
                     bItem = GUI.Toggle(new Rect (x+145, y+60, 70, 20), maj.itemSet[maidsState[tgID].motionID][17], "電マ" , gsToggle );
                     if (maj.itemSet[maidsState[tgID].motionID][17] != bItem) { maj.itemSet[maidsState[tgID].motionID][17] = bItem; setManMotionItem(tgID); }
-                    
+
                     x = 390;
                     y = 265;
                     GUI.Label(new Rect (x, y, 170, 20), "【設置アイテム】", gsLabel);
                     if (GUI.Button(new Rect (x+10, y+20, 20, 20), "<", gsButton)) {
                       --maj.prefabSet[maidsState[tgID].motionID];
                       if (maj.prefabSet[maidsState[tgID].motionID] == 3) maj.prefabSet[maidsState[tgID].motionID]--; //椅子拘束台は非表示
-                      if(maj.prefabSet[maidsState[tgID].motionID] < 0)maj.prefabSet[maidsState[tgID].motionID] = prefabList[0].Length - 1;
+                      if (maj.prefabSet[maidsState[tgID].motionID] < 0) maj.prefabSet[maidsState[tgID].motionID] = prefabList[0].Length - 1;
                       addMotionPrefab(tgID, maidsState[tgID].motionID);
                     }
                     if (GUI.Button(new Rect (x+35, y+20, 20, 20), ">", gsButton)) {
                       ++maj.prefabSet[maidsState[tgID].motionID];
                       if (maj.prefabSet[maidsState[tgID].motionID] == 3) maj.prefabSet[maidsState[tgID].motionID]++; //椅子拘束台は非表示
-                      if(maj.prefabSet[maidsState[tgID].motionID] >= prefabList[0].Length)maj.prefabSet[maidsState[tgID].motionID] = 0;
+                      if (maj.prefabSet[maidsState[tgID].motionID] >= prefabList[0].Length) maj.prefabSet[maidsState[tgID].motionID] = 0;
                       addMotionPrefab(tgID, maidsState[tgID].motionID);
                     }
                     GUI.Label(new Rect (x+60, y+20, 150, 20), prefabList[0][maj.prefabSet[maidsState[tgID].motionID]] , gsLabel);
@@ -14080,40 +14327,40 @@ namespace CM3D2.VibeYourMaid.Plugin {
                       maj.prefabSetR[maidsState[tgID].motionID] = prefabSetR;
                       setMotionPrefabPosition(tgID, maidsState[tgID].motionID, false);
                     }
-                    
+
                     /*
                     GUI.Label(new Rect (205, 90, 190, 20), "左手アタッチ：" + boneList[maj.iTargetLH[maidsState[tgID].motionID]][1] , gsLabel);
                     if (GUI.Button(new Rect (350, 90, 20, 20), "<", gsButton)) {
                       --maj.iTargetLH[maidsState[tgID].motionID];
-                      if(maj.iTargetLH[maidsState[tgID].motionID] < 0)maj.iTargetLH[maidsState[tgID].motionID] = 6;
+                      if (maj.iTargetLH[maidsState[tgID].motionID] < 0) maj.iTargetLH[maidsState[tgID].motionID] = 6;
                     }
                     if (GUI.Button(new Rect (375, 90, 20, 20), ">", gsButton)) {
                       ++maj.iTargetLH[maidsState[tgID].motionID];
-                      if(maj.iTargetLH[maidsState[tgID].motionID] > 6)maj.iTargetLH[maidsState[tgID].motionID] = 0;
+                      if (maj.iTargetLH[maidsState[tgID].motionID] > 6) maj.iTargetLH[maidsState[tgID].motionID] = 0;
                     }
 
                     GUI.Label(new Rect (205, 115, 190, 20), "右手アタッチ：" + boneList[maj.iTargetRH[maidsState[tgID].motionID]][1] , gsLabel);
                     if (GUI.Button(new Rect (350, 115, 20, 20), "<", gsButton)) {
                       --maj.iTargetRH[maidsState[tgID].motionID];
-                      if(maj.iTargetRH[maidsState[tgID].motionID] < 0)maj.iTargetRH[maidsState[tgID].motionID] = 6;
+                      if (maj.iTargetRH[maidsState[tgID].motionID] < 0) maj.iTargetRH[maidsState[tgID].motionID] = 6;
                     }
                     if (GUI.Button(new Rect (375, 115, 20, 20), ">", gsButton)) {
                       ++maj.iTargetRH[maidsState[tgID].motionID];
-                      if(maj.iTargetRH[maidsState[tgID].motionID] > 6)maj.iTargetRH[maidsState[tgID].motionID] = 0;
+                      if (maj.iTargetRH[maidsState[tgID].motionID] > 6) maj.iTargetRH[maidsState[tgID].motionID] = 0;
                     }
                     */
-                    
+
                   }
                     GUI.EndScrollView();
-                    
+
                     //GUI.Label(new Rect (0, 290, 620, 20), "――――――――――――――――――――――――――――――――――――――――――――――――", gsLabel2);
                     GUI.DrawTexture(new Rect(1, 326, 618, 1), guiLineTexture, ScaleMode.StretchToFill, true, 0);
-                    
+
                     //GUI.Label(new Rect (5, 310, 400, 20), "■以下はモーションアジャスト設定のサポート用" , gsLabel);
-                    
+
                     GUI.Label(new Rect (5, 330, 200, 20), showSubMotionUI?"【ボイスセット】サブメイド":"【ボイスセット】", gsLabel);
                     y = 355;
-                    if(maidsState[motionMaidID].editVoiceSetName != ""){
+                    if (maidsState[motionMaidID].editVoiceSetName != "") {
                       if (GUI.Button(new Rect (10, y, 40, 20), "解除", gsButton)) {
                         maidsState[motionMaidID].editVoiceSetName = "";
                         maidsState[motionMaidID].editVoiceSet = new List<string[]>();
@@ -14123,14 +14370,14 @@ namespace CM3D2.VibeYourMaid.Plugin {
                     }
 
                     int h1 = evsFiles.Count * 22;
-                    if(maidsState[motionMaidID].editVoiceSetName != "")h1 += 30;
-                    if(h1 < 445 - y)h1 = 445 - y;
+                    if (maidsState[motionMaidID].editVoiceSetName != "") h1 += 30;
+                    if (h1 < 445 - y) h1 = 445 - y;
                     Rect scrlRect1    = new Rect(10, y, 190, 445 - y);
                     Rect contentRect1 = new Rect(0, 0, 170, h1);
                     vsScrollPos1 = GUI.BeginScrollView(scrlRect1, vsScrollPos1, contentRect1, false, true );
                     y = 0;
-                    
-                    foreach(string f in evsFiles){
+
+                    foreach (string f in evsFiles) {
                       string FileName = f.Replace("evs_", "").Replace(".xml", "");
                       if (GUI.Button(new Rect (0, y, 170, 20), FileName, gsButton)) {
                         voiceSetLoad(f,motionMaidID);
@@ -14159,8 +14406,8 @@ namespace CM3D2.VibeYourMaid.Plugin {
                       MaidMove(tgID, "pz", moveValue, true);
                     }
                     if (GUI.Button(new Rect (300, 395, 50, 20), "集合", gsButton)) {
-                      foreach(int maidID in vmId){
-                        if(maidID != tgID && LinkMaidCheck(tgID, maidID)){
+                      foreach (int maidID in vmId) {
+                        if (maidID != tgID && LinkMaidCheck(tgID, maidID)) {
                           stockMaids[maidID].mem.transform.position = maid.transform.position;
                           stockMaids[maidID].mem.transform.eulerAngles = maid.transform.eulerAngles;
                           maidsState[maidID].majPositionBak.x = maidsState[tgID].majPositionBak.x;
@@ -14169,8 +14416,8 @@ namespace CM3D2.VibeYourMaid.Plugin {
                           maidsState[maidID].majAngleYBak = maidsState[tgID].majAngleYBak;
                         }
                       }
-                      for (int i = 0; i < SubMans.Length; i++){
-                        if(!SubMans[i].Visible || MansTg[i] != tgID)continue;
+                      for (int i = 0; i < SubMans.Length; i++) {
+                        if (!SubMans[i].Visible || MansTg[i] != tgID) continue;
                         SubMans[i].transform.position = maid.transform.position;
                         SubMans[i].transform.eulerAngles = maid.transform.eulerAngles;
                       }
@@ -14186,19 +14433,19 @@ namespace CM3D2.VibeYourMaid.Plugin {
                       MaidMove(tgID, "pz", -moveValue, true);
                     }
                     if (GUI.Button(new Rect (300, 420, 50, 20), "原点", gsButton)) {
-                      foreach(int maidID in vmId){
-                        if(maidID != tgID && !LinkMaidCheck(tgID, maidID))continue;
+                      foreach (int maidID in vmId) {
+                        if (maidID != tgID && !LinkMaidCheck(tgID, maidID)) continue;
                         stockMaids[maidID].mem.transform.position = new Vector3(0f, 0f, 0f);
                         maidsState[maidID].majPositionBak.x = 0f;
                         maidsState[maidID].majPositionBak.y = 0f;
                         maidsState[maidID].majPositionBak.z = 0f;
                       }
-                      for (int i = 0; i < SubMans.Length; i++){
-                        if(!SubMans[i].Visible || MansTg[i] != tgID)continue;
+                      for (int i = 0; i < SubMans.Length; i++) {
+                        if (!SubMans[i].Visible || MansTg[i] != tgID) continue;
                         SubMans[i].transform.position = new Vector3(0f, 0f, 0f);
                       }
                     }
-                    
+
 
                     GUI.Label(new Rect (405, 330, 200, 20), showSubMotionUI?"【クパ値設定】サブメイド":"【クパ値設定】" , gsLabel);
                     if (GUI.Button(new Rect (570, 330, 40, 20), "取得", gsButton)) {
@@ -14217,11 +14464,11 @@ namespace CM3D2.VibeYourMaid.Plugin {
                     maidsState[motionMaidID].hibuSlider2Value = GUI.HorizontalSlider(new Rect(495, 405, 100, 20), maidsState[motionMaidID].hibuSlider2Value, 0.0F, 100.0F);
                     GUI.Label(new Rect (405, 420, 90, 20), "anal(停) ： " + Math.Floor(maidsState[motionMaidID].analSlider2Value) , gsLabel);
                     maidsState[motionMaidID].analSlider2Value = GUI.HorizontalSlider(new Rect(495, 425, 100, 20), maidsState[motionMaidID].analSlider2Value, 0.0F, 100.0F);
-                    
+
                   }
         }
 
-#if EmpiresLife
+        #if EmpiresLife
         //エンパイアズライフ設定画面
         private void WindowCallback3_7(Maid maid) {
             int x = 0;
@@ -14230,10 +14477,10 @@ namespace CM3D2.VibeYourMaid.Plugin {
               x = 0;
               y = 0;
               scKeyOff = GUI.Toggle(new Rect(420, 5, 140, 20), scKeyOff, "ショートカット無効", gsToggle);
-              
+
               x = 5;
               y = 40;
-              
+
               if (GUI.Button(new Rect (5, y, 110, 20), "背景情報取得", gsButton)) {
                 if(el_Overwrite || ELS.bgCode == ""){
                   ELS.bgCode = GameMain.Instance.BgMgr.GetBGName();
@@ -14245,8 +14492,8 @@ namespace CM3D2.VibeYourMaid.Plugin {
                 }
               }
               el_Overwrite = GUI.Toggle(new Rect(125, y, 70, 20), el_Overwrite, "上書／ｸﾘｱ", gsToggle);
-              
-              
+
+
               y += 25;
               GUI.Label(new Rect (5, y, 180, 20), "背景：" + ELS.bgName , gsLabel);
 
@@ -14255,7 +14502,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                 ++ELS.timeZone;
                 if(ELS.timeZone > 2)ELS.timeZone = 0;
               }
-              
+
               if (GUI.Button(new Rect (55, y, 55, 20), "クリア", gsButton)) {
                 if(el_Overwrite){
                   ELS = new EmpiresLifeScene_Xml();
@@ -14268,7 +14515,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                 LifeSceneSave();
                 LifeSceneLoad();
               }
-              
+
               y += 30;
               if(elErrer != 0){
                 if (GUI.Button(new Rect (5, y, 20, 20), "x", gsButton)) {
@@ -14277,16 +14524,16 @@ namespace CM3D2.VibeYourMaid.Plugin {
                 GUI.Label(new Rect (30, y, 170, 60), elErrerText[elErrer], gsLabelErr);
               }
               y += 30;
-              
-              
+
+
               GUI.Label(new Rect (5, y, 55, 20), "【ｼｰﾝ名】" , gsLabel);
               ELS.bgName = GUI.TextField(new Rect(70, y, 130, 20), ELS.bgName);
               y += 25;
-              
+
               GUI.Label(new Rect (5, y, 55, 20), "【BGM】" , gsLabel);
               ELS.bgm = GUI.TextField(new Rect(70, y, 130, 20), ELS.bgm);
               y += 30;
-              
+
               //初期カメラ位置
               if (GUI.Button(new Rect (5, y, 180, 20), "初期カメラ位置を設定", gsButton)) {
                 ELS.cameraPos = mainCamera.transform.position;
@@ -14296,12 +14543,12 @@ namespace CM3D2.VibeYourMaid.Plugin {
               GUI.Label(new Rect (5, y, 200, 20), "【位置】 X:" + Math.Round(ELS.cameraPos.x, 2) + " Y:" + Math.Round(ELS.cameraPos.y, 2) + " Z:" + Math.Round(ELS.cameraPos.z, 2), gsLabel);
               y += 20;
               GUI.Label(new Rect (5, y, 200, 20), "【向き】 X:" + Math.Round(ELS.cameraEul.x, 2) + " Y:" + Math.Round(ELS.cameraEul.y, 2) + " Z:" + Math.Round(ELS.cameraEul.z, 2), gsLabel);
-              
-              
+
+
               //ライフセット一覧
               y += 30;
               GUI.Label(new Rect (5, y, 200, 20), "【登録済みシーン一覧】" , gsLabel);
-              
+
               y += 20;
               int h1 = elsFiles.Count * 22;
               if(h1 < 445 - y)h1 = 445 - y;
@@ -14317,23 +14564,23 @@ namespace CM3D2.VibeYourMaid.Plugin {
                 y += 22;
               }
               GUI.EndScrollView();
-              
-              
-              
+
+
+
               //ライフセット編集画面
               x = 220;
               y = 50;
-              
+
               int h2 = ELE.motionSet.Count * 65 + 30;
               if(h2 < 445 - y)h2 = 445 - y;
 
               Rect scrlRect2    = new Rect(x, y, 400, 445 - y);
               Rect contentRect2 = new Rect(0, 0, 380, h2);
               vsScrollPos2 = GUI.BeginScrollView( scrlRect2, vsScrollPos2, contentRect2, false, true );
-              
+
               y = 0;
               for (int i = 0; i < ELE.motionSet.Count; i++){
-                
+
                 GUI.Label(new Rect (0, 0 + y, 110, 20), "モーションセット" , gsLabel);
                 ELE.motionSet[i] = GUI.TextField(new Rect(110, 0 + y, 260, 20), ELE.motionSet[i]);
 
@@ -14357,43 +14604,43 @@ namespace CM3D2.VibeYourMaid.Plugin {
 
                 y += 65;
               }
-              
+
               if (GUI.Button(new Rect (315, 0 + y, 60, 20), "追加", gsButton)) {
                 MSX.saveMotionSet[msCategory].Add("");
               }
 
               GUI.EndScrollView();
         }
-#endif
+        #endif
 
         //エロステータス画面
         private void WindowCallback3_8(Maid maid) {
-            
+
               GUI.Label(new Rect (5, 30, 190, 20), "【エロステータス（β版）】" , gsLabel);
-              
+
               GUI.Label(new Rect (10, 60, 300, 20), "クリトリス肥大度：" + Math.Round(maidsState[tgID].cliHidai, 1,  MidpointRounding.AwayFromZero) , gsLabel);
               //GUI.Label(new Rect (10, 80, 300, 20), "乳首肥大度　　　：" + Math.Round(maidsState[tgID].chikubiHidai, 1,  MidpointRounding.AwayFromZero) , gsLabel);
-              
+
               GUI.Label(new Rect (10, 110, 300, 20), "トータル絶頂数：" + maidsState[tgID].orgTotal + " 回" , gsLabel);
               GUI.Label(new Rect (10, 130, 300, 20), "最大連続絶頂数：" + maidsState[tgID].orgMax + " 回" , gsLabel);
-              
+
               GUI.Label(new Rect (10, 160, 300, 20), "中出し回数（膣）　：" + maidsState[tgID].syaseiTotal1[0] + " 回（" + Math.Round(maidsState[tgID].syaseiTotal2[0], 2,  MidpointRounding.AwayFromZero) + " ml）" , gsLabel);
               GUI.Label(new Rect (10, 180, 300, 20), "中出し回数（anal）：" + maidsState[tgID].syaseiTotal1[1] + " 回（" + Math.Round(maidsState[tgID].syaseiTotal2[1], 2,  MidpointRounding.AwayFromZero) + " ml）"  , gsLabel);
               GUI.Label(new Rect (10, 200, 300, 20), "精飲回数　　　　　：" + maidsState[tgID].syaseiTotal1[2] + " 回（" + Math.Round(maidsState[tgID].syaseiTotal2[2], 2,  MidpointRounding.AwayFromZero) + " ml）"  , gsLabel);
               GUI.Label(new Rect (10, 220, 300, 20), "外出し回数　　　　：" + maidsState[tgID].syaseiTotal1[3] + " 回（" + Math.Round(maidsState[tgID].syaseiTotal2[3], 2,  MidpointRounding.AwayFromZero) + " ml）"  , gsLabel);
-              
+
               GUI.Label(new Rect (10, 250, 300, 20), "潮吹き回数：" + maidsState[tgID].sioTotal1 + " 回（" + Math.Round(maidsState[tgID].sioTotal2, 2,  MidpointRounding.AwayFromZero) + " ml）" , gsLabel);
               GUI.Label(new Rect (10, 270, 300, 20), "失禁回数　：" + maidsState[tgID].nyoTotal1 + " 回（" + Math.Round(maidsState[tgID].nyoTotal2, 1,  MidpointRounding.AwayFromZero) + " ml）"  , gsLabel);
-              
+
               GUI.Label(new Rect (10, 300, 300, 20), "失神回数　：" + maidsState[tgID].stanTotal + " 回" , gsLabel);
               GUI.Label(new Rect (10, 320, 300, 20), "子宮脱回数：" + maidsState[tgID].uDatsuTotal + " 回" , gsLabel);
-              
-              
+
+
               GUI.Label(new Rect (10, 350, 300, 20), "潮：" + maidsState[tgID].sioVolume , gsLabel);
               GUI.Label(new Rect (10, 370, 300, 20), "尿：" + maidsState[tgID].nyoVolume , gsLabel);
 
 
-              //hidden info
+              //hidden info #109
 				      GUI.Label(new Rect(310, 30, 300, 20), "【机密信息】", gsLabel);
               GUI.Label (new Rect (310, 60, 300, 20), "快感值：" + maidsState[tgID].kaikanLevel , gsLabel);
 				      GUI.Label (new Rect (310, 80, 300, 20), "興奮値：" + maidsState[tgID].exciteValue , gsLabel);
@@ -14406,11 +14653,11 @@ namespace CM3D2.VibeYourMaid.Plugin {
 				      GUI.Label (new Rect (310, 220, 300, 20), "感度base：" + maidsState[tgID].boostBase , gsLabel);
               GUI.Label (new Rect (310, 240, 300, 20), "高潮数：" + maidsState[tgID].orgasmCount , gsLabel);
 				      GUI.Label (new Rect (310, 260, 300, 20), "乳首肥大度：" + Math.Round(maidsState[tgID].chikubiHidai, 1,  MidpointRounding.AwayFromZero) , gsLabel);		
-              
+
               /*自分用
               GUI.Label(new Rect (10, 400, 300, 20), "マウス：" + mouse_move , gsLabel);
               GUI.Label(new Rect (10, 420, 300, 20), "お触りポイント：" + hitName , gsLabel);
-              
+
               GUI.Label(new Rect (310, 60, 300, 20), "快感レベル：" + maidsState[tgID].kaikanLevel , gsLabel);
               GUI.Label(new Rect (310, 80, 300, 20), "スタミナ：" + maidsState[tgID].maidStamina , gsLabel);
               GUI.Label(new Rect (310, 100, 300, 20), "勃起値：" + maidsState[tgID].bokkiValue1 , gsLabel);
@@ -14420,19 +14667,19 @@ namespace CM3D2.VibeYourMaid.Plugin {
               var kz = Mathf.Cos(angleZ * Mathf.Deg2Rad);
               GUI.Label(new Rect (310, 150, 300, 20), "頭Z：" + maidsState[tgID].maidHead.transform.rotation.eulerAngles.z , gsLabel);
               GUI.Label(new Rect (310, 170, 300, 20), "頭加算：" + kz , gsLabel);
-              
+
               angleZ = 360 - maidsState[tgID].maidXxx.transform.rotation.eulerAngles.z;
               kz = Mathf.Cos(angleZ * Mathf.Deg2Rad);
               GUI.Label(new Rect (310, 200, 300, 20), "股Z：" + maidsState[tgID].maidXxx.transform.rotation.eulerAngles.z , gsLabel);
               GUI.Label(new Rect (310, 220, 300, 20), "股加Z：" + kz , gsLabel);
-              
+
               angleZ = 360 - maidsState[tgID].maidXxx.transform.rotation.eulerAngles.y;
               kz = Mathf.Cos(angleZ * Mathf.Deg2Rad);
               GUI.Label(new Rect (310, 250, 300, 20), "股Y：" + maidsState[tgID].maidXxx.transform.rotation.eulerAngles.y , gsLabel);
               GUI.Label(new Rect (310, 270, 300, 20), "股加Y：" + kz , gsLabel);
-              
+
               GUI.Label(new Rect (310, 300, 300, 20), "股X：" + maidsState[tgID].maidXxx.transform.rotation.eulerAngles.x , gsLabel);
-              
+
               */
         }
 
@@ -14444,12 +14691,12 @@ namespace CM3D2.VibeYourMaid.Plugin {
               y = 35;
               GUI.Label(new Rect (5, y, 200, 20), "【乳首設定の登録（" + chikubiText[cv] + "）】" , gsLabel);
               y += 25;
-              
+
               maidsState[tgID].chikubiEnabled = GUI.Toggle(new Rect(10, y, 150, 20), maidsState[tgID].chikubiEnabled, "乳首操作の有効化", gsToggle);
-              
+
               if(maidsState[tgID].chikubiEnabled){
                 maidsState[tgID].chikubiBokkiEnabled = GUI.Toggle(new Rect(160, y, 100, 20), maidsState[tgID].chikubiBokkiEnabled, "勃起の有無", gsToggle);
-                
+
                 y = 50;
                 if (GUI.Button(new Rect (320, y, 80, 30), "着衣時", gsButton)) {
                   cv = 0;
@@ -14458,7 +14705,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                   cv = 1;
                 }
                 y += 40;
-                
+
                 GUI.Label(new Rect (5, y, 100, 20), "乳首基本：" + Math.Floor(maidsState[tgID].tits_chikubi_def[cv] * 100) , gsLabel);
                 maidsState[tgID].tits_chikubi_def[cv] = GUI.HorizontalSlider(new Rect(105, y+5, 190, 20), maidsState[tgID].tits_chikubi_def[cv], 0.0F, 2.0F);
                 y += 20;
@@ -14470,35 +14717,35 @@ namespace CM3D2.VibeYourMaid.Plugin {
                 GUI.Label(new Rect (5, y, 100, 20), "乳首牛：" + Math.Floor(maidsState[tgID].tits_chikubi_cow[cv] * 100) , gsLabel);
                 maidsState[tgID].tits_chikubi_cow[cv] = GUI.HorizontalSlider(new Rect(105, y+5, 190, 20), maidsState[tgID].tits_chikubi_cow[cv], 0.0F, 2.0F);
                 y += 20;
-                
+
                 GUI.Label(new Rect (5, y, 100, 20), "乳首凹：" + Math.Floor(maidsState[tgID].tits_chikubi_observe[cv] * 100) , gsLabel);
                 maidsState[tgID].tits_chikubi_observe[cv] = GUI.HorizontalSlider(new Rect(105, y+5, 190, 20), maidsState[tgID].tits_chikubi_observe[cv], 0.0F, 2.0F);
                 y += 20;
-                
+
                 GUI.Label(new Rect (5, y, 100, 20), "乳首膨１：" + Math.Floor(maidsState[tgID].tits_chikubi_wide[cv] * 100) , gsLabel);
                 maidsState[tgID].tits_chikubi_wide[cv] = GUI.HorizontalSlider(new Rect(105, y+5, 190, 20), maidsState[tgID].tits_chikubi_wide[cv], 0.0F, 2.0F);
                 y += 20;
-                
+
                 GUI.Label(new Rect (5, y, 100, 20), "乳首膨２：" + Math.Floor(maidsState[tgID].tits_chikubi_ultrawide[cv] * 100) , gsLabel);
                 maidsState[tgID].tits_chikubi_ultrawide[cv] = GUI.HorizontalSlider(new Rect(105, y+5, 190, 20), maidsState[tgID].tits_chikubi_ultrawide[cv], 0.0F, 2.0F);
                 y += 20;
-                
+
                 GUI.Label(new Rect (5, y, 100, 20), "乳首長さ：" + Math.Floor(maidsState[tgID].tits_chikubi_ultralong[cv] * 100) , gsLabel);
                 maidsState[tgID].tits_chikubi_ultralong[cv] = GUI.HorizontalSlider(new Rect(105, y+5, 190, 20), maidsState[tgID].tits_chikubi_ultralong[cv], 0.0F, 2.0F);
                 y += 20;
-                
+
                 GUI.Label(new Rect (5, y, 100, 20), "乳首垂れ：" + Math.Floor(maidsState[tgID].tits_chikubi_ultratare[cv] * 100) , gsLabel);
                 maidsState[tgID].tits_chikubi_ultratare[cv] = GUI.HorizontalSlider(new Rect(105, y+5, 190, 20), maidsState[tgID].tits_chikubi_ultratare[cv], 0.0F, 2.0F);
                 y += 20;
-                
+
                 GUI.Label(new Rect (5, y, 100, 20), "乳首陥没１：" + Math.Floor(maidsState[tgID].tits_chikubi_kanbotsu_n[cv] * 100) , gsLabel);
                 maidsState[tgID].tits_chikubi_kanbotsu_n[cv] = GUI.HorizontalSlider(new Rect(105, y+5, 190, 20), maidsState[tgID].tits_chikubi_kanbotsu_n[cv], 0.0F, 2.0F);
                 y += 20;
-                
+
                 GUI.Label(new Rect (5, y, 100, 20), "乳首陥没２：" + Math.Floor(maidsState[tgID].tits_chikubi_kanbotsu_s[cv] * 100) , gsLabel);
                 maidsState[tgID].tits_chikubi_kanbotsu_s[cv] = GUI.HorizontalSlider(new Rect(105, y+5, 190, 20), maidsState[tgID].tits_chikubi_kanbotsu_s[cv], 0.0F, 2.0F);
                 y += 20;
-                
+
                 GUI.Label(new Rect (5, y, 100, 20), "乳首陥没３：" + Math.Floor(maidsState[tgID].tits_chikubi_kanbotsu_p[cv] * 100) , gsLabel);
                 maidsState[tgID].tits_chikubi_kanbotsu_p[cv] = GUI.HorizontalSlider(new Rect(105, y+5, 190, 20), maidsState[tgID].tits_chikubi_kanbotsu_p[cv], 0.0F, 2.0F);
                 y = 90;
@@ -14507,40 +14754,40 @@ namespace CM3D2.VibeYourMaid.Plugin {
                 GUI.Label(new Rect (305, y, 100, 20), "乳輪基本：" + Math.Floor(maidsState[tgID].tits_nipple_def[cv] * 100) , gsLabel);
                 maidsState[tgID].tits_nipple_def[cv] = GUI.HorizontalSlider(new Rect(405, y+5, 190, 20), maidsState[tgID].tits_nipple_def[cv], 0.0F, 2.0F);
                 y += 20;
-                
+
                 GUI.Label(new Rect (305, y, 100, 20), "乳輪尖１：" + Math.Floor(maidsState[tgID].tits_nipple_perky1[cv] * 100) , gsLabel);
                 maidsState[tgID].tits_nipple_perky1[cv] = GUI.HorizontalSlider(new Rect(405, y+5, 190, 20), maidsState[tgID].tits_nipple_perky1[cv], 0.0F, 2.0F);
                 y += 20;
-                
+
                 GUI.Label(new Rect (305, y, 100, 20), "乳輪尖２：" + Math.Floor(maidsState[tgID].tits_nipple_perky2[cv] * 100) , gsLabel);
                 maidsState[tgID].tits_nipple_perky2[cv] = GUI.HorizontalSlider(new Rect(405, y+5, 190, 20), maidsState[tgID].tits_nipple_perky2[cv], 0.0F, 2.0F);
                 y += 20;
-                
+
                 GUI.Label(new Rect (305, y, 100, 20), "乳輪伸１：" + Math.Floor(maidsState[tgID].tits_nipple_long1[cv] * 100) , gsLabel);
                 maidsState[tgID].tits_nipple_long1[cv] = GUI.HorizontalSlider(new Rect(405, y+5, 190, 20), maidsState[tgID].tits_nipple_long1[cv], 0.0F, 2.0F);
                 y += 20;
-                
+
                 GUI.Label(new Rect (305, y, 100, 20), "乳輪伸２：" + Math.Floor(maidsState[tgID].tits_nipple_long2[cv] * 100) , gsLabel);
                 maidsState[tgID].tits_nipple_long2[cv] = GUI.HorizontalSlider(new Rect(405, y+5, 190, 20), maidsState[tgID].tits_nipple_long2[cv], 0.0F, 2.0F);
                 y += 20;
-                
+
                 GUI.Label(new Rect (305, y, 100, 20), "乳輪膨：" + Math.Floor(maidsState[tgID].tits_nipple_wide[cv] * 100) , gsLabel);
                 maidsState[tgID].tits_nipple_wide[cv] = GUI.HorizontalSlider(new Rect(405, y+5, 190, 20), maidsState[tgID].tits_nipple_wide[cv], 0.0F, 2.0F);
                 y += 20;
-                
+
                 GUI.Label(new Rect (305, y, 100, 20), "ぷっくり：" + Math.Floor(maidsState[tgID].tits_nipple_puffy[cv] * 100) , gsLabel);
                 maidsState[tgID].tits_nipple_puffy[cv] = GUI.HorizontalSlider(new Rect(405, y+5, 190, 20), maidsState[tgID].tits_nipple_puffy[cv], 0.0F, 2.0F);
                 y += 20;
-                
+
                 GUI.Label(new Rect (305, y, 90, 20), "乳首クパ：" + Math.Floor(maidsState[tgID].tits_nipple_kupa[cv] * 100) , gsLabel);
                 maidsState[tgID].tits_nipple_kupa[cv] = GUI.HorizontalSlider(new Rect(405, y+5, 190, 20), maidsState[tgID].tits_nipple_kupa[cv], 0.0F, 2.0F);
                 y += 20;
-                
+
                 GUI.Label(new Rect (305, y, 90, 20), "ちっぱい：" + Math.Floor(maidsState[tgID].tits_munel_chippai[cv] * 100) , gsLabel);
                 maidsState[tgID].tits_munel_chippai[cv] = GUI.HorizontalSlider(new Rect(405, y+5, 190, 20), maidsState[tgID].tits_munel_chippai[cv], 0.0F, 2.0F);
                 y += 40;
-                
-                
+
+
                 if (GUI.Button(new Rect (320, y, 130, 20), "コピー（着衣 → 裸）", gsButton)) {
                   ChikubiCopy(tgID, 1, 0);
                 }
@@ -14548,11 +14795,11 @@ namespace CM3D2.VibeYourMaid.Plugin {
                   ChikubiCopy(tgID, 0, 1);
                 }
                 y += 40;
-                
-                
+
+
                 GUI.Label(new Rect (10, y, 200, 20), "▼基本設定の読み込み" , gsLabel);
                 y += 30;
-                
+
                 if (GUI.Button(new Rect (10, y, 120, 20), "基本乳首", gsButton)) {
                   ChikubiReset(tgID, cv);
                   maidsState[tgID].tits_chikubi_def[cv] = 0.22f;
@@ -14560,7 +14807,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                   maidsState[tgID].tits_chikubi_wide[cv] = 0.40f;
                   maidsState[tgID].tits_nipple_puffy[cv] = 0.31f;
                 }
-                
+
                 if (GUI.Button(new Rect (140, y, 120, 20), "大きい乳首", gsButton)) {
                   ChikubiReset(tgID, cv);
                   maidsState[tgID].tits_chikubi_perky[cv] = 0.46f;
@@ -14568,7 +14815,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                   maidsState[tgID].tits_nipple_wide[cv] = 0.75f;
                   maidsState[tgID].tits_nipple_puffy[cv] = 0.42f;
                 }
-               
+
                 if (GUI.Button(new Rect (270, y, 120, 20), "陥没乳首", gsButton)) {
                   ChikubiReset(tgID, cv);
                   maidsState[tgID].tits_chikubi_def[cv] = 0.80f;
@@ -14578,7 +14825,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                   maidsState[tgID].tits_nipple_wide[cv] = 1.0f;
                   maidsState[tgID].tits_nipple_puffy[cv] = 0.40f;
                 }
-                
+
                 if (GUI.Button(new Rect (410, y, 120, 20), "デカ乳輪", gsButton)) {
                   ChikubiReset(tgID, cv);
                   maidsState[tgID].tits_chikubi_def[cv] = 0.42f;
@@ -14589,7 +14836,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                   maidsState[tgID].tits_nipple_puffy[cv] = 0.80f;
                 }
                 y += 30;
-                
+
                 if (GUI.Button(new Rect (10, y, 120, 20), "トンガリ乳首", gsButton)) {
                   ChikubiReset(tgID, cv);
                   maidsState[tgID].tits_chikubi_def[cv] = 0.21f;
@@ -14600,26 +14847,26 @@ namespace CM3D2.VibeYourMaid.Plugin {
                   maidsState[tgID].tits_nipple_puffy[cv] = 0.72f;
                 }
                 y += 10;
-              
+
               /*
               GUI.Label(new Rect (20, 300, 300, 20), "上着（本）：" + maid.GetProp(MPN.wear).strFileName , gsLabel);
               GUI.Label(new Rect (320, 300, 300, 20), "上着（仮）：" + maid.GetProp(MPN.wear).strTempFileName , gsLabel);
-              
+
               GUI.Label(new Rect (20, 320, 300, 20), "ワンピ（本）：" + maid.GetProp(MPN.onepiece).strFileName , gsLabel);
               GUI.Label(new Rect (320, 320, 300, 20), "ワンピ（仮）：" + maid.GetProp(MPN.onepiece).strTempFileName , gsLabel);
-              
+
               GUI.Label(new Rect (20, 340, 300, 20), "水着（本）：" + maid.GetProp(MPN.mizugi).strFileName , gsLabel);
               GUI.Label(new Rect (320, 340, 300, 20), "水着（仮）：" + maid.GetProp(MPN.mizugi).strTempFileName , gsLabel);
-              
+
               GUI.Label(new Rect (20, 360, 300, 20), "ブラ（本）：" + maid.GetProp(MPN.bra).strFileName , gsLabel);
               GUI.Label(new Rect (320, 360, 300, 20), "ブラ（仮）：" + maid.GetProp(MPN.bra).strTempFileName , gsLabel);
               */
-              
+
                 if (GUI.Button(new Rect (470, y, 120, 30), "設定保存", gsButton)) {
                   ChikubiSave(tgID, 0);
                   ChikubiSave(tgID, 1);
                 }
-                
+
                 ChikubiSet(stockMaids[tgID].mem, maidsState[tgID], cv);
               }
         }
@@ -14729,7 +14976,9 @@ namespace CM3D2.VibeYourMaid.Plugin {
         private bool smHVisible = true;
         //private bool unzipSelect = false;
         bool unzipPanelScroll = false;
-        void WindowCallback4(int id){
+
+        void WindowCallback4(int id)
+        {
 
           cfgw.autoManEnabled = GUI.Toggle(new Rect (230, 0, 60, 20), cfgw.autoManEnabled, "" , gsToggle );
           GUI.Label(new Rect (245, 0, 100, 20), "男を自動表示", gsLabel);
@@ -14754,20 +15003,20 @@ namespace CM3D2.VibeYourMaid.Plugin {
                 if (GUI.Button(new Rect (600, 0, 20, 20), "x", gsButton)) {
                   cfgw.unzipGuiFlag = false;
                 }
-                
+
                 int y = 1;
                 int x = 5;
                 int w = 70;
 
-                for (int i = 0; i < YotogiGroup.Count; i++){
-                  if(i != YotogiMenu){
+                for (int i = 0; i < YotogiGroup.Count; i++) {
+                  if (i != YotogiMenu) {
                     if (GUI.Button(new Rect ( x, y*25, w, 20), YotogiGroup[i], gsButton)) {
                       YotogiMenu = i;
                     }
-                  }else{
+                  } else {
                     GUI.Label(new Rect (x, y*25, w, 20), ">> " + YotogiGroup[i], gsLabel2Y);
                   }
-                  
+
                   x += w + 5;
                   if(x + w > 615){
                     x = 5;
@@ -14776,16 +15025,16 @@ namespace CM3D2.VibeYourMaid.Plugin {
                 }
 
                 int h = 185 - y * 25;
-                if(YotogiGroup.Count - 1 > YotogiMenu){
+                if (YotogiGroup.Count - 1 > YotogiMenu) {
                   h = 22 * (visibleYotogiCount / 3 + 1);
-                  if(YotogiMenu == 9 || YotogiMenu == 10)h = 22 * (visibleYotogiCount / 2 + 1);
+                  if (YotogiMenu == 9 || YotogiMenu == 10) h = 22 * (visibleYotogiCount / 2 + 1);
 
-                  if (h < (185 - y * 25)){
+                  if (h < (185 - y * 25)) {
                     h = 185 - y * 25;
                   }
-                }else {
+                } else {
                   h = 5 + (int)Math.Ceiling(emsFiles.Count/3.0) * 22;
-                  if(maidsState[tgID].editMotionSetName != "") h += 25;
+                  if (maidsState[tgID].editMotionSetName != "") h += 25;
                   if (h < (185 - y * 25))h = 185 - y * 25;
                 }
 
@@ -14795,22 +15044,22 @@ namespace CM3D2.VibeYourMaid.Plugin {
                 YotogiScrollPos = GUI.BeginScrollView( scrlRect, YotogiScrollPos, contentRect, false, true );
 
                 Maid maid = stockMaids[tgID].mem;
-                
+
                 //夜伽モーションのリスト画面
-                if(YotogiGroup.Count - 1 > YotogiMenu){
+                if (YotogiGroup.Count - 1 > YotogiMenu) {
                   y = 0;
                   x = 0;
-                  if(YotogiMenu == 9 || YotogiMenu == 10){
+                  if (YotogiMenu == 9 || YotogiMenu == 10) {
                     w = 290;
-                  }else{
+                  } else {
                     w = 195;
                   }
-                  
+
                   visibleYotogiCount = 0; //次フレームでスクロール内のパネルの高さを変更する用
-                  for (int i = 0; i < YotogiList[YotogiMenu].Count; i++){
+                  for (int i = 0; i < YotogiList[YotogiMenu].Count; i++) {
                     string t = YotogiList[YotogiMenu][i];
                     string name = YotogiListName[YotogiMenu][i];
-                    if(!smHVisible && (name.Contains( "女B" ) || name.Contains( "女C" )) )continue;
+                    if (!smHVisible && (name.Contains( "女B" ) || name.Contains( "女C" )) )continue;
                     if (!cfgw.crcMotionVisible && t.StartsWith("crc_")) continue; //CRCモーション除外
 
                     visibleYotogiCount++;
@@ -14827,40 +15076,40 @@ namespace CM3D2.VibeYourMaid.Plugin {
                         unzipPanelScroll = false;
                       }
                     }
-                    
+
                     if (GUI.Button(new Rect ( x, y*22, w, 20), name, gsButton)) {
                       StartMaidMotion(tgID, t);
                     }
-                    
+
                     if (selected) {
                       gsButton.normal.textColor = Color.white;
                       gsButton.hover.textColor = Color.white;
                     }
-                    
+
                     x += w +2;
-                    if(x + w > 590){
+                    if (x + w > 590) {
                       x = 0;
                       y += 1;
                     }
-                    
+
                   }
-                  
+
 
                 } else {
                   //ランダムモーションセット
                   y = 5;
                   x = 0;
                   w = 195;
-                  
-                  if(maidsState[tgID].editMotionSetName != ""){
+
+                  if (maidsState[tgID].editMotionSetName != "") {
                     if (GUI.Button(new Rect (x, y, 50, 20), "解除", gsButton)) {
                       MotionSetClear(tgID);
                     }
                     GUI.Label(new Rect (x + 60, y, 600, 20), "『" + maidsState[tgID].editMotionSetName +"』：『"+MotionNameChange(maj.motionName[maidsState[tgID].motionID])+"』再生中" , gsLabel);
                     y += 25;
                   }
-                  
-                  foreach(string f in emsFiles){
+
+                  foreach (string f in emsFiles) {
                     string emsName = f.Replace("ems_", "").Replace(".xml", "");
 
                     bool selected = (maidsState[tgID].editMotionSetName == emsName);
@@ -14875,9 +15124,9 @@ namespace CM3D2.VibeYourMaid.Plugin {
                       gsButton.normal.textColor = Color.white;
                       gsButton.hover.textColor = Color.white;
                     }
-                    
+
                     x += w + 2;
-                    if(x + w > 590){
+                    if (x + w > 590) {
                       x = 0;
                       y += 22;
                     }
@@ -14899,74 +15148,74 @@ namespace CM3D2.VibeYourMaid.Plugin {
           MotionAdjustDo(maidID, t, true, -1);
 
           //メイドのモーション変更
-          if ( maidsState[maidID].vStateMajor == 20 ){ //強度に合わせて変更
+          if (maidsState[maidID].vStateMajor == 20) { //強度に合わせて変更
             t = t.Replace("_1_", "_2_");
-          } else if ( maidsState[maidID].vStateMajor == 30 ){
+          } else if (maidsState[maidID].vStateMajor == 30) {
             t = t.Replace("_1_", "_3_");
           }
-          
+
           string inMotion = MotionCheckTokusyu(t, sInMaidMotion); //挿入モーションがあるかチェック
-          if(inMotion == "Non" || maidsState[maidID].inMotion == inMotion){
+          if (inMotion == "Non" || maidsState[maidID].inMotion == inMotion) {
             MotionChange(maid, t + ".anm", true, cfgw.majFadeTime, 1f);
-          }else{
+          } else {
             MotionChange(maid, inMotion + ".anm", false, cfgw.majFadeTime, 1f);
             MotionChangeAf(maid, t + ".anm", true, cfgw.majFadeTime, 1f); // 終わったら再生する
           }
-          
-          if(maidsState[maidID].uDatsu == 2 && maj.hkupa1[maidsState[maidID].motionID] > 50f){
+
+          if (maidsState[maidID].uDatsu == 2 && maj.hkupa1[maidsState[maidID].motionID] > 50f) {
             maidsState[maidID].uDatsuValue1 = 0f;
             maidsState[maidID].uDatsu = 0;
             try { VertexMorph_FromProcItem(maid.body0, "pussy_uterus_prolapse", 0f); } catch { /*LogError(ex);*/ }
           }
-          
-          if(maidsState[maidID].uDatsu == 3)maidsState[maidID].uDatsu = 0;
-          
+
+          if (maidsState[maidID].uDatsu == 3) maidsState[maidID].uDatsu = 0;
+
           //2.5のunzipエラー対策
           try {
             maidIKTargetToBone(maid);
           } catch (Exception e) { UnityEngine.Debug.Log(e); }
-          
+
           //サブメイドとのリンクは解除
           maidsState[maidID].motionLinkID = -1;
           if (maidsState[maidID].motionLinkID != -1) maidsState[maidsState[maidID].motionLinkID].motionLinkID = -1;
           //百合・ハーレム相手のモーション変更
-          if(YotogiMenu == 8 || YotogiMenu == 9 || t.Contains("yuri") || t.Contains("harem") || t.Contains("wfera") || t.Contains("wasikoki")) {
-            if(inMotion == "Non" || maidsState[maidID].inMotion == inMotion){
+          if (YotogiMenu == 8 || YotogiMenu == 9 || t.Contains("yuri") || t.Contains("harem") || t.Contains("wfera") || t.Contains("wasikoki")) {
+            if (inMotion == "Non" || maidsState[maidID].inMotion == inMotion) {
               SubMotionChange(maidID, t + ".anm", true, true, cfgw.majFadeTime, 1f);
-            }else{
+            } else {
               SubMotionChange(maidID, inMotion + ".anm", false, true, cfgw.majFadeTime, 1f);
               SubMotionChange(maidID, t + ".anm", true, false, cfgw.majFadeTime, 1f);
             }
             //サブメイドにリンクしている男を削除
             if (cfgw.autoManEnabled && maidsState[maidID].motionLinkID != -1) {
-              for (int im = 0; im < SubMans.Length; im++){
-                if (SubMans[im] && MansTg[im] == maidsState[maidID].motionLinkID && SubMans[im].Visible) SubMans[im].Visible = false;
+              for (int im = 0; im < SubMans.Length; im++) {
+                if (SubMans[im] && SubMans[im].Visible && MansTg[im] == maidsState[maidID].motionLinkID) SubMans[im].Visible = false;
               }
             }
           }
-          
+
           //男の自動表示
           AutoMansVisible(maidID, t);
-          
+
           //男のモーション変更
-          if(inMotion == "Non" || maidsState[maidID].inMotion == inMotion){
+          if (inMotion == "Non" || maidsState[maidID].inMotion == inMotion) {
             ManMotionChange(maidID, true, cfgw.majFadeTime, 1.0f);
-          }else{
+          } else {
             ManMotionChange(inMotion + ".anm", maidID, false, cfgw.majFadeTime, 1f);
             ManMotionChangeAf(t + ".anm", maidID, true, cfgw.majFadeTime, 1f); // 終わったら再生する
           }
-          
+
           //挿入モーションのバックアップを取得
           maidsState[maidID].inMotion = inMotion;
-          
+
           //モーションセットリセット
           MotionSetClear(maidID);
-          
+
           #if EmpiresLife
           //いたずら開始フラグ
-          if(lifeStart >= 5)maidsState[maidID].elItazuraFlag = true;
+          if (lifeStart >= 5) maidsState[maidID].elItazuraFlag = true;
           #endif
-          
+
           //タイマーリセット
           maidsState[maidID].motionHoldTime = UnityEngine.Random.Range(200f,600f);
           maidsState[maidID].voiceHoldTime = 0f;
@@ -14976,9 +15225,9 @@ namespace CM3D2.VibeYourMaid.Plugin {
           //モーションアジャスト詳細設定のメイド選択を初期化
           showSubMotionUI = false;
           //パネルのスクロール変更
-          unzipPanelScroll = true;          
+          unzipPanelScroll = true;
         }
-        
+
         /** TypeLoadExceptionが出るので別メソッドに */
         void maidIKTargetToBone(Maid maid) {
           #if !COM3D2_5
@@ -14986,7 +15235,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
           maid.IKTargetToBone("右手", null, "無し", Vector3.zero, IKCtrlData.IKAttachType.Point, false, false, IKCtrlData.IKExecTiming.Normal);
           #endif
         }
-        
+
         private string getPrevMotion(string motion)
         {
           int idx = motion == null ? -1 : YotogiList[YotogiMenu].IndexOf(motion);
@@ -15095,51 +15344,13 @@ namespace CM3D2.VibeYourMaid.Plugin {
           }
         }
 
-        //男の自動表示 モーションの有無で人数を切り替え
-        private void AutoMansVisible(int maidID, string t) {
-          if (cfgw.autoManEnabled) {
-            int manNum = 0; //男無し
-            //6pまでチェック mとm2がない場合がある
-            string mamMotion = Regex.Replace(t.Replace(".anm", ""), @"_f\d?$", "_m");
-            if (MotionOldCheck(mamMotion) != -1) manNum++;
-            if (MotionOldCheck(mamMotion+"2") != -1) manNum++;
-            if (MotionOldCheck(mamMotion+"3") != -1) manNum++;
-            if (MotionOldCheck(mamMotion+"4") != -1) manNum++;
-            if (MotionOldCheck(mamMotion+"5") != -1) manNum++;
-            Console.WriteLine("AutoMansVisible "+mamMotion+" manNum="+manNum);
-
-            //現在の人数カウント 余分な男は減らす
-            for (int im = 0; im < SubMans.Length; im++) {
-              if (!SubMans[im]) SubMans[im] = GameMain.Instance.CharacterMgr.GetMan(im);
-              if (SubMans[im].Visible && MansTg[im] == maidID) {
-                //不要なリンクしている男を非表示
-                if (manNum <= 0) {
-                  SubMans[im].Visible = false;
-                  MansTg[im] = -1;
-                }
-                //表示済みならカウントを減らす
-                else manNum--;
-              }
-            }
-            for (int im = 0; im < SubMans.Length; im++) {
-              if (manNum == 0) break;
-              if (!SubMans[im].Visible) {
-                //非表示の男を追加表示
-                StartCoroutine ("MansVisible", im); 
-                //maid.EyeToCamera((Maid.EyeMoveType)0, 0.8f);
-                manNum--;
-              }
-            }
-          }
-        }
-        
-        void WindowCallback4a(int id){
+        void WindowCallback4a(int id) {
 
             int y = 0;
             int w = 195;
             int h = 22 * maidsState[tgID].senyouTokusyuMotion.Count;
-            if(h < 185)h = 185;
-            
+            if (h < 185) h = 185;
+
             Maid maid = stockMaids[tgID].mem;
 
             Rect scrlRect    = new Rect(0, 25, 220, 190);
@@ -15147,30 +15358,30 @@ namespace CM3D2.VibeYourMaid.Plugin {
             YotogiScrollPos2 = GUI.BeginScrollView( scrlRect, YotogiScrollPos2, contentRect, false, true );
 
             //特殊モーションリスト
-              foreach(string tokusyu in maidsState[tgID].senyouTokusyuMotion){
+              foreach (string tokusyu in maidsState[tgID].senyouTokusyuMotion) {
                 name = MotionNameChange(tokusyu);
                 if (GUI.Button(new Rect ( 5, y*22, w, 20), name, gsButton)) {
                   string t = maid.body0.LastAnimeFN;
-                  
-                  if(tokusyu.Contains("_once_")){
+
+                  if (tokusyu.Contains("_once_")) {
                     MotionChange(maid, tokusyu + ".anm", false, 0.7f, 1f);
                     ManMotionChange(tokusyu + ".anm", tgID, false, 0.7f, 1f);
 
                     MotionChangeAf(maid, t, true, 0.7f, 1f);
                     ManMotionChangeAf(t, tgID, true, 0.7f, 1f); // 終わったら再生する
-                  }else{
+                  } else {
                     MotionChange(maid, tokusyu + ".anm", true, 0.7f, 1f);
                     ManMotionChange(tgID, true, 0.7f, 1.0f);
                   }
                 }
               y += 1;
               }
-              
+
             GUI.EndScrollView();
-        
+
           GUI.DragWindow();
         }
-        
+
 
 
 
@@ -15195,19 +15406,19 @@ namespace CM3D2.VibeYourMaid.Plugin {
                 node5.width = 220;
                 node5.height = 20;
               }
-              
+
                 Maid maid = null;
                 if(tgID != -1)maid = stockMaids[tgID].mem;
 
                 int x = 0;
                 int y = 30;
-                
-                
+
+
                 //GUI.Label(new Rect (5, y, 190, 20), "【移動先選択】" , gsLabel);
                 Rect scrlRect    = new Rect(0, y, 620, 100);
                 Rect contentRect = new Rect(0, 0, 600, 25 * bgC);
                 elScrollPos = GUI.BeginScrollView( scrlRect, elScrollPos, contentRect, false, true );
-                
+
                 y = 0;
 
                   for (int i = 0; i < bgArray1.GetLength(0); i++){
@@ -15216,13 +15427,13 @@ namespace CM3D2.VibeYourMaid.Plugin {
                     if(bgArray1[i][3] == "0" )continue;
                     if(flagN && bgArray1[i][3] == "1" )continue;
                     if(!flagN && bgArray1[i][3] == "2" )continue;
-                    
+
                     string bgName = bgArray1[i][1].Replace("（夜）", "");
                     if(bgID == i){
                       GUI.Label(new Rect (10 + x, y, 140, 20), "≫ " + bgName , gsLabel2);
                     }else{
                       if (GUI.Button(new Rect (10 + x, y, 140, 20), bgName, gsButton)) {
-                         StartCoroutine ("ElChange", i);
+                         StartCoroutine("ElChange", i);
                       }
                     }
 
@@ -15233,17 +15444,17 @@ namespace CM3D2.VibeYourMaid.Plugin {
                       x += 145;
                     }
                   }
-                  
+
                   foreach(EmpiresLifeScene_Xml _els in elsList){
                     if(_els.timeZone != 2){
                       if(flagN && _els.timeZone == 0)continue;
                       if(!flagN && _els.timeZone == 1)continue;
                     }
-                    
+
                     if (GUI.Button(new Rect (10 + x, y, 140, 20), _els.bgName, gsButton)) {
                       elsChange(_els);
                     }
-                    
+
                     if(x >= 435){
                       y += 25;
                       x = 0;
@@ -15251,17 +15462,17 @@ namespace CM3D2.VibeYourMaid.Plugin {
                       x += 145;
                     }
                   }
-                  
+
                   if(!maidOver){
                     for (int i2 = 0; i2 < holidayMaid.Count; i2++){
-                    
+
                       string hmName = stockMaids[holidayMaid[i2][0]].mem.status.firstName + "の部屋";
                       if(bgID == 38 && hmID ==i2){
                         GUI.Label(new Rect (10 + x, y, 140, 20), "≫ " + hmName , gsLabel2);
                       }else{
                         if (GUI.Button(new Rect (10 + x, y, 140, 20), hmName, gsButton)) {
                           mn[38] = holidayMaid[i2];
-                          StartCoroutine ("ElChange", 38);
+                          StartCoroutine("ElChange", 38);
                           hmID = i2;
                         }
                       }
@@ -15274,10 +15485,10 @@ namespace CM3D2.VibeYourMaid.Plugin {
                       }
                     }
                   }
-                  
-                  
+
+
                 GUI.EndScrollView();
-                
+
                 y = 140;
 
 
@@ -15286,42 +15497,42 @@ namespace CM3D2.VibeYourMaid.Plugin {
                   speed = GUI.HorizontalSlider(new Rect(70, y + 5, 100, 20), speed, 0.1f, 2f);
                   if (GUI.Button(new Rect (180, y, 20, 20), "R", gsButton)){
                     speed = 1;
-		  }
-		}
-		
-		if (GUI.Button(new Rect (220, y, 90, 20), "ラナルータ", gsButton)){
+                  }
+                }
+
+                if (GUI.Button(new Rect (220, y, 90, 20), "ラナルータ", gsButton)){
                   flagN = !flagN;
                   ElStart();
-                 if(!flagN)StartCoroutine ("ElChange", 0);
-                 if(flagN)StartCoroutine ("ElChange", 1);
-		}
-		
+                 if(!flagN)StartCoroutine("ElChange", 0);
+                 if(flagN)StartCoroutine("ElChange", 1);
+                }
+
                 if (GUI.Button(new Rect (370, y, 120, 20), "アイテム表示切替", gsButton)){
                   isItem = !isItem;
                   maid.body0.SetMask(TBody.SlotID.HandItemR, isItem);
                   maid.body0.SetMask(TBody.SlotID.HandItemL, isItem);
                   maid.body0.SetMask(TBody.SlotID.kousoku_upper, isItem);
                   maid.body0.SetMask(TBody.SlotID.kousoku_lower, isItem);
-		}
+                }
 
                 if (GUI.Button(new Rect (500, y, 75, 20), "NTRﾌﾞﾛｯｸ", gsButton)){
                   cfgw.ntrBlock = !cfgw.ntrBlock;
                   ElStart();
-                  StartCoroutine ("ElChange", bgID);
-		}
-		
-		if(cfgw.ntrBlock)GUI.Label(new Rect (580, y, 35, 20), "ON" , gsLabel);
-		if(!cfgw.ntrBlock)GUI.Label(new Rect (580, y, 35, 20), "OFF" , gsLabel);
-		
+                  StartCoroutine("ElChange", bgID);
+                }
 
-		y = 30;
+                if(cfgw.ntrBlock)GUI.Label(new Rect (580, y, 35, 20), "ON" , gsLabel);
+                if(!cfgw.ntrBlock)GUI.Label(new Rect (580, y, 35, 20), "OFF" , gsLabel);
+
+
+                y = 30;
 
 
                 if(maid){
                   if(bgID == 36 || bgID == 37){
 
                     GUI.Label(new Rect (635, y, 200, 20), "【スポット移動】" , gsLabel);
-                    
+
                     if (GUI.Button(new Rect (640, y + 25, 85, 20), "スポット１", gsButton)){
                       maid.transform.position = new Vector3(-2.81f, 0.6f, -3.76f);
                       man.transform.position = new Vector3(-2.81f, 0.6f, -3.76f);
@@ -15331,7 +15542,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                       maid.CrossFadeAbsolute( "om_seijyoui_1_f.anm", GameUty.FileSystem, false, true, false, 0.7f, 1f );
                       man.CrossFadeAbsolute( "om_seijyoui_1_m.anm", GameUty.FileSystem, false, true, false, 0.7f, 1f );
                     }
-                    
+
                     if (GUI.Button(new Rect (735, y + 25, 85, 20), "スポット２", gsButton)){
                       maid.transform.position = new Vector3(-2.73f, 0.73f, -7.27f);
                       man.transform.position = new Vector3(-2.73f, 0.73f, -7.27f);
@@ -15383,18 +15594,18 @@ namespace CM3D2.VibeYourMaid.Plugin {
       //GUI関係終了-------------------------------
 
 
+      #if EmpiresLife
       //-------------------------------------------------
       //新 エンパイアズライフ関係------------------------
-#if EmpiresLife
         private bool el_Overwrite = false;
         private int elErrer = 0;
         private string[] elErrerText = new string[] { "" , "背景名が空白のため保存できません" , "上書きする場合は『上書／ｸﾘｱ』にチェックを入れて下さい" , "クリアする場合は『上書／ｸﾘｱ』にチェックを入れて下さい"};
         private string[] eyeModeText = new string[] { "自動" , "顔と目を向ける" , "目だけ向ける" , "向けない"};
         private string[] timeText = new string[] { "昼" , "夜" , "共通"};
-        
+
         EmpiresLifeScene_Xml ELS = new EmpiresLifeScene_Xml();
         List<EmpiresLifeScene_Xml> elsList = new List<EmpiresLifeScene_Xml>();
-        
+
         public class EmpiresLifeScene_Xml{
           public string bgName = "";
           public string bgCode = "";
@@ -15403,7 +15614,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
           public Color lightColor = new Color(1f, 1f, 1f, 1f);
           public Vector3 cameraPos = new Vector3(0f, 0f, 0f);
           public Vector3 cameraEul = new Vector3(0f, 0f, 0f);
-          
+
           public List<string> mansMotion = new List<string>();
           public List<int> mansTime = new List<int>();
           public List<Vector3> mansPos = new List<Vector3>();
@@ -15415,7 +15626,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
           public string evName = "";
           public string bgCode = "";
           public int timeZone = 0;
-          
+
           public List<string> motionSet = new List<string>();
           public List<string> voiceSet = new List<string>();
           public List<bool> ntr = new List<bool>();
@@ -15444,51 +15655,51 @@ namespace CM3D2.VibeYourMaid.Plugin {
           if (System.IO.Directory.Exists(@"Sybaris\UnityInjector\Config\VibeYourMaid\EmpiresLifeSet\")){
             _files.Clear();
             files = Directory.GetFiles(@"Sybaris\UnityInjector\Config\VibeYourMaid\EmpiresLifeSet\", "*.xml");
-            
+
             foreach (string file in files){
               fileName = Path.GetFileName(file);
               if(Regex.IsMatch(fileName, "^els_"))_files.Add(fileName);
             }
             elsFiles = new List<string>(_files);
           }
-          
+
           elsList.Clear();
           foreach (string file in elsFiles){
             fileName = @"Sybaris\UnityInjector\Config\VibeYourMaid\EmpiresLifeSet\" + file;
             elsList.Add(elsXmlLoad(fileName));
           }
         }
-        
+
         private void LifeSceneLoad(string bgCode){
 
           //保存先のファイル名
           string fileName = @"Sybaris\UnityInjector\Config\VibeYourMaid\EmpiresLifeSet\els_" + bgCode + @".xml";
           Console.WriteLine(fileName);
-          
+
           if (System.IO.File.Exists(fileName)){
             ELS = elsXmlLoad(fileName);
-            
+
           } else { //ファイルが存在しない場合に初期ファイルを作成
             LifeSceneSave();
           }
         }
 
         private EmpiresLifeScene_Xml elsXmlLoad(string fileName){
-          
+
           EmpiresLifeScene_Xml _els = new EmpiresLifeScene_Xml();
-          
+
           //XmlSerializerオブジェクトを作成
           System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(EmpiresLifeScene_Xml));
           //読み込むファイルを開く
           System.IO.StreamReader sr = new System.IO.StreamReader(fileName, new System.Text.UTF8Encoding(false));
-          
+
           //XMLファイルから読み込み、逆シリアル化する
           _els = (EmpiresLifeScene_Xml)serializer.Deserialize(sr);
 
           //ファイルを閉じる
           sr.Close();
           Console.WriteLine("読み込み完了");
-          
+
           return _els;
         }
 
@@ -15498,13 +15709,13 @@ namespace CM3D2.VibeYourMaid.Plugin {
           //保存先のファイル名
           string fileName = @"Sybaris\UnityInjector\Config\VibeYourMaid\EmpiresLifeSet\" + bgCode + @"\ele_" + file + @".xml";
           Console.WriteLine(fileName);
-          
+
           if (System.IO.File.Exists(fileName)){
             //XmlSerializerオブジェクトを作成
             System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(EmpiresLifeEvents_Xml));
             //読み込むファイルを開く
             System.IO.StreamReader sr = new System.IO.StreamReader(fileName, new System.Text.UTF8Encoding(false));
-            
+
             //XMLファイルから読み込み、逆シリアル化する
             ELE = (EmpiresLifeEvents_Xml)serializer.Deserialize(sr);
 
@@ -15522,32 +15733,32 @@ namespace CM3D2.VibeYourMaid.Plugin {
             //ない場合はフォルダ作成
             System.IO.DirectoryInfo di = System.IO.Directory.CreateDirectory(@"Sybaris\UnityInjector\Config\VibeYourMaid\EmpiresLifeSet");
           }
-          
-          
+
+
           if(ELS.bgName == "" || ELS.bgCode == ""){  //ボイスセット名が空白の場合保存しない
             elErrer = 1;
-            
+
           } else {
             //保存先のファイル名
             string fileName = @"Sybaris\UnityInjector\Config\VibeYourMaid\EmpiresLifeSet\els_" + ELS.bgCode + @".xml";
-            
+
             if (System.IO.File.Exists(fileName) && !el_Overwrite){  //上書きのチェック
               elErrer = 2;
 
             } else {
-            
+
               //XmlSerializerオブジェクトを作成
               //オブジェクトの型を指定する
               System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(EmpiresLifeScene_Xml));
-              
+
               //書き込むファイルを開く（UTF-8 BOM無し）
               System.IO.StreamWriter sw = new System.IO.StreamWriter(fileName, false, new System.Text.UTF8Encoding(false));
-              
+
               //シリアル化し、XMLファイルに保存する
               serializer.Serialize(sw, ELS);
               //ファイルを閉じる
               sw.Close();
-              
+
               el_Overwrite = false;
               elErrer = 0;
             }
@@ -15563,57 +15774,57 @@ namespace CM3D2.VibeYourMaid.Plugin {
             //ない場合はフォルダ作成
             System.IO.DirectoryInfo di = System.IO.Directory.CreateDirectory(folder);
           }
-          
-          
+
+
           if(ELE.evName == "" || ELE.bgCode == ""){  //イベント名が空白の場合保存しない
             elErrer = 1;
-            
+
           } else {
             //保存先のファイル名
             string fileName = folder + "ele_" + ELE.evName + @".xml";
-            
+
             if (System.IO.File.Exists(fileName) && !el_Overwrite){  //上書きのチェック
               elErrer = 2;
 
             } else {
-            
+
               //XmlSerializerオブジェクトを作成
               //オブジェクトの型を指定する
               System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(EmpiresLifeEvents_Xml));
-              
+
               //書き込むファイルを開く（UTF-8 BOM無し）
               System.IO.StreamWriter sw = new System.IO.StreamWriter(fileName, false, new System.Text.UTF8Encoding(false));
-              
+
               //シリアル化し、XMLファイルに保存する
               serializer.Serialize(sw, ELE);
               //ファイルを閉じる
               sw.Close();
-              
+
               el_Overwrite = false;
               elErrer = 0;
             }
           }
         }
-        
-        
+
+
         private void elsChange(EmpiresLifeScene_Xml els){
-          
+
           GameMain.Instance.SoundMgr.StopSe();
-	  GameMain.Instance.SoundMgr.StopBGM(2f);
-	  
-	  GameMain.Instance.MainLight.GetComponent<Light>().color = els.lightColor; //ライト変更
-	  
-	  //全メイドと男を一旦非表示
+          GameMain.Instance.SoundMgr.StopBGM(2f);
+
+          GameMain.Instance.MainLight.GetComponent<Light>().color = els.lightColor; //ライト変更
+
+          //全メイドと男を一旦非表示
           GameMain.Instance.CharacterMgr.DeactivateMaidAll();
           GameMain.Instance.CharacterMgr.ResetCharaPosAll();
           foreach (Maid man in SubMans){
             man.Visible = false;
           }
-          
+
           //背景変更
           Console.WriteLine("背景チェンジ:" + els.bgCode);
           GameMain.Instance.BgMgr.ChangeBg(els.bgCode);
-          
+
           //カメラ移動
           mainCamera.transform.eulerAngles = els.cameraEul;
           if(!bVR){
@@ -15623,108 +15834,107 @@ namespace CM3D2.VibeYourMaid.Plugin {
           }else{
             mainCamera.SetPos(els.cameraPos);
           }
-          
+
           //BGM変更
           GameMain.Instance.SoundMgr.PlayBGMLegacy(els.bgm, 0f, true);
-          
+
         }
 
-#endif
       //新 エンパイアズライフ関係終了------------------------
+      #endif
 
 
 
+        private bool dCheck = false;
 
+      #if EmpiresLife
       //-------------------------------------------------
       //エンパイアズライフ関係---------------------------
         //エンパイアズライフ用変数
-	private int bgID = 0;
-	private int lifeStart = 0;
-	private bool dCheck = false;
-  private bool elFade = false;
+        private int bgID = 0;
+        private bool elFade = false;
+        private int lifeStart = 0;
+        private int danceFlag = 0;
+        private bool maidOver = false;
+        private bool freeOver = false;
+        private bool exclusiveOver = false;
+        private int hmID = 0;
+        private int[] elMouthMode = new int[]{ 0, 0, 0, 0 };
+        private int[] eldatui = new int[]{ 0, 0, 0, 0 };
+        private float[] lifeTime1 = new float[]{ 0, 0, 0, 0 };
+        private float[] lifeTime2 = new float[]{ 0, 0, 0, 0 };
+        private float[] lifeTime3 = new float[]{ 0, 0, 0, 0 };
+        private int[] elvFlag = new int[]{ 0, 0, 0, 0 };
+        private bool[] elcrFlag = new bool[]{ false, false, false, false };
+        private bool[] mOnceFlag = new bool[]{ false, false, false, false };
+        private string[] mOnceBack = new string[]{ "" , "" , "" , "" };
+        private string[][] mItem = new string[][]{
+          new string[]{ "" , "" },
+          new string[]{ "" , "" },
+          new string[]{ "" , "" },
+          new string[]{ "" , "" }
+        };
 
-#if EmpiresLife
-	private int danceFlag = 0;
-	private bool maidOver = false;
-	private bool freeOver = false;
-	private bool exclusiveOver = false;
-	private int hmID = 0;
-	private int[] elMouthMode = new int[]{ 0, 0, 0, 0 };
-	private int[] eldatui = new int[]{ 0, 0, 0, 0 };
-	private float[] lifeTime1 = new float[]{ 0, 0, 0, 0 };
-	private float[] lifeTime2 = new float[]{ 0, 0, 0, 0 };
-	private float[] lifeTime3 = new float[]{ 0, 0, 0, 0 };
-	private int[] elvFlag = new int[]{ 0, 0, 0, 0 };
-	private bool[] elcrFlag = new bool[]{ false, false, false, false };
-	private bool[] mOnceFlag = new bool[]{ false, false, false, false };
-	private string[] mOnceBack = new string[]{ "" , "" , "" , "" };
-	private string[][] mItem = new string[][]{
-	  new string[]{ "" , "" },
-	  new string[]{ "" , "" },
-	  new string[]{ "" , "" },
-	  new string[]{ "" , "" }
-	};
-	
-	private int[][] mn = new int[][]{
-	  new int[]{-1,-1,-1,-1},
-	  new int[]{-1,-1,-1,-1},
-	  new int[]{-1,-1,-1,-1},
-	  new int[]{-1,-1,-1,-1},
-	  new int[]{-1,-1,-1,-1},
-	  new int[]{-1,-1,-1,-1},
-	  new int[]{-1,-1,-1,-1},
-	  new int[]{-1,-1,-1,-1},
-	  new int[]{-1,-1,-1,-1},
-	  new int[]{-1,-1,-1,-1},
-	  new int[]{-1,-1,-1,-1},
-	  new int[]{-1,-1,-1,-1},
-	  new int[]{-1,-1,-1,-1},
-	  new int[]{-1,-1,-1,-1},
-	  new int[]{-1,-1,-1,-1},
-	  new int[]{-1,-1,-1,-1},
-	  new int[]{-1,-1,-1,-1},
-	  new int[]{-1,-1,-1,-1},
-	  new int[]{-1,-1,-1,-1},
-	  new int[]{-1,-1,-1,-1},
-	  new int[]{-1,-1,-1,-1},
-	  new int[]{-1,-1,-1,-1},
-	  new int[]{-1,-1,-1,-1},
-	  new int[]{-1,-1,-1,-1},
-	  new int[]{-1,-1,-1,-1},
-	  new int[]{-1,-1,-1,-1},
-	  new int[]{-1,-1,-1,-1},
-	  new int[]{-1,-1,-1,-1},
-	  new int[]{-1,-1,-1,-1},
-	  new int[]{-1,-1,-1,-1},
-	  new int[]{-1,-1,-1,-1},
-	  new int[]{-1,-1,-1,-1},
-	  new int[]{-1,-1,-1,-1},
-	  new int[]{-1,-1,-1,-1},
-	  new int[]{-1,-1,-1,-1},
-	  new int[]{-1,-1,-1,-1},
-	  new int[]{-1,-1,-1,-1},
-	  new int[]{-1,-1,-1,-1},
-	  new int[]{-1,-1,-1,-1},
-	  new int[]{-1,-1,-1,-1}
-	};
-	private List<int[]> holidayMaid = new List<int[]>();
+        private int[][] mn = new int[][]{
+          new int[]{-1,-1,-1,-1},
+          new int[]{-1,-1,-1,-1},
+          new int[]{-1,-1,-1,-1},
+          new int[]{-1,-1,-1,-1},
+          new int[]{-1,-1,-1,-1},
+          new int[]{-1,-1,-1,-1},
+          new int[]{-1,-1,-1,-1},
+          new int[]{-1,-1,-1,-1},
+          new int[]{-1,-1,-1,-1},
+          new int[]{-1,-1,-1,-1},
+          new int[]{-1,-1,-1,-1},
+          new int[]{-1,-1,-1,-1},
+          new int[]{-1,-1,-1,-1},
+          new int[]{-1,-1,-1,-1},
+          new int[]{-1,-1,-1,-1},
+          new int[]{-1,-1,-1,-1},
+          new int[]{-1,-1,-1,-1},
+          new int[]{-1,-1,-1,-1},
+          new int[]{-1,-1,-1,-1},
+          new int[]{-1,-1,-1,-1},
+          new int[]{-1,-1,-1,-1},
+          new int[]{-1,-1,-1,-1},
+          new int[]{-1,-1,-1,-1},
+          new int[]{-1,-1,-1,-1},
+          new int[]{-1,-1,-1,-1},
+          new int[]{-1,-1,-1,-1},
+          new int[]{-1,-1,-1,-1},
+          new int[]{-1,-1,-1,-1},
+          new int[]{-1,-1,-1,-1},
+          new int[]{-1,-1,-1,-1},
+          new int[]{-1,-1,-1,-1},
+          new int[]{-1,-1,-1,-1},
+          new int[]{-1,-1,-1,-1},
+          new int[]{-1,-1,-1,-1},
+          new int[]{-1,-1,-1,-1},
+          new int[]{-1,-1,-1,-1},
+          new int[]{-1,-1,-1,-1},
+          new int[]{-1,-1,-1,-1},
+          new int[]{-1,-1,-1,-1},
+          new int[]{-1,-1,-1,-1}
+        };
+        private List<int[]> holidayMaid = new List<int[]>();
 
-	//モーション , PX , PY , PZ , EX , EY , EZ , 表情 , フェイスブレンド , 床調整 , 着衣 , 視線 , ダンスBGM , ボイスセット , ボイス再生距離 , ボイス再生間隔 , メイドアイテム, NTRブロック
+        //モーション , PX , PY , PZ , EX , EY , EZ , 表情 , フェイスブレンド , 床調整 , 着衣 , 視線 , ダンスBGM , ボイスセット , ボイス再生距離 , ボイス再生間隔 , メイドアイテム, NTRブロック
         private string[][] life_f = new string[][]{
           new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "" , "" , "" , "0" },
           new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "" , "" , "" , "0" },
           new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "" , "" , "" , "0" },
           new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "" , "" , "" , "0" }
         };
-	//モーション , PX , PY , PZ , EX , EY , EZ , ターゲットメイド
+        //モーション , PX , PY , PZ , EX , EY , EZ , ターゲットメイド
         private string[][] life_m = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
         };
 
-	private string[][] bgArray1 = new string[][]{
+        private string[][] bgArray1 = new string[][]{
           new string[] {"Shitsumu_ChairRot"       , "執務室"                 , "bgm015.ogg"    , "1" , "-0.08" , "1.57" ,  "2.60" , "3.7" , "183.4" , "0" , "1" , "1" }, //00
           new string[] {"Shitsumu_ChairRot_Night" , "執務室（夜）"           , "bgm015.ogg"    , "2" , "-0.08" , "1.57" ,  "2.60" , "3.7" , "183.4" , "0" , "1" , "1" }, //01
           new string[] {"Salon"                   , "サロン"                 , "bgm014.ogg"    , "1" ,  "0.00" , "0.00" , "19.00" , "0.0" , "180" , "0" , "1" , "1" }, //02
@@ -15765,1054 +15975,1054 @@ namespace CM3D2.VibeYourMaid.Plugin {
           new string[] {"Soap"                    , "ソープ（夜）"           , "bgm011.ogg"    , "2" , "-0.02" , "1.34" , "-7.26" , "0" , "0" , "0" , "1" , "1" },  //37
           new string[] {"MaidRoom"                , "メイド部屋"             , "bgm014.ogg"    , "0" ,  "0.10" , "1.53" ,  "2.33" , "5.6" , "183.8" , "0" , "6" , "1" }, //38
           new string[] {"MaidRoom"                , "メイド部屋（夜）"       , "bgm014.ogg"    , "0" ,  "0.10" , "1.53" ,  "2.33" , "5.6" , "183.8" , "0" , "1" , "1" }  //39
-	};
-	
-
-	//00：執務室 シーン設定
-	private string[][] life00_01f = new string[][]{
-	  new string[] { "soji_mop.anm|soji_mop_kaiwa.anm" , "-1.3" , "0" , "1" , "0" , "312" , "0" , "通常|微笑み|にっこり|思案伏せ目|発情|困った|疑問|誘惑" , "頬０涙０" , "0" , "0" , "0" , "" , "掃除" , "-1" , "-1" , "handitem,HandItemR_Mop_I_.menu" , "0" },
-	  new string[] { "soji_zoukin.anm|soji_zoukin_kaiwa_l.anm" , "1" , "0" , "1.5" , "0" , "65" , "0" , "通常|微笑み|にっこり|思案伏せ目|発情|困った|疑問|誘惑" , "頬０涙０" , "0" , "0" , "0" , "" , "掃除" , "-1" , "-1" , "handitem,HandItemR_Zoukin2_I_.menu" , "0" },
-	  new string[] { "" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] { "" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
-	};
-	private string[][] life00_01m = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
-	};
+        };
 
 
-	//01：執務室（夜） シーン設定
-	private string[][] life01_01f = new string[][]{
-	  new string[] { "maid_stand02akubi_ONCE_.anm|maid_dressroom02.anm|maid_stand02ListenB_Unazuki_ONCE_.anm|maid_stand02Listenloop2.anm|maid_stand02tere.anm|maid_stand02sian2_ONCE_.anm|maid_stand02Left_ONCE_.anm|maid_stand02akubi_ONCE_.anm|maid_stand02hair_ONCE_.anm|maid_comehome2_LOOP_.anm" , "1.28" , "0" , "0" , "0" , "272.5" , "0" , "通常|微笑み|笑顔|にっこり|優しさ|思案伏せ目|発情|困った|疑問|誘惑" , "頬０涙０" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] { "" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] { "" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] { "" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
-	};
-	private string[][] life01_01m = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
-	};
+        //00：執務室 シーン設定
+        private string[][] life00_01f = new string[][]{
+          new string[] { "soji_mop.anm|soji_mop_kaiwa.anm" , "-1.3" , "0" , "1" , "0" , "312" , "0" , "通常|微笑み|にっこり|思案伏せ目|発情|困った|疑問|誘惑" , "頬０涙０" , "0" , "0" , "0" , "" , "掃除" , "-1" , "-1" , "handitem,HandItemR_Mop_I_.menu" , "0" },
+          new string[] { "soji_zoukin.anm|soji_zoukin_kaiwa_l.anm" , "1" , "0" , "1.5" , "0" , "65" , "0" , "通常|微笑み|にっこり|思案伏せ目|発情|困った|疑問|誘惑" , "頬０涙０" , "0" , "0" , "0" , "" , "掃除" , "-1" , "-1" , "handitem,HandItemR_Zoukin2_I_.menu" , "0" },
+          new string[] { "" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] { "" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
+        };
+        private string[][] life00_01m = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
+        };
 
 
-	//02：サロン シーン設定
-	private string[][] life02_01f = new string[][]{
-	  new string[] { "dance_cm3d_004_kano_f1.anm" , "0" , "0" , "-0.62" , "0" , "0" , "0" , "引きつり笑顔|困った|泣き" , "頬０涙１" , "0" , "0" , "0" , "dummy" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] { "dance_cm3d_004_kano_f1.anm" , "-0.9" , "0" , "0.20" , "0" , "0" , "0" , "引きつり笑顔|困った|泣き" , "頬０涙１" , "0" , "0" , "0" , "dummy" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] { "dance_cm3d_004_kano_f1.anm" , "0.9" , "0" , "0.20" , "0" , "0" , "0" , "通常|笑顔|にっこり|ドヤ顔|ウインク照れ" , "頬０涙０" , "0" , "0" , "0" , "dummy" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] { "kaiwa_tati_hakusyu_taiki_2_f.anm|kaiwa_tati_hakusyu_taiki_2_f.anm|kaiwa_tati_hakusyu_taiki_2_f.anm|kaiwa_tati_yubisasu_f_ONCE_.anm|kaiwa_tati_kuyasi_f_ONCE_.anm|kaiwa_tati_mo_f_ONCE_.anm|kaiwa_tati_yorokobu_f_ONCE_.anm" , "0" , "0" , "2.04" , "0" , "180" , "0" , "怒り|照れ叫び|ジト目|むー" , "頬０涙０" , "0" , "0" , "1" , "" , "" , "-1" , "-1" , "" , "0" }
-	};
-	private string[][] life02_01m = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
-	};
+        //01：執務室（夜） シーン設定
+        private string[][] life01_01f = new string[][]{
+          new string[] { "maid_stand02akubi_ONCE_.anm|maid_dressroom02.anm|maid_stand02ListenB_Unazuki_ONCE_.anm|maid_stand02Listenloop2.anm|maid_stand02tere.anm|maid_stand02sian2_ONCE_.anm|maid_stand02Left_ONCE_.anm|maid_stand02akubi_ONCE_.anm|maid_stand02hair_ONCE_.anm|maid_comehome2_LOOP_.anm" , "1.28" , "0" , "0" , "0" , "272.5" , "0" , "通常|微笑み|笑顔|にっこり|優しさ|思案伏せ目|発情|困った|疑問|誘惑" , "頬０涙０" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] { "" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] { "" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] { "" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
+        };
+        private string[][] life01_01m = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
+        };
 
 
-	//03：サロン（夜） シーン設定
-	private string[][] life03_01f = new string[][]{
-	  new string[] {"dance_cm3d_001_f1.anm","0","0","0","0","0","0","笑顔|にっこり|ドヤ顔|ウインク照れ|引きつり笑顔|微笑み|発情|誘惑|思案伏せ目|疑問","頬０涙０","0" , "0" , "1" , "entrancetoyou_short.ogg" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"kaiwa_sofa_kangaeruB_taiki_f.anm|kaiwa_sofa_1_f.anm|kaiwa_sofa_kangaeru_f_ONCE_.anm|kaiwa_sofa_noridasu_2_f_ONCE_.anm|kaiwa_sofa_teawaseA_taiki1_f.anm|kaiwa_sofa_teawase_taiki_f.anm|kaiwa_sofa_tere_taiki_f.anm","-5.67","-1.45","7.91","0","106","0","通常|微笑み|笑顔|にっこり|優しさ|思案伏せ目|発情|誘惑","頬０涙０","-2" , "0" , "1" , "" , "会話01" , "-1" , "300" , "" , "0" },
-	  new string[] {"settai_aibu_2_f.anm|settai_aibu_3_f.anm","3.73","-1.46","11.48","0","205","0","エロ羞恥１|エロ羞恥２|興奮射精後１|エロ痛み２|エロ我慢３|まぶたギュ","頬２涙１","-2" , "0" , "2" , "" , "SEX_A" , "-1" , "0" , "" , "1" },
-	  new string[] {"om_furo_taimenzai_kiss_2_f.anm|om_furo_taimenzai_kiss_3_f.anm","5.73","-1.47","4.69","0","268","0","エロ羞恥２|エロ羞恥３|エロ好感３|興奮射精後１|発情|エロ興奮３|エロ期待","頬２涙１よだれ","-2" , "3" , "2" , "" , "SEX_A" , "-1" , "0" , "" , "1" }
-	};
-	private string[][] life03_01m = new string[][]{
-	  new string[] { "" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] { "man_suwarimati1.anm" , "-5.73" , "-1.41" , "8.6" , "0" , "114" , "0" , "1" },
-	  new string[] { "settai_aibu_2_m.anm|settai_aibu_3_m.anm" , "3.73" , "-1.46" , "11.48" , "0" , "205" , "0" , "2" },
-	  new string[] { "om_furo_taimenzai_kiss_2_m.anm|om_furo_taimenzai_kiss_3_m.anm" , "5.73" , "-1.47" , "4.69" , "0" , "268" , "0" , "3" }
-	};
+        //02：サロン シーン設定
+        private string[][] life02_01f = new string[][]{
+          new string[] { "dance_cm3d_004_kano_f1.anm" , "0" , "0" , "-0.62" , "0" , "0" , "0" , "引きつり笑顔|困った|泣き" , "頬０涙１" , "0" , "0" , "0" , "dummy" , "" , "-1" , "-1" , "" , "0" },
+          new string[] { "dance_cm3d_004_kano_f1.anm" , "-0.9" , "0" , "0.20" , "0" , "0" , "0" , "引きつり笑顔|困った|泣き" , "頬０涙１" , "0" , "0" , "0" , "dummy" , "" , "-1" , "-1" , "" , "0" },
+          new string[] { "dance_cm3d_004_kano_f1.anm" , "0.9" , "0" , "0.20" , "0" , "0" , "0" , "通常|笑顔|にっこり|ドヤ顔|ウインク照れ" , "頬０涙０" , "0" , "0" , "0" , "dummy" , "" , "-1" , "-1" , "" , "0" },
+          new string[] { "kaiwa_tati_hakusyu_taiki_2_f.anm|kaiwa_tati_hakusyu_taiki_2_f.anm|kaiwa_tati_hakusyu_taiki_2_f.anm|kaiwa_tati_yubisasu_f_ONCE_.anm|kaiwa_tati_kuyasi_f_ONCE_.anm|kaiwa_tati_mo_f_ONCE_.anm|kaiwa_tati_yorokobu_f_ONCE_.anm" , "0" , "0" , "2.04" , "0" , "180" , "0" , "怒り|照れ叫び|ジト目|むー" , "頬０涙０" , "0" , "0" , "1" , "" , "" , "-1" , "-1" , "" , "0" }
+        };
+        private string[][] life02_01m = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
+        };
 
-	private string[][] life03_02f = new string[][]{
-	  new string[] { "dance_cm3d2_001_f1.anm" , "0" , "0" , "0" , "0" , "0" , "0" , "笑顔|にっこり|ドヤ顔|ウインク照れ|引きつり笑顔|微笑み|発情|誘惑|思案伏せ目|疑問" , "頬０涙０" , "0" , "0" , "1" , "dokidokifallinlove_short.ogg" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] { "dance_cm3d2_001_f2.anm" , "0" , "0" , "0" , "0" , "0" , "0" , "笑顔|にっこり|ドヤ顔|ウインク照れ|引きつり笑顔|微笑み|発情|誘惑|思案伏せ目|疑問" , "頬０涙０" , "0" , "0" , "1" , "dokidokifallinlove_short.ogg" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] { "dance_cm3d2_001_f3.anm" , "0" , "0" , "0" , "0" , "0" , "0" , "笑顔|にっこり|ドヤ顔|ウインク照れ|引きつり笑顔|微笑み|発情|誘惑|思案伏せ目|疑問" , "頬０涙０" , "0" , "0" , "1" , "dokidokifallinlove_short.ogg" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] { "haimenritui_2_f.anm|haimenritui_2a01_f.anm|haimenritui_2b01_f.anm|haimenritui_2b02_f.anm|haimenritui_3_f.anm|haimenritui_3a01_f.anm|haimenritui_3b01_f.anm|haimenritui_3b02_f.anm" , "-0.77" , "-1.92" , "-4.26" , "0" , "318.3" , "0" , "エロ痛み我慢|エロ羞恥２|興奮射精後１|エロ痛み２|引きつり笑顔|エロ我慢３|まぶたギュ" , "頬２涙１" , "-2" , "3" , "1" , "" , "SEX_A" , "-1" , "0" , "" , "1" }
-	};
-	private string[][] life03_02m = new string[][]{
-	  new string[] { "" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] { "haimenritui_2_m.anm|haimenritui_2_m.anm|haimenritui_2_m.anm|haimenritui_2_m.anm|haimenritui_3_m.anm|haimenritui_3_m.anm|haimenritui_3_m.anm|haimenritui_3_m.anm" , "-0.77" , "-1.92" , "-4.26" , "0" , "318.3" , "0" , "3" },
-	  new string[] { "m_dance000_m.anm" , "0.86" , "-1.94" , "10.25" , "0" , "188.3" , "0" , "0" },
-	  new string[] { "m_dance000_m.anm" , "-1.11" , "-1.92" , "10.01" , "0" , "172.2" , "0" , "0" }
-	};
 
-	private string[][] life03_03f = new string[][]{
-	  new string[] { "dance_cm3d2_kara_002_cktc_f1.anm" , "0.54" , "0" , "5.58" , "0" , "75.7" , "0" , "笑顔|にっこり|ドヤ顔|ウインク照れ|引きつり笑顔|微笑み|発情|誘惑|思案伏せ目|疑問" , "頬０涙０" , "0" , "0" , "0" , "can_know_two_close.ogg" , "" , "-1" , "-1" , "handitem,HandItemL_Karaoke_Mike_I_.menu" , "0" },
-	  new string[] { "dance_cm3d_004_kano_f1.anm" , "-0.75" , "0" , "-0.05" , "0" , "0" , "0" , "笑顔|にっこり|ドヤ顔|ウインク照れ|引きつり笑顔|微笑み|発情|誘惑|思案伏せ目|疑問" , "頬０涙０" , "0" , "0" , "1" , "can_know_two_close.ogg" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] { "dance_cm3d_004_kano_f1.anm" , "0.75" , "0" , "-0.05" , "0" , "0" , "0" , "笑顔|にっこり|ドヤ顔|ウインク照れ|引きつり笑顔|微笑み|発情|誘惑|思案伏せ目|疑問" , "頬０涙０" , "0" , "0" , "1" , "can_know_two_close.ogg" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] { "jump_s.anm|jump_s.anm|jump_s.anm|[S]turn01_ATOFF_.anm|kaiwa_tati_kuyasi_taiki_1_f.anm|kaiwa_tati_kuyasi_taiki_1_f.anm|kaiwa_tati_yorokobu_f_ONCE_.anm" , "0.50" , "-1.92" , "8.95" , "0" , "186.0" , "0" , "笑顔|にっこり|ドヤ顔|微笑み|ウインク照れ" , "頬１涙０" , "-2" , "0" , "1" , "" , "" , "-1" , "0" , "" , "0" }
-	};
-	private string[][] life03_03m = new string[][]{
-	  new string[] { "" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] { "m_dance000_m.anm" , "-2.72" , "-1.92" , "8.78" , "0" , "166.2" , "0" , "0" },
+        //03：サロン（夜） シーン設定
+        private string[][] life03_01f = new string[][]{
+          new string[] {"dance_cm3d_001_f1.anm","0","0","0","0","0","0","笑顔|にっこり|ドヤ顔|ウインク照れ|引きつり笑顔|微笑み|発情|誘惑|思案伏せ目|疑問","頬０涙０","0" , "0" , "1" , "entrancetoyou_short.ogg" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"kaiwa_sofa_kangaeruB_taiki_f.anm|kaiwa_sofa_1_f.anm|kaiwa_sofa_kangaeru_f_ONCE_.anm|kaiwa_sofa_noridasu_2_f_ONCE_.anm|kaiwa_sofa_teawaseA_taiki1_f.anm|kaiwa_sofa_teawase_taiki_f.anm|kaiwa_sofa_tere_taiki_f.anm","-5.67","-1.45","7.91","0","106","0","通常|微笑み|笑顔|にっこり|優しさ|思案伏せ目|発情|誘惑","頬０涙０","-2" , "0" , "1" , "" , "会話01" , "-1" , "300" , "" , "0" },
+          new string[] {"settai_aibu_2_f.anm|settai_aibu_3_f.anm","3.73","-1.46","11.48","0","205","0","エロ羞恥１|エロ羞恥２|興奮射精後１|エロ痛み２|エロ我慢３|まぶたギュ","頬２涙１","-2" , "0" , "2" , "" , "SEX_A" , "-1" , "0" , "" , "1" },
+          new string[] {"om_furo_taimenzai_kiss_2_f.anm|om_furo_taimenzai_kiss_3_f.anm","5.73","-1.47","4.69","0","268","0","エロ羞恥２|エロ羞恥３|エロ好感３|興奮射精後１|発情|エロ興奮３|エロ期待","頬２涙１よだれ","-2" , "3" , "2" , "" , "SEX_A" , "-1" , "0" , "" , "1" }
+        };
+        private string[][] life03_01m = new string[][]{
+          new string[] { "" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] { "man_suwarimati1.anm" , "-5.73" , "-1.41" , "8.6" , "0" , "114" , "0" , "1" },
+          new string[] { "settai_aibu_2_m.anm|settai_aibu_3_m.anm" , "3.73" , "-1.46" , "11.48" , "0" , "205" , "0" , "2" },
+          new string[] { "om_furo_taimenzai_kiss_2_m.anm|om_furo_taimenzai_kiss_3_m.anm" , "5.73" , "-1.47" , "4.69" , "0" , "268" , "0" , "3" }
+        };
+
+        private string[][] life03_02f = new string[][]{
+          new string[] { "dance_cm3d2_001_f1.anm" , "0" , "0" , "0" , "0" , "0" , "0" , "笑顔|にっこり|ドヤ顔|ウインク照れ|引きつり笑顔|微笑み|発情|誘惑|思案伏せ目|疑問" , "頬０涙０" , "0" , "0" , "1" , "dokidokifallinlove_short.ogg" , "" , "-1" , "-1" , "" , "0" },
+          new string[] { "dance_cm3d2_001_f2.anm" , "0" , "0" , "0" , "0" , "0" , "0" , "笑顔|にっこり|ドヤ顔|ウインク照れ|引きつり笑顔|微笑み|発情|誘惑|思案伏せ目|疑問" , "頬０涙０" , "0" , "0" , "1" , "dokidokifallinlove_short.ogg" , "" , "-1" , "-1" , "" , "0" },
+          new string[] { "dance_cm3d2_001_f3.anm" , "0" , "0" , "0" , "0" , "0" , "0" , "笑顔|にっこり|ドヤ顔|ウインク照れ|引きつり笑顔|微笑み|発情|誘惑|思案伏せ目|疑問" , "頬０涙０" , "0" , "0" , "1" , "dokidokifallinlove_short.ogg" , "" , "-1" , "-1" , "" , "0" },
+          new string[] { "haimenritui_2_f.anm|haimenritui_2a01_f.anm|haimenritui_2b01_f.anm|haimenritui_2b02_f.anm|haimenritui_3_f.anm|haimenritui_3a01_f.anm|haimenritui_3b01_f.anm|haimenritui_3b02_f.anm" , "-0.77" , "-1.92" , "-4.26" , "0" , "318.3" , "0" , "エロ痛み我慢|エロ羞恥２|興奮射精後１|エロ痛み２|引きつり笑顔|エロ我慢３|まぶたギュ" , "頬２涙１" , "-2" , "3" , "1" , "" , "SEX_A" , "-1" , "0" , "" , "1" }
+        };
+        private string[][] life03_02m = new string[][]{
+          new string[] { "" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] { "haimenritui_2_m.anm|haimenritui_2_m.anm|haimenritui_2_m.anm|haimenritui_2_m.anm|haimenritui_3_m.anm|haimenritui_3_m.anm|haimenritui_3_m.anm|haimenritui_3_m.anm" , "-0.77" , "-1.92" , "-4.26" , "0" , "318.3" , "0" , "3" },
+          new string[] { "m_dance000_m.anm" , "0.86" , "-1.94" , "10.25" , "0" , "188.3" , "0" , "0" },
+          new string[] { "m_dance000_m.anm" , "-1.11" , "-1.92" , "10.01" , "0" , "172.2" , "0" , "0" }
+        };
+
+        private string[][] life03_03f = new string[][]{
+          new string[] { "dance_cm3d2_kara_002_cktc_f1.anm" , "0.54" , "0" , "5.58" , "0" , "75.7" , "0" , "笑顔|にっこり|ドヤ顔|ウインク照れ|引きつり笑顔|微笑み|発情|誘惑|思案伏せ目|疑問" , "頬０涙０" , "0" , "0" , "0" , "can_know_two_close.ogg" , "" , "-1" , "-1" , "handitem,HandItemL_Karaoke_Mike_I_.menu" , "0" },
+          new string[] { "dance_cm3d_004_kano_f1.anm" , "-0.75" , "0" , "-0.05" , "0" , "0" , "0" , "笑顔|にっこり|ドヤ顔|ウインク照れ|引きつり笑顔|微笑み|発情|誘惑|思案伏せ目|疑問" , "頬０涙０" , "0" , "0" , "1" , "can_know_two_close.ogg" , "" , "-1" , "-1" , "" , "0" },
+          new string[] { "dance_cm3d_004_kano_f1.anm" , "0.75" , "0" , "-0.05" , "0" , "0" , "0" , "笑顔|にっこり|ドヤ顔|ウインク照れ|引きつり笑顔|微笑み|発情|誘惑|思案伏せ目|疑問" , "頬０涙０" , "0" , "0" , "1" , "can_know_two_close.ogg" , "" , "-1" , "-1" , "" , "0" },
+          new string[] { "jump_s.anm|jump_s.anm|jump_s.anm|[S]turn01_ATOFF_.anm|kaiwa_tati_kuyasi_taiki_1_f.anm|kaiwa_tati_kuyasi_taiki_1_f.anm|kaiwa_tati_yorokobu_f_ONCE_.anm" , "0.50" , "-1.92" , "8.95" , "0" , "186.0" , "0" , "笑顔|にっこり|ドヤ顔|微笑み|ウインク照れ" , "頬１涙０" , "-2" , "0" , "1" , "" , "" , "-1" , "0" , "" , "0" }
+        };
+        private string[][] life03_03m = new string[][]{
+          new string[] { "" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] { "m_dance000_m.anm" , "-2.72" , "-1.92" , "8.78" , "0" , "166.2" , "0" , "0" },
           new string[] { "m_dance000_m.anm" , "2.17" , "-1.92" , "10.29" , "0" , "202.6" , "0" , "0" },
           new string[] { "m_dance000_m.anm" , "-1.11" , "-1.92" , "10.01" , "0" , "172.2" , "0" , "0" }
-	};
+        };
 
-	private string[][] life03_04f = new string[][]{
-	  new string[] { "dance_cm3d2_kara_001_sl_f1.anm" , "3.42" , "0" , "0.28" , "0" , "177.7" , "0" , "笑顔|にっこり|ドヤ顔|ウインク照れ|引きつり笑顔|微笑み|発情|誘惑|思案伏せ目|疑問" , "頬０涙０" , "0" , "0" , "0" , "scarlet leap_short.ogg" , "" , "-1" , "-1" , "handitem,HandItemL_Karaoke_Mike_I_.menu" , "0" },
-	  new string[] { "dance_cm3d_002_end_f1.anm" , "-0.92" , "0" , "-0.48" , "0" , "35" , "0" , "笑顔|にっこり|ドヤ顔|ウインク照れ|引きつり笑顔|微笑み|発情|誘惑|思案伏せ目|疑問" , "頬０涙０" , "0" , "0" , "1" , "scarlet leap_short.ogg" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] { "dance_cm3d_002_end_f1.anm" , "1.02" , "0" , "-0.38" , "0" , "330" , "0" , "笑顔|にっこり|ドヤ顔|ウインク照れ|引きつり笑顔|微笑み|発情|誘惑|思案伏せ目|疑問" , "頬０涙０" , "0" , "0" , "1" , "scarlet leap_short.ogg" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] { "jump_s.anm|jump_s.anm|jump_s.anm|[S]turn01_ATOFF_.anm|kaiwa_tati_kuyasi_taiki_1_f.anm|kaiwa_tati_kuyasi_taiki_1_f.anm|kaiwa_tati_yorokobu_f_ONCE_.anm" , "0.50" , "-1.92" , "8.95" , "0" , "186.0" , "0" , "笑顔|にっこり|ドヤ顔|微笑み|ウインク照れ" , "頬１涙０" , "-2" , "0" , "1" , "" , "" , "-1" , "0" , "" , "0" }
-	};
-	private string[][] life03_04m = new string[][]{
-	  new string[] { "" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] { "m_dance000_m.anm" , "-2.72" , "-1.92" , "8.78" , "0" , "166.2" , "0" , "0" },
+        private string[][] life03_04f = new string[][]{
+          new string[] { "dance_cm3d2_kara_001_sl_f1.anm" , "3.42" , "0" , "0.28" , "0" , "177.7" , "0" , "笑顔|にっこり|ドヤ顔|ウインク照れ|引きつり笑顔|微笑み|発情|誘惑|思案伏せ目|疑問" , "頬０涙０" , "0" , "0" , "0" , "scarlet leap_short.ogg" , "" , "-1" , "-1" , "handitem,HandItemL_Karaoke_Mike_I_.menu" , "0" },
+          new string[] { "dance_cm3d_002_end_f1.anm" , "-0.92" , "0" , "-0.48" , "0" , "35" , "0" , "笑顔|にっこり|ドヤ顔|ウインク照れ|引きつり笑顔|微笑み|発情|誘惑|思案伏せ目|疑問" , "頬０涙０" , "0" , "0" , "1" , "scarlet leap_short.ogg" , "" , "-1" , "-1" , "" , "0" },
+          new string[] { "dance_cm3d_002_end_f1.anm" , "1.02" , "0" , "-0.38" , "0" , "330" , "0" , "笑顔|にっこり|ドヤ顔|ウインク照れ|引きつり笑顔|微笑み|発情|誘惑|思案伏せ目|疑問" , "頬０涙０" , "0" , "0" , "1" , "scarlet leap_short.ogg" , "" , "-1" , "-1" , "" , "0" },
+          new string[] { "jump_s.anm|jump_s.anm|jump_s.anm|[S]turn01_ATOFF_.anm|kaiwa_tati_kuyasi_taiki_1_f.anm|kaiwa_tati_kuyasi_taiki_1_f.anm|kaiwa_tati_yorokobu_f_ONCE_.anm" , "0.50" , "-1.92" , "8.95" , "0" , "186.0" , "0" , "笑顔|にっこり|ドヤ顔|微笑み|ウインク照れ" , "頬１涙０" , "-2" , "0" , "1" , "" , "" , "-1" , "0" , "" , "0" }
+        };
+        private string[][] life03_04m = new string[][]{
+          new string[] { "" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] { "m_dance000_m.anm" , "-2.72" , "-1.92" , "8.78" , "0" , "166.2" , "0" , "0" },
           new string[] { "m_dance000_m.anm" , "2.17" , "-1.92" , "10.29" , "0" , "202.6" , "0" , "0" },
           new string[] { "m_dance000_m.anm" , "-1.11" , "-1.92" , "10.01" , "0" , "172.2" , "0" , "0" }
-	};
+        };
 
-	private string[][] life03_05f = new string[][]{
-	  new string[] { "dance_cmo_001_cg_f1.anm" , "0" , "0" , "0" , "0" , "0" , "0" , "笑顔|にっこり|ドヤ顔|ウインク照れ|引きつり笑顔|微笑み|発情|誘惑|思案伏せ目|疑問" , "頬０涙０" , "0" , "0" , "1" , "candygirl_short.ogg" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] { "dance_cmo_001_cg_f2.anm" , "0" , "0" , "0" , "0" , "0" , "0" , "笑顔|にっこり|ドヤ顔|ウインク照れ|引きつり笑顔|微笑み|発情|誘惑|思案伏せ目|疑問" , "頬０涙０" , "0" , "0" , "1" , "candygirl_short.ogg" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] { "dance_cmo_001_cg_f3.anm" , "0" , "0" , "0" , "0" , "0" , "0" , "笑顔|にっこり|ドヤ顔|ウインク照れ|引きつり笑顔|微笑み|発情|誘惑|思案伏せ目|疑問" , "頬０涙０" , "0" , "0" , "1" , "candygirl_short.ogg" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] { "jump_s.anm|jump_s.anm|jump_s.anm|[S]turn01_ATOFF_.anm|kaiwa_tati_kuyasi_taiki_1_f.anm|kaiwa_tati_kuyasi_taiki_1_f.anm|kaiwa_tati_yorokobu_f_ONCE_.anm" , "0.50" , "-1.92" , "8.95" , "0" , "186.0" , "0" , "笑顔|にっこり|ドヤ顔|微笑み|ウインク照れ" , "頬１涙０" , "-2" , "0" , "1" , "" , "" , "-1" , "0" , "" , "0" }
-	};
-	private string[][] life03_05m = new string[][]{
-	  new string[] { "" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] { "m_dance000_m.anm" , "-2.72" , "-1.92" , "8.78" , "0" , "166.2" , "0" , "0" },
+        private string[][] life03_05f = new string[][]{
+          new string[] { "dance_cmo_001_cg_f1.anm" , "0" , "0" , "0" , "0" , "0" , "0" , "笑顔|にっこり|ドヤ顔|ウインク照れ|引きつり笑顔|微笑み|発情|誘惑|思案伏せ目|疑問" , "頬０涙０" , "0" , "0" , "1" , "candygirl_short.ogg" , "" , "-1" , "-1" , "" , "0" },
+          new string[] { "dance_cmo_001_cg_f2.anm" , "0" , "0" , "0" , "0" , "0" , "0" , "笑顔|にっこり|ドヤ顔|ウインク照れ|引きつり笑顔|微笑み|発情|誘惑|思案伏せ目|疑問" , "頬０涙０" , "0" , "0" , "1" , "candygirl_short.ogg" , "" , "-1" , "-1" , "" , "0" },
+          new string[] { "dance_cmo_001_cg_f3.anm" , "0" , "0" , "0" , "0" , "0" , "0" , "笑顔|にっこり|ドヤ顔|ウインク照れ|引きつり笑顔|微笑み|発情|誘惑|思案伏せ目|疑問" , "頬０涙０" , "0" , "0" , "1" , "candygirl_short.ogg" , "" , "-1" , "-1" , "" , "0" },
+          new string[] { "jump_s.anm|jump_s.anm|jump_s.anm|[S]turn01_ATOFF_.anm|kaiwa_tati_kuyasi_taiki_1_f.anm|kaiwa_tati_kuyasi_taiki_1_f.anm|kaiwa_tati_yorokobu_f_ONCE_.anm" , "0.50" , "-1.92" , "8.95" , "0" , "186.0" , "0" , "笑顔|にっこり|ドヤ顔|微笑み|ウインク照れ" , "頬１涙０" , "-2" , "0" , "1" , "" , "" , "-1" , "0" , "" , "0" }
+        };
+        private string[][] life03_05m = new string[][]{
+          new string[] { "" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] { "m_dance000_m.anm" , "-2.72" , "-1.92" , "8.78" , "0" , "166.2" , "0" , "0" },
           new string[] { "m_dance000_m.anm" , "2.17" , "-1.92" , "10.29" , "0" , "202.6" , "0" , "0" },
           new string[] { "m_dance000_m.anm" , "-1.11" , "-1.92" , "10.01" , "0" , "172.2" , "0" , "0" }
-	};
+        };
 
 
-	//04：書斎 シーン設定
-	private string[][] life04_01f = new string[][]{
+        //04：書斎 シーン設定
+        private string[][] life04_01f = new string[][]{
           new string[] { "work_saihou.anm" , "-1.139137" , "0.5423361" , "-1.183796" , "0" , "0" , "0" , "ドヤ顔|ジト目|思案伏せ目" , "頬０涙０" , "0" , "0" , "1" , "" , "裁縫" , "-1" , "-1" , "handitem,HandItemD_Shisyuu_Hari_I_.menu" , "0" },
           new string[] { "kaiwa_sofa_kangaeruB_taiki_f.anm|kaiwa_sofa_1_f.anm|kaiwa_sofa_kangaeru_f_ONCE_.anm|kaiwa_sofa_noridasu_2_f_ONCE_.anm|kaiwa_sofa_teawaseA_taiki1_f.anm|kaiwa_sofa_teawase_taiki_f.anm|kaiwa_sofa_tere_taiki_f.anm|kaiwa_sofa_odoroki_taiki_f.anm" , "3.708251" , "0.4274125" , "-0.442423" , "0" , "306.8843" , "0" , "通常|微笑み|にっこり|思案伏せ目|困った|疑問|びっくり" , "頬０涙０" , "0" , "0" , "0" , "" , "会話01" , "-1" , "300" , "" , "0" },
           new string[] { "kaiwa_sofa_kangaeruB_taiki_f.anm|kaiwa_sofa_1_f.anm|kaiwa_sofa_kangaeru_f_ONCE_.anm|kaiwa_sofa_noridasu_2_f_ONCE_.anm|kaiwa_sofa_teawaseA_taiki1_f.anm|kaiwa_sofa_teawase_taiki_f.anm|kaiwa_sofa_tere_taiki_f.anm" , "3.033922" , "0.4356421" , "-1.74213" , "0" , "87.28329" , "0" , "通常|微笑み|にっこり|思案伏せ目|困った|疑問|びっくり" , "頬０涙０" , "0" , "0" , "0" , "" , "会話01" , "-1" , "300" , "" , "0" },
           new string[] { "sleep2.anm" , "-1.119797" , "0.5723807" , "1.035077" , "0" , "173.4105" , "0" , "居眠り安眠|接吻|まぶたギュ" , "頬０涙０" , "0" , "0" , "1" , "" , "" , "-1" , "-1" , "" , "0" }
-	};
-	private string[][] life04_01m = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
-	};
+        };
+        private string[][] life04_01m = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
+        };
 
 
-	//05：書斎（夜） シーン設定
-	private string[][] life05_01f = new string[][]{
-	  new string[] { "midasinami_kesyou_lip_f.anm" , "-2.320528" , "0.5723807" , "1.035077" , "0" , "173.4105" , "0" , "優しさ|思案伏せ目|疑問" , "頬０涙０" , "0" , "0" , "1" , "" , "化粧" , "-1" , "-1" , "handitem,HandItemR_Rip_I_.menu" , "0" },
-	  new string[] { "midasinami_kesyou_puff_f.anm" , "-1.139137" , "0.5423361" , "-1.072908" , "0" , "0" , "0" , "優しさ|思案伏せ目|疑問|ジト目" , "頬０涙０" , "0" , "0" , "1" , "" , "化粧" , "-1" , "-1" , "handitem,HandItemR_Puff_I_.menu" , "0" },
+        //05：書斎（夜） シーン設定
+        private string[][] life05_01f = new string[][]{
+          new string[] { "midasinami_kesyou_lip_f.anm" , "-2.320528" , "0.5723807" , "1.035077" , "0" , "173.4105" , "0" , "優しさ|思案伏せ目|疑問" , "頬０涙０" , "0" , "0" , "1" , "" , "化粧" , "-1" , "-1" , "handitem,HandItemR_Rip_I_.menu" , "0" },
+          new string[] { "midasinami_kesyou_puff_f.anm" , "-1.139137" , "0.5423361" , "-1.072908" , "0" , "0" , "0" , "優しさ|思案伏せ目|疑問|ジト目" , "頬０涙０" , "0" , "0" , "1" , "" , "化粧" , "-1" , "-1" , "handitem,HandItemR_Puff_I_.menu" , "0" },
           new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" },
           new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" }
-	};
-	private string[][] life05_01m = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
-	};
+        };
+        private string[][] life05_01m = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
+        };
 
 
-	//06：ドレスルーム シーン設定
-	private string[][] life06_01f = new string[][]{
+        //06：ドレスルーム シーン設定
+        private string[][] life06_01f = new string[][]{
           new string[] { "siriname_2_f.anm" , "-2.120155" , "0" , "-1.992422" , "0" , "266.5095" , "0" , "エロ舐め愛情|エロ舌責快楽|エロ舐め快楽" , "頬２涙０" , "0" , "0" , "1" , "" , "フェラ01" , "-1" , "0" , "" , "0" },
           new string[] { "tati_kunni_2_f.anm" , "-2.259117" , "0" , "-1.992422" , "0" , "89.15967" , "0" , "エロ痛み我慢|エロ痛み我慢２|エロ痛み我慢３|エロメソ泣き|エロ羞恥３|エロ我慢３|まぶたギュ" , "頬３涙２よだれ" , "0" , "3" , "1" , "" , "SEX01" , "-1" , "0" , "" , "0" },
           new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
           new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
-	};
-	private string[][] life06_01m = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
-	};
+        };
+        private string[][] life06_01m = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
+        };
 
 
-	//07：ドレスルーム（夜） シーン設定
-	private string[][] life07_01f = new string[][]{
+        //07：ドレスルーム（夜） シーン設定
+        private string[][] life07_01f = new string[][]{
           new string[] { "turn01_ATOFF_.anm" , "-0.9644787" , "0" , "-0.9544698" , "0" , "8.691078" , "0" , "ウインク照れ" , "頬０涙０" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
           new string[] { "kaiwa_tati_hakusyu_taiki_2_f.anm" , "-0.9416001" , "0" , "0.3957111" , "0" , "186.1866" , "0" , "疑問" , "頬０涙０" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
           new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
           new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
-	};
-	private string[][] life07_01m = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
-	};
+        };
+        private string[][] life07_01m = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
+        };
 
 
-	//08：自室 シーン設定
-	private string[][] life08_01f = new string[][]{
-	  new string[] { "work_bed.anm" , "-0.2246854" , "0.1080843" , "-1.012155" , "0" , "0" , "0" , "通常|微笑み|にっこり|思案伏せ目|発情|困った|疑問|誘惑" , "頬０涙０" , "0" , "0" , "0" , "" , "掃除" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
-	};
-	private string[][] life08_01m = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
-	};
+        //08：自室 シーン設定
+        private string[][] life08_01f = new string[][]{
+          new string[] { "work_bed.anm" , "-0.2246854" , "0.1080843" , "-1.012155" , "0" , "0" , "0" , "通常|微笑み|にっこり|思案伏せ目|発情|困った|疑問|誘惑" , "頬０涙０" , "0" , "0" , "0" , "" , "掃除" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
+        };
+        private string[][] life08_01m = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
+        };
 
 
-	//09：自室（夜） シーン設定
-	private string[][] life09_01f = new string[][]{
-	  new string[] { "pose_03_f.anm" , "-0.29" , "0.66" , "-1.94" , "0" , "18.7" , "0" , "発情|誘惑|エロ期待|エロ興奮３|優しさ" , "頬１涙０" , "0" , "1" , "0" , "" , "誘惑" , "-1" , "-1" , "" , "0" },
-	  new string[] { "edit_pose_010_f.anm" , "0.08" , "0.66" , "-0.71" , "0" , "276.3" , "0" , "発情|誘惑|エロ期待|エロ興奮３|優しさ" , "頬１涙０" , "0" , "1" , "0" , "" , "誘惑" , "-1" , "-1" , "" , "0" },
-	  new string[] { "fera_onani_2_f.anm" , "-0.5006242" , "0" , "2.292451" , "0" , "177.9255" , "0" , "絶頂射精後１" , "頬３涙０" , "0" , "3" , "1" , "" , "SEX01" , "2.5" , "0" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
-	};	private string[][] life09_01m = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
-	};
+        //09：自室（夜） シーン設定
+        private string[][] life09_01f = new string[][]{
+          new string[] { "pose_03_f.anm" , "-0.29" , "0.66" , "-1.94" , "0" , "18.7" , "0" , "発情|誘惑|エロ期待|エロ興奮３|優しさ" , "頬１涙０" , "0" , "1" , "0" , "" , "誘惑" , "-1" , "-1" , "" , "0" },
+          new string[] { "edit_pose_010_f.anm" , "0.08" , "0.66" , "-0.71" , "0" , "276.3" , "0" , "発情|誘惑|エロ期待|エロ興奮３|優しさ" , "頬１涙０" , "0" , "1" , "0" , "" , "誘惑" , "-1" , "-1" , "" , "0" },
+          new string[] { "fera_onani_2_f.anm" , "-0.5006242" , "0" , "2.292451" , "0" , "177.9255" , "0" , "絶頂射精後１" , "頬３涙０" , "0" , "3" , "1" , "" , "SEX01" , "2.5" , "0" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
+        };        private string[][] life09_01m = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
+        };
 
 
-	//10：ハネムーンルーム（夜） シーン設定
-	private string[][] life10_01f = new string[][]{
-	  new string[] { "onani_1_f.anm" , "0.24" , "0.47" , "-1.51" , "0" , "320.2" , "0" , "発情|誘惑|エロ期待|エロ興奮３|優しさ" , "頬１涙０" , "0" , "1" , "0" , "" , "誘惑" , "-1" , "-1" , "" , "0" },
-	  new string[] { "sleep1.anm" , "3.47" , "0.39" , "-2.06" , "0" , "347.3" , "0" , "発情|誘惑|エロ期待|エロ興奮３|優しさ" , "頬２涙０" , "0" , "1" , "0" , "" , "誘惑" , "-1" , "-1" , "" , "0" },
-	  new string[] { "pose_ero_06_loop_f.anm" , "-6.24" , "0.42" , "-0.46" , "0" , "60.9" , "0" , "発情|誘惑|エロ期待|エロ興奮３|優しさ" , "頬１涙０" , "0" , "1" , "0" , "" , "誘惑" , "-1" , "-1" , "" , "0" },
-	  new string[] { "yorisoi_sokui_hibuhiraki_1_f.anm" , "-0.63" , "0.42" , "-1.54" , "0" , "318.4" , "0" , "発情|誘惑|エロ期待|エロ興奮３|優しさ" , "頬１涙０" , "0" , "1" , "0" , "" , "誘惑" , "-1" , "-1" , "" , "0" }
-	};
-	private string[][] life10_01m = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
-	};
+        //10：ハネムーンルーム（夜） シーン設定
+        private string[][] life10_01f = new string[][]{
+          new string[] { "onani_1_f.anm" , "0.24" , "0.47" , "-1.51" , "0" , "320.2" , "0" , "発情|誘惑|エロ期待|エロ興奮３|優しさ" , "頬１涙０" , "0" , "1" , "0" , "" , "誘惑" , "-1" , "-1" , "" , "0" },
+          new string[] { "sleep1.anm" , "3.47" , "0.39" , "-2.06" , "0" , "347.3" , "0" , "発情|誘惑|エロ期待|エロ興奮３|優しさ" , "頬２涙０" , "0" , "1" , "0" , "" , "誘惑" , "-1" , "-1" , "" , "0" },
+          new string[] { "pose_ero_06_loop_f.anm" , "-6.24" , "0.42" , "-0.46" , "0" , "60.9" , "0" , "発情|誘惑|エロ期待|エロ興奮３|優しさ" , "頬１涙０" , "0" , "1" , "0" , "" , "誘惑" , "-1" , "-1" , "" , "0" },
+          new string[] { "yorisoi_sokui_hibuhiraki_1_f.anm" , "-0.63" , "0.42" , "-1.54" , "0" , "318.4" , "0" , "発情|誘惑|エロ期待|エロ興奮３|優しさ" , "頬１涙０" , "0" , "1" , "0" , "" , "誘惑" , "-1" , "-1" , "" , "0" }
+        };
+        private string[][] life10_01m = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
+        };
 
 
-	//11：風呂（夜） シーン設定
-	private string[][] life11_01f = new string[][]{
+        //11：風呂（夜） シーン設定
+        private string[][] life11_01f = new string[][]{
           new string[] { "mp_arai_tekoki_2_f.anm|mp_arai_2_f.anm|mp_arai_kiss_f.anm|mp_arai_tikubiname_2_f.anm|mp_arai_asiname_2_f.anm|mp2_siri_f.anm|mp2_sakasaarai_f.anm|mp2_sumata_f.anm" , "-0.9051085" , "0" , "-1.240942" , "0" , "127.0402" , "0" , "エロ羞恥２|エロ羞恥３|エロ好感３|興奮射精後１|発情|エロ興奮３|エロ期待" , "頬２涙１よだれ" , "0" , "1" , "1" , "" , "SEX_A" , "-1" , "0" , "" , "1" },
-	  new string[] { "taimenzai_2_f.anm|taimenzai_kiss2_f.anm|taimenzai_momi_2_f.anm|taimenzai_3_f.anm|taimenzai_kiss3_f.anm|taimenzai_momi_3_f.anm" , "0.70387" , "-0.5754409" , "-3.30988" , "0" , "355.7758" , "0" , "エロ羞恥２|興奮射精後１|発情|エロ痛み２|引きつり笑顔|エロ我慢３|まぶたギュ" , "頬３涙１" , "-1" , "1" , "1" , "" , "SEX_A" , "-1" , "0" , "" , "1" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
-	};
-	private string[][] life11_01m = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] { "taimenzai_2_f.anm|taimenzai_kiss2_f.anm|taimenzai_momi_2_f.anm|taimenzai_3_f.anm|taimenzai_kiss3_f.anm|taimenzai_momi_3_f.anm" , "0.70387" , "-0.5754409" , "-3.30988" , "0" , "355.7758" , "0" , "エロ羞恥２|興奮射精後１|発情|エロ痛み２|引きつり笑顔|エロ我慢３|まぶたギュ" , "頬３涙１" , "-1" , "1" , "1" , "" , "SEX_A" , "-1" , "0" , "" , "1" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
+        };
+        private string[][] life11_01m = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
           new string[] { "mp_arai_tekoki_2_m.anm|mp_arai_2_m.anm|mp_arai_kiss_m.anm|mp_arai_tikubiname_2_m.anm|mp_arai_asiname_2_m.anm|mp2_siri_m.anm|mp2_sakasaarai_m.anm|mp2_sumata_m.anm" , "-0.9051085" , "0" , "-1.240942" , "0" , "127.0402" , "0" , "0" },
           new string[] { "taimenzai_2_m.anm|taimenzai_kiss2_m.anm|taimenzai_momi_2_m.anm|taimenzai_3_m.anm|taimenzai_kiss3_m.anm|taimenzai_momi_3_m.anm" , "0.70387" , "-0.5754409" , "-3.30988" , "0" , "355.7758" , "0" , "1" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
-	};
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
+        };
 
 
-	//12：プレイルーム シーン設定
-	private string[][] life12_01f = new string[][]{
-	  new string[] { "soji_hakisouji.anm" , "-1.35" , "-0.04" , "-1.343" , "0" , "318.4" , "0" , "通常|微笑み|にっこり|思案伏せ目|発情|困った|疑問|誘惑" , "頬０涙０" , "0" , "0" , "0" , "" , "掃除" , "-1" , "-1" , "handitem,HandItemR_Houki_I_.menu" , "0" },
-	  new string[] { "soji_tukuefuki_salon.anm" , "1.88" , "0.50" , "0.22" , "0" , "88.5" , "0" , "通常|微笑み|にっこり|思案伏せ目|発情|困った|疑問|誘惑" , "頬０涙０" , "0" , "0" , "0" , "" , "掃除" , "-1" , "-1" , "handitem,HandItemR_Zoukin2_I_.menu" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
-	};
-	private string[][] life12_01m = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
-	};
+        //12：プレイルーム シーン設定
+        private string[][] life12_01f = new string[][]{
+          new string[] { "soji_hakisouji.anm" , "-1.35" , "-0.04" , "-1.343" , "0" , "318.4" , "0" , "通常|微笑み|にっこり|思案伏せ目|発情|困った|疑問|誘惑" , "頬０涙０" , "0" , "0" , "0" , "" , "掃除" , "-1" , "-1" , "handitem,HandItemR_Houki_I_.menu" , "0" },
+          new string[] { "soji_tukuefuki_salon.anm" , "1.88" , "0.50" , "0.22" , "0" , "88.5" , "0" , "通常|微笑み|にっこり|思案伏せ目|発情|困った|疑問|誘惑" , "頬０涙０" , "0" , "0" , "0" , "" , "掃除" , "-1" , "-1" , "handitem,HandItemR_Zoukin2_I_.menu" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
+        };
+        private string[][] life12_01m = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
+        };
 
 
-	//13：プレイルーム（夜） シーン設定
-	private string[][] life13_01f = new string[][]{
-	  new string[] { "seijyoui_kiss_2_f.anm|j_seijyoui_kiss_2a01_f.anm|k_seijyoui_kiss_2a01_f.anm|t_seijyoui_kiss_2a01_f.anm|seijyoui_kiss_2a01_f.anm|seijyoui_daki_kiss_2_f.anm|seijyoui_2_f.anm|seijyoui_2e01_f.anm|seijyoui_2e02_f.anm|j_seijyoui_2_f.anm|k_seijyoui_2_f.anm|t_seijyoui_2_f.anm|seijyoui_3_f.anm|seijyoui_3e01_f.anm|seijyoui_3e02_f.anm|j_seijyoui_3_f.anm|k_seijyoui_3_f.anm|t_seijyoui_3_f.anm" , "0.95" , "0.5" , "1.92" , "0" , "272.9" , "0" , "エロ羞恥２|エロ羞恥３|エロ好感３|興奮射精後１|発情|エロ興奮３|エロ期待" , "頬２涙１" , "0" , "1" , "1" , "" , "SEX_A" , "-1" , "0" , "" , "1" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
-	};
-	private string[][] life13_01m = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] { "seijyoui_kiss_2_m.anm|j_seijyoui_kiss_2a01_m.anm|k_seijyoui_kiss_2a01_m.anm|t_seijyoui_kiss_2a01_m.anm|seijyoui_kiss_2a01_m.anm|seijyoui_daki_kiss_2_m.anm|seijyoui_2_m.anm|seijyoui_2e01_m.anm|seijyoui_2e02_m.anm|j_seijyoui_2_m.anm|k_seijyoui_2_m.anm|t_seijyoui_2_m.anm|seijyoui_3_m.anm|seijyoui_3e01_m.anm|seijyoui_3e02_m.anm|j_seijyoui_3_m.anm|k_seijyoui_3_m.anm|t_seijyoui_3_m.anm" , "0.95" , "0.5" , "1.92" , "0" , "272.9" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
-	};
+        //13：プレイルーム（夜） シーン設定
+        private string[][] life13_01f = new string[][]{
+          new string[] { "seijyoui_kiss_2_f.anm|j_seijyoui_kiss_2a01_f.anm|k_seijyoui_kiss_2a01_f.anm|t_seijyoui_kiss_2a01_f.anm|seijyoui_kiss_2a01_f.anm|seijyoui_daki_kiss_2_f.anm|seijyoui_2_f.anm|seijyoui_2e01_f.anm|seijyoui_2e02_f.anm|j_seijyoui_2_f.anm|k_seijyoui_2_f.anm|t_seijyoui_2_f.anm|seijyoui_3_f.anm|seijyoui_3e01_f.anm|seijyoui_3e02_f.anm|j_seijyoui_3_f.anm|k_seijyoui_3_f.anm|t_seijyoui_3_f.anm" , "0.95" , "0.5" , "1.92" , "0" , "272.9" , "0" , "エロ羞恥２|エロ羞恥３|エロ好感３|興奮射精後１|発情|エロ興奮３|エロ期待" , "頬２涙１" , "0" , "1" , "1" , "" , "SEX_A" , "-1" , "0" , "" , "1" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
+        };
+        private string[][] life13_01m = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] { "seijyoui_kiss_2_m.anm|j_seijyoui_kiss_2a01_m.anm|k_seijyoui_kiss_2a01_m.anm|t_seijyoui_kiss_2a01_m.anm|seijyoui_kiss_2a01_m.anm|seijyoui_daki_kiss_2_m.anm|seijyoui_2_m.anm|seijyoui_2e01_m.anm|seijyoui_2e02_m.anm|j_seijyoui_2_m.anm|k_seijyoui_2_m.anm|t_seijyoui_2_m.anm|seijyoui_3_m.anm|seijyoui_3e01_m.anm|seijyoui_3e02_m.anm|j_seijyoui_3_m.anm|k_seijyoui_3_m.anm|t_seijyoui_3_m.anm" , "0.95" , "0.5" , "1.92" , "0" , "272.9" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
+        };
 
-	private string[][] life13_02f = new string[][]{
-	  new string[] { "kouhaii_3_f.anm|kouhaii_3a01_f.anm|kouhaii_3b01_f.anm|kouhaii_3b02_f.anm|kouhaii_cli_3_f.anm|kouhaii_daki_3_f.anm|kouhaii_siri_3_f.anm" , "0.77" , "0.5" , "1.92" , "0" , "272.9" , "0" , "エロ痛み我慢|エロ痛み我慢２|エロ痛み我慢３|エロメソ泣き|エロ羞恥３|エロ我慢３" , "頬３涙２" , "0" , "1" , "1" , "" , "SEX_A" , "-1" , "0" , "" , "1" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
-	};
-	private string[][] life13_02m = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] { "kouhaii_3_m.anm|kouhaii_3_m.anm|kouhaii_3_m.anm|kouhaii_3_m.anm|kouhaii_cli_3_m.anm|kouhaii_daki_3_m.anm|kouhaii_siri_3_m.anm" , "0.77" , "0.5" , "1.92" , "0" , "272.9" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
-	};
+        private string[][] life13_02f = new string[][]{
+          new string[] { "kouhaii_3_f.anm|kouhaii_3a01_f.anm|kouhaii_3b01_f.anm|kouhaii_3b02_f.anm|kouhaii_cli_3_f.anm|kouhaii_daki_3_f.anm|kouhaii_siri_3_f.anm" , "0.77" , "0.5" , "1.92" , "0" , "272.9" , "0" , "エロ痛み我慢|エロ痛み我慢２|エロ痛み我慢３|エロメソ泣き|エロ羞恥３|エロ我慢３" , "頬３涙２" , "0" , "1" , "1" , "" , "SEX_A" , "-1" , "0" , "" , "1" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
+        };
+        private string[][] life13_02m = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] { "kouhaii_3_m.anm|kouhaii_3_m.anm|kouhaii_3_m.anm|kouhaii_3_m.anm|kouhaii_cli_3_m.anm|kouhaii_daki_3_m.anm|kouhaii_siri_3_m.anm" , "0.77" , "0.5" , "1.92" , "0" , "272.9" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
+        };
 
 
-	//14：プレイルーム2 シーン設定
-	private string[][] life14_01f = new string[][]{
-	  new string[] { "midasinami_moyougae_f.anm" , "-4.50" , "0" , "-1.35" , "0" , "242.1" , "0" , "通常|微笑み|にっこり|思案伏せ目|発情|困った|疑問|誘惑" , "頬０涙０" , "0" , "0" , "0" , "" , "掃除" , "-1" , "-1" , "" , "0" },
+        //14：プレイルーム2 シーン設定
+        private string[][] life14_01f = new string[][]{
+          new string[] { "midasinami_moyougae_f.anm" , "-4.50" , "0" , "-1.35" , "0" , "242.1" , "0" , "通常|微笑み|にっこり|思案伏せ目|発情|困った|疑問|誘惑" , "頬０涙０" , "0" , "0" , "0" , "" , "掃除" , "-1" , "-1" , "" , "0" },
           new string[] { "soji_hataki_kaiwa_r.anm" , "3.20" , "0" , "-1.32" , "0" , "110.3" , "0" , "通常|微笑み|にっこり|思案伏せ目|発情|困った|疑問|誘惑" , "頬０涙０" , "0" , "0" , "0" , "" , "掃除" , "-1" , "-1" , "handitem,HandItemR_Dance_Hataki_I_.menu" , "0" },
           new string[] { "soji_tukuefuki_salon.anm" , "-2.06" , "0.42" , "5.3" , "0" , "297.1" , "0" , "通常|微笑み|にっこり|思案伏せ目|発情|困った|疑問|誘惑" , "頬０涙０" , "0" , "0" , "0" , "" , "掃除" , "-1" , "-1" , "handitem,HandItemR_Zoukin2_I_.menu" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
-	};
-	private string[][] life14_01m = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
-	};
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
+        };
+        private string[][] life14_01m = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
+        };
 
 
-	//15：プレイルーム2（夜） シーン設定
-	private string[][] life15_01f = new string[][]{
-	  new string[] {"harem_sex_2_f.anm" , "0" , "0.58" , "-1.38" , "0" , "180" , "0" , "エロ痛み我慢|エロ痛み我慢２|エロ痛み我慢３|エロメソ泣き|エロ羞恥３|エロ我慢３|まぶたギュ" , "頬２涙１" , "0" , "1" , "1" , "" , "SEX02" , "-1" , "0" , "" , "1" },
-	  new string[] {"harem_sex_2_f2.anm" , "0" , "0.58" , "-1.38" , "0" , "180" , "0" , "エロ羞恥２|興奮射精後１|発情|エロ痛み２|引きつり笑顔|エロ我慢３|まぶたギュ" , "頬２涙１" , "0" , "1" , "1" , "" , "SEX01" , "-1" , "0" , "" , "1" },
-	  new string[] {"harem_sex_2_f3.anm" , "0" , "0.58" , "-1.38" , "0" , "180" , "0" , "エロ羞恥２|興奮射精後１|発情|エロ痛み２|引きつり笑顔|エロ我慢３|まぶたギュ" , "頬２涙１" , "0" , "1" , "1" , "" , "SEX01" , "-1" , "0" , "" , "1" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
-	};
-	private string[][] life15_01m = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"harem_sex_2_m.anm" , "0" , "0.58" , "-1.38" , "0" , "180" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
-	};
+        //15：プレイルーム2（夜） シーン設定
+        private string[][] life15_01f = new string[][]{
+          new string[] {"harem_sex_2_f.anm" , "0" , "0.58" , "-1.38" , "0" , "180" , "0" , "エロ痛み我慢|エロ痛み我慢２|エロ痛み我慢３|エロメソ泣き|エロ羞恥３|エロ我慢３|まぶたギュ" , "頬２涙１" , "0" , "1" , "1" , "" , "SEX02" , "-1" , "0" , "" , "1" },
+          new string[] {"harem_sex_2_f2.anm" , "0" , "0.58" , "-1.38" , "0" , "180" , "0" , "エロ羞恥２|興奮射精後１|発情|エロ痛み２|引きつり笑顔|エロ我慢３|まぶたギュ" , "頬２涙１" , "0" , "1" , "1" , "" , "SEX01" , "-1" , "0" , "" , "1" },
+          new string[] {"harem_sex_2_f3.anm" , "0" , "0.58" , "-1.38" , "0" , "180" , "0" , "エロ羞恥２|興奮射精後１|発情|エロ痛み２|引きつり笑顔|エロ我慢３|まぶたギュ" , "頬２涙１" , "0" , "1" , "1" , "" , "SEX01" , "-1" , "0" , "" , "1" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
+        };
+        private string[][] life15_01m = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"harem_sex_2_m.anm" , "0" , "0.58" , "-1.38" , "0" , "180" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
+        };
 
 
-	//16：プール シーン設定
-	private string[][] life16_01f = new string[][]{
-	  new string[] { "sixnine_2_f.anm|sixnine_2a01_f.anm|paizuri_69_2_f.anm|paizuri_69_kunni_f.anm|paizuri_fera_69_2_f.anm" , "4.25" , "0.37" , "10" , "0" , "180" , "0" , "エロ羞恥２|エロ羞恥３|エロ好感３|興奮射精後１|発情|エロ興奮３|エロ期待" , "頬２涙１よだれ" , "0" , "1" , "1" , "" , "SEX_A" , "-1" , "0" , "" , "1" },
-	  new string[] { "hekimen_tati_sokui_2_f.anm|hekimen_tati_sokui_3_f.anm|hekimen_tati_sokui_kiss_2_f.anm|hekimen_tati_sokui_kiss_2a01_f.anm|hekimen_tati_sokui_kiss_3_f.anm|hekimen_tati_sokui_kiss_3a01_f.anm" , "10.43" , "-0.47" , "0.5" , "0" , "91.4" , "0" , "エロ羞恥２|エロ羞恥３|エロ好感３|興奮射精後１|発情|エロ興奮３|エロ期待" , "頬２涙１" , "-1" , "1" , "1" , "" , "SEX_A" , "-1" , "0" , "" , "1" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
-	};
-	private string[][] life16_01m = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] { "sixnine_2_m.anm|sixnine_2_m.anm|paizuri_69_2_m.anm|paizuri_69_kunni_m.anm|paizuri_fera_69_2_m.anm" , "4.25" , "0.37" , "10" , "0" , "180" , "0" , "0" },
-	  new string[] { "hekimen_tati_sokui_2_m.anm|hekimen_tati_sokui_3_m.anm|hekimen_tati_sokui_kiss_2_m.anm|hekimen_tati_sokui_kiss_2a01_m.anm|hekimen_tati_sokui_kiss_3_m.anm|hekimen_tati_sokui_kiss_3a01_m.anm" , "10.43" , "-0.47" , "0.5" , "0" , "91.4" , "0" , "1" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
-	};
+        //16：プール シーン設定
+        private string[][] life16_01f = new string[][]{
+          new string[] { "sixnine_2_f.anm|sixnine_2a01_f.anm|paizuri_69_2_f.anm|paizuri_69_kunni_f.anm|paizuri_fera_69_2_f.anm" , "4.25" , "0.37" , "10" , "0" , "180" , "0" , "エロ羞恥２|エロ羞恥３|エロ好感３|興奮射精後１|発情|エロ興奮３|エロ期待" , "頬２涙１よだれ" , "0" , "1" , "1" , "" , "SEX_A" , "-1" , "0" , "" , "1" },
+          new string[] { "hekimen_tati_sokui_2_f.anm|hekimen_tati_sokui_3_f.anm|hekimen_tati_sokui_kiss_2_f.anm|hekimen_tati_sokui_kiss_2a01_f.anm|hekimen_tati_sokui_kiss_3_f.anm|hekimen_tati_sokui_kiss_3a01_f.anm" , "10.43" , "-0.47" , "0.5" , "0" , "91.4" , "0" , "エロ羞恥２|エロ羞恥３|エロ好感３|興奮射精後１|発情|エロ興奮３|エロ期待" , "頬２涙１" , "-1" , "1" , "1" , "" , "SEX_A" , "-1" , "0" , "" , "1" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
+        };
+        private string[][] life16_01m = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] { "sixnine_2_m.anm|sixnine_2_m.anm|paizuri_69_2_m.anm|paizuri_69_kunni_m.anm|paizuri_fera_69_2_m.anm" , "4.25" , "0.37" , "10" , "0" , "180" , "0" , "0" },
+          new string[] { "hekimen_tati_sokui_2_m.anm|hekimen_tati_sokui_3_m.anm|hekimen_tati_sokui_kiss_2_m.anm|hekimen_tati_sokui_kiss_2a01_m.anm|hekimen_tati_sokui_kiss_3_m.anm|hekimen_tati_sokui_kiss_3a01_m.anm" , "10.43" , "-0.47" , "0.5" , "0" , "91.4" , "0" , "1" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
+        };
 
 
-	//17：SMルーム シーン設定
-	private string[][] life17_01f = new string[][]{
-	  new string[] { "soji_hataki_kaiwa_r.anm|soji_hataki_kaiwa_r.anm|maid_stand02ListenB_ONCE_.anm" , "-2.29" , "0" , "2.61" , "0" , "275.2" , "0" , "通常|微笑み|にっこり|思案伏せ目|発情|困った|疑問|誘惑" , "頬０涙０" , "0" , "0" , "0" , "" , "掃除" , "-1" , "-1" , "handitem,HandItemR_Dance_Hataki_I_.menu" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
-	};
-	private string[][] life17_01m = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
-	};
+        //17：SMルーム シーン設定
+        private string[][] life17_01f = new string[][]{
+          new string[] { "soji_hataki_kaiwa_r.anm|soji_hataki_kaiwa_r.anm|maid_stand02ListenB_ONCE_.anm" , "-2.29" , "0" , "2.61" , "0" , "275.2" , "0" , "通常|微笑み|にっこり|思案伏せ目|発情|困った|疑問|誘惑" , "頬０涙０" , "0" , "0" , "0" , "" , "掃除" , "-1" , "-1" , "handitem,HandItemR_Dance_Hataki_I_.menu" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
+        };
+        private string[][] life17_01m = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
+        };
 
 
-	//18：SMルーム（夜） シーン設定
-	private string[][] life18_01f = new string[][]{
-	  new string[] { "harituke_3_f.anm|harituke_3_f.anm|harituke_zeccyou_f_once_.anm" , "-0.97" , "0" , "1.22" , "0" , "180" , "0" , "エロ痛み我慢|エロ痛み我慢２|エロ痛み我慢３|エロメソ泣き|エロ羞恥３|エロ我慢３|まぶたギュ" , "頬３涙３よだれ" , "0" , "1" , "1" , "" , "SEX03" , "-1" , "0" , "kousoku_upper,KousokuU_SMRoom_Haritsuke_I_.menu|kousoku_lower,KousokuL_AshikaseUp_I_.menu|accvag,accVag_VibeBig_I_.menu" , "1" },
-	  new string[] { "x_manguri_vibe_oku_3_f.anm|x_manguri_vibe_zeccyou_f_once_.anm" , "0.75" , "0.32" , "-0.19" , "0" , "109.7" , "0" , "エロ痛み我慢|エロ痛み我慢２|エロ痛み我慢３|エロメソ泣き|エロ羞恥３|エロ我慢３|まぶたギュ" , "頬３涙３" , "0" , "1" , "1" , "" , "SEX02" , "-1" , "0" , "kousoku_upper,KousokuU_TekaseOne_I_.menu|kousoku_lower,KousokuL_AshikaseUp_I_.menu|accvag,accVag_VibeBig_I_.menu" , "1"  },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
-	};
-	private string[][] life18_01m = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] { "harituke_3_m.anm|harituke_3_m.anm|harituke_zeccyou_m_once_.anm" , "-0.97" , "0" , "1.22" , "0" , "180" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
-	};
+        //18：SMルーム（夜） シーン設定
+        private string[][] life18_01f = new string[][]{
+          new string[] { "harituke_3_f.anm|harituke_3_f.anm|harituke_zeccyou_f_once_.anm" , "-0.97" , "0" , "1.22" , "0" , "180" , "0" , "エロ痛み我慢|エロ痛み我慢２|エロ痛み我慢３|エロメソ泣き|エロ羞恥３|エロ我慢３|まぶたギュ" , "頬３涙３よだれ" , "0" , "1" , "1" , "" , "SEX03" , "-1" , "0" , "kousoku_upper,KousokuU_SMRoom_Haritsuke_I_.menu|kousoku_lower,KousokuL_AshikaseUp_I_.menu|accvag,accVag_VibeBig_I_.menu" , "1" },
+          new string[] { "x_manguri_vibe_oku_3_f.anm|x_manguri_vibe_zeccyou_f_once_.anm" , "0.75" , "0.32" , "-0.19" , "0" , "109.7" , "0" , "エロ痛み我慢|エロ痛み我慢２|エロ痛み我慢３|エロメソ泣き|エロ羞恥３|エロ我慢３|まぶたギュ" , "頬３涙３" , "0" , "1" , "1" , "" , "SEX02" , "-1" , "0" , "kousoku_upper,KousokuU_TekaseOne_I_.menu|kousoku_lower,KousokuL_AshikaseUp_I_.menu|accvag,accVag_VibeBig_I_.menu" , "1"  },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
+        };
+        private string[][] life18_01m = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] { "harituke_3_m.anm|harituke_3_m.anm|harituke_zeccyou_m_once_.anm" , "-0.97" , "0" , "1.22" , "0" , "180" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
+        };
 
 
-	//19：地下室 シーン設定
-	private string[][] life19_01f = new string[][]{
-	  new string[] { "soji_mop.anm" , "0.22" , "0" , "1.07" , "0" , "57.3" , "0" , "通常|微笑み|にっこり|思案伏せ目|発情|困った|疑問|誘惑" , "頬０涙０" , "0" , "0" , "0" , "" , "掃除" , "-1" , "-1" , "handitem,HandItemR_Mop_I_.menu" , "0" },
+        //19：地下室 シーン設定
+        private string[][] life19_01f = new string[][]{
+          new string[] { "soji_mop.anm" , "0.22" , "0" , "1.07" , "0" , "57.3" , "0" , "通常|微笑み|にっこり|思案伏せ目|発情|困った|疑問|誘惑" , "頬０涙０" , "0" , "0" , "0" , "" , "掃除" , "-1" , "-1" , "handitem,HandItemR_Mop_I_.menu" , "0" },
           new string[] { "fukisouji1.anm" , "-3.66" , "0" , "-1.42" , "0" , "264.5" , "0" , "通常|微笑み|にっこり|思案伏せ目|発情|困った|疑問|誘惑" , "頬０涙０" , "0" , "0" , "0" , "" , "掃除" , "-1" , "-1" , "handitem,HandItemL_Zoukin2_I_.menu" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
-	};
-	private string[][] life19_01m = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
-	};
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
+        };
+        private string[][] life19_01m = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
+        };
 
 
-	//20：地下室（夜） シーン設定
-	private string[][] life20_01f = new string[][]{
-	  new string[] {"muri_6p_aibu_2_f.anm|muri_6p_aibu_3_f.anm|muri_6p_aibu_kunni_2_f.anm|muri_6p_aibu_kunni_3_f.anm|muri_6p_seijyoui_2a01_f.anm|muri_6p_seijyoui_3a01_f.anm|muri_6p_seijyoui_3ana_2_f.anm|muri_6p_seijyoui_3ana_3_f.anm" , "0" , "0.146" , "-1.55" , "0" , "0" , "0" , "エロ痛み我慢|エロ痛み我慢２|エロ痛み我慢３|エロ痛み１|エロ痛み２|エロ痛み３|エロ羞恥３" , "頬３涙３よだれ" , "0" , "1" , "1" , "" , "SEX03" , "-1" , "0" , "kousoku_upper,KousokuU_TekaseOne_I_.menu|kousoku_lower,KousokuL_AshikaseUp_I_.menu" , "1" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
-	};
-	private string[][] life20_01m = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] { "muri_6p_aibu_2_m.anm|muri_6p_aibu_3_m.anm|muri_6p_aibu_kunni_2_m.anm|muri_6p_aibu_kunni_3_m.anm|muri_6p_seijyoui_2_m.anm|muri_6p_seijyoui_3_m.anm|muri_6p_seijyoui_3ana_2_m.anm|muri_6p_seijyoui_3ana_3_m.anm" , "0" , "0.146" , "-1.55" , "0" , "0" , "0" , "0" },
+        //20：地下室（夜） シーン設定
+        private string[][] life20_01f = new string[][]{
+          new string[] {"muri_6p_aibu_2_f.anm|muri_6p_aibu_3_f.anm|muri_6p_aibu_kunni_2_f.anm|muri_6p_aibu_kunni_3_f.anm|muri_6p_seijyoui_2a01_f.anm|muri_6p_seijyoui_3a01_f.anm|muri_6p_seijyoui_3ana_2_f.anm|muri_6p_seijyoui_3ana_3_f.anm" , "0" , "0.146" , "-1.55" , "0" , "0" , "0" , "エロ痛み我慢|エロ痛み我慢２|エロ痛み我慢３|エロ痛み１|エロ痛み２|エロ痛み３|エロ羞恥３" , "頬３涙３よだれ" , "0" , "1" , "1" , "" , "SEX03" , "-1" , "0" , "kousoku_upper,KousokuU_TekaseOne_I_.menu|kousoku_lower,KousokuL_AshikaseUp_I_.menu" , "1" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
+        };
+        private string[][] life20_01m = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] { "muri_6p_aibu_2_m.anm|muri_6p_aibu_3_m.anm|muri_6p_aibu_kunni_2_m.anm|muri_6p_aibu_kunni_3_m.anm|muri_6p_seijyoui_2_m.anm|muri_6p_seijyoui_3_m.anm|muri_6p_seijyoui_3ana_2_m.anm|muri_6p_seijyoui_3ana_3_m.anm" , "0" , "0.146" , "-1.55" , "0" , "0" , "0" , "0" },
           new string[] { "muri_6p_aibu_2_m2.anm|muri_6p_aibu_3_m2.anm|muri_6p_aibu_kunni_2_m2.anm|muri_6p_aibu_kunni_3_m2.anm|muri_6p_seijyoui_2_m2.anm|muri_6p_seijyoui_3_m2.anm|muri_6p_seijyoui_3ana_2_m2.anm|muri_6p_seijyoui_3ana_3_m21.anm" , "0" , "0.146" , "-1.55" , "0" , "0" , "0" , "0" },
           new string[] { "muri_6p_aibu_2_m5.anm|muri_6p_aibu_3_m5.anm|muri_6p_aibu_kunni_2_m5.anm|muri_6p_aibu_kunni_3_m5.anm|muri_6p_seijyoui_2_m5.anm|muri_6p_seijyoui_3_m5.anm|muri_6p_seijyoui_3ana_2_m5.anm|muri_6p_seijyoui_3ana_3_m5.anm" , "0" , "0.1468" , "-1.55" , "0" , "0" , "0" , "0" }
-	};
+        };
 
 
-	//21：中庭" シーン設定
-	private string[][] life21_01f = new string[][]{
-	  new string[] { "[S]inu_omocya_aruki_f_ONCE_.anm" , "-1.98" , "0" , "0" , "0" , "180" , "0" , "エロ痛み我慢|エロ痛み我慢２|エロ痛み我慢３|エロメソ泣き|エロ羞恥３|エロ我慢３|まぶたギュ" , "頬３涙２" , "0" , "1" , "0" , "" , "SEX01" , "-1" , "-1" , "accvag,accVag_Vibe_I_.menu|accanl,accAnl_Photo_VibePink_I_.menu" , "1" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
-	};
-	private string[][] life21_01m = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] { "man_porse01.anm" , "-1.98" , "0" , "0.42" , "0" , "180" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
-	};
+        //21：中庭" シーン設定
+        private string[][] life21_01f = new string[][]{
+          new string[] { "[S]inu_omocya_aruki_f_ONCE_.anm" , "-1.98" , "0" , "0" , "0" , "180" , "0" , "エロ痛み我慢|エロ痛み我慢２|エロ痛み我慢３|エロメソ泣き|エロ羞恥３|エロ我慢３|まぶたギュ" , "頬３涙２" , "0" , "1" , "0" , "" , "SEX01" , "-1" , "-1" , "accvag,accVag_Vibe_I_.menu|accanl,accAnl_Photo_VibePink_I_.menu" , "1" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
+        };
+        private string[][] life21_01m = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] { "man_porse01.anm" , "-1.98" , "0" , "0.42" , "0" , "180" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
+        };
 
 
-	//22：大浴場 シーン設定
-	private string[][] life22_01f = new string[][]{
+        //22：大浴場 シーン設定
+        private string[][] life22_01f = new string[][]{
           new string[] { "j_taimenkijyoui_momi_1a01_f.anm" , "-3.584383" , "0" , "0.3971604" , "6.920276" , "83.96275" , "0" , "にっこり" , "頬２涙０" , "0" , "1" , "1" , "" , "風呂" , "-1" , "-1" , "" , "0" },
           new string[] { "senakanagasi_f.anm" , "-3.909705" , "0" , "0.4116318" , "4.166075" , "275.2422" , "0" , "笑顔" , "頬１涙０" , "0" , "1" , "1" , "" , "" , "-1" , "-1" , "handitem,HandItemR_Zoukin2_I_.menu" , "0" },
           new string[] { "sit_tukue.anm" , "1.396726" , "0.09520975" , "-1.849392" , "0" , "89.57285" , "0" , "誘惑" , "頬２涙０" , "0" , "1" , "0" , "" , "風呂" , "-1" , "-1" , "" , "0" },
           new string[] { "syagami_pose_f.anm" , "2.150745" , "-0.4503197" , "-0.7838227" , "0" , "113.13" , "0" , "ためいき" , "頬３涙０" , "-1" , "1" , "1" , "" , "風呂" , "-1" , "-1" , "" , "0" }
-	};
-	private string[][] life22_01m = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
-	};
+        };
+        private string[][] life22_01m = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
+        };
 
 
-	//23：大浴場（夜） シーン設定
-	private string[][] life23_01f = new string[][]{
-	  new string[] { "itya_aibu_2_f.anm|itya_aibu_cli_2_f.anm|itya_aibu_kiss_2_f.anm|aibu_hibu_2_f.anm|aibu_tikubi_2_f.anm|itya_aibu_3_f.anm|itya_aibu_cli_3_f.anm|itya_aibu_kiss_3_f.anm|aibu_hibu_3_f.anm|aibu_tikubi_3_f.anm" , "2.05" , "-0.48" , "-2.84" , "0" , "92.6" , "0" , "エロ羞恥２|興奮射精後１|発情|エロ痛み２|引きつり笑顔|エロ我慢３|まぶたギュ" , "頬３涙１" , "-0.5" , "1" , "1" , "" , "SEX_A" , "-1" , "0" , "" , "1" },
+        //23：大浴場（夜） シーン設定
+        private string[][] life23_01f = new string[][]{
+          new string[] { "itya_aibu_2_f.anm|itya_aibu_cli_2_f.anm|itya_aibu_kiss_2_f.anm|aibu_hibu_2_f.anm|aibu_tikubi_2_f.anm|itya_aibu_3_f.anm|itya_aibu_cli_3_f.anm|itya_aibu_kiss_3_f.anm|aibu_hibu_3_f.anm|aibu_tikubi_3_f.anm" , "2.05" , "-0.48" , "-2.84" , "0" , "92.6" , "0" , "エロ羞恥２|興奮射精後１|発情|エロ痛み２|引きつり笑顔|エロ我慢３|まぶたギュ" , "頬３涙１" , "-0.5" , "1" , "1" , "" , "SEX_A" , "-1" , "0" , "" , "1" },
           new string[] { "arai2_tubo_1_f.anm|arai2_tubo_2_f.anm|arai2_tawasi_1_f.anm|arai2_tawasi_2_f.anm|arai2_mune_2_f.anm" , "-3.67" , "0" , "2.00" , "0" , "5.6" , "0" , "エロメソ泣き|エロ羞恥２|興奮射精後１|発情|エロ羞恥３|引きつり笑顔|エロ我慢３|まぶたギュ" , "頬２涙１" , "0" , "1" , "1" , "" , "SEX_A" , "-1" , "0" , "" , "1" },
           new string[] { "senboukyou_fera_1_kiss_f.anm|senboukyou_fera_1_sentan_f.anm|senboukyou_fera_1_name_f.anm|senboukyou_fera_1_name_ura_f.anm|senboukyou_fera_2_f.anm|senboukyou_fera_3_f.anm|senboukyou_fera_shasei_kao_f_ONCE_.anm" , "-0.86" , "-0.27" , "-4.09" , "0" , "182.3" , "0" , "エロ舐め愛情|エロ舌責快楽|エロ舐め快楽" , "頬２涙０" , "-0.5" , "1" , "1" , "" , "フェラ01" , "-1" , "0" , "" , "1" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
-	};
-	private string[][] life23_01m = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] { "itya_aibu_2_m.anm|itya_aibu_cli_2_m.anm|itya_aibu_kiss_2_m.anm|aibu_hibu_2_m.anm|aibu_tikubi_2_m.anm|itya_aibu_3_m.anm|itya_aibu_cli_3_m.anm|itya_aibu_kiss_3_m.anm|aibu_hibu_3_m.anm|aibu_tikubi_3_m.anm" , "2.05" , "-0.48" , "-2.84" , "0" , "92.6" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
+        };
+        private string[][] life23_01m = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] { "itya_aibu_2_m.anm|itya_aibu_cli_2_m.anm|itya_aibu_kiss_2_m.anm|aibu_hibu_2_m.anm|aibu_tikubi_2_m.anm|itya_aibu_3_m.anm|itya_aibu_cli_3_m.anm|itya_aibu_kiss_3_m.anm|aibu_hibu_3_m.anm|aibu_tikubi_3_m.anm" , "2.05" , "-0.48" , "-2.84" , "0" , "92.6" , "0" , "0" },
           new string[] { "arai2_tubo_1_m.anm|arai2_tubo_2_m.anm|arai2_tawasi_1_m.anm|arai2_tawasi_2_m.anm|arai2_mune_2_m.anm" , "-3.67" , "-0.05" , "2.00" , "0" , "5.6" , "0" , "1" },
           new string[] { "senboukyou_fera_1_kiss_m.anm|senboukyou_fera_1_sentan_m.anm|senboukyou_fera_1_name_m.anm|senboukyou_fera_1_name_ura_m.anm|senboukyou_fera_2_m.anm|senboukyou_fera_3_m.anm|senboukyou_fera_shasei_kao_m_ONCE_.anm" , "-0.86" , "-0.27" , "-4.09" , "0" , "182.3" , "0" , "2" }
-	};
+        };
 
 
-	//24：花魁部屋 シーン設定
-	private string[][] life24_01f = new string[][]{
-	  new string[] {"edit_pose_010_f.anm" , "0.16" , "0.14" , "-4.24" , "0" , "299.2" , "0" , "居眠り安眠|接吻" , "頬０涙０" , "0" , "0" , "1" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
-	};
-	private string[][] life24_01m = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
-	};
+        //24：花魁部屋 シーン設定
+        private string[][] life24_01f = new string[][]{
+          new string[] {"edit_pose_010_f.anm" , "0.16" , "0.14" , "-4.24" , "0" , "299.2" , "0" , "居眠り安眠|接吻" , "頬０涙０" , "0" , "0" , "1" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
+        };
+        private string[][] life24_01m = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
+        };
 
 
-	//25：花魁部屋（夜） シーン設定
-	private string[][] life25_01f = new string[][]{
-	  new string[] { "settai_kiss_2_f.anm" , "0" , "0.23" , "-1.11" , "0" , "0" , "0" , "エロ舐め愛情|エロ舌責快楽|エロ舐め快楽" , "頬２涙０" , "0" , "1" , "1" , "" , "キス01" , "-1" , "0" , "" , "1" },
-	  new string[] { "taimenkijyoui_gr_2_f.anm" , "0" , "0.31" , "-1.17" , "0" , "0" , "0" , "エロメソ泣き|エロ羞恥２|興奮射精後１|発情|エロ羞恥３|引きつり笑顔|エロ我慢３|まぶたギュ" , "頬２涙１" , "0" , "1" , "1" , "" , "SEX01" , "-1" , "0" , "" , "1" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
-	};
-	private string[][] life25_01m = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] { "settai_kiss_2_m.anm" , "0" , "0.23" , "-1.11" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
-	};
+        //25：花魁部屋（夜） シーン設定
+        private string[][] life25_01f = new string[][]{
+          new string[] { "settai_kiss_2_f.anm" , "0" , "0.23" , "-1.11" , "0" , "0" , "0" , "エロ舐め愛情|エロ舌責快楽|エロ舐め快楽" , "頬２涙０" , "0" , "1" , "1" , "" , "キス01" , "-1" , "0" , "" , "1" },
+          new string[] { "taimenkijyoui_gr_2_f.anm" , "0" , "0.31" , "-1.17" , "0" , "0" , "0" , "エロメソ泣き|エロ羞恥２|興奮射精後１|発情|エロ羞恥３|引きつり笑顔|エロ我慢３|まぶたギュ" , "頬２涙１" , "0" , "1" , "1" , "" , "SEX01" , "-1" , "0" , "" , "1" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
+        };
+        private string[][] life25_01m = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] { "settai_kiss_2_m.anm" , "0" , "0.23" , "-1.11" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
+        };
 
 
-	//26：ペントハウス シーン設定
-	private string[][] life26_01f = new string[][]{
-	  new string[] { "haimenritui_2_f.anm|haimenritui_2a01_f.anm|haimenritui_2b01_f.anm|haimenritui_2b02_f.anm|haimenritui_3_f.anm|haimenritui_3a01_f.anm|haimenritui_3b01_f.anm|haimenritui_3b02_f.anm|haimenritui_cli_2_f.anm|haimenritui_cli_3_f.anm" , "-6.93" , "-0.52" , "-5.51" , "0" , "87" , "0" , "エロメソ泣き|エロ羞恥２|興奮射精後１|発情|エロ痛み２|引きつり笑顔|エロ我慢３|まぶたギュ" , "頬３涙２" , "-0.5" , "1" , "1" , "" , "SEX_A" , "-1" , "0" , "" , "1" },
+        //26：ペントハウス シーン設定
+        private string[][] life26_01f = new string[][]{
+          new string[] { "haimenritui_2_f.anm|haimenritui_2a01_f.anm|haimenritui_2b01_f.anm|haimenritui_2b02_f.anm|haimenritui_3_f.anm|haimenritui_3a01_f.anm|haimenritui_3b01_f.anm|haimenritui_3b02_f.anm|haimenritui_cli_2_f.anm|haimenritui_cli_3_f.anm" , "-6.93" , "-0.52" , "-5.51" , "0" , "87" , "0" , "エロメソ泣き|エロ羞恥２|興奮射精後１|発情|エロ痛み２|引きつり笑顔|エロ我慢３|まぶたギュ" , "頬３涙２" , "-0.5" , "1" , "1" , "" , "SEX_A" , "-1" , "0" , "" , "1" },
           new string[] { "kousokudai_kunni_2_f.anm|kousokudai_kunni_3_f.anm" , "-0.31" , "-0.15" , "2.26" , "0" , "181" , "0" , "エロ痛み我慢|エロ痛み我慢２|エロ痛み我慢３|エロメソ泣き|エロ羞恥３|エロ我慢３|まぶたギュ" , "頬２涙２" , "0" , "1" , "1" , "" , "SEX_A" , "-1" , "0" , "" , "1" },
           new string[] { "wfera_2_f.anm" , "3.97" , "0.039" , "-0.62" , "0" , "259.2" , "0" , "エロ舐め愛情|エロ舌責快楽|エロ舐め快楽" , "頬１涙０" , "0" , "1" , "1" , "" , "フェラ01" , "-1" , "0" , "" , "1" },
           new string[] { "wfera_2_f2.anm" , "3.97" , "0.039" , "-0.62" , "0" , "259.2" , "0" , "エロ舐め愛情|エロ舌責快楽|エロ舐め快楽" , "頬１涙０" , "0" , "1" , "1" , "" , "フェラ01" , "-1" , "0" , "" , "1" }
-	};
-	private string[][] life26_01m = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] { "haimenritui_2_m.anm|haimenritui_2_m.anm|haimenritui_2_m.anm|haimenritui_2_m.anm|haimenritui_3_m.anm|haimenritui_3_m.anm|haimenritui_3_m.anm|haimenritui_3_m.anm|haimenritui_cli_2_m.anm|haimenritui_cli_3_m.anm" , "-6.93" , "-0.55" , "-5.51" , "0" , "87" , "0" , "0" },
+        };
+        private string[][] life26_01m = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] { "haimenritui_2_m.anm|haimenritui_2_m.anm|haimenritui_2_m.anm|haimenritui_2_m.anm|haimenritui_3_m.anm|haimenritui_3_m.anm|haimenritui_3_m.anm|haimenritui_3_m.anm|haimenritui_cli_2_m.anm|haimenritui_cli_3_m.anm" , "-6.93" , "-0.55" , "-5.51" , "0" , "87" , "0" , "0" },
           new string[] { "kousokudai_kunni_2_m.anm|kousokudai_kunni_3_m.anm" , "-0.31" , "-0.31" , "2.26" , "0" , "181" , "0" , "1" },
           new string[] { "wfera_2_m.anm" , "3.970175" , "0.03" , "-0.62" , "0" , "259.2" , "0" , "2" }
-	};
+        };
 
 
-	//27：街 シーン設定
-	private string[][] life27_01f = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
-	};
-	private string[][] life27_01m = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
-	};
+        //27：街 シーン設定
+        private string[][] life27_01f = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
+        };
+        private string[][] life27_01m = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
+        };
 
 
-	//28：キッチン シーン設定
-	private string[][] life28_01f = new string[][]{
-	  new string[] { "work_ryouri_houtyou.anm" , "-0.93" , "0" , "-2.22" , "0" , "180" , "0" , "思案伏せ目" , "頬０涙０" , "0" , "0" , "0" , "" , "料理" , "-1" , "-1" , "handitem,HandItemR_Houchou_I_.menu" , "0" },
-	  new string[] { "soji_syokkiarai.anm" , "1.91" , "-0.05" , "0.25" , "0" , "90.4" , "0" , "微笑み" , "頬０涙０" , "0" , "0" , "0" , "" , "料理" , "-1" , "-1" , "handitem,HandItemD_Sara_Sponge_I_.menu" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
-	};
-	private string[][] life28_01m = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
-	};
+        //28：キッチン シーン設定
+        private string[][] life28_01f = new string[][]{
+          new string[] { "work_ryouri_houtyou.anm" , "-0.93" , "0" , "-2.22" , "0" , "180" , "0" , "思案伏せ目" , "頬０涙０" , "0" , "0" , "0" , "" , "料理" , "-1" , "-1" , "handitem,HandItemR_Houchou_I_.menu" , "0" },
+          new string[] { "soji_syokkiarai.anm" , "1.91" , "-0.05" , "0.25" , "0" , "90.4" , "0" , "微笑み" , "頬０涙０" , "0" , "0" , "0" , "" , "料理" , "-1" , "-1" , "handitem,HandItemD_Sara_Sponge_I_.menu" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
+        };
+        private string[][] life28_01m = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
+        };
 
 
-	//29：キッチン（夜） シーン設定
-	private string[][] life29_01f = new string[][]{
-	  new string[] { "kyousitu_aibu_kutiosae_1_f.anm" , "2.16" , "0.08" , "-0.87" , "0" , "264.3" , "0" , "エロ痛み我慢３" , "頬２涙１" , "0" , "3" , "0" , "" , "SEX01" , "-1" , "0" , "" , "0" },
+        //29：キッチン（夜） シーン設定
+        private string[][] life29_01f = new string[][]{
+          new string[] { "kyousitu_aibu_kutiosae_1_f.anm" , "2.16" , "0.08" , "-0.87" , "0" , "264.3" , "0" , "エロ痛み我慢３" , "頬２涙１" , "0" , "3" , "0" , "" , "SEX01" , "-1" , "0" , "" , "0" },
           new string[] { "siriname_1_f.anm" , "2.02" , "0.019" , "-0.87" , "0" , "84.3" , "0" , "エロ舐め愛情" , "頬２涙０" , "0" , "0" , "1" , "" , "フェラ01" , "-1" , "0" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
-	};
-	private string[][] life29_01m = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
-	};
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
+        };
+        private string[][] life29_01m = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
+        };
 
 
-	//30：エントランス シーン設定
-	private string[][] life30_01f = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
-	};
-	private string[][] life30_01m = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
-	};
+        //30：エントランス シーン設定
+        private string[][] life30_01f = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
+        };
+        private string[][] life30_01m = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
+        };
 
 
-	//31：エントランス（夜） シーン設定
-	private string[][] life31_01f = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
-	};
-	private string[][] life31_01m = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
-	};
+        //31：エントランス（夜） シーン設定
+        private string[][] life31_01f = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
+        };
+        private string[][] life31_01m = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
+        };
 
 
-	//モーション , PX , PY , PZ , EX , EY , EZ , 表情 , フェイスブレンド , 床調整 , 着衣 , 視線 , ダンスBGM , ボイスセット , ボイス再生距離 , ボイス再生間隔 , メイドアイテム, NTRブロック
-	//32：ポールダンス シーン設定
-	private string[][] life32_01f = new string[][]{
-	  new string[] {"dance_cm3d21_pole_001_fa_f1.anm" , "0.16" , "0" , "0.18" , "0" , "180" , "0" , "通常|微笑み|笑顔|にっこり|優しさ|思案伏せ目|発情|誘惑" , "頬１涙０" , "0" , "0" , "-1" , "fusionicaddiction_short_pole.ogg" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"dance_cm3d21_pole_001_fa_f1.anm" , "-4.44" , "0" , "2.01" , "0" , "137.7" , "0" , "通常|微笑み|笑顔|にっこり|優しさ|思案伏せ目|発情|誘惑" , "頬１涙０" , "0" , "0" , "-1" , "fusionicaddiction_short_pole.ogg" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"dance_cm3d21_pole_001_fa_f1.anm" , "4.76" , "0" , "2.01" , "0" , "214" , "0" , "通常|微笑み|笑顔|にっこり|優しさ|思案伏せ目|発情|誘惑" , "頬１涙０" , "0" , "0" , "-1" , "fusionicaddiction_short_pole.ogg" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
-	};
-	private string[][] life32_01m = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
-	};
-	
-	private string[][] life32_02f = new string[][]{
-	  new string[] {"dance_cm3d21_pole_002_lc_f1.anm" , "0.16" , "0" , "0.18" , "0" , "180" , "0" , "通常|微笑み|笑顔|にっこり|優しさ|思案伏せ目|発情|誘惑" , "頬１涙０" , "0" , "0" , "-1" , "lovemorecrymore_short_pole.ogg" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"dance_cm3d21_pole_002_lc_f2.anm" , "-4.44" , "0" , "2.01" , "0" , "137.7" , "0" , "通常|微笑み|笑顔|にっこり|優しさ|思案伏せ目|発情|誘惑" , "頬１涙０" , "0" , "0" , "-1" , "lovemorecrymore_short_pole.ogg" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"dance_cm3d21_pole_002_lc_f3.anm" , "4.76" , "0" , "2.01" , "0" , "214" , "0" , "通常|微笑み|笑顔|にっこり|優しさ|思案伏せ目|発情|誘惑" , "頬１涙０" , "0" , "0" , "-1" , "lovemorecrymore_short_pole.ogg" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
-	};
-	private string[][] life32_02m = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
-	};
+        //モーション , PX , PY , PZ , EX , EY , EZ , 表情 , フェイスブレンド , 床調整 , 着衣 , 視線 , ダンスBGM , ボイスセット , ボイス再生距離 , ボイス再生間隔 , メイドアイテム, NTRブロック
+        //32：ポールダンス シーン設定
+        private string[][] life32_01f = new string[][]{
+          new string[] {"dance_cm3d21_pole_001_fa_f1.anm" , "0.16" , "0" , "0.18" , "0" , "180" , "0" , "通常|微笑み|笑顔|にっこり|優しさ|思案伏せ目|発情|誘惑" , "頬１涙０" , "0" , "0" , "-1" , "fusionicaddiction_short_pole.ogg" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"dance_cm3d21_pole_001_fa_f1.anm" , "-4.44" , "0" , "2.01" , "0" , "137.7" , "0" , "通常|微笑み|笑顔|にっこり|優しさ|思案伏せ目|発情|誘惑" , "頬１涙０" , "0" , "0" , "-1" , "fusionicaddiction_short_pole.ogg" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"dance_cm3d21_pole_001_fa_f1.anm" , "4.76" , "0" , "2.01" , "0" , "214" , "0" , "通常|微笑み|笑顔|にっこり|優しさ|思案伏せ目|発情|誘惑" , "頬１涙０" , "0" , "0" , "-1" , "fusionicaddiction_short_pole.ogg" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
+        };
+        private string[][] life32_01m = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
+        };
+
+        private string[][] life32_02f = new string[][]{
+          new string[] {"dance_cm3d21_pole_002_lc_f1.anm" , "0.16" , "0" , "0.18" , "0" , "180" , "0" , "通常|微笑み|笑顔|にっこり|優しさ|思案伏せ目|発情|誘惑" , "頬１涙０" , "0" , "0" , "-1" , "lovemorecrymore_short_pole.ogg" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"dance_cm3d21_pole_002_lc_f2.anm" , "-4.44" , "0" , "2.01" , "0" , "137.7" , "0" , "通常|微笑み|笑顔|にっこり|優しさ|思案伏せ目|発情|誘惑" , "頬１涙０" , "0" , "0" , "-1" , "lovemorecrymore_short_pole.ogg" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"dance_cm3d21_pole_002_lc_f3.anm" , "4.76" , "0" , "2.01" , "0" , "214" , "0" , "通常|微笑み|笑顔|にっこり|優しさ|思案伏せ目|発情|誘惑" , "頬１涙０" , "0" , "0" , "-1" , "lovemorecrymore_short_pole.ogg" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
+        };
+        private string[][] life32_02m = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
+        };
 
 
-	//33：バー（夜） シーン設定
-	private string[][] life33_01f = new string[][]{
-	  new string[] { "kaiwa_tati_taiki_f.anm|kaiwa_tati_teawase_f_ONCE_.anm|kaiwa_tati_teawase_taiki_f.anm|kaiwa_tati_hutuu1_taiki_f.anm|kaiwa_tati_ayamaru_f_ONCE_.anm|maid_comehome2_LOOP_.anm|maid_stand02Kaiwa2_ONCE_.anm|kaiwa_tati_hohokaki_taiki_f.anm|kaiwa_tati_tutorial_1_taiki_f.anm" , "-3.17" , "0" , "1.60" , "0" , "89.0" , "0" , "通常|微笑み|笑顔|にっこり|優しさ|思案伏せ目|発情|誘惑" , "頬０涙０" , "0" , "0" , "-1" , "" , "会話01" , "-1" , "300" , "" , "0" },
-	  new string[] { "work_mimi_f.anm" , "1.03" , "0.55" , "4.67" , "0" , "88.0" , "0" , "通常|微笑み|笑顔|にっこり|優しさ|思案伏せ目|発情|誘惑" , "頬０涙０" , "0" , "0" , "-1" , "" , "会話01" , "-1" , "300" , "handitem,HandItemR_Mimikaki_I_.menu" , "0" },
-	  new string[] { "op_wine_taiki_f.anm|op_wine_taiki_f.anm|op_wine_taiki_f.anm|op_wine_nomu_f_ONCE_.anm|op_wine_nomu_f_ONCE_.anm|op_wine_kanpai_f_ONCE_.anm" , "2.85" , "0.53" , "-1.12" , "0" , "271.3" , "0" , "通常|微笑み|笑顔|にっこり|優しさ|思案伏せ目|発情|誘惑" , "頬０涙０" , "0" , "0" , "-1" , "" , "会話01" , "-1" , "300" , "handitem,HandItemR_WineGlass_I_.menu" , "0" },
-	  new string[] { "work_demukae_b.anm|kaiwa_tati_hutuu1_taiki_f.anm|kaiwa_tati_teawase_taiki_f.anm|maid_ojigi02_ONCE_.anm|maid_stand02hair_ONCE_.anm|maid_stand02Left_ONCE_.anm" , "0.47" , "0" , "-2.96" , "0" , "229.8" , "0" , "通常|微笑み|笑顔|にっこり|優しさ|思案伏せ目|発情|誘惑" , "頬０涙０" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
-	};
-	private string[][] life33_01m = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] { "man_suwarimati1.anm" , "-1.47" , "0.71" , "1.70" , "0" , "267.5" , "0" , "0" },
-	  new string[] { "work_mimi_itazurago_m.anm" , "1.04" , "0.55" , "4.66" , "0" , "88.0" , "0" , "1" },
-	  new string[] { "man_suwarimati1.anm" , "3.24" , "0.53" , "-1.70" , "0" , "264.0" , "0" , "2" }
-	};
+        //33：バー（夜） シーン設定
+        private string[][] life33_01f = new string[][]{
+          new string[] { "kaiwa_tati_taiki_f.anm|kaiwa_tati_teawase_f_ONCE_.anm|kaiwa_tati_teawase_taiki_f.anm|kaiwa_tati_hutuu1_taiki_f.anm|kaiwa_tati_ayamaru_f_ONCE_.anm|maid_comehome2_LOOP_.anm|maid_stand02Kaiwa2_ONCE_.anm|kaiwa_tati_hohokaki_taiki_f.anm|kaiwa_tati_tutorial_1_taiki_f.anm" , "-3.17" , "0" , "1.60" , "0" , "89.0" , "0" , "通常|微笑み|笑顔|にっこり|優しさ|思案伏せ目|発情|誘惑" , "頬０涙０" , "0" , "0" , "-1" , "" , "会話01" , "-1" , "300" , "" , "0" },
+          new string[] { "work_mimi_f.anm" , "1.03" , "0.55" , "4.67" , "0" , "88.0" , "0" , "通常|微笑み|笑顔|にっこり|優しさ|思案伏せ目|発情|誘惑" , "頬０涙０" , "0" , "0" , "-1" , "" , "会話01" , "-1" , "300" , "handitem,HandItemR_Mimikaki_I_.menu" , "0" },
+          new string[] { "op_wine_taiki_f.anm|op_wine_taiki_f.anm|op_wine_taiki_f.anm|op_wine_nomu_f_ONCE_.anm|op_wine_nomu_f_ONCE_.anm|op_wine_kanpai_f_ONCE_.anm" , "2.85" , "0.53" , "-1.12" , "0" , "271.3" , "0" , "通常|微笑み|笑顔|にっこり|優しさ|思案伏せ目|発情|誘惑" , "頬０涙０" , "0" , "0" , "-1" , "" , "会話01" , "-1" , "300" , "handitem,HandItemR_WineGlass_I_.menu" , "0" },
+          new string[] { "work_demukae_b.anm|kaiwa_tati_hutuu1_taiki_f.anm|kaiwa_tati_teawase_taiki_f.anm|maid_ojigi02_ONCE_.anm|maid_stand02hair_ONCE_.anm|maid_stand02Left_ONCE_.anm" , "0.47" , "0" , "-2.96" , "0" , "229.8" , "0" , "通常|微笑み|笑顔|にっこり|優しさ|思案伏せ目|発情|誘惑" , "頬０涙０" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
+        };
+        private string[][] life33_01m = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] { "man_suwarimati1.anm" , "-1.47" , "0.71" , "1.70" , "0" , "267.5" , "0" , "0" },
+          new string[] { "work_mimi_itazurago_m.anm" , "1.04" , "0.55" , "4.66" , "0" , "88.0" , "0" , "1" },
+          new string[] { "man_suwarimati1.anm" , "3.24" , "0.53" , "-1.70" , "0" , "264.0" , "0" , "2" }
+        };
 
 
-	//34：トイレ シーン設定
-	private string[][] life34_01f = new string[][]{
+        //34：トイレ シーン設定
+        private string[][] life34_01f = new string[][]{
           new string[] { "toilet_onani_2_f.anm|toilet_onani_3_f.anm" , "-3.228128" , "0.1530618" , "0.2837493" , "0" , "87.56886" , "0" , "エロ羞恥２|興奮射精後１|発情|エロ興奮３" , "頬３涙１" , "0" , "3" , "1" , "" , "SEX_A" , "-1" , "0" , "" , "0" },
           new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
           new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
           new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
-	};
-	private string[][] life34_01m = new string[][]{
-	  new string[] { "" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] { "" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] { "" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] { "" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
-	};
+        };
+        private string[][] life34_01m = new string[][]{
+          new string[] { "" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] { "" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] { "" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] { "" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
+        };
 
 
-	//35：トイレ（夜） シーン設定
-	private string[][] life35_01f = new string[][]{
+        //35：トイレ（夜） シーン設定
+        private string[][] life35_01f = new string[][]{
           new string[] { "toilet_sex_2_f.anm|toilet_sex_3_f.anm" , "-3.228128" , "0.1530618" , "0.2837493" , "0" , "87.56886" , "0" , "エロ羞恥２|興奮射精後１|発情|エロ興奮３" , "頬３涙２" , "0" , "3" , "1" , "" , "SEX_A" , "4" , "0" , "" , "1" },
           new string[] { "fera_onani_2_f.anm|fera_onani_3_f.anm" , "-2.581944" , "0.01027089" , "-4.653751" , "0" , "180" , "0" , "エロ羞恥２|興奮射精後１|発情|エロ興奮３" , "頬２涙１よだれ" , "0" , "3" , "1" , "" , "SEX_A" , "4" , "0" , "" , "1" },
           new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
           new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
-	};
-	private string[][] life35_01m = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+        };
+        private string[][] life35_01m = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
           new string[] { "toilet_sex_2_m.anm|toilet_sex_3_m.anm" , "-3.228128" , "0.1530618" , "0.2837493" , "0" , "87.56886" , "0" , "0" },
           new string[] { "fera_onani_2_m.anm|fera_onani_3_m.anm" , "-2.581944" , "-0.0902865" , "-4.653751" , "0" , "180" , "0" , "1" },
           new string[] { "fera_miage_1_sentan_m.anm" , "3.571411" , "-0.08703265" , "-0.7674932" , "0" , "271.1132" , "0" , "0" }
-	};
+        };
 
 
-	//36：ロッカールーム シーン設定
-	private string[][] life36_01f = new string[][]{
-	  //new string[] { "maid_stand02akubi_ONCE_.anm|maid_dressroom02.anm|maid_stand02ListenB_Unazuki_ONCE_.anm|maid_stand02Listenloop2.anm|maid_stand02tere.anm|maid_stand02sian2_ONCE_.anm|maid_stand02Left_ONCE_.anm|maid_stand02akubi_ONCE_.anm|maid_stand02hair_ONCE_.anm|maid_comehome2_LOOP_.anm" , "1.28" , "0" , "0" , "0" , "272.5" , "0" , "通常|微笑み|笑顔|にっこり|優しさ|思案伏せ目|発情|困った|疑問|誘惑" , "頬０涙０" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] { "" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] { "" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] { "" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] { "" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
-	};
-	private string[][] life36_01m = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
-	};
+        //36：ロッカールーム シーン設定
+        private string[][] life36_01f = new string[][]{
+          //new string[] { "maid_stand02akubi_ONCE_.anm|maid_dressroom02.anm|maid_stand02ListenB_Unazuki_ONCE_.anm|maid_stand02Listenloop2.anm|maid_stand02tere.anm|maid_stand02sian2_ONCE_.anm|maid_stand02Left_ONCE_.anm|maid_stand02akubi_ONCE_.anm|maid_stand02hair_ONCE_.anm|maid_comehome2_LOOP_.anm" , "1.28" , "0" , "0" , "0" , "272.5" , "0" , "通常|微笑み|笑顔|にっこり|優しさ|思案伏せ目|発情|困った|疑問|誘惑" , "頬０涙０" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] { "" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] { "" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] { "" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] { "" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
+        };
+        private string[][] life36_01m = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
+        };
 
 
-	//37：ロッカールーム（夜） シーン設定
-	private string[][] life37_01f = new string[][]{
-	  //new string[] { "maid_stand02akubi_ONCE_.anm|maid_dressroom02.anm|maid_stand02ListenB_Unazuki_ONCE_.anm|maid_stand02Listenloop2.anm|maid_stand02tere.anm|maid_stand02sian2_ONCE_.anm|maid_stand02Left_ONCE_.anm|maid_stand02akubi_ONCE_.anm|maid_stand02hair_ONCE_.anm|maid_comehome2_LOOP_.anm" , "1.28" , "0" , "0" , "0" , "272.5" , "0" , "通常|微笑み|笑顔|にっこり|優しさ|思案伏せ目|発情|困った|疑問|誘惑" , "頬０涙０" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] { "" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] { "" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] { "" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] { "" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
-	};
-	private string[][] life37_01m = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
-	};
+        //37：ロッカールーム（夜） シーン設定
+        private string[][] life37_01f = new string[][]{
+          //new string[] { "maid_stand02akubi_ONCE_.anm|maid_dressroom02.anm|maid_stand02ListenB_Unazuki_ONCE_.anm|maid_stand02Listenloop2.anm|maid_stand02tere.anm|maid_stand02sian2_ONCE_.anm|maid_stand02Left_ONCE_.anm|maid_stand02akubi_ONCE_.anm|maid_stand02hair_ONCE_.anm|maid_comehome2_LOOP_.anm" , "1.28" , "0" , "0" , "0" , "272.5" , "0" , "通常|微笑み|笑顔|にっこり|優しさ|思案伏せ目|発情|困った|疑問|誘惑" , "頬０涙０" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] { "" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] { "" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] { "" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] { "" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
+        };
+        private string[][] life37_01m = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
+        };
 
 
-	//38：メイド部屋 シーン設定
-	private string[][] life38_01f = new string[][]{
-	  new string[] {"edit_pose_010_f.anm" , "2.09" , "0.51" , "-1.91" , "0" , "223.5" , "0" , "居眠り安眠|接吻" , "頬０涙０" , "0" , "0" , "1" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
-	};
-	private string[][] life38_01m = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
-	};
+        //38：メイド部屋 シーン設定
+        private string[][] life38_01f = new string[][]{
+          new string[] {"edit_pose_010_f.anm" , "2.09" , "0.51" , "-1.91" , "0" , "223.5" , "0" , "居眠り安眠|接吻" , "頬０涙０" , "0" , "0" , "1" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
+        };
+        private string[][] life38_01m = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
+        };
 
-	private string[][] life38_02f = new string[][]{
+        private string[][] life38_02f = new string[][]{
           new string[] { "work_saihou.anm" , "1.47" , "0.55" , "-1.53" , "0" , "270.9" , "0" , "ドヤ顔|ジト目|思案伏せ目" , "頬０涙０" , "0" , "0" , "0" , "" , "裁縫" , "-1" , "-1" , "handitem,HandItemD_Shisyuu_Hari_I_.menu" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
-	};
-	private string[][] life38_02m = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
-	};
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
+        };
+        private string[][] life38_02m = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
+        };
 
-	private string[][] life38_03f = new string[][]{
-	  new string[] { "midasinami_kesyou_lip_f.anm" , "2.27" , "0.53" , "2.03" , "0" , "348.6" , "0" , "優しさ|思案伏せ目|疑問" , "頬０涙０" , "0" , "0" , "1" , "" , "化粧" , "-1" , "-1" , "handitem,HandItemR_Rip_I_.menu" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
-	};
-	private string[][] life38_03m = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
-	};
+        private string[][] life38_03f = new string[][]{
+          new string[] { "midasinami_kesyou_lip_f.anm" , "2.27" , "0.53" , "2.03" , "0" , "348.6" , "0" , "優しさ|思案伏せ目|疑問" , "頬０涙０" , "0" , "0" , "1" , "" , "化粧" , "-1" , "-1" , "handitem,HandItemR_Rip_I_.menu" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
+        };
+        private string[][] life38_03m = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
+        };
 
-	private string[][] life38_04f = new string[][]{
-	  new string[] { "pose_kakkoii_01_loop_f.anm|pose_kakkoii_06_loop_f.anm|[S]pose_kawaii_01_loop_f.anm|[S]pose_kawaii_03_loop_f.anm|edit_pose_005_f.anm|[S]edit_pose_008_f.anm|[S]edit_pose_009_f.anm|stand_akire.anm|[S]edit_pose_036_f.anm|[S]edit_pose_ke17_002_f.anm|[S]edit_pose_dg17s_003_f.anm|maid_dressroom02.anm|maid_comehome4_Gatsu_ONCE_.anm|maid_stand02hair_ONCE_.anm|maid_stand02sian2_ONCE_.anm|[S]turn01_ATOFF_.anm|kaiwa_tati_appeal_f_ONCE_.anm" , "1.62" , "0.012" , "0.65" , "0" , "87.7" , "0" , "通常|微笑み|にっこり|思案伏せ目|発情|困った|疑問|誘惑" , "頬０涙０" , "0" , "2" , "1" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
-	};
-	private string[][] life38_04m = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
-	};
+        private string[][] life38_04f = new string[][]{
+          new string[] { "pose_kakkoii_01_loop_f.anm|pose_kakkoii_06_loop_f.anm|[S]pose_kawaii_01_loop_f.anm|[S]pose_kawaii_03_loop_f.anm|edit_pose_005_f.anm|[S]edit_pose_008_f.anm|[S]edit_pose_009_f.anm|stand_akire.anm|[S]edit_pose_036_f.anm|[S]edit_pose_ke17_002_f.anm|[S]edit_pose_dg17s_003_f.anm|maid_dressroom02.anm|maid_comehome4_Gatsu_ONCE_.anm|maid_stand02hair_ONCE_.anm|maid_stand02sian2_ONCE_.anm|[S]turn01_ATOFF_.anm|kaiwa_tati_appeal_f_ONCE_.anm" , "1.62" , "0.012" , "0.65" , "0" , "87.7" , "0" , "通常|微笑み|にっこり|思案伏せ目|発情|困った|疑問|誘惑" , "頬０涙０" , "0" , "2" , "1" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
+        };
+        private string[][] life38_04m = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
+        };
 
-	private string[][] life38_05f = new string[][]{
+        private string[][] life38_05f = new string[][]{
           new string[] { "onani_2_f.anm|onani_cli_2_f.anm|onani2_1_f.anm|onani2_cli_1_f.anm|onani_3_f.anm|onani_cli_3_f.anm|onani2_1_f.anm|onani3_cli_1_f.anm" , "1.85" , "0.50" , "-1.30" , "0" , "348.6" , "0" , "エロ羞恥１|エロ羞恥２|興奮射精後１|エロ痛み２|エロ我慢３|まぶたギュ" , "頬２涙１" , "0" , "3" , "1" , "" , "SEX_A" , "-1" , "0" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
-	};
-	private string[][] life38_05m = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
-	};
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
+        };
+        private string[][] life38_05m = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
+        };
 
-	private string[][] life38_06f = new string[][]{
+        private string[][] life38_06f = new string[][]{
           new string[] { "vibe_onania_2_f.anm|vibe_onania_3_f.anm" , "1.85" , "0.50" , "-1.30" , "0" , "348.6" , "0" , "エロ痛み我慢|エロ痛み我慢２|エロ痛み我慢３|エロメソ泣き|エロ羞恥３|エロ我慢３" , "頬３涙２" , "0" , "3" , "1" , "" , "SEX_A" , "-1" , "0" , "handitem,HandItemR_AnalVibe_I_.menu" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
-	};
-	private string[][] life38_06m = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
-	};
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
+        };
+        private string[][] life38_06m = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
+        };
 
 
-	//39：メイド部屋（夜） シーン設定
-	private string[][] life39_01f = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
-	};
-	private string[][] life39_01m = new string[][]{
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
-	  new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
-	};
+        //39：メイド部屋（夜） シーン設定
+        private string[][] life39_01f = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "" , "" , "0" , "0" , "0" , "" , "" , "-1" , "-1" , "" , "0" }
+        };
+        private string[][] life39_01m = new string[][]{
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" },
+          new string[] {"" , "0" , "0" , "0" , "0" , "0" , "0" , "0" }
+        };
 
 
 
-	//エンパイアズライフ用ボイスセット
-	private string[][] elVs = new string[][]{
-	  new string[] { "" , "" , "" , "" , "" },
-	  new string[] { "" , "" , "" , "" , "" },
-	  new string[] { "" , "" , "" , "" , "" },
-	  new string[] { "" , "" , "" , "" , "" }
-	};
+        //エンパイアズライフ用ボイスセット
+        private string[][] elVs = new string[][]{
+          new string[] { "" , "" , "" , "" , "" },
+          new string[] { "" , "" , "" , "" , "" },
+          new string[] { "" , "" , "" , "" , "" },
+          new string[] { "" , "" , "" , "" , "" }
+        };
 
-	private string[][] elVs_sex01 = new string[][]{
-	  new string[] { "s0_01236.ogg" , "s0_01237.ogg" , "s0_01238.ogg" , "s0_01239.ogg" },
-	  new string[] { "s1_02396.ogg" , "s1_02390.ogg" , "s1_02391.ogg" , "s1_02392.ogg" },
-	  new string[] { "s2_01235.ogg" , "s2_01236.ogg" , "s2_01237.ogg" , "s2_01238.ogg" },
-	  new string[] { "s3_02767.ogg" , "s3_02768.ogg" , "s3_02769.ogg" , "s3_02770.ogg" },
-	  new string[] { "s4_08211.ogg" , "s4_08212.ogg" , "s4_08213.ogg" , "s4_08214.ogg" },
-	  new string[] { "s5_04133.ogg" , "s5_04134.ogg" , "s5_04047.ogg" , "s5_04048.ogg" },
-	  new string[] { "S6_02179.ogg" , "S6_02183.ogg" , "S6_02246.ogg" , "S6_02247.ogg" },
+        private string[][] elVs_sex01 = new string[][]{
+          new string[] { "s0_01236.ogg" , "s0_01237.ogg" , "s0_01238.ogg" , "s0_01239.ogg" },
+          new string[] { "s1_02396.ogg" , "s1_02390.ogg" , "s1_02391.ogg" , "s1_02392.ogg" },
+          new string[] { "s2_01235.ogg" , "s2_01236.ogg" , "s2_01237.ogg" , "s2_01238.ogg" },
+          new string[] { "s3_02767.ogg" , "s3_02768.ogg" , "s3_02769.ogg" , "s3_02770.ogg" },
+          new string[] { "s4_08211.ogg" , "s4_08212.ogg" , "s4_08213.ogg" , "s4_08214.ogg" },
+          new string[] { "s5_04133.ogg" , "s5_04134.ogg" , "s5_04047.ogg" , "s5_04048.ogg" },
+          new string[] { "S6_02179.ogg" , "S6_02183.ogg" , "S6_02246.ogg" , "S6_02247.ogg" },
 
-	  new string[] { "s0_01236.ogg" , "s0_01237.ogg" , "s0_01238.ogg" , "s0_01239.ogg" },
-	  new string[] { "s1_02396.ogg" , "s1_02390.ogg" , "s1_02391.ogg" , "s1_02392.ogg" },
-	  new string[] { "s2_01235.ogg" , "s2_01236.ogg" , "s2_01237.ogg" , "s2_01238.ogg" },
-	  new string[] { "s3_02767.ogg" , "s3_02768.ogg" , "s3_02769.ogg" , "s3_02770.ogg" },
-	  new string[] { "s5_04133.ogg" , "s5_04134.ogg" , "s5_04047.ogg" , "s5_04048.ogg" },
-	  new string[] { "s4_08211.ogg" , "s4_08212.ogg" , "s4_08213.ogg" , "s4_08214.ogg" },
-	  new string[] { "S6_02179.ogg" , "S6_02183.ogg" , "S6_02246.ogg" , "S6_02247.ogg" },
-	  new string[] { "s2_01235.ogg" , "s2_01236.ogg" , "s2_01237.ogg" , "s2_01238.ogg" },
-	  new string[] { "s1_02396.ogg" , "s1_02390.ogg" , "s1_02391.ogg" , "s1_02392.ogg" },
-	  new string[] { "s1_02396.ogg" , "s1_02390.ogg" , "s1_02391.ogg" , "s1_02392.ogg" }
+          new string[] { "s0_01236.ogg" , "s0_01237.ogg" , "s0_01238.ogg" , "s0_01239.ogg" },
+          new string[] { "s1_02396.ogg" , "s1_02390.ogg" , "s1_02391.ogg" , "s1_02392.ogg" },
+          new string[] { "s2_01235.ogg" , "s2_01236.ogg" , "s2_01237.ogg" , "s2_01238.ogg" },
+          new string[] { "s3_02767.ogg" , "s3_02768.ogg" , "s3_02769.ogg" , "s3_02770.ogg" },
+          new string[] { "s5_04133.ogg" , "s5_04134.ogg" , "s5_04047.ogg" , "s5_04048.ogg" },
+          new string[] { "s4_08211.ogg" , "s4_08212.ogg" , "s4_08213.ogg" , "s4_08214.ogg" },
+          new string[] { "S6_02179.ogg" , "S6_02183.ogg" , "S6_02246.ogg" , "S6_02247.ogg" },
+          new string[] { "s2_01235.ogg" , "s2_01236.ogg" , "s2_01237.ogg" , "s2_01238.ogg" },
+          new string[] { "s1_02396.ogg" , "s1_02390.ogg" , "s1_02391.ogg" , "s1_02392.ogg" },
+          new string[] { "s1_02396.ogg" , "s1_02390.ogg" , "s1_02391.ogg" , "s1_02392.ogg" }
 
-	};
+        };
 
-	private string[][] elVs_sex02 = new string[][]{
-	  new string[] { "s0_01326.ogg" , "s0_01327.ogg" , "s0_01330.ogg" , "s0_01331.ogg" },
-	  new string[] { "s1_02401.ogg" , "s1_02400.ogg" , "s1_02402.ogg" , "s1_02404.ogg" },
-	  new string[] { "s2_01185.ogg" , "s2_01186.ogg" , "s2_01187.ogg" , "s2_01188.ogg" },
-	  new string[] { "s3_02797.ogg" , "s3_02798.ogg" , "s3_02691.ogg" , "s3_02796.ogg" },
-	  new string[] { "s4_08140.ogg" , "s4_08134.ogg" , "s4_08149.ogg" , "s4_08150.ogg" },
-	  new string[] { "s5_04055.ogg" , "s5_04061.ogg" , "s5_04054.ogg" , "s5_04052.ogg" },
-	  new string[] { "S6_02249.ogg" , "S6_02250.ogg" , "S6_02185.ogg" , "S6_02186.ogg" },
+        private string[][] elVs_sex02 = new string[][]{
+          new string[] { "s0_01326.ogg" , "s0_01327.ogg" , "s0_01330.ogg" , "s0_01331.ogg" },
+          new string[] { "s1_02401.ogg" , "s1_02400.ogg" , "s1_02402.ogg" , "s1_02404.ogg" },
+          new string[] { "s2_01185.ogg" , "s2_01186.ogg" , "s2_01187.ogg" , "s2_01188.ogg" },
+          new string[] { "s3_02797.ogg" , "s3_02798.ogg" , "s3_02691.ogg" , "s3_02796.ogg" },
+          new string[] { "s4_08140.ogg" , "s4_08134.ogg" , "s4_08149.ogg" , "s4_08150.ogg" },
+          new string[] { "s5_04055.ogg" , "s5_04061.ogg" , "s5_04054.ogg" , "s5_04052.ogg" },
+          new string[] { "S6_02249.ogg" , "S6_02250.ogg" , "S6_02185.ogg" , "S6_02186.ogg" },
 
-	  new string[] { "s0_01326.ogg" , "s0_01327.ogg" , "s0_01330.ogg" , "s0_01331.ogg" },
-	  new string[] { "s1_02401.ogg" , "s1_02400.ogg" , "s1_02402.ogg" , "s1_02404.ogg" },
-	  new string[] { "s2_01185.ogg" , "s2_01186.ogg" , "s2_01187.ogg" , "s2_01188.ogg" },
-	  new string[] { "s3_02797.ogg" , "s3_02798.ogg" , "s3_02691.ogg" , "s3_02796.ogg" },
-	  new string[] { "s5_04055.ogg" , "s5_04061.ogg" , "s5_04054.ogg" , "s5_04052.ogg" },
-	  new string[] { "s4_08140.ogg" , "s4_08134.ogg" , "s4_08149.ogg" , "s4_08150.ogg" },
-	  new string[] { "S6_02249.ogg" , "S6_02250.ogg" , "S6_02185.ogg" , "S6_02186.ogg" },
-	  new string[] { "s2_01185.ogg" , "s2_01186.ogg" , "s2_01187.ogg" , "s2_01188.ogg" },
-	  new string[] { "s1_02401.ogg" , "s1_02400.ogg" , "s1_02402.ogg" , "s1_02404.ogg" },
-	  new string[] { "s1_02401.ogg" , "s1_02400.ogg" , "s1_02402.ogg" , "s1_02404.ogg" }
-	};
+          new string[] { "s0_01326.ogg" , "s0_01327.ogg" , "s0_01330.ogg" , "s0_01331.ogg" },
+          new string[] { "s1_02401.ogg" , "s1_02400.ogg" , "s1_02402.ogg" , "s1_02404.ogg" },
+          new string[] { "s2_01185.ogg" , "s2_01186.ogg" , "s2_01187.ogg" , "s2_01188.ogg" },
+          new string[] { "s3_02797.ogg" , "s3_02798.ogg" , "s3_02691.ogg" , "s3_02796.ogg" },
+          new string[] { "s5_04055.ogg" , "s5_04061.ogg" , "s5_04054.ogg" , "s5_04052.ogg" },
+          new string[] { "s4_08140.ogg" , "s4_08134.ogg" , "s4_08149.ogg" , "s4_08150.ogg" },
+          new string[] { "S6_02249.ogg" , "S6_02250.ogg" , "S6_02185.ogg" , "S6_02186.ogg" },
+          new string[] { "s2_01185.ogg" , "s2_01186.ogg" , "s2_01187.ogg" , "s2_01188.ogg" },
+          new string[] { "s1_02401.ogg" , "s1_02400.ogg" , "s1_02402.ogg" , "s1_02404.ogg" },
+          new string[] { "s1_02401.ogg" , "s1_02400.ogg" , "s1_02402.ogg" , "s1_02404.ogg" }
+        };
 
-	private string[][] elVs_sex03 = new string[][]{
-	  new string[] { "s0_09072.ogg" , "s0_09070.ogg" , "s0_09099.ogg" , "s0_09059.ogg" , "s0_09067.ogg" , "s0_09068.ogg" , "s0_09069.ogg" , "s0_09071.ogg" , "s0_09085.ogg" , "s0_09086.ogg" , "s0_09087.ogg" , "s0_09091.ogg" },
-	  new string[] { "s1_03207.ogg" , "s1_03205.ogg" , "s1_08993.ogg" , "s1_08971.ogg" , "s1_09344.ogg" , "s1_09370.ogg" , "s1_09371.ogg" , "s1_09372.ogg" , "s1_09374.ogg" , "s1_09398.ogg" , "s1_09392.ogg" , "s1_09365.ogg" },
-	  new string[] { "s2_09039.ogg" , "s2_09067.ogg" , "s2_09052.ogg" , "s2_08502.ogg" , "s2_09047.ogg" , "s2_09048.ogg" , "s2_09049.ogg" , "s2_09050.ogg" , "s2_09051.ogg" , "s2_09066.ogg" , "s2_09069.ogg" , "s2_09073.ogg" },
-	  new string[] { "s3_02905.ogg" , "s3_02906.ogg" , "s3_02907.ogg" , "s3_05540.ogg" , "s3_05657.ogg" , "s3_05658.ogg" , "s3_05659.ogg" , "s3_05660.ogg" , "s3_05661.ogg" , "s3_05678.ogg" , "s3_05651.ogg" , "s3_05656.ogg" },
-	  new string[] { "s4_08347.ogg" , "s4_08355.ogg" , "s4_08356.ogg" , "s4_11658.ogg" , "s4_11684.ogg" , "s4_11677.ogg" , "s4_11680.ogg" , "s4_11683.ogg" , "s4_11661.ogg" , "s4_11659.ogg" , "s4_11654.ogg" , "s4_11660.ogg" },
-	  new string[] { "s5_04266.ogg" , "s5_18375.ogg" , "s5_18380.ogg" , "s5_18393.ogg" , "s5_18379.ogg" , "s5_18380.ogg" , "s5_18382.ogg" , "s5_18384.ogg" , "s5_18385.ogg" , "s5_18400.ogg" , "s5_18402.ogg" , "s5_18119.ogg" },
-	  new string[] { "S6_28817.ogg" , "S6_02398.ogg" , "S6_02399.ogg" , "s6_02402.ogg" , "S6_09048.ogg" , "S6_01984.ogg" , "S6_01988.ogg" , "S6_01991.ogg" , "S6_02000.ogg" , "S6_01996.ogg" , "S6_01997.ogg" , "S6_01998.ogg" , "S6_01999.ogg" , "S6_02001.ogg" , "s6_05796.ogg" , "s6_05797.ogg" , "s6_05798.ogg" , "s6_05799.ogg" , "s6_05800.ogg" , "s6_05801.ogg" },
+        private string[][] elVs_sex03 = new string[][]{
+          new string[] { "s0_09072.ogg" , "s0_09070.ogg" , "s0_09099.ogg" , "s0_09059.ogg" , "s0_09067.ogg" , "s0_09068.ogg" , "s0_09069.ogg" , "s0_09071.ogg" , "s0_09085.ogg" , "s0_09086.ogg" , "s0_09087.ogg" , "s0_09091.ogg" },
+          new string[] { "s1_03207.ogg" , "s1_03205.ogg" , "s1_08993.ogg" , "s1_08971.ogg" , "s1_09344.ogg" , "s1_09370.ogg" , "s1_09371.ogg" , "s1_09372.ogg" , "s1_09374.ogg" , "s1_09398.ogg" , "s1_09392.ogg" , "s1_09365.ogg" },
+          new string[] { "s2_09039.ogg" , "s2_09067.ogg" , "s2_09052.ogg" , "s2_08502.ogg" , "s2_09047.ogg" , "s2_09048.ogg" , "s2_09049.ogg" , "s2_09050.ogg" , "s2_09051.ogg" , "s2_09066.ogg" , "s2_09069.ogg" , "s2_09073.ogg" },
+          new string[] { "s3_02905.ogg" , "s3_02906.ogg" , "s3_02907.ogg" , "s3_05540.ogg" , "s3_05657.ogg" , "s3_05658.ogg" , "s3_05659.ogg" , "s3_05660.ogg" , "s3_05661.ogg" , "s3_05678.ogg" , "s3_05651.ogg" , "s3_05656.ogg" },
+          new string[] { "s4_08347.ogg" , "s4_08355.ogg" , "s4_08356.ogg" , "s4_11658.ogg" , "s4_11684.ogg" , "s4_11677.ogg" , "s4_11680.ogg" , "s4_11683.ogg" , "s4_11661.ogg" , "s4_11659.ogg" , "s4_11654.ogg" , "s4_11660.ogg" },
+          new string[] { "s5_04266.ogg" , "s5_18375.ogg" , "s5_18380.ogg" , "s5_18393.ogg" , "s5_18379.ogg" , "s5_18380.ogg" , "s5_18382.ogg" , "s5_18384.ogg" , "s5_18385.ogg" , "s5_18400.ogg" , "s5_18402.ogg" , "s5_18119.ogg" },
+          new string[] { "S6_28817.ogg" , "S6_02398.ogg" , "S6_02399.ogg" , "s6_02402.ogg" , "S6_09048.ogg" , "S6_01984.ogg" , "S6_01988.ogg" , "S6_01991.ogg" , "S6_02000.ogg" , "S6_01996.ogg" , "S6_01997.ogg" , "S6_01998.ogg" , "S6_01999.ogg" , "S6_02001.ogg" , "s6_05796.ogg" , "s6_05797.ogg" , "s6_05798.ogg" , "s6_05799.ogg" , "s6_05800.ogg" , "s6_05801.ogg" },
 
-	  new string[] { "s0_09072.ogg" , "s0_09070.ogg" , "s0_09099.ogg" , "s0_09059.ogg" , "s0_09067.ogg" , "s0_09068.ogg" , "s0_09069.ogg" , "s0_09071.ogg" , "s0_09085.ogg" , "s0_09086.ogg" , "s0_09087.ogg" , "s0_09091.ogg" },
-	  new string[] { "s1_03207.ogg" , "s1_03205.ogg" , "s1_08993.ogg" , "s1_08971.ogg" , "s1_09344.ogg" , "s1_09370.ogg" , "s1_09371.ogg" , "s1_09372.ogg" , "s1_09374.ogg" , "s1_09398.ogg" , "s1_09392.ogg" , "s1_09365.ogg" },
-	  new string[] { "s2_09039.ogg" , "s2_09067.ogg" , "s2_09052.ogg" , "s2_08502.ogg" , "s2_09047.ogg" , "s2_09048.ogg" , "s2_09049.ogg" , "s2_09050.ogg" , "s2_09051.ogg" , "s2_09066.ogg" , "s2_09069.ogg" , "s2_09073.ogg" },
-	  new string[] { "s3_02905.ogg" , "s3_02906.ogg" , "s3_02907.ogg" , "s3_05540.ogg" , "s3_05657.ogg" , "s3_05658.ogg" , "s3_05659.ogg" , "s3_05660.ogg" , "s3_05661.ogg" , "s3_05678.ogg" , "s3_05651.ogg" , "s3_05656.ogg" },
-	  new string[] { "s5_04266.ogg" , "s5_18375.ogg" , "s5_18380.ogg" , "s5_18393.ogg" , "s5_18379.ogg" , "s5_18380.ogg" , "s5_18382.ogg" , "s5_18384.ogg" , "s5_18385.ogg" , "s5_18400.ogg" , "s5_18402.ogg" , "s5_18119.ogg" },
-	  new string[] { "s4_08347.ogg" , "s4_08355.ogg" , "s4_08356.ogg" , "s4_11658.ogg" , "s4_11684.ogg" , "s4_11677.ogg" , "s4_11680.ogg" , "s4_11683.ogg" , "s4_11661.ogg" , "s4_11659.ogg" , "s4_11654.ogg" , "s4_11660.ogg" },
-	  new string[] { "S6_28817.ogg" , "S6_02398.ogg" , "S6_02399.ogg" , "s6_02402.ogg" , "S6_09048.ogg" , "S6_01984.ogg" , "S6_01988.ogg" , "S6_01991.ogg" , "S6_02000.ogg" , "S6_01996.ogg" , "S6_01997.ogg" , "S6_01998.ogg" , "S6_01999.ogg" , "S6_02001.ogg" , "s6_05796.ogg" , "s6_05797.ogg" , "s6_05798.ogg" , "s6_05799.ogg" , "s6_05800.ogg" , "s6_05801.ogg" },
-	  new string[] { "s2_09039.ogg" , "s2_09067.ogg" , "s2_09052.ogg" , "s2_08502.ogg" , "s2_09047.ogg" , "s2_09048.ogg" , "s2_09049.ogg" , "s2_09050.ogg" , "s2_09051.ogg" , "s2_09066.ogg" , "s2_09069.ogg" , "s2_09073.ogg" },
-	  new string[] { "s1_03207.ogg" , "s1_03205.ogg" , "s1_08993.ogg" , "s1_08971.ogg" , "s1_09344.ogg" , "s1_09370.ogg" , "s1_09371.ogg" , "s1_09372.ogg" , "s1_09374.ogg" , "s1_09398.ogg" , "s1_09392.ogg" , "s1_09365.ogg" },
-	  new string[] { "s1_03207.ogg" , "s1_03205.ogg" , "s1_08993.ogg" , "s1_08971.ogg" , "s1_09344.ogg" , "s1_09370.ogg" , "s1_09371.ogg" , "s1_09372.ogg" , "s1_09374.ogg" , "s1_09398.ogg" , "s1_09392.ogg" , "s1_09365.ogg" }
-	};
+          new string[] { "s0_09072.ogg" , "s0_09070.ogg" , "s0_09099.ogg" , "s0_09059.ogg" , "s0_09067.ogg" , "s0_09068.ogg" , "s0_09069.ogg" , "s0_09071.ogg" , "s0_09085.ogg" , "s0_09086.ogg" , "s0_09087.ogg" , "s0_09091.ogg" },
+          new string[] { "s1_03207.ogg" , "s1_03205.ogg" , "s1_08993.ogg" , "s1_08971.ogg" , "s1_09344.ogg" , "s1_09370.ogg" , "s1_09371.ogg" , "s1_09372.ogg" , "s1_09374.ogg" , "s1_09398.ogg" , "s1_09392.ogg" , "s1_09365.ogg" },
+          new string[] { "s2_09039.ogg" , "s2_09067.ogg" , "s2_09052.ogg" , "s2_08502.ogg" , "s2_09047.ogg" , "s2_09048.ogg" , "s2_09049.ogg" , "s2_09050.ogg" , "s2_09051.ogg" , "s2_09066.ogg" , "s2_09069.ogg" , "s2_09073.ogg" },
+          new string[] { "s3_02905.ogg" , "s3_02906.ogg" , "s3_02907.ogg" , "s3_05540.ogg" , "s3_05657.ogg" , "s3_05658.ogg" , "s3_05659.ogg" , "s3_05660.ogg" , "s3_05661.ogg" , "s3_05678.ogg" , "s3_05651.ogg" , "s3_05656.ogg" },
+          new string[] { "s5_04266.ogg" , "s5_18375.ogg" , "s5_18380.ogg" , "s5_18393.ogg" , "s5_18379.ogg" , "s5_18380.ogg" , "s5_18382.ogg" , "s5_18384.ogg" , "s5_18385.ogg" , "s5_18400.ogg" , "s5_18402.ogg" , "s5_18119.ogg" },
+          new string[] { "s4_08347.ogg" , "s4_08355.ogg" , "s4_08356.ogg" , "s4_11658.ogg" , "s4_11684.ogg" , "s4_11677.ogg" , "s4_11680.ogg" , "s4_11683.ogg" , "s4_11661.ogg" , "s4_11659.ogg" , "s4_11654.ogg" , "s4_11660.ogg" },
+          new string[] { "S6_28817.ogg" , "S6_02398.ogg" , "S6_02399.ogg" , "s6_02402.ogg" , "S6_09048.ogg" , "S6_01984.ogg" , "S6_01988.ogg" , "S6_01991.ogg" , "S6_02000.ogg" , "S6_01996.ogg" , "S6_01997.ogg" , "S6_01998.ogg" , "S6_01999.ogg" , "S6_02001.ogg" , "s6_05796.ogg" , "s6_05797.ogg" , "s6_05798.ogg" , "s6_05799.ogg" , "s6_05800.ogg" , "s6_05801.ogg" },
+          new string[] { "s2_09039.ogg" , "s2_09067.ogg" , "s2_09052.ogg" , "s2_08502.ogg" , "s2_09047.ogg" , "s2_09048.ogg" , "s2_09049.ogg" , "s2_09050.ogg" , "s2_09051.ogg" , "s2_09066.ogg" , "s2_09069.ogg" , "s2_09073.ogg" },
+          new string[] { "s1_03207.ogg" , "s1_03205.ogg" , "s1_08993.ogg" , "s1_08971.ogg" , "s1_09344.ogg" , "s1_09370.ogg" , "s1_09371.ogg" , "s1_09372.ogg" , "s1_09374.ogg" , "s1_09398.ogg" , "s1_09392.ogg" , "s1_09365.ogg" },
+          new string[] { "s1_03207.ogg" , "s1_03205.ogg" , "s1_08993.ogg" , "s1_08971.ogg" , "s1_09344.ogg" , "s1_09370.ogg" , "s1_09371.ogg" , "s1_09372.ogg" , "s1_09374.ogg" , "s1_09398.ogg" , "s1_09392.ogg" , "s1_09365.ogg" }
+        };
 
-	private string[][] elVs_fera01 = new string[][]{
-	  new string[] { "S0_01383.ogg" , "S0_01367.ogg" , "S0_01384.ogg" , "S0_01369.ogg" },
-	  new string[] { "S1_02455.ogg" , "S1_02440.ogg" , "S1_02457.ogg" , "S1_02442.ogg" },
-	  new string[] { "S2_01296.ogg" , "S2_01281.ogg" , "S2_01298.ogg" , "S2_01282.ogg" },
-	  new string[] { "S3_02833.ogg" , "S3_02818.ogg" , "S3_02835.ogg" , "S3_02820.ogg" },
-	  new string[] { "S4_08241.ogg" , "S4_08258.ogg" , "S4_08243.ogg" , "S4_08259.ogg" },
-	  new string[] { "S5_04163.ogg" , "S5_04162.ogg" , "S5_04179.ogg" , "s5_04174.ogg" },
-	  new string[] { "S6_02219.ogg" , "S6_02220.ogg" , "S6_02221.ogg" , "S6_02222.ogg" },
+        private string[][] elVs_fera01 = new string[][]{
+          new string[] { "S0_01383.ogg" , "S0_01367.ogg" , "S0_01384.ogg" , "S0_01369.ogg" },
+          new string[] { "S1_02455.ogg" , "S1_02440.ogg" , "S1_02457.ogg" , "S1_02442.ogg" },
+          new string[] { "S2_01296.ogg" , "S2_01281.ogg" , "S2_01298.ogg" , "S2_01282.ogg" },
+          new string[] { "S3_02833.ogg" , "S3_02818.ogg" , "S3_02835.ogg" , "S3_02820.ogg" },
+          new string[] { "S4_08241.ogg" , "S4_08258.ogg" , "S4_08243.ogg" , "S4_08259.ogg" },
+          new string[] { "S5_04163.ogg" , "S5_04162.ogg" , "S5_04179.ogg" , "s5_04174.ogg" },
+          new string[] { "S6_02219.ogg" , "S6_02220.ogg" , "S6_02221.ogg" , "S6_02222.ogg" },
 
-	  new string[] { "S0_01383.ogg" , "S0_01367.ogg" , "S0_01384.ogg" , "S0_01369.ogg" },
-	  new string[] { "S1_02455.ogg" , "S1_02440.ogg" , "S1_02457.ogg" , "S1_02442.ogg" },
-	  new string[] { "S2_01296.ogg" , "S2_01281.ogg" , "S2_01298.ogg" , "S2_01282.ogg" },
-	  new string[] { "S3_02833.ogg" , "S3_02818.ogg" , "S3_02835.ogg" , "S3_02820.ogg" },
-	  new string[] { "S5_04163.ogg" , "S5_04162.ogg" , "S5_04179.ogg" , "s5_04174.ogg" },
-	  new string[] { "S4_08241.ogg" , "S4_08258.ogg" , "S4_08243.ogg" , "S4_08259.ogg" },
-	  new string[] { "S6_02219.ogg" , "S6_02220.ogg" , "S6_02221.ogg" , "S6_02222.ogg" },
-	  new string[] { "S2_01296.ogg" , "S2_01281.ogg" , "S2_01298.ogg" , "S2_01282.ogg" },
-	  new string[] { "S1_02455.ogg" , "S1_02440.ogg" , "S1_02457.ogg" , "S1_02442.ogg" },
-	  new string[] { "S1_02455.ogg" , "S1_02440.ogg" , "S1_02457.ogg" , "S1_02442.ogg" }
-	};
+          new string[] { "S0_01383.ogg" , "S0_01367.ogg" , "S0_01384.ogg" , "S0_01369.ogg" },
+          new string[] { "S1_02455.ogg" , "S1_02440.ogg" , "S1_02457.ogg" , "S1_02442.ogg" },
+          new string[] { "S2_01296.ogg" , "S2_01281.ogg" , "S2_01298.ogg" , "S2_01282.ogg" },
+          new string[] { "S3_02833.ogg" , "S3_02818.ogg" , "S3_02835.ogg" , "S3_02820.ogg" },
+          new string[] { "S5_04163.ogg" , "S5_04162.ogg" , "S5_04179.ogg" , "s5_04174.ogg" },
+          new string[] { "S4_08241.ogg" , "S4_08258.ogg" , "S4_08243.ogg" , "S4_08259.ogg" },
+          new string[] { "S6_02219.ogg" , "S6_02220.ogg" , "S6_02221.ogg" , "S6_02222.ogg" },
+          new string[] { "S2_01296.ogg" , "S2_01281.ogg" , "S2_01298.ogg" , "S2_01282.ogg" },
+          new string[] { "S1_02455.ogg" , "S1_02440.ogg" , "S1_02457.ogg" , "S1_02442.ogg" },
+          new string[] { "S1_02455.ogg" , "S1_02440.ogg" , "S1_02457.ogg" , "S1_02442.ogg" }
+        };
 
-	private string[][] elVs_kiss01 = new string[][]{
-	  new string[] { "S0_01383.ogg" , "S0_01367.ogg" , "S0_01384.ogg" , "S0_01369.ogg" },
-	  new string[] { "S1_02455.ogg" , "S1_02440.ogg" , "S1_02457.ogg" , "S1_02442.ogg" },
-	  new string[] { "S2_01296.ogg" , "S2_01281.ogg" , "S2_01298.ogg" , "S2_01282.ogg" },
-	  new string[] { "S3_02833.ogg" , "S3_02818.ogg" , "S3_02835.ogg" , "S3_02820.ogg" },
-	  new string[] { "S4_08241.ogg" , "S4_08258.ogg" , "S4_08243.ogg" , "S4_08259.ogg" },
-	  new string[] { "S5_04163.ogg" , "S5_04162.ogg" , "S5_04179.ogg" , "s5_04174.ogg" },
-	  new string[] { "S6_02219.ogg" , "S6_02220.ogg" , "S6_02221.ogg" , "S6_02222.ogg" },
+        private string[][] elVs_kiss01 = new string[][]{
+          new string[] { "S0_01383.ogg" , "S0_01367.ogg" , "S0_01384.ogg" , "S0_01369.ogg" },
+          new string[] { "S1_02455.ogg" , "S1_02440.ogg" , "S1_02457.ogg" , "S1_02442.ogg" },
+          new string[] { "S2_01296.ogg" , "S2_01281.ogg" , "S2_01298.ogg" , "S2_01282.ogg" },
+          new string[] { "S3_02833.ogg" , "S3_02818.ogg" , "S3_02835.ogg" , "S3_02820.ogg" },
+          new string[] { "S4_08241.ogg" , "S4_08258.ogg" , "S4_08243.ogg" , "S4_08259.ogg" },
+          new string[] { "S5_04163.ogg" , "S5_04162.ogg" , "S5_04179.ogg" , "s5_04174.ogg" },
+          new string[] { "S6_02219.ogg" , "S6_02220.ogg" , "S6_02221.ogg" , "S6_02222.ogg" },
 
-	  new string[] { "S0_01383.ogg" , "S0_01367.ogg" , "S0_01384.ogg" , "S0_01369.ogg" },
-	  new string[] { "S1_02455.ogg" , "S1_02440.ogg" , "S1_02457.ogg" , "S1_02442.ogg" },
-	  new string[] { "S2_01296.ogg" , "S2_01281.ogg" , "S2_01298.ogg" , "S2_01282.ogg" },
-	  new string[] { "S3_02833.ogg" , "S3_02818.ogg" , "S3_02835.ogg" , "S3_02820.ogg" },
-	  new string[] { "S5_04163.ogg" , "S5_04162.ogg" , "S5_04179.ogg" , "s5_04174.ogg" },
-	  new string[] { "S4_08241.ogg" , "S4_08258.ogg" , "S4_08243.ogg" , "S4_08259.ogg" },
-	  new string[] { "S6_02219.ogg" , "S6_02220.ogg" , "S6_02221.ogg" , "S6_02222.ogg" },
-	  new string[] { "S2_01296.ogg" , "S2_01281.ogg" , "S2_01298.ogg" , "S2_01282.ogg" },
-	  new string[] { "S1_02455.ogg" , "S1_02440.ogg" , "S1_02457.ogg" , "S1_02442.ogg" },
-	  new string[] { "S1_02455.ogg" , "S1_02440.ogg" , "S1_02457.ogg" , "S1_02442.ogg" }
-	};
+          new string[] { "S0_01383.ogg" , "S0_01367.ogg" , "S0_01384.ogg" , "S0_01369.ogg" },
+          new string[] { "S1_02455.ogg" , "S1_02440.ogg" , "S1_02457.ogg" , "S1_02442.ogg" },
+          new string[] { "S2_01296.ogg" , "S2_01281.ogg" , "S2_01298.ogg" , "S2_01282.ogg" },
+          new string[] { "S3_02833.ogg" , "S3_02818.ogg" , "S3_02835.ogg" , "S3_02820.ogg" },
+          new string[] { "S5_04163.ogg" , "S5_04162.ogg" , "S5_04179.ogg" , "s5_04174.ogg" },
+          new string[] { "S4_08241.ogg" , "S4_08258.ogg" , "S4_08243.ogg" , "S4_08259.ogg" },
+          new string[] { "S6_02219.ogg" , "S6_02220.ogg" , "S6_02221.ogg" , "S6_02222.ogg" },
+          new string[] { "S2_01296.ogg" , "S2_01281.ogg" , "S2_01298.ogg" , "S2_01282.ogg" },
+          new string[] { "S1_02455.ogg" , "S1_02440.ogg" , "S1_02457.ogg" , "S1_02442.ogg" },
+          new string[] { "S1_02455.ogg" , "S1_02440.ogg" , "S1_02457.ogg" , "S1_02442.ogg" }
+        };
 
-	private string[][] elVs_souji01 = new string[][]{
-	  new string[] { "S0_03152.ogg" , "S0_03410.ogg" , "S0_03429.ogg" , "S0_03293.ogg" , "S0_03368.ogg" , "S0_03381.ogg" },
-	  new string[] { "S1_05632.ogg" , "S1_05656.ogg" , "S1_05632.ogg" , "S1_04690.ogg" , "S1_05643.ogg" },
-	  new string[] { "S2_04678.ogg" , "S2_04277.ogg" , "S2_04282.ogg" , "S2_04714.ogg" , "S2_04702.ogg" },
-	  new string[] { "S3_12858.ogg" , "S3_12859.ogg" , "S3_12860.ogg" , "S3_07808.ogg" , "S3_07840.ogg" },
-	  new string[] { "S4_12860.ogg" , "S4_12862.ogg" , "S4_06759.ogg" , "S4_06760.ogg" },
-	  new string[] { "S5_15282.ogg" , "S5_15283.ogg" , "S5_15284.ogg" , "S5_03418.ogg" , "S5_03436.ogg" },
-	  new string[] { "S6_24074.ogg" , "S6_24075.ogg" , "S6_24076.ogg" , "S6_14037.ogg" , "S6_14015.ogg" },
+        private string[][] elVs_souji01 = new string[][]{
+          new string[] { "S0_03152.ogg" , "S0_03410.ogg" , "S0_03429.ogg" , "S0_03293.ogg" , "S0_03368.ogg" , "S0_03381.ogg" },
+          new string[] { "S1_05632.ogg" , "S1_05656.ogg" , "S1_05632.ogg" , "S1_04690.ogg" , "S1_05643.ogg" },
+          new string[] { "S2_04678.ogg" , "S2_04277.ogg" , "S2_04282.ogg" , "S2_04714.ogg" , "S2_04702.ogg" },
+          new string[] { "S3_12858.ogg" , "S3_12859.ogg" , "S3_12860.ogg" , "S3_07808.ogg" , "S3_07840.ogg" },
+          new string[] { "S4_12860.ogg" , "S4_12862.ogg" , "S4_06759.ogg" , "S4_06760.ogg" },
+          new string[] { "S5_15282.ogg" , "S5_15283.ogg" , "S5_15284.ogg" , "S5_03418.ogg" , "S5_03436.ogg" },
+          new string[] { "S6_24074.ogg" , "S6_24075.ogg" , "S6_24076.ogg" , "S6_14037.ogg" , "S6_14015.ogg" },
 
-	  new string[] { "S0_03152.ogg" , "S0_03410.ogg" , "S0_03429.ogg" , "S0_03293.ogg" , "S0_03368.ogg" , "S0_03381.ogg" },
-	  new string[] { "S1_05632.ogg" , "S1_05656.ogg" , "S1_05632.ogg" , "S1_04690.ogg" , "S1_05643.ogg" },
-	  new string[] { "S2_04678.ogg" , "S2_04277.ogg" , "S2_04282.ogg" , "S2_04714.ogg" , "S2_04702.ogg" },
-	  new string[] { "S3_12858.ogg" , "S3_12859.ogg" , "S3_12860.ogg" , "S3_07808.ogg" , "S3_07840.ogg" },
-	  new string[] { "S5_15282.ogg" , "S5_15283.ogg" , "S5_15284.ogg" , "S5_03418.ogg" , "S5_03436.ogg" },
-	  new string[] { "S4_12860.ogg" , "S4_12862.ogg" , "S4_06759.ogg" , "S4_06760.ogg" },
-	  new string[] { "S6_24074.ogg" , "S6_24075.ogg" , "S6_24076.ogg" , "S6_14037.ogg" , "S6_14015.ogg" },
-	  new string[] { "S2_04678.ogg" , "S2_04277.ogg" , "S2_04282.ogg" , "S2_04714.ogg" , "S2_04702.ogg" },
-	  new string[] { "S1_05632.ogg" , "S1_05656.ogg" , "S1_05632.ogg" , "S1_04690.ogg" , "S1_05643.ogg" },
-	  new string[] { "S1_05632.ogg" , "S1_05656.ogg" , "S1_05632.ogg" , "S1_04690.ogg" , "S1_05643.ogg" }
-	};
+          new string[] { "S0_03152.ogg" , "S0_03410.ogg" , "S0_03429.ogg" , "S0_03293.ogg" , "S0_03368.ogg" , "S0_03381.ogg" },
+          new string[] { "S1_05632.ogg" , "S1_05656.ogg" , "S1_05632.ogg" , "S1_04690.ogg" , "S1_05643.ogg" },
+          new string[] { "S2_04678.ogg" , "S2_04277.ogg" , "S2_04282.ogg" , "S2_04714.ogg" , "S2_04702.ogg" },
+          new string[] { "S3_12858.ogg" , "S3_12859.ogg" , "S3_12860.ogg" , "S3_07808.ogg" , "S3_07840.ogg" },
+          new string[] { "S5_15282.ogg" , "S5_15283.ogg" , "S5_15284.ogg" , "S5_03418.ogg" , "S5_03436.ogg" },
+          new string[] { "S4_12860.ogg" , "S4_12862.ogg" , "S4_06759.ogg" , "S4_06760.ogg" },
+          new string[] { "S6_24074.ogg" , "S6_24075.ogg" , "S6_24076.ogg" , "S6_14037.ogg" , "S6_14015.ogg" },
+          new string[] { "S2_04678.ogg" , "S2_04277.ogg" , "S2_04282.ogg" , "S2_04714.ogg" , "S2_04702.ogg" },
+          new string[] { "S1_05632.ogg" , "S1_05656.ogg" , "S1_05632.ogg" , "S1_04690.ogg" , "S1_05643.ogg" },
+          new string[] { "S1_05632.ogg" , "S1_05656.ogg" , "S1_05632.ogg" , "S1_04690.ogg" , "S1_05643.ogg" }
+        };
 
-	private string[][] elVs_saiho01 = new string[][]{
-	  new string[] { "S0_03036.ogg" , "S0_03013.ogg" , "S0_03214.ogg" , "S0_03152.ogg" , "S0_03293.ogg" , "S0_03029.ogg" },
-	  new string[] { "S1_04524.ogg" , "S1_04598.ogg" , "S1_04697.ogg" , "S1_04690.ogg" , "S1_05656.ogg" , "S1_06549.ogg" },
-	  new string[] { "S2_02518.ogg" , "S2_02519.ogg" , "S2_02530.ogg" , "S2_02531.ogg" , "S2_02532.ogg" , "S2_02534.ogg" },
-	  new string[] { "S3_12840.ogg" , "S3_12841.ogg" , "S3_12842.ogg" , "S3_07439.ogg" , "S3_07440.ogg" },
-	  new string[] { "S4_12842.ogg" , "S4_12843.ogg" , "S4_12844.ogg" , "S4_06325.ogg" , "S4_06367.ogg" , "S4_06395.ogg" },
-	  new string[] { "S5_15264.ogg" , "S5_15265.ogg" , "S5_15266.ogg" , "S5_01949.ogg" , "S5_01970.ogg" , "S5_01978.ogg" , "S5_02001.ogg" },
-	  new string[] { "S6_24056.ogg" , "S6_24057.ogg" , "S6_24058.ogg" , "S6_24062.ogg" , "S6_00051.ogg" , "S6_24064.ogg" },
+        private string[][] elVs_saiho01 = new string[][]{
+          new string[] { "S0_03036.ogg" , "S0_03013.ogg" , "S0_03214.ogg" , "S0_03152.ogg" , "S0_03293.ogg" , "S0_03029.ogg" },
+          new string[] { "S1_04524.ogg" , "S1_04598.ogg" , "S1_04697.ogg" , "S1_04690.ogg" , "S1_05656.ogg" , "S1_06549.ogg" },
+          new string[] { "S2_02518.ogg" , "S2_02519.ogg" , "S2_02530.ogg" , "S2_02531.ogg" , "S2_02532.ogg" , "S2_02534.ogg" },
+          new string[] { "S3_12840.ogg" , "S3_12841.ogg" , "S3_12842.ogg" , "S3_07439.ogg" , "S3_07440.ogg" },
+          new string[] { "S4_12842.ogg" , "S4_12843.ogg" , "S4_12844.ogg" , "S4_06325.ogg" , "S4_06367.ogg" , "S4_06395.ogg" },
+          new string[] { "S5_15264.ogg" , "S5_15265.ogg" , "S5_15266.ogg" , "S5_01949.ogg" , "S5_01970.ogg" , "S5_01978.ogg" , "S5_02001.ogg" },
+          new string[] { "S6_24056.ogg" , "S6_24057.ogg" , "S6_24058.ogg" , "S6_24062.ogg" , "S6_00051.ogg" , "S6_24064.ogg" },
 
-	  new string[] { "S0_03036.ogg" , "S0_03013.ogg" , "S0_03214.ogg" , "S0_03152.ogg" , "S0_03293.ogg" , "S0_03029.ogg" },
-	  new string[] { "S1_04524.ogg" , "S1_04598.ogg" , "S1_04697.ogg" , "S1_04690.ogg" , "S1_05656.ogg" , "S1_06549.ogg" },
-	  new string[] { "S2_02518.ogg" , "S2_02519.ogg" , "S2_02530.ogg" , "S2_02531.ogg" , "S2_02532.ogg" , "S2_02534.ogg" },
-	  new string[] { "S3_12840.ogg" , "S3_12841.ogg" , "S3_12842.ogg" , "S3_07439.ogg" , "S3_07440.ogg" },
-	  new string[] { "S5_15264.ogg" , "S5_15265.ogg" , "S5_15266.ogg" , "S5_01949.ogg" , "S5_01970.ogg" , "S5_01978.ogg" , "S5_02001.ogg" },
-	  new string[] { "S4_12842.ogg" , "S4_12843.ogg" , "S4_12844.ogg" , "S4_06325.ogg" , "S4_06367.ogg" , "S4_06395.ogg" },
-	  new string[] { "S6_24056.ogg" , "S6_24057.ogg" , "S6_24058.ogg" , "S6_24062.ogg" , "S6_00051.ogg" , "S6_24064.ogg" },
-	  new string[] { "S2_02518.ogg" , "S2_02519.ogg" , "S2_02530.ogg" , "S2_02531.ogg" , "S2_02532.ogg" , "S2_02534.ogg" },
-	  new string[] { "S1_04524.ogg" , "S1_04598.ogg" , "S1_04697.ogg" , "S1_04690.ogg" , "S1_05656.ogg" , "S1_06549.ogg" },
-	  new string[] { "S1_04524.ogg" , "S1_04598.ogg" , "S1_04697.ogg" , "S1_04690.ogg" , "S1_05656.ogg" , "S1_06549.ogg" }
-	};
+          new string[] { "S0_03036.ogg" , "S0_03013.ogg" , "S0_03214.ogg" , "S0_03152.ogg" , "S0_03293.ogg" , "S0_03029.ogg" },
+          new string[] { "S1_04524.ogg" , "S1_04598.ogg" , "S1_04697.ogg" , "S1_04690.ogg" , "S1_05656.ogg" , "S1_06549.ogg" },
+          new string[] { "S2_02518.ogg" , "S2_02519.ogg" , "S2_02530.ogg" , "S2_02531.ogg" , "S2_02532.ogg" , "S2_02534.ogg" },
+          new string[] { "S3_12840.ogg" , "S3_12841.ogg" , "S3_12842.ogg" , "S3_07439.ogg" , "S3_07440.ogg" },
+          new string[] { "S5_15264.ogg" , "S5_15265.ogg" , "S5_15266.ogg" , "S5_01949.ogg" , "S5_01970.ogg" , "S5_01978.ogg" , "S5_02001.ogg" },
+          new string[] { "S4_12842.ogg" , "S4_12843.ogg" , "S4_12844.ogg" , "S4_06325.ogg" , "S4_06367.ogg" , "S4_06395.ogg" },
+          new string[] { "S6_24056.ogg" , "S6_24057.ogg" , "S6_24058.ogg" , "S6_24062.ogg" , "S6_00051.ogg" , "S6_24064.ogg" },
+          new string[] { "S2_02518.ogg" , "S2_02519.ogg" , "S2_02530.ogg" , "S2_02531.ogg" , "S2_02532.ogg" , "S2_02534.ogg" },
+          new string[] { "S1_04524.ogg" , "S1_04598.ogg" , "S1_04697.ogg" , "S1_04690.ogg" , "S1_05656.ogg" , "S1_06549.ogg" },
+          new string[] { "S1_04524.ogg" , "S1_04598.ogg" , "S1_04697.ogg" , "S1_04690.ogg" , "S1_05656.ogg" , "S1_06549.ogg" }
+        };
 
-	private string[][] elVs_ryouri01 = new string[][]{
-	  new string[] { "S0_03086.ogg" , "S0_03090.ogg" , "S0_03121.ogg" , "S0_03214.ogg" , "S0_03293.ogg" , "S0_03064.ogg" , "S0_03075.ogg" },
-	  new string[] { "S1_04618.ogg" , "S1_04642.ogg" , "S1_05656.ogg" , "S1_04610.ogg" , "S1_04644.ogg" , "S1_04586.ogg" },
-	  new string[] { "S2_02625.ogg" , "S2_04097.ogg" , "S2_04714.ogg" , "S2_04678.ogg" , "S2_02621.ogg" },
-	  new string[] { "S3_12843.ogg" , "S3_12844.ogg" , "S3_12845.ogg" , "S3_07477.ogg" , "S3_07509.ogg" , "S3_07516.ogg" },
-	  new string[] { "S4_12845.ogg" , "S4_12847.ogg" , "S4_06462.ogg" , "S4_06583.ogg" },
-	  new string[] { "S5_15268.ogg" , "S5_03377.ogg" , "S5_03396.ogg" , "S5_02071.ogg" , "S5_02072.ogg" },
-	  new string[] { "S6_24059.ogg" , "S6_24060.ogg" , "S6_24061.ogg" , "S6_00051.ogg" , "S6_00077.ogg" , "S6_00113.ogg" },
+        private string[][] elVs_ryouri01 = new string[][]{
+          new string[] { "S0_03086.ogg" , "S0_03090.ogg" , "S0_03121.ogg" , "S0_03214.ogg" , "S0_03293.ogg" , "S0_03064.ogg" , "S0_03075.ogg" },
+          new string[] { "S1_04618.ogg" , "S1_04642.ogg" , "S1_05656.ogg" , "S1_04610.ogg" , "S1_04644.ogg" , "S1_04586.ogg" },
+          new string[] { "S2_02625.ogg" , "S2_04097.ogg" , "S2_04714.ogg" , "S2_04678.ogg" , "S2_02621.ogg" },
+          new string[] { "S3_12843.ogg" , "S3_12844.ogg" , "S3_12845.ogg" , "S3_07477.ogg" , "S3_07509.ogg" , "S3_07516.ogg" },
+          new string[] { "S4_12845.ogg" , "S4_12847.ogg" , "S4_06462.ogg" , "S4_06583.ogg" },
+          new string[] { "S5_15268.ogg" , "S5_03377.ogg" , "S5_03396.ogg" , "S5_02071.ogg" , "S5_02072.ogg" },
+          new string[] { "S6_24059.ogg" , "S6_24060.ogg" , "S6_24061.ogg" , "S6_00051.ogg" , "S6_00077.ogg" , "S6_00113.ogg" },
 
-	  new string[] { "S0_03086.ogg" , "S0_03090.ogg" , "S0_03121.ogg" , "S0_03214.ogg" , "S0_03293.ogg" , "S0_03064.ogg" , "S0_03075.ogg" },
-	  new string[] { "S1_04618.ogg" , "S1_04642.ogg" , "S1_05656.ogg" , "S1_04610.ogg" , "S1_04644.ogg" , "S1_04586.ogg" },
-	  new string[] { "S2_02625.ogg" , "S2_04097.ogg" , "S2_04714.ogg" , "S2_04678.ogg" , "S2_02621.ogg" },
-	  new string[] { "S3_12843.ogg" , "S3_12844.ogg" , "S3_12845.ogg" , "S3_07477.ogg" , "S3_07509.ogg" , "S3_07516.ogg" },
-	  new string[] { "S5_15268.ogg" , "S5_03377.ogg" , "S5_03396.ogg" , "S5_02071.ogg" , "S5_02072.ogg" },
-	  new string[] { "S4_12845.ogg" , "S4_12847.ogg" , "S4_06462.ogg" , "S4_06583.ogg" },
-	  new string[] { "S6_24059.ogg" , "S6_24060.ogg" , "S6_24061.ogg" , "S6_00051.ogg" , "S6_00077.ogg" , "S6_00113.ogg" },
-	  new string[] { "S2_02625.ogg" , "S2_04097.ogg" , "S2_04714.ogg" , "S2_04678.ogg" , "S2_02621.ogg" },
-	  new string[] { "S1_04618.ogg" , "S1_04642.ogg" , "S1_05656.ogg" , "S1_04610.ogg" , "S1_04644.ogg" , "S1_04586.ogg" },
-	  new string[] { "S1_04618.ogg" , "S1_04642.ogg" , "S1_05656.ogg" , "S1_04610.ogg" , "S1_04644.ogg" , "S1_04586.ogg" }
-	};
+          new string[] { "S0_03086.ogg" , "S0_03090.ogg" , "S0_03121.ogg" , "S0_03214.ogg" , "S0_03293.ogg" , "S0_03064.ogg" , "S0_03075.ogg" },
+          new string[] { "S1_04618.ogg" , "S1_04642.ogg" , "S1_05656.ogg" , "S1_04610.ogg" , "S1_04644.ogg" , "S1_04586.ogg" },
+          new string[] { "S2_02625.ogg" , "S2_04097.ogg" , "S2_04714.ogg" , "S2_04678.ogg" , "S2_02621.ogg" },
+          new string[] { "S3_12843.ogg" , "S3_12844.ogg" , "S3_12845.ogg" , "S3_07477.ogg" , "S3_07509.ogg" , "S3_07516.ogg" },
+          new string[] { "S5_15268.ogg" , "S5_03377.ogg" , "S5_03396.ogg" , "S5_02071.ogg" , "S5_02072.ogg" },
+          new string[] { "S4_12845.ogg" , "S4_12847.ogg" , "S4_06462.ogg" , "S4_06583.ogg" },
+          new string[] { "S6_24059.ogg" , "S6_24060.ogg" , "S6_24061.ogg" , "S6_00051.ogg" , "S6_00077.ogg" , "S6_00113.ogg" },
+          new string[] { "S2_02625.ogg" , "S2_04097.ogg" , "S2_04714.ogg" , "S2_04678.ogg" , "S2_02621.ogg" },
+          new string[] { "S1_04618.ogg" , "S1_04642.ogg" , "S1_05656.ogg" , "S1_04610.ogg" , "S1_04644.ogg" , "S1_04586.ogg" },
+          new string[] { "S1_04618.ogg" , "S1_04642.ogg" , "S1_05656.ogg" , "S1_04610.ogg" , "S1_04644.ogg" , "S1_04586.ogg" }
+        };
 
-	private string[][] elVs_kesyou01 = new string[][]{
-	  new string[] { "S0_03252.ogg" , "S0_03288.ogg" , "S0_03293.ogg" , "S0_03273.ogg" , "S0_03302.ogg" },
-	  new string[] { "S1_05510.ogg" , "S1_05521.ogg" , "S1_05656.ogg" , "S1_05484.ogg" , "S1_05485.ogg" },
-	  new string[] { "S2_04607.ogg" , "S2_04624.ogg" , "S2_04646.ogg" , "S2_04714.ogg" , "S2_04678.ogg" },
-	  new string[] { "S3_12853.ogg" , "S3_07674.ogg" , "S3_07702.ogg" , "S3_07730.ogg" },
-	  new string[] { "S5_15276.ogg" , "S5_15277.ogg" , "S5_15278.ogg" , "S5_02311.ogg" , "S5_02339.ogg" , "S5_02340.ogg" },
-	  new string[] { "S4_12854.ogg" , "S4_12855.ogg" , "S4_12856.ogg" , "S4_06637.ogg" , "S4_06648.ogg" },
-	  new string[] { "S6_24068.ogg" , "S6_24069.ogg" , "S6_24070.ogg" , "S6_00051.ogg" , "S6_00273.ogg" , "S6_00331.ogg" },
+        private string[][] elVs_kesyou01 = new string[][]{
+          new string[] { "S0_03252.ogg" , "S0_03288.ogg" , "S0_03293.ogg" , "S0_03273.ogg" , "S0_03302.ogg" },
+          new string[] { "S1_05510.ogg" , "S1_05521.ogg" , "S1_05656.ogg" , "S1_05484.ogg" , "S1_05485.ogg" },
+          new string[] { "S2_04607.ogg" , "S2_04624.ogg" , "S2_04646.ogg" , "S2_04714.ogg" , "S2_04678.ogg" },
+          new string[] { "S3_12853.ogg" , "S3_07674.ogg" , "S3_07702.ogg" , "S3_07730.ogg" },
+          new string[] { "S5_15276.ogg" , "S5_15277.ogg" , "S5_15278.ogg" , "S5_02311.ogg" , "S5_02339.ogg" , "S5_02340.ogg" },
+          new string[] { "S4_12854.ogg" , "S4_12855.ogg" , "S4_12856.ogg" , "S4_06637.ogg" , "S4_06648.ogg" },
+          new string[] { "S6_24068.ogg" , "S6_24069.ogg" , "S6_24070.ogg" , "S6_00051.ogg" , "S6_00273.ogg" , "S6_00331.ogg" },
 
-	  new string[] { "S0_03252.ogg" , "S0_03288.ogg" , "S0_03293.ogg" , "S0_03273.ogg" , "S0_03302.ogg" },
-	  new string[] { "S1_05510.ogg" , "S1_05521.ogg" , "S1_05656.ogg" , "S1_05484.ogg" , "S1_05485.ogg" },
-	  new string[] { "S2_04607.ogg" , "S2_04624.ogg" , "S2_04646.ogg" , "S2_04714.ogg" , "S2_04678.ogg" },
-	  new string[] { "S3_12853.ogg" , "S3_07674.ogg" , "S3_07702.ogg" , "S3_07730.ogg" },
-	  new string[] { "S5_15276.ogg" , "S5_15277.ogg" , "S5_15278.ogg" , "S5_02311.ogg" , "S5_02339.ogg" , "S5_02340.ogg" },
-	  new string[] { "S4_12854.ogg" , "S4_12855.ogg" , "S4_12856.ogg" , "S4_06637.ogg" , "S4_06648.ogg" },
-	  new string[] { "S6_24068.ogg" , "S6_24069.ogg" , "S6_24070.ogg" , "S6_00051.ogg" , "S6_00273.ogg" , "S6_00331.ogg" },
-	  new string[] { "S2_04607.ogg" , "S2_04624.ogg" , "S2_04646.ogg" , "S2_04714.ogg" , "S2_04678.ogg" },
-	  new string[] { "S1_05510.ogg" , "S1_05521.ogg" , "S1_05656.ogg" , "S1_05484.ogg" , "S1_05485.ogg" },
-	  new string[] { "S1_05510.ogg" , "S1_05521.ogg" , "S1_05656.ogg" , "S1_05484.ogg" , "S1_05485.ogg" }
-	};
+          new string[] { "S0_03252.ogg" , "S0_03288.ogg" , "S0_03293.ogg" , "S0_03273.ogg" , "S0_03302.ogg" },
+          new string[] { "S1_05510.ogg" , "S1_05521.ogg" , "S1_05656.ogg" , "S1_05484.ogg" , "S1_05485.ogg" },
+          new string[] { "S2_04607.ogg" , "S2_04624.ogg" , "S2_04646.ogg" , "S2_04714.ogg" , "S2_04678.ogg" },
+          new string[] { "S3_12853.ogg" , "S3_07674.ogg" , "S3_07702.ogg" , "S3_07730.ogg" },
+          new string[] { "S5_15276.ogg" , "S5_15277.ogg" , "S5_15278.ogg" , "S5_02311.ogg" , "S5_02339.ogg" , "S5_02340.ogg" },
+          new string[] { "S4_12854.ogg" , "S4_12855.ogg" , "S4_12856.ogg" , "S4_06637.ogg" , "S4_06648.ogg" },
+          new string[] { "S6_24068.ogg" , "S6_24069.ogg" , "S6_24070.ogg" , "S6_00051.ogg" , "S6_00273.ogg" , "S6_00331.ogg" },
+          new string[] { "S2_04607.ogg" , "S2_04624.ogg" , "S2_04646.ogg" , "S2_04714.ogg" , "S2_04678.ogg" },
+          new string[] { "S1_05510.ogg" , "S1_05521.ogg" , "S1_05656.ogg" , "S1_05484.ogg" , "S1_05485.ogg" },
+          new string[] { "S1_05510.ogg" , "S1_05521.ogg" , "S1_05656.ogg" , "S1_05484.ogg" , "S1_05485.ogg" }
+        };
 
-	private string[][] elVs_kaiwa01 = new string[][]{
-	  new string[] { "S0_03621.ogg" , "S0_03625.ogg" , "S0_03631.ogg" , "S0_03638.ogg" , "S0_03655.ogg" , "S0_03656.ogg" , "S0_03657.ogg" , "S0_03666.ogg" , "S0_03668.ogg" , "S0_03728.ogg" , "S0_03729.ogg" , "S0_03738.ogg" , "S0_03767.ogg" , "S0_03769.ogg" , "S0_03770.ogg" , "S0_03776.ogg" , "S0_03780.ogg" , "S0_03781.ogg" },
-	  new string[] { "S1_03509.ogg" , "S1_03510.ogg" , "S1_03511.ogg" , "S1_03518.ogg" , "S1_03520.ogg" , "S1_03521.ogg" , "S1_03525.ogg" , "S1_03526.ogg" , "S1_03536.ogg" , "S1_03538.ogg" , "S1_03547.ogg" , "S1_03548.ogg" , "S1_03555.ogg" , "S1_03556.ogg" , "S1_03557.ogg" , "S1_03560.ogg" , "S1_03572.ogg" , "S1_03574.ogg" },
-	  new string[] { "S2_02651.ogg" , "S2_02686.ogg" , "S2_02687.ogg" , "S2_02692.ogg" , "S2_02709.ogg" , "S2_02711.ogg" , "S2_02714.ogg" , "S2_02722.ogg" , "S2_02734.ogg" , "S2_02736.ogg" , "S2_02740.ogg" , "S2_02741.ogg" , "S2_02748.ogg" , "S2_02755.ogg" , "S2_02758.ogg" , "S2_02761.ogg" , "S2_02768.ogg" , "S2_02824.ogg" },
-	  new string[] { "S3_00052.ogg" , "S3_00053.ogg" , "S3_00054.ogg" , "S3_00060.ogg" , "S3_00071.ogg" , "S3_00072.ogg" , "S3_00073.ogg" , "S3_00074.ogg" , "S3_00077.ogg" , "S3_00079.ogg" , "S3_00080.ogg" , "S3_00087.ogg" , "S3_00089.ogg" , "S3_00090.ogg" , "S3_00092.ogg" , "S3_00093.ogg" , "S3_00098.ogg" , "S3_00099.ogg" },
-	  new string[] { "S4_04034.ogg" , "S4_04035.ogg" , "S4_04036.ogg" , "S4_04037.ogg" , "S4_04038.ogg" , "S4_04039.ogg" , "S4_04040.ogg" , "S4_04053.ogg" , "S4_04054.ogg" , "S4_04055.ogg" , "S4_04056.ogg" , "S4_04057.ogg" , "S4_04063.ogg" , "S4_04071.ogg" , "S4_04072.ogg" , "S4_04075.ogg" , "S4_04076.ogg" , "S4_04078.ogg" },
-	  new string[] { "S5_04554.ogg" , "S5_04555.ogg" , "S5_04556.ogg" , "S5_04557.ogg" , "S5_04575.ogg" , "S5_04576.ogg" , "S5_04577.ogg" , "S5_04578.ogg" , "S5_04579.ogg" , "S5_04582.ogg" , "S5_04594.ogg" , "S5_04595.ogg" , "S5_04596.ogg" , "S5_04597.ogg" , "S5_04598.ogg" , "S5_04642.ogg" , "S5_04643.ogg" , "S5_04646.ogg" },
-	  new string[] { "S6_24126.ogg" , "S6_24127.ogg" , "S6_24128.ogg" , "S6_24129.ogg" , "S6_00474.ogg" , "S6_00476.ogg" , "S6_00477.ogg" , "S6_00479.ogg" , "S6_00480.ogg" , "S6_00491.ogg" , "S6_00492.ogg" , "S6_00493.ogg" , "S6_00494.ogg" , "S6_00495.ogg" , "S6_00531.ogg" , "S6_00532.ogg" , "S6_00533.ogg" , "S6_00534.ogg" },
+        private string[][] elVs_kaiwa01 = new string[][]{
+          new string[] { "S0_03621.ogg" , "S0_03625.ogg" , "S0_03631.ogg" , "S0_03638.ogg" , "S0_03655.ogg" , "S0_03656.ogg" , "S0_03657.ogg" , "S0_03666.ogg" , "S0_03668.ogg" , "S0_03728.ogg" , "S0_03729.ogg" , "S0_03738.ogg" , "S0_03767.ogg" , "S0_03769.ogg" , "S0_03770.ogg" , "S0_03776.ogg" , "S0_03780.ogg" , "S0_03781.ogg" },
+          new string[] { "S1_03509.ogg" , "S1_03510.ogg" , "S1_03511.ogg" , "S1_03518.ogg" , "S1_03520.ogg" , "S1_03521.ogg" , "S1_03525.ogg" , "S1_03526.ogg" , "S1_03536.ogg" , "S1_03538.ogg" , "S1_03547.ogg" , "S1_03548.ogg" , "S1_03555.ogg" , "S1_03556.ogg" , "S1_03557.ogg" , "S1_03560.ogg" , "S1_03572.ogg" , "S1_03574.ogg" },
+          new string[] { "S2_02651.ogg" , "S2_02686.ogg" , "S2_02687.ogg" , "S2_02692.ogg" , "S2_02709.ogg" , "S2_02711.ogg" , "S2_02714.ogg" , "S2_02722.ogg" , "S2_02734.ogg" , "S2_02736.ogg" , "S2_02740.ogg" , "S2_02741.ogg" , "S2_02748.ogg" , "S2_02755.ogg" , "S2_02758.ogg" , "S2_02761.ogg" , "S2_02768.ogg" , "S2_02824.ogg" },
+          new string[] { "S3_00052.ogg" , "S3_00053.ogg" , "S3_00054.ogg" , "S3_00060.ogg" , "S3_00071.ogg" , "S3_00072.ogg" , "S3_00073.ogg" , "S3_00074.ogg" , "S3_00077.ogg" , "S3_00079.ogg" , "S3_00080.ogg" , "S3_00087.ogg" , "S3_00089.ogg" , "S3_00090.ogg" , "S3_00092.ogg" , "S3_00093.ogg" , "S3_00098.ogg" , "S3_00099.ogg" },
+          new string[] { "S4_04034.ogg" , "S4_04035.ogg" , "S4_04036.ogg" , "S4_04037.ogg" , "S4_04038.ogg" , "S4_04039.ogg" , "S4_04040.ogg" , "S4_04053.ogg" , "S4_04054.ogg" , "S4_04055.ogg" , "S4_04056.ogg" , "S4_04057.ogg" , "S4_04063.ogg" , "S4_04071.ogg" , "S4_04072.ogg" , "S4_04075.ogg" , "S4_04076.ogg" , "S4_04078.ogg" },
+          new string[] { "S5_04554.ogg" , "S5_04555.ogg" , "S5_04556.ogg" , "S5_04557.ogg" , "S5_04575.ogg" , "S5_04576.ogg" , "S5_04577.ogg" , "S5_04578.ogg" , "S5_04579.ogg" , "S5_04582.ogg" , "S5_04594.ogg" , "S5_04595.ogg" , "S5_04596.ogg" , "S5_04597.ogg" , "S5_04598.ogg" , "S5_04642.ogg" , "S5_04643.ogg" , "S5_04646.ogg" },
+          new string[] { "S6_24126.ogg" , "S6_24127.ogg" , "S6_24128.ogg" , "S6_24129.ogg" , "S6_00474.ogg" , "S6_00476.ogg" , "S6_00477.ogg" , "S6_00479.ogg" , "S6_00480.ogg" , "S6_00491.ogg" , "S6_00492.ogg" , "S6_00493.ogg" , "S6_00494.ogg" , "S6_00495.ogg" , "S6_00531.ogg" , "S6_00532.ogg" , "S6_00533.ogg" , "S6_00534.ogg" },
 
-	  new string[] { "S0_03621.ogg" , "S0_03625.ogg" , "S0_03631.ogg" , "S0_03638.ogg" , "S0_03655.ogg" , "S0_03656.ogg" , "S0_03657.ogg" , "S0_03666.ogg" , "S0_03668.ogg" , "S0_03728.ogg" , "S0_03729.ogg" , "S0_03738.ogg" , "S0_03767.ogg" , "S0_03769.ogg" , "S0_03770.ogg" , "S0_03776.ogg" , "S0_03780.ogg" , "S0_03781.ogg" },
-	  new string[] { "S1_03509.ogg" , "S1_03510.ogg" , "S1_03511.ogg" , "S1_03518.ogg" , "S1_03520.ogg" , "S1_03521.ogg" , "S1_03525.ogg" , "S1_03526.ogg" , "S1_03536.ogg" , "S1_03538.ogg" , "S1_03547.ogg" , "S1_03548.ogg" , "S1_03555.ogg" , "S1_03556.ogg" , "S1_03557.ogg" , "S1_03560.ogg" , "S1_03572.ogg" , "S1_03574.ogg" },
-	  new string[] { "S2_02651.ogg" , "S2_02686.ogg" , "S2_02687.ogg" , "S2_02692.ogg" , "S2_02709.ogg" , "S2_02711.ogg" , "S2_02714.ogg" , "S2_02722.ogg" , "S2_02734.ogg" , "S2_02736.ogg" , "S2_02740.ogg" , "S2_02741.ogg" , "S2_02748.ogg" , "S2_02755.ogg" , "S2_02758.ogg" , "S2_02761.ogg" , "S2_02768.ogg" , "S2_02824.ogg" },
-	  new string[] { "S3_00052.ogg" , "S3_00053.ogg" , "S3_00054.ogg" , "S3_00060.ogg" , "S3_00071.ogg" , "S3_00072.ogg" , "S3_00073.ogg" , "S3_00074.ogg" , "S3_00077.ogg" , "S3_00079.ogg" , "S3_00080.ogg" , "S3_00087.ogg" , "S3_00089.ogg" , "S3_00090.ogg" , "S3_00092.ogg" , "S3_00093.ogg" , "S3_00098.ogg" , "S3_00099.ogg" },
-	  new string[] { "S5_04554.ogg" , "S5_04555.ogg" , "S5_04556.ogg" , "S5_04557.ogg" , "S5_04575.ogg" , "S5_04576.ogg" , "S5_04577.ogg" , "S5_04578.ogg" , "S5_04579.ogg" , "S5_04582.ogg" , "S5_04594.ogg" , "S5_04595.ogg" , "S5_04596.ogg" , "S5_04597.ogg" , "S5_04598.ogg" , "S5_04642.ogg" , "S5_04643.ogg" , "S5_04646.ogg" },
-	  new string[] { "S4_04034.ogg" , "S4_04035.ogg" , "S4_04036.ogg" , "S4_04037.ogg" , "S4_04038.ogg" , "S4_04039.ogg" , "S4_04040.ogg" , "S4_04053.ogg" , "S4_04054.ogg" , "S4_04055.ogg" , "S4_04056.ogg" , "S4_04057.ogg" , "S4_04063.ogg" , "S4_04071.ogg" , "S4_04072.ogg" , "S4_04075.ogg" , "S4_04076.ogg" , "S4_04078.ogg" },
-	  new string[] { "S6_24126.ogg" , "S6_24127.ogg" , "S6_24128.ogg" , "S6_24129.ogg" , "S6_00474.ogg" , "S6_00476.ogg" , "S6_00477.ogg" , "S6_00479.ogg" , "S6_00480.ogg" , "S6_00491.ogg" , "S6_00492.ogg" , "S6_00493.ogg" , "S6_00494.ogg" , "S6_00495.ogg" , "S6_00531.ogg" , "S6_00532.ogg" , "S6_00533.ogg" , "S6_00534.ogg" },
-	  new string[] { "S2_02651.ogg" , "S2_02686.ogg" , "S2_02687.ogg" , "S2_02692.ogg" , "S2_02709.ogg" , "S2_02711.ogg" , "S2_02714.ogg" , "S2_02722.ogg" , "S2_02734.ogg" , "S2_02736.ogg" , "S2_02740.ogg" , "S2_02741.ogg" , "S2_02748.ogg" , "S2_02755.ogg" , "S2_02758.ogg" , "S2_02761.ogg" , "S2_02768.ogg" , "S2_02824.ogg" },
-	  new string[] { "S1_03509.ogg" , "S1_03510.ogg" , "S1_03511.ogg" , "S1_03518.ogg" , "S1_03520.ogg" , "S1_03521.ogg" , "S1_03525.ogg" , "S1_03526.ogg" , "S1_03536.ogg" , "S1_03538.ogg" , "S1_03547.ogg" , "S1_03548.ogg" , "S1_03555.ogg" , "S1_03556.ogg" , "S1_03557.ogg" , "S1_03560.ogg" , "S1_03572.ogg" , "S1_03574.ogg" },
-	  new string[] { "S1_03509.ogg" , "S1_03510.ogg" , "S1_03511.ogg" , "S1_03518.ogg" , "S1_03520.ogg" , "S1_03521.ogg" , "S1_03525.ogg" , "S1_03526.ogg" , "S1_03536.ogg" , "S1_03538.ogg" , "S1_03547.ogg" , "S1_03548.ogg" , "S1_03555.ogg" , "S1_03556.ogg" , "S1_03557.ogg" , "S1_03560.ogg" , "S1_03572.ogg" , "S1_03574.ogg" }
-	};
+          new string[] { "S0_03621.ogg" , "S0_03625.ogg" , "S0_03631.ogg" , "S0_03638.ogg" , "S0_03655.ogg" , "S0_03656.ogg" , "S0_03657.ogg" , "S0_03666.ogg" , "S0_03668.ogg" , "S0_03728.ogg" , "S0_03729.ogg" , "S0_03738.ogg" , "S0_03767.ogg" , "S0_03769.ogg" , "S0_03770.ogg" , "S0_03776.ogg" , "S0_03780.ogg" , "S0_03781.ogg" },
+          new string[] { "S1_03509.ogg" , "S1_03510.ogg" , "S1_03511.ogg" , "S1_03518.ogg" , "S1_03520.ogg" , "S1_03521.ogg" , "S1_03525.ogg" , "S1_03526.ogg" , "S1_03536.ogg" , "S1_03538.ogg" , "S1_03547.ogg" , "S1_03548.ogg" , "S1_03555.ogg" , "S1_03556.ogg" , "S1_03557.ogg" , "S1_03560.ogg" , "S1_03572.ogg" , "S1_03574.ogg" },
+          new string[] { "S2_02651.ogg" , "S2_02686.ogg" , "S2_02687.ogg" , "S2_02692.ogg" , "S2_02709.ogg" , "S2_02711.ogg" , "S2_02714.ogg" , "S2_02722.ogg" , "S2_02734.ogg" , "S2_02736.ogg" , "S2_02740.ogg" , "S2_02741.ogg" , "S2_02748.ogg" , "S2_02755.ogg" , "S2_02758.ogg" , "S2_02761.ogg" , "S2_02768.ogg" , "S2_02824.ogg" },
+          new string[] { "S3_00052.ogg" , "S3_00053.ogg" , "S3_00054.ogg" , "S3_00060.ogg" , "S3_00071.ogg" , "S3_00072.ogg" , "S3_00073.ogg" , "S3_00074.ogg" , "S3_00077.ogg" , "S3_00079.ogg" , "S3_00080.ogg" , "S3_00087.ogg" , "S3_00089.ogg" , "S3_00090.ogg" , "S3_00092.ogg" , "S3_00093.ogg" , "S3_00098.ogg" , "S3_00099.ogg" },
+          new string[] { "S5_04554.ogg" , "S5_04555.ogg" , "S5_04556.ogg" , "S5_04557.ogg" , "S5_04575.ogg" , "S5_04576.ogg" , "S5_04577.ogg" , "S5_04578.ogg" , "S5_04579.ogg" , "S5_04582.ogg" , "S5_04594.ogg" , "S5_04595.ogg" , "S5_04596.ogg" , "S5_04597.ogg" , "S5_04598.ogg" , "S5_04642.ogg" , "S5_04643.ogg" , "S5_04646.ogg" },
+          new string[] { "S4_04034.ogg" , "S4_04035.ogg" , "S4_04036.ogg" , "S4_04037.ogg" , "S4_04038.ogg" , "S4_04039.ogg" , "S4_04040.ogg" , "S4_04053.ogg" , "S4_04054.ogg" , "S4_04055.ogg" , "S4_04056.ogg" , "S4_04057.ogg" , "S4_04063.ogg" , "S4_04071.ogg" , "S4_04072.ogg" , "S4_04075.ogg" , "S4_04076.ogg" , "S4_04078.ogg" },
+          new string[] { "S6_24126.ogg" , "S6_24127.ogg" , "S6_24128.ogg" , "S6_24129.ogg" , "S6_00474.ogg" , "S6_00476.ogg" , "S6_00477.ogg" , "S6_00479.ogg" , "S6_00480.ogg" , "S6_00491.ogg" , "S6_00492.ogg" , "S6_00493.ogg" , "S6_00494.ogg" , "S6_00495.ogg" , "S6_00531.ogg" , "S6_00532.ogg" , "S6_00533.ogg" , "S6_00534.ogg" },
+          new string[] { "S2_02651.ogg" , "S2_02686.ogg" , "S2_02687.ogg" , "S2_02692.ogg" , "S2_02709.ogg" , "S2_02711.ogg" , "S2_02714.ogg" , "S2_02722.ogg" , "S2_02734.ogg" , "S2_02736.ogg" , "S2_02740.ogg" , "S2_02741.ogg" , "S2_02748.ogg" , "S2_02755.ogg" , "S2_02758.ogg" , "S2_02761.ogg" , "S2_02768.ogg" , "S2_02824.ogg" },
+          new string[] { "S1_03509.ogg" , "S1_03510.ogg" , "S1_03511.ogg" , "S1_03518.ogg" , "S1_03520.ogg" , "S1_03521.ogg" , "S1_03525.ogg" , "S1_03526.ogg" , "S1_03536.ogg" , "S1_03538.ogg" , "S1_03547.ogg" , "S1_03548.ogg" , "S1_03555.ogg" , "S1_03556.ogg" , "S1_03557.ogg" , "S1_03560.ogg" , "S1_03572.ogg" , "S1_03574.ogg" },
+          new string[] { "S1_03509.ogg" , "S1_03510.ogg" , "S1_03511.ogg" , "S1_03518.ogg" , "S1_03520.ogg" , "S1_03521.ogg" , "S1_03525.ogg" , "S1_03526.ogg" , "S1_03536.ogg" , "S1_03538.ogg" , "S1_03547.ogg" , "S1_03548.ogg" , "S1_03555.ogg" , "S1_03556.ogg" , "S1_03557.ogg" , "S1_03560.ogg" , "S1_03572.ogg" , "S1_03574.ogg" }
+        };
 
-	private string[][] elVs_suimin01 = new string[][]{
-	  new string[] { "S0_03176.ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
-	  new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
-	  new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
-	  new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
-	  new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
-	  new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
-	  new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
-	  new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
-	  new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
-	  new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
-	  new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
-	  new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
-	  new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
-	  new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
-	  new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
-	  new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
-	  new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" }
-	};
+        private string[][] elVs_suimin01 = new string[][]{
+          new string[] { "S0_03176.ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+          new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+          new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+          new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+          new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+          new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+          new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+          new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+          new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+          new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+          new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+          new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+          new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+          new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+          new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+          new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+          new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" }
+        };
 
-	private string[][] elVs_furo01 = new string[][]{
-	  new string[] { "S0_03344.ogg" , "S0_03358.ogg" , "S0_03320.ogg" , "S0_03343.ogg" , "S0_03339.ogg" },
-	  new string[] { "S1_05610.ogg" , "S1_05620.ogg" , "S1_04524.ogg" , "S1_06930.ogg" },
-	  new string[] { "S2_04103.ogg" , "S2_04714.ogg" , "S2_04678.ogg" },
-	  new string[] { "S3_12857.ogg" , "S3_12855.ogg" , "S3_07702.ogg" , "S3_07745.ogg" },
-	  new string[] { "S4_06686.ogg" , "S4_06695.ogg" , "S4_06711.ogg" },
-	  new string[] { "S5_15279.ogg" , "S5_02392.ogg" , "S5_02382.ogg" , "S5_02433.ogg" , "S5_02442.ogg" },
-	  new string[] { "S6_24073.ogg" , "S6_00367.ogg" , "S6_00358.ogg" , "S6_00404.ogg" },
+        private string[][] elVs_furo01 = new string[][]{
+          new string[] { "S0_03344.ogg" , "S0_03358.ogg" , "S0_03320.ogg" , "S0_03343.ogg" , "S0_03339.ogg" },
+          new string[] { "S1_05610.ogg" , "S1_05620.ogg" , "S1_04524.ogg" , "S1_06930.ogg" },
+          new string[] { "S2_04103.ogg" , "S2_04714.ogg" , "S2_04678.ogg" },
+          new string[] { "S3_12857.ogg" , "S3_12855.ogg" , "S3_07702.ogg" , "S3_07745.ogg" },
+          new string[] { "S4_06686.ogg" , "S4_06695.ogg" , "S4_06711.ogg" },
+          new string[] { "S5_15279.ogg" , "S5_02392.ogg" , "S5_02382.ogg" , "S5_02433.ogg" , "S5_02442.ogg" },
+          new string[] { "S6_24073.ogg" , "S6_00367.ogg" , "S6_00358.ogg" , "S6_00404.ogg" },
 
-	  new string[] { "S0_03344.ogg" , "S0_03358.ogg" , "S0_03320.ogg" , "S0_03343.ogg" , "S0_03339.ogg" },
-	  new string[] { "S1_05610.ogg" , "S1_05620.ogg" , "S1_04524.ogg" , "S1_06930.ogg" },
-	  new string[] { "S2_04103.ogg" , "S2_04714.ogg" , "S2_04678.ogg" },
-	  new string[] { "S3_12857.ogg" , "S3_12855.ogg" , "S3_07702.ogg" , "S3_07745.ogg" },
-	  new string[] { "S5_15279.ogg" , "S5_02392.ogg" , "S5_02382.ogg" , "S5_02433.ogg" , "S5_02442.ogg" },
-	  new string[] { "S4_06686.ogg" , "S4_06695.ogg" , "S4_06711.ogg" },
-	  new string[] { "S6_24073.ogg" , "S6_00367.ogg" , "S6_00358.ogg" , "S6_00404.ogg" },
-	  new string[] { "S2_04103.ogg" , "S2_04714.ogg" , "S2_04678.ogg" },
-	  new string[] { "S1_05610.ogg" , "S1_05620.ogg" , "S1_04524.ogg" , "S1_06930.ogg" },
-	  new string[] { "S1_05610.ogg" , "S1_05620.ogg" , "S1_04524.ogg" , "S1_06930.ogg" }
-	};
+          new string[] { "S0_03344.ogg" , "S0_03358.ogg" , "S0_03320.ogg" , "S0_03343.ogg" , "S0_03339.ogg" },
+          new string[] { "S1_05610.ogg" , "S1_05620.ogg" , "S1_04524.ogg" , "S1_06930.ogg" },
+          new string[] { "S2_04103.ogg" , "S2_04714.ogg" , "S2_04678.ogg" },
+          new string[] { "S3_12857.ogg" , "S3_12855.ogg" , "S3_07702.ogg" , "S3_07745.ogg" },
+          new string[] { "S5_15279.ogg" , "S5_02392.ogg" , "S5_02382.ogg" , "S5_02433.ogg" , "S5_02442.ogg" },
+          new string[] { "S4_06686.ogg" , "S4_06695.ogg" , "S4_06711.ogg" },
+          new string[] { "S6_24073.ogg" , "S6_00367.ogg" , "S6_00358.ogg" , "S6_00404.ogg" },
+          new string[] { "S2_04103.ogg" , "S2_04714.ogg" , "S2_04678.ogg" },
+          new string[] { "S1_05610.ogg" , "S1_05620.ogg" , "S1_04524.ogg" , "S1_06930.ogg" },
+          new string[] { "S1_05610.ogg" , "S1_05620.ogg" , "S1_04524.ogg" , "S1_06930.ogg" }
+        };
 
-	private string[][] elVs_sake01 = new string[][]{
-	  new string[] { "S0_03503.ogg" , "S0_03177.ogg" , "S0_03520.ogg" , "S0_08143.ogg" , "S0_08146.ogg" , "S0_18208.ogg" , "S0_18212.ogg" , "S0_03633.ogg" },
-	  new string[] { "S1_06581.ogg" , "S1_06598.ogg" , "S1_06605.ogg" , "S1_05001.ogg" , "S1_05002.ogg" , "S1_05005.ogg" , "S1_05025.ogg" },
-	  new string[] { "S2_02663.ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
-	  new string[] { "S3_12865.ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
-	  new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
-	  new string[] { "S5_15289.ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
-	  new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
-	  new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
-	  new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
-	  new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
-	  new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
-	  new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
-	  new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
-	  new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
-	  new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
-	  new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
-	  new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" }
-	};
+        private string[][] elVs_sake01 = new string[][]{
+          new string[] { "S0_03503.ogg" , "S0_03177.ogg" , "S0_03520.ogg" , "S0_08143.ogg" , "S0_08146.ogg" , "S0_18208.ogg" , "S0_18212.ogg" , "S0_03633.ogg" },
+          new string[] { "S1_06581.ogg" , "S1_06598.ogg" , "S1_06605.ogg" , "S1_05001.ogg" , "S1_05002.ogg" , "S1_05005.ogg" , "S1_05025.ogg" },
+          new string[] { "S2_02663.ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+          new string[] { "S3_12865.ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+          new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+          new string[] { "S5_15289.ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+          new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+          new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+          new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+          new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+          new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+          new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+          new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+          new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+          new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+          new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+          new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" }
+        };
 
-	private string[][] elVs_hanyou01 = new string[][]{
-	  new string[] { "S0_03293.ogg" , "S0_03321.ogg" , ".ogg" , ".ogg" , ".ogg" },
-	  new string[] { "S1_04524.ogg" , "S1_04690.ogg" , "S1_05656.ogg" , ".ogg" , ".ogg" },
-	  new string[] { "S2_04714.ogg" , "S2_04678.ogg" , ".ogg" , ".ogg" , ".ogg" },
-	  new string[] { "S3_07702.ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
-	  new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
-	  new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
-	  new string[] { "S6_00051.ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
-	  new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
-	  new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
-	  new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
-	  new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
-	  new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
-	  new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
-	  new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
-	  new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
-	  new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
-	  new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" }
-	};
+        private string[][] elVs_hanyou01 = new string[][]{
+          new string[] { "S0_03293.ogg" , "S0_03321.ogg" , ".ogg" , ".ogg" , ".ogg" },
+          new string[] { "S1_04524.ogg" , "S1_04690.ogg" , "S1_05656.ogg" , ".ogg" , ".ogg" },
+          new string[] { "S2_04714.ogg" , "S2_04678.ogg" , ".ogg" , ".ogg" , ".ogg" },
+          new string[] { "S3_07702.ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+          new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+          new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+          new string[] { "S6_00051.ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+          new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+          new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+          new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+          new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+          new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+          new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+          new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+          new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+          new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" },
+          new string[] { ".ogg" , ".ogg" , ".ogg" , ".ogg" , ".ogg" }
+        };
 
 
 
@@ -16829,47 +17039,47 @@ namespace CM3D2.VibeYourMaid.Plugin {
 
             //シーンファイルの読み込み
             ElLoad(bgID);
-            
+
             //ライト設定
             if(bgID == 32){
               GameMain.Instance.MainLight.GetComponent<Light>().color = new Color(0.9f, 0.8f, 0.7f, 1f);
             }else{
               GameMain.Instance.MainLight.GetComponent<Light>().color = new Color(1f, 1f, 1f, 1f);
             }
-            
+
             //全メイドと男を一旦非表示
             GameMain.Instance.CharacterMgr.DeactivateMaidAll();
             GameMain.Instance.CharacterMgr.ResetCharaPosAll();
             foreach (Maid man in SubMans){
               man.Visible = false;
             }
-            
+
             //メイドを呼び出す
             for (int i = 0; i < 4; i++){
               if(mn[bgID][i] == -1 || life_f[i][0] == "")continue;
               LoadMaid(stockMaids[mn[bgID][i]].mem);
-              
+
               stockMaids[mn[bgID][i]].mem.ResetAll();
-              
+
             }
-            
+
             //男を呼び出す
             for (int i = 0; i < 4; i++){
               if(life_m[i][0] == "")continue;
 
               SubMans[i].Visible = true;
             }
-            
+
             if(node5.y < 0){
               node5.y = 0;
               cfgw.subGuiFlag = 0;
               cfgw.configGuiFlag = false;
             }
             lifeStart = 2;
-          
+
           }
-          
-          
+
+
           if(lifeStart == 2){
             int lc = 0;
             for (int i = 0; i < 4; i++){
@@ -16909,11 +17119,11 @@ namespace CM3D2.VibeYourMaid.Plugin {
                 stockMaids[mn[bgID][i]].mem.transform.position = new Vector3(floatCnv(life_f[i][1]), floatCnv(life_f[i][2]), floatCnv(life_f[i][3]));
                 stockMaids[mn[bgID][i]].mem.transform.eulerAngles = new Vector3(floatCnv(life_f[i][4]), floatCnv(life_f[i][5]), floatCnv(life_f[i][6]));
                 stockMaids[mn[bgID][i]].mem.body0.SetBoneHitHeightY(floatCnv(life_f[i][9]));
-                
+
                 //表情変更
                 MaidSetFace(life_f[i][7], stockMaids[mn[bgID][i]].mem);
                 stockMaids[mn[bgID][i]].mem.FaceBlend(life_f[i][8]);
-                
+
                 //着衣の変更
                 if(life_f[i][10] == "0"){ //全着衣
                   stockMaids[mn[bgID][i]].mem.body0.SetMask(TBody.SlotID.wear, true);
@@ -16987,7 +17197,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                   stockMaids[mn[bgID][i]].mem.EyeToCamera((Maid.EyeMoveType)0, 0.8f);
                   stockMaids[mn[bgID][i]].mem.body0.boEyeToCam = true;
                 }
-                
+
                 //ボイスセット読み込み
                 int iPersonal = Array.IndexOf(personalList[1], stockMaids[mn[bgID][i]].personal);
                 elVs[i] = new string[] { "" , "" , "" , "" , "" };
@@ -17037,24 +17247,24 @@ namespace CM3D2.VibeYourMaid.Plugin {
                     Array.Copy(elVs_furo01[iPersonal], elVs[i], elVs_furo01[iPersonal].Length);
                   }
                 }
-                
+
                 //マウスモード設定
                 if(life_f[i][13].Contains("キス")){
                   elMouthMode[i] = 1;
-                  
+
                 } else if(life_f[i][13].Contains("フェラ")){
                   elMouthMode[i] = 2;
-                
+
                 } else if(!life_f[i][13].Contains("SEX_A")) {
                   elMouthMode[i] = 0;
-                
-                }
-                
 
-                
+                }
+
+
+
                 //メイドアイテム装備
                 MaidSetItem(life_f[i][16], stockMaids[mn[bgID][i]].mem);
-                
+
                 //風呂シーン以外では汗を引かせる（要汗MOD）
                 if(bgID != 11 && bgID != 22 && bgID != 23){
                   try {
@@ -17067,8 +17277,8 @@ namespace CM3D2.VibeYourMaid.Plugin {
                 lifeTime3[i] = UnityEngine.Random.Range(250f, 500f);
                 elvFlag[i] = 0;
                 elcrFlag[i] = false;
-                
-                
+
+
               }
             }
 
@@ -17081,17 +17291,17 @@ namespace CM3D2.VibeYourMaid.Plugin {
                 SubMans[i].transform.eulerAngles = new Vector3(floatCnv(life_m[i][4]), floatCnv(life_m[i][5]), floatCnv(life_m[i][6]));
 
                 ManSetMotion(life_m[i][0], SubMans[i] ,0.7f, 0);
-                
+
                 //MansTg[i] = vmId[intCnv(life_m[i][7])];
                 MansTg[i] = stockMaids[mn[bgID][intCnv(life_m[i][7])]].id;
-                
+
               }
             }
 
              //背景変更
             Console.WriteLine("背景チェンジ:" + bgID);
             GameMain.Instance.BgMgr.ChangeBg(bgArray1[bgID][0]);
-            
+
             //カメラ移動
             Vector3 vNewPosition = Vector3.zero;
             vNewPosition = new Vector3( floatCnv(bgArray1[bgID][4]) , floatCnv(bgArray1[bgID][5]) , floatCnv(bgArray1[bgID][6]) );
@@ -17103,7 +17313,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
             }else{
               mainCamera.SetPos(vNewPosition);
             }
-            
+
             //BGM変更
             if(life_f[0][12] == ""){
               if(bgID == 32){
@@ -17116,11 +17326,11 @@ namespace CM3D2.VibeYourMaid.Plugin {
               danceFlag = 2; //ダンス曲が設定されている場合ダンスフラグを2に
               if(life_f[0][12] == "dummy")GameMain.Instance.SoundMgr.PlayBGMLegacy(bgArray1[bgID][2], 0f, true); //ダンス曲がダミーの場合は普通にBGM再生
             }
-            
+
           }
 
           if(lifeStart == 4){
-            StartCoroutine ("ElChangeEnd");
+            StartCoroutine("ElChangeEnd");
           }
 
           if(lifeStart >= 5 && !elFade && tgID != -1){
@@ -17148,9 +17358,9 @@ namespace CM3D2.VibeYourMaid.Plugin {
                   } else {
                     lifeTime1[i] -= Time.deltaTime * 60;
                   }
-                  
+
                 }
-                
+
                 //脱衣状態チェック
                 if(dCheck && life_f[i][10] == "0"){
                   eldatui[i] = 0;
@@ -17158,8 +17368,8 @@ namespace CM3D2.VibeYourMaid.Plugin {
                   if(!stockMaids[mn[bgID][i]].mem.body0.GetMask(TBody.SlotID.panz))eldatui[i] += 1;
                   if(stockMaids[mn[bgID][i]].mem.GetProp(MPN.accvag).strTempFileName == "accVag_VibePink_I_.menu")eldatui[i] += 1;
                   if(stockMaids[mn[bgID][i]].mem.GetProp(MPN.accanl).strTempFileName == "accAnl_AnalVibe_I_.menu")eldatui[i] += 1;
-                  
-                  
+
+
                   if(eldatui[i] == 0){
                     stockMaids[mn[bgID][i]].mem.FaceBlend(life_f[i][8]);
                   }else if(eldatui[i] == 1){
@@ -17167,11 +17377,11 @@ namespace CM3D2.VibeYourMaid.Plugin {
                   }else if(eldatui[i] == 2){
                     stockMaids[mn[bgID][i]].mem.FaceBlend("頬３涙１");
                   }
-                  
+
                   lifeTime3[i] = 0;
                 }
-                
-                
+
+
                 //表情変更処理
                 if(lifeTime3[i] <= 0){
                   //if((life_f[i][12] == "" && bgID != 32) || eldatui[i] == 0){
@@ -17181,7 +17391,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                     if(eldatui[i] == 1)MaidSetFace("発情|引きつり笑顔|苦笑い|困った|泣き|少し怒り|誘惑|恥ずかしい|エロ羞恥２|エロ興奮３", stockMaids[mn[bgID][i]].mem);
                     if(eldatui[i] >= 2)MaidSetFace("発情|引きつり笑顔|苦笑い|困った|泣き|少し怒り|誘惑|恥ずかしい|エロ羞恥２|エロ興奮３|興奮射精後１|絶頂射精後１|エロ痛み１|エロ痛み２|エロ我慢２|エロ我慢３|まぶたギュ", stockMaids[mn[bgID][i]].mem);
                   }
-                  
+
                   //タイマーリセット
                   if(life_f[i][12] == "")lifeTime3[i] = UnityEngine.Random.Range(300f, 600f);
                   if(life_f[i][12] != "")lifeTime3[i] = UnityEngine.Random.Range(100f, 200f);
@@ -17215,14 +17425,14 @@ namespace CM3D2.VibeYourMaid.Plugin {
                         lifeTime2[i] = 30;
                     }
                   }
-                  
+
                   //距離が離れたときもしくは再生が終わったときの処理
                   if (elvFlag[i] == 1){
                     if(!DistanceToMaid(stockMaids[mn[bgID][i]].mem, maidsState[mn[bgID][i]] , cr)){
                       stockMaids[mn[bgID][i]].mem.AudioMan.Stop(1.5f);
                       elcrFlag[i] = false;
                     }
-                    
+
                     if(!stockMaids[mn[bgID][i]].mem.AudioMan.audiosource.isPlaying){
                       float vt = 0f;
                       if(life_f[i][15] == "-1"){
@@ -17231,31 +17441,31 @@ namespace CM3D2.VibeYourMaid.Plugin {
                       }else{
                         vt = floatCnv(life_f[i][15]);
                       }
-                      
+
                       elvFlag[i] = 0; //再生中フラグOFF
-                      
+
                       //タイマーリセット
                       if(elcrFlag[i]){
                         lifeTime2[i] = UnityEngine.Random.Range(vt, vt * 2.5f);
                       }else{
                         lifeTime2[i] = 30;
                       }
-                    
+
                     }
                   }
-                  
+
                 } else {
                   lifeTime2[i] -= Time.deltaTime * 60;
                 }
-                
+
               }
               if(dCheck)dCheck = false;
-              
-              
+
+
               if(lifeStart == 5)lifeStart = 6;
-              
+
             //}
-            
+
             //ダンス関連チェック
             //メイドのモーションをチェックし、全員のダンスモーションが終了していた場合にフラグを2にする
             if(danceFlag == 1){
@@ -17268,7 +17478,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
 
                 Animation anim = stockMaids[mn[bgID][i]].mem.body0.GetAnimation();
                 if(!anim.IsPlaying(life_f[i][0]))++dc;
-                
+
                 //特定のモーションを遅らせて再生
                 if(life_f[i][0] == "dance_cm3d2_kara_002_cktc_f1.anm"){
                   if(lifeTime1[i] <= 0){
@@ -17290,9 +17500,9 @@ namespace CM3D2.VibeYourMaid.Plugin {
 
               }
               if(dc == 4)danceFlag = 2;
-              
+
             }
-            
+
             //フラグが2の場合、ダンス曲とダンスモーションを再生する
             if(danceFlag == 2){
               if(life_f[0][12] != "" && life_f[0][12] != "dummy"){
@@ -17306,13 +17516,13 @@ namespace CM3D2.VibeYourMaid.Plugin {
 
               for (int i = 0; i < 4; i++){
                 if(life_f[i][12] != "" && mn[bgID][i] != -1){
-                  
+
                   if(allFilesSet.Contains(life_f[i][0].Replace(".anm", ""))){
                     stockMaids[mn[bgID][i]].mem.CrossFadeAbsolute( life_f[i][0], false, false, false, 0.5f, 1f );
                   } else if(allFilesOldSet.Contains(life_f[i][0].Replace(".anm", ""))){
                     stockMaids[mn[bgID][i]].mem.CrossFadeAbsolute( life_f[i][0], GameUty.FileSystemOld, false, false, false, 0.5f, 1f );
                   }
-                  
+
                   //特定のモーションは再生を遅らせるために一旦停止
                   if(life_f[i][0] == "dance_cm3d2_kara_002_cktc_f1.anm"){
                     lifeTime1[i] = 350; //遅らせる時間設定
@@ -17324,10 +17534,10 @@ namespace CM3D2.VibeYourMaid.Plugin {
               }
               danceFlag = 1;
             }
-            
+
             //カメラ移動処理
             if(!bVR)ElMove();
-          
+
           }
 
         }
@@ -17347,9 +17557,9 @@ namespace CM3D2.VibeYourMaid.Plugin {
             old = true;
           }else{
             Console.WriteLine("モーションが見つかりません：" + motion);
-            return;          
+            return;
           }
-          
+
           if(motionList[i].Contains("[S]")){
             if(old){
               m.CrossFadeAbsolute( motion, GameUty.FileSystemOld, false, false, false, t, 1f );
@@ -17387,7 +17597,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
             if(old){
               m.CrossFadeAbsolute( motion, GameUty.FileSystemOld, false, true, false, t, 1f );
             }else{
-              m.CrossFadeAbsolute( motion, GameUty.FileSystem, false, true, false, t, 1f );            
+              m.CrossFadeAbsolute( motion, GameUty.FileSystem, false, true, false, t, 1f );
             }
             mOnceFlag[n] = false;
             mOnceBack[n] = "";
@@ -17400,17 +17610,17 @@ namespace CM3D2.VibeYourMaid.Plugin {
               ManSetMotion(life_m[i2][0], SubMans[i2] ,t, i);
             }
           }
-          
+
           //表情タイマーを0
           lifeTime3[n] = 0;
-          
+
           //"SEX_A"の場合は音声のオート変更処理
           if(life_f[n][13] == "SEX_A"){
             int iPersonal = Array.IndexOf(personalList[1], m.status.personal.uniqueName);
             lifeTime2[n] = 0;
             m.AudioMan.Stop();
             elMouthMode[n] = CheckMouthMode(motion);
-            
+
             if(elMouthMode[n] == 0){
               if(motion.Contains("_3_f") || motion.Contains("_3a01_f") || motion.Contains("_3b01_f") || motion.Contains("_3b02_f") || motion.Contains("_3e01_f") || motion.Contains("_3e02_f")){
                 elVs[n] = new string[elVs_sex02[iPersonal].Length];
@@ -17423,12 +17633,12 @@ namespace CM3D2.VibeYourMaid.Plugin {
             }else if(elMouthMode[n] == 1){
               elVs[n] = new string[elVs_kiss01[iPersonal].Length];
               Array.Copy(elVs_kiss01[iPersonal], elVs[n], elVs_kiss01[iPersonal].Length);
-            
+
             }else if(elMouthMode[n] == 2){
               elVs[n] = new string[elVs_fera01[iPersonal].Length];
               Array.Copy(elVs_fera01[iPersonal], elVs[n], elVs_fera01[iPersonal].Length);
             }
-          
+
           }
 
         }
@@ -17449,10 +17659,10 @@ namespace CM3D2.VibeYourMaid.Plugin {
 
           } else {
             Console.WriteLine("男のモーションが見つかりません：" + motion);
-            return;          
+            return;
           }
-          
-          
+
+
         }
 
 
@@ -17463,12 +17673,12 @@ namespace CM3D2.VibeYourMaid.Plugin {
           int i = UnityEngine.Random.Range(0 , faceList.Length);
           m.FaceAnime(faceList[i] , cfgw.fAnimeFadeTimeV , 0);
         }
-        
+
         private void MaidSetItem(string s, Maid m){
           if(s == "")return;
-          
+
           string[] itemList = s.Split('|');
-          
+
           foreach(string item in itemList){
             string[] mItem = item.Split(',');
             m.SetProp(mItem[0], mItem[1], 0, true, false);
@@ -17492,7 +17702,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
           int fi = 0;
           int[] hm = new int[]{-1, -1, -1, -1};
           //flagN = GameMain.Instance.CharacterMgr.status.GetFlag("時間帯") == 3;
-          
+
 
           //NTRブロック用にフリーとそれ以外のメイドを分ける
           List<int> exclusive = new List<int>();
@@ -17500,7 +17710,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
           List<int> all = new List<int>();
           foreach (int a in ary){
             if (stockMaids[a].mem.status.heroineType.ToString() == "Sub")continue; //NPCメイドを除外する
-            
+
             all.Add(a);
             if(stockMaids[a].mem.status.contract.ToString() == "Free"){
               free.Add(a);
@@ -17508,7 +17718,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
               exclusive.Add(a);
             }
           }
-          
+
 
           for (int i = 0; i < bgArray1.GetLength(0); i++){
 
@@ -17521,19 +17731,19 @@ namespace CM3D2.VibeYourMaid.Plugin {
               }
             }
             if (@object == null)bgArray1[i][3] = "0";
-            
+
             if(bgArray1[i][3] == "0" )continue;
             if(flagN && bgArray1[i][3] == "1" )continue;
             if(!flagN && bgArray1[i][3] == "2" )continue;
             if(bgArray1[i][0] == "MaidRoom" )continue;
-            
+
             //複数シーンファイルがある場合にランダム選択
             int r = UnityEngine.Random.Range(0,intCnv(bgArray1[i][10])) + 1;
             bgArray1[i][11] = r.ToString();
-            
+
             //メイド配置のためにシーンファイルをロード
             ElLoad(i);
-            
+
             //各シーンにランダムに並び替えたメイドを順番に配置する
             for (int i2 = 0; i2 < 4; i2++){
               if(life_f[i2][0] == "")continue;
@@ -17544,7 +17754,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                     mn[i][i2] = -1;
                     continue;
                   }
-                  
+
                   mn[i][i2] = exclusive[ei];
                   ++ei;
                   if(exclusive.Count <= ei){
@@ -17566,7 +17776,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                   }
                 }
                 if(exclusiveOver && freeOver)maidOver = true;
-              
+
               } else { //NTRブロック無効時
                 if(all.Count <= i2){
                   mn[i][i2] = -1;
@@ -17575,19 +17785,19 @@ namespace CM3D2.VibeYourMaid.Plugin {
 
                 mn[i][i2] = all[mi];
                 ++mi;
-                
+
                 if(all.Count <= mi){
                   mi = 0; //メイド数が限界に達した場合０に戻してループさせる
                   maidOver = true;
                 }
               }
-            
+
             }
-            
+
             ++bgC;
-            
+
           }
-          
+
           if(cfgw.ntrBlock && flagN){
             holidayMaid.Clear();
             if(!exclusiveOver){
@@ -17610,7 +17820,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
                 ++bgC;
               }
             }
-          
+
           }else{
             holidayMaid.Clear();
             if(!maidOver){
@@ -17625,13 +17835,13 @@ namespace CM3D2.VibeYourMaid.Plugin {
             }
           }
 
-          
+
           if(bgC % 4 == 0){
             bgC = bgC / 4;
           }else{
             bgC = bgC / 4 + 1;
           }
-        
+
         }
 
 
@@ -17669,13 +17879,13 @@ namespace CM3D2.VibeYourMaid.Plugin {
           }else{
             mainCamera.SetPos(vNewPosition);
           }
-          
+
           //BGM変更
           GameMain.Instance.SoundMgr.PlayBGMLegacy("bgm015.ogg", 0f, true);
 
           GameMain.Instance.MainCamera.FadeIn(1f, false, null, true, true, default(Color));
           elFade = false;
-        
+
         }
 
 
@@ -17686,7 +17896,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
           vNewPosition = Camera.main.transform.position;
           float frontValue = 0;
           float rightValue = 0;
-          
+
 
           if(Input.GetKey(KeyCode.W))frontValue = 0.025f * speed;
           if(Input.GetKey(KeyCode.S))frontValue = -0.025f * speed;
@@ -17708,7 +17918,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
               mainCamera.SetPos(vNewPosition);
             }
           }
-        
+
         }
 
         private IEnumerator ElChange(int i){
@@ -17716,11 +17926,11 @@ namespace CM3D2.VibeYourMaid.Plugin {
           GameMain.Instance.MainCamera.FadeOut(0f, false, null, true, default(Color));
           elFade = true;
           yield return new WaitForSeconds (0.1f);
-          
+
           bgID = i;
           lifeStart = 1;
         }
-        
+
         private IEnumerator ElChangeEnd(){
           yield return new WaitForSeconds (1f);
           GameMain.Instance.MainCamera.FadeIn(1f, false, null, true, true, default(Color));
@@ -17976,171 +18186,168 @@ namespace CM3D2.VibeYourMaid.Plugin {
                    life39_01m.CopyTo(life_m, 0);
                    break;
             }
-        
+
         }
-#endif
+      #endif
       //エンパイアズライフ関係終了-----------------------
-      
-      
-      
-      
-      
+
+
       //おさわり処理関係-----------------------
 
-        //おさわり用ターゲット配置
-  private void targetSet(int maidID, Maid maid, MaidState maidState){
-          if (reGetMaid) return; //単独でも呼ばれるのでここでチェック
+      //おさわり用ターゲット配置
+        private void targetSet(int maidID, Maid maid, MaidState maidState) {
+        if (reGetMaid) return; //単独でも呼ばれるのでここでチェック
 
-          if (maid.body0.m_Bones == null) return;
+        if (maid.body0.m_Bones == null) return;
 
-        	maidState.bodyName = maid.GetProp(MPN.body).strFileName;
-        	Console.WriteLine("お触りボディ:" + maidState.bodyName);
-    try {
-    //口
-		maidState.targetSphere_mouth = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-    maidState.targetSphere_mouth.layer = 8;
-		maidState.targetSphere_mouth.name = "MO_" + maidID;
-		maidState.targetSphere_mouth.transform.localScale = new Vector3(0.06f, 0.06f, 0.06f);
-		maidState.targetSphere_mouth.GetComponent<Renderer>().enabled = false;
-		//BoxCollider boxCollider0 = maidState.targetSphere_mouth.AddComponent<BoxCollider>();
-		maidState.targetSphere_mouth.GetComponent<Collider>().isTrigger = true;
-		maidState.IK_mouth = CMT.SearchObjName(maid.body0.m_Bones.transform, "Bip01 Head", true);
+        maidState.bodyName = maid.GetProp(MPN.body).strFileName;
+        Console.WriteLine("お触りボディ:" + maidState.bodyName);
+        try {
+        //口
+        maidState.targetSphere_mouth = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        maidState.targetSphere_mouth.layer = 8;
+        maidState.targetSphere_mouth.name = "MO_" + maidID;
+        maidState.targetSphere_mouth.transform.localScale = new Vector3(0.06f, 0.06f, 0.06f);
+        maidState.targetSphere_mouth.GetComponent<Renderer>().enabled = false;
+        //BoxCollider boxCollider0 = maidState.targetSphere_mouth.AddComponent<BoxCollider>();
+        maidState.targetSphere_mouth.GetComponent<Collider>().isTrigger = true;
+        maidState.IK_mouth = CMT.SearchObjName(maid.body0.m_Bones.transform, "Bip01 Head", true);
 
-		//むね
-		maidState.targetSphere_muneR = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-    maidState.targetSphere_muneR.layer = 8;
-		maidState.targetSphere_muneR.name = "MR_" + maidID;
-		maidState.targetSphere_muneR.transform.localScale = bVR ? new Vector3(0.12f, 0.12f, 0.12f) : new Vector3(0.2f, 0.2f, 0.2f); //VRとマウスで大きさ調整
-		maidState.targetSphere_muneR.GetComponent<Renderer>().enabled = false;
-		//BoxCollider boxCollider1 = maidState.targetSphere_muneR.AddComponent<BoxCollider>();
-		maidState.targetSphere_muneR.GetComponent<Collider>().isTrigger = true;
-		maidState.IK_muneR = CMT.SearchObjName(maid.body0.m_Bones.transform, "_IK_muneR", true);
+        //むね
+        maidState.targetSphere_muneR = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        maidState.targetSphere_muneR.layer = 8;
+        maidState.targetSphere_muneR.name = "MR_" + maidID;
+        maidState.targetSphere_muneR.transform.localScale = bVR ? new Vector3(0.12f, 0.12f, 0.12f) : new Vector3(0.2f, 0.2f, 0.2f); //VRとマウスで大きさ調整
+        maidState.targetSphere_muneR.GetComponent<Renderer>().enabled = false;
+        //BoxCollider boxCollider1 = maidState.targetSphere_muneR.AddComponent<BoxCollider>();
+        maidState.targetSphere_muneR.GetComponent<Collider>().isTrigger = true;
+        maidState.IK_muneR = CMT.SearchObjName(maid.body0.m_Bones.transform, "_IK_muneR", true);
 
-		maidState.targetSphere_muneL = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-    maidState.targetSphere_muneL.layer = 8;
-		maidState.targetSphere_muneL.name = "ML_" + maidID;
-		maidState.targetSphere_muneL.transform.localScale = bVR ? new Vector3(0.12f, 0.12f, 0.12f) : new Vector3(0.2f, 0.2f, 0.2f); //VRとマウスで大きさ調整
-		maidState.targetSphere_muneL.GetComponent<Renderer>().enabled = false;
-		//BoxCollider boxCollider2 = maidState.targetSphere_muneL.AddComponent<BoxCollider>();
-		maidState.targetSphere_muneL.GetComponent<Collider>().isTrigger = true;
-		maidState.IK_muneL = CMT.SearchObjName(maid.body0.m_Bones.transform, "_IK_muneL", true);
+        maidState.targetSphere_muneL = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        maidState.targetSphere_muneL.layer = 8;
+        maidState.targetSphere_muneL.name = "ML_" + maidID;
+        maidState.targetSphere_muneL.transform.localScale = bVR ? new Vector3(0.12f, 0.12f, 0.12f) : new Vector3(0.2f, 0.2f, 0.2f); //VRとマウスで大きさ調整
+        maidState.targetSphere_muneL.GetComponent<Renderer>().enabled = false;
+        //BoxCollider boxCollider2 = maidState.targetSphere_muneL.AddComponent<BoxCollider>();
+        maidState.targetSphere_muneL.GetComponent<Collider>().isTrigger = true;
+        maidState.IK_muneL = CMT.SearchObjName(maid.body0.m_Bones.transform, "_IK_muneL", true);
 
-                //おしり
-		maidState.targetSphere_hipL = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-    maidState.targetSphere_hipL.layer = 8;
-		maidState.targetSphere_hipL.name = "HL_" + maidID;
-		maidState.targetSphere_hipL.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f); //VR用に変更
-		maidState.targetSphere_hipL.GetComponent<Renderer>().enabled = false;
-		//BoxCollider boxCollider3 = maidState.targetSphere_hipL.AddComponent<BoxCollider>();
-		maidState.targetSphere_hipL.GetComponent<Collider>().isTrigger = true;
-		maidState.IK_hipL = CMT.SearchObjName(maid.body0.m_Bones.transform, "_IK_hipL", true);
-		maidState.Hip_L = CMT.SearchObjName(maid.body0.m_Bones.transform, "Hip_L", true);
+                    //おしり
+        maidState.targetSphere_hipL = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        maidState.targetSphere_hipL.layer = 8;
+        maidState.targetSphere_hipL.name = "HL_" + maidID;
+        maidState.targetSphere_hipL.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f); //VR用に変更
+        maidState.targetSphere_hipL.GetComponent<Renderer>().enabled = false;
+        //BoxCollider boxCollider3 = maidState.targetSphere_hipL.AddComponent<BoxCollider>();
+        maidState.targetSphere_hipL.GetComponent<Collider>().isTrigger = true;
+        maidState.IK_hipL = CMT.SearchObjName(maid.body0.m_Bones.transform, "_IK_hipL", true);
+        maidState.Hip_L = CMT.SearchObjName(maid.body0.m_Bones.transform, "Hip_L", true);
 
-		maidState.targetSphere_hipR = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-    maidState.targetSphere_hipR.layer = 8;
-		maidState.targetSphere_hipR.name = "HR_" + maidID;
-		maidState.targetSphere_hipR.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f); //VR用に変更
-		maidState.targetSphere_hipR.GetComponent<Renderer>().enabled = false;
-		//BoxCollider boxCollider4 = maidState.targetSphere_hipR.AddComponent<BoxCollider>();
-		maidState.targetSphere_hipR.GetComponent<Collider>().isTrigger = true;
-		maidState.IK_hipR = CMT.SearchObjName(maid.body0.m_Bones.transform, "_IK_hipR", true);
-		maidState.Hip_R = CMT.SearchObjName(maid.body0.m_Bones.transform, "Hip_R", true);
+        maidState.targetSphere_hipR = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        maidState.targetSphere_hipR.layer = 8;
+        maidState.targetSphere_hipR.name = "HR_" + maidID;
+        maidState.targetSphere_hipR.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f); //VR用に変更
+        maidState.targetSphere_hipR.GetComponent<Renderer>().enabled = false;
+        //BoxCollider boxCollider4 = maidState.targetSphere_hipR.AddComponent<BoxCollider>();
+        maidState.targetSphere_hipR.GetComponent<Collider>().isTrigger = true;
+        maidState.IK_hipR = CMT.SearchObjName(maid.body0.m_Bones.transform, "_IK_hipR", true);
+        maidState.Hip_R = CMT.SearchObjName(maid.body0.m_Bones.transform, "Hip_R", true);
 
-                //大事なとこ
-		maidState.targetSphere_vagina = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-    maidState.targetSphere_vagina.layer = 8;
-		maidState.targetSphere_vagina.name = "VA_" + maidID;
-		maidState.targetSphere_vagina.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
-		maidState.targetSphere_vagina.GetComponent<Renderer>().enabled = false;
-		//BoxCollider boxCollider5 = maidState.targetSphere_vagina.AddComponent<BoxCollider>();
-		maidState.targetSphere_vagina.GetComponent<Collider>().isTrigger = true;
-		maidState.IK_vagina = CMT.SearchObjName(maid.body0.m_Bones.transform, "Bip01 Pelvis", true);
+                    //大事なとこ
+        maidState.targetSphere_vagina = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        maidState.targetSphere_vagina.layer = 8;
+        maidState.targetSphere_vagina.name = "VA_" + maidID;
+        maidState.targetSphere_vagina.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+        maidState.targetSphere_vagina.GetComponent<Renderer>().enabled = false;
+        //BoxCollider boxCollider5 = maidState.targetSphere_vagina.AddComponent<BoxCollider>();
+        maidState.targetSphere_vagina.GetComponent<Collider>().isTrigger = true;
+        maidState.IK_vagina = CMT.SearchObjName(maid.body0.m_Bones.transform, "Bip01 Pelvis", true);
 
-                //アナル
-		maidState.targetSphere_anal = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-    maidState.targetSphere_anal.layer = 8;
-		maidState.targetSphere_anal.name = "AN_" + maidID;
-		maidState.targetSphere_anal.transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
-		maidState.targetSphere_anal.GetComponent<Renderer>().enabled = false;
-		//BoxCollider boxCollider6 = maidState.targetSphere_anal.AddComponent<BoxCollider>();
-		maidState.targetSphere_anal.GetComponent<Collider>().isTrigger = true;
-		maidState.IK_anal = CMT.SearchObjName(maid.body0.m_Bones.transform, "_IK_anal", true);
+                    //アナル
+        maidState.targetSphere_anal = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        maidState.targetSphere_anal.layer = 8;
+        maidState.targetSphere_anal.name = "AN_" + maidID;
+        maidState.targetSphere_anal.transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
+        maidState.targetSphere_anal.GetComponent<Renderer>().enabled = false;
+        //BoxCollider boxCollider6 = maidState.targetSphere_anal.AddComponent<BoxCollider>();
+        maidState.targetSphere_anal.GetComponent<Collider>().isTrigger = true;
+        maidState.IK_anal = CMT.SearchObjName(maid.body0.m_Bones.transform, "_IK_anal", true);
 
-    } catch { //(Exception e) {
-      UnityEngine.Debug.LogError("targetSet Error : "+maid);
-      targetDestroy(maidID, maidState); //targetを削除
-    }
-  }
-	
-	
-	//お触りターゲット消去
-	private void targetDestroy(int maidID, MaidState maidState){
-	  if (maidState.targetSphere_mouth) UnityEngine.Object.Destroy(maidState.targetSphere_mouth);
-	  if (maidState.targetSphere_muneR) UnityEngine.Object.Destroy(maidState.targetSphere_muneR);
-	  if (maidState.targetSphere_muneL) UnityEngine.Object.Destroy(maidState.targetSphere_muneL);
-	  if (maidState.targetSphere_hipL) UnityEngine.Object.Destroy(maidState.targetSphere_hipL);
-	  if (maidState.targetSphere_hipR) UnityEngine.Object.Destroy(maidState.targetSphere_hipR);
-	  if (maidState.targetSphere_vagina) UnityEngine.Object.Destroy(maidState.targetSphere_vagina);
-	  if (maidState.targetSphere_anal) UnityEngine.Object.Destroy(maidState.targetSphere_anal);
-	}
-	
-	
-	//ターゲット位置の更新 お触りが有効の場合は毎フレーム呼ばれる
-	private void targetInstallation(int maidID, MaidState maidState){
-    try {
-	  //if(maidState.bodyName != stockMaids[maidID].mem.GetProp(MPN.body).strFileName)targetDestroy(maidID); //例外処理で対応
-	  //if(!maidState.targetSphere_mouth)targetSet(maidID, meid, maidState); //例外処理で対応
-    
-	  maidState.targetSphere_mouth.transform.position = maidState.IK_mouth.transform.position;
-	  
-	  maidState.targetSphere_muneR.transform.position = maidState.IK_muneR.transform.position;
-	  maidState.targetSphere_muneL.transform.position = maidState.IK_muneL.transform.position;
+        } catch { //(Exception e) {
+          UnityEngine.Debug.LogError("targetSet Error : "+maid);
+          targetDestroy(maidID, maidState); //targetを削除
+        }
+      }
 
-	  maidState.targetSphere_hipL.transform.position = new Vector3(
-      (maidState.IK_hipL.transform.position.x + maidState.Hip_L.transform.position.x) * 0.5f,
-      (maidState.IK_hipL.transform.position.y + maidState.Hip_L.transform.position.y) * 0.5f,
-      (maidState.IK_hipL.transform.position.z + maidState.Hip_L.transform.position.z) * 0.5f
-    );
 
-	  maidState.targetSphere_hipR.transform.position = new Vector3(
-  	  (maidState.IK_hipR.transform.position.x + maidState.Hip_R.transform.position.x) * 0.5f,
-	    (maidState.IK_hipR.transform.position.y + maidState.Hip_R.transform.position.y) * 0.5f,
-	    (maidState.IK_hipR.transform.position.z + maidState.Hip_R.transform.position.z) * 0.5f
-    );
+      //お触りターゲット消去
+      private void targetDestroy(int maidID, MaidState maidState) {
+        if (maidState.targetSphere_mouth) UnityEngine.Object.Destroy(maidState.targetSphere_mouth);
+        if (maidState.targetSphere_muneR) UnityEngine.Object.Destroy(maidState.targetSphere_muneR);
+        if (maidState.targetSphere_muneL) UnityEngine.Object.Destroy(maidState.targetSphere_muneL);
+        if (maidState.targetSphere_hipL) UnityEngine.Object.Destroy(maidState.targetSphere_hipL);
+        if (maidState.targetSphere_hipR) UnityEngine.Object.Destroy(maidState.targetSphere_hipR);
+        if (maidState.targetSphere_vagina) UnityEngine.Object.Destroy(maidState.targetSphere_vagina);
+        if (maidState.targetSphere_anal) UnityEngine.Object.Destroy(maidState.targetSphere_anal);
+      }
 
-	  maidState.targetSphere_vagina.transform.position = maidState.IK_vagina.transform.position;
-	  
-	  maidState.targetSphere_anal.transform.position = maidState.IK_anal.transform.position;
 
-    } catch { //(Exception e) {
-      //初回のtargetSet未実施の場合もここで例外処理して再作成される
-      //スタジオで同じメイドをロードした場合にIK_mouthが取得できずにエラーになる
-      //UnityEngine.Debug.LogError("targetInstallation Error : "+stockMaids[maidID].mem);
-      VisibleMaidCheckActivate(maidID, stockMaids[maidID].mem, maidState); //再取得
-    }
-	}
-	
-  //お触り管理クラス初期化
-  Osawari osawari = null;
+      //ターゲット位置の更新 お触りが有効の場合は毎フレーム呼ばれる
+      private void targetInstallation(int maidID, MaidState maidState) {
+        try {
+        //if (maidState.bodyName != stockMaids[maidID].mem.GetProp(MPN.body).strFileName) targetDestroy(maidID); //例外処理で対応
+        //if (!maidState.targetSphere_mouth) targetSet(maidID, meid, maidState); //例外処理で対応
 
-  //お触り時の処理 Update()から呼ばれる
-  private void osawariHand()
-  {
-    //お触り処理実行
-    osawari.osawariHand(vmId);
+        maidState.targetSphere_mouth.transform.position = maidState.IK_mouth.transform.position;
 
-  }
-      
+        maidState.targetSphere_muneR.transform.position = maidState.IK_muneR.transform.position;
+        maidState.targetSphere_muneL.transform.position = maidState.IK_muneL.transform.position;
+
+        maidState.targetSphere_hipL.transform.position = new Vector3(
+          (maidState.IK_hipL.transform.position.x + maidState.Hip_L.transform.position.x) * 0.5f,
+          (maidState.IK_hipL.transform.position.y + maidState.Hip_L.transform.position.y) * 0.5f,
+          (maidState.IK_hipL.transform.position.z + maidState.Hip_L.transform.position.z) * 0.5f
+        );
+
+        maidState.targetSphere_hipR.transform.position = new Vector3(
+          (maidState.IK_hipR.transform.position.x + maidState.Hip_R.transform.position.x) * 0.5f,
+          (maidState.IK_hipR.transform.position.y + maidState.Hip_R.transform.position.y) * 0.5f,
+          (maidState.IK_hipR.transform.position.z + maidState.Hip_R.transform.position.z) * 0.5f
+        );
+
+        maidState.targetSphere_vagina.transform.position = maidState.IK_vagina.transform.position;
+
+        maidState.targetSphere_anal.transform.position = maidState.IK_anal.transform.position;
+
+        } catch { //(Exception e) {
+          //初回のtargetSet未実施の場合もここで例外処理して再作成される
+          //スタジオで同じメイドをロードした場合にIK_mouthが取得できずにエラーになる
+          //UnityEngine.Debug.LogError("targetInstallation Error : "+stockMaids[maidID].mem);
+          VisibleMaidCheckActivate(maidID, stockMaids[maidID].mem, maidState); //再取得
+        }
+      }
+
+      //お触り管理クラス初期化
+      Osawari osawari = null;
+
+      //お触り時の処理 Update()から呼ばれる
+      private void osawariHand()
+      {
+        //お触り処理実行
+        osawari.osawariHand(vmId);
+
+      }
+
       //お触りクラス初期化
       private void initOsawari()
       {
         try {
+
         if (bVR) {
           osawari = new Osawari(2, stockMaids, maidsState, cfgw, true);
           OvrMgr OvrMgr = GameMain.Instance.OvrMgr;
           if (bOculusVR) {
             //Quest
-            UnityEngine.Debug.Log("[VibeYourMaid] initOsawari for Quest");
             OVRInput.RawButton LButton = OVRInput.RawButton.X;
             OVRInput.RawButton RButton = OVRInput.RawButton.A;
             if (cfgw.osawariButton != null) {
@@ -18159,11 +18366,9 @@ namespace CM3D2.VibeYourMaid.Plugin {
             osawari.setOsawariInput(0, true, new OsawariQuestController(LButton, OVRInput.Controller.LTouch, OVRInput.RawButton.Y, OvrMgr.GetVRControllerTransform(true)));
             osawari.setOsawariInput(1, false, new OsawariQuestController(RButton, OVRInput.Controller.RTouch, OVRInput.RawButton.X, OvrMgr.GetVRControllerTransform(false)));
             //初期化ログ
-            UnityEngine.Debug.Log("[VibeYourMaid] initOsawari LButton="+LButton);
-            UnityEngine.Debug.Log("[VibeYourMaid] initOsawari RButton="+RButton);
+            UnityEngine.Debug.Log("[VibeYourMaid] initOsawari LButton="+LButton+" RButton="+RButton);
           } else {
             //SteamVR
-            UnityEngine.Debug.Log("[VibeYourMaid] initOsawari for SteamVR");
             //ボタンは固定
             AVRControllerButtons.BTN LButton = AVRControllerButtons.BTN.STICK_PAD;
             AVRControllerButtons.BTN RButton = AVRControllerButtons.BTN.STICK_PAD;
@@ -18186,8 +18391,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
             osawari.setOsawariInput(0, true, new OsawariViveController(LButton, OvrMgr.ovr_obj.left_controller, AVRControllerButtons.BTN.VIRTUAL_MENU));
             osawari.setOsawariInput(1, false, new OsawariViveController(RButton, OvrMgr.ovr_obj.right_controller, AVRControllerButtons.BTN.VIRTUAL_MENU));
             //初期化ログ
-            UnityEngine.Debug.Log("[VibeYourMaid] initOsawari LButton="+LButton);
-            UnityEngine.Debug.Log("[VibeYourMaid] initOsawari RButton="+RButton);
+            UnityEngine.Debug.Log("[VibeYourMaid] initOsawari LButton="+LButton+" RButton="+RButton);
           }
         } else {
           //その他
@@ -18196,14 +18400,16 @@ namespace CM3D2.VibeYourMaid.Plugin {
           //マルチタッチは Input.touches[] の順番が入れ替わる
           osawari.setOsawariInput(1); //マルチタッチ用
         }
+
         } catch (Exception e) {
           UnityEngine.Debug.Log("[VibeYourMaid] initOsawari Failed : "+e);
           if (osawari != null ) osawari.initFailed();
         }
       }
+
       /**
       * お触り用メインクラス
-      * 複数のOsawariクラスとMuneOsawariクラスを管理する
+      * 複数のOsawariInputクラスとMuneOsawariクラスを管理する
       */
       public class Osawari
       {
@@ -18215,7 +18421,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
         public List<MaidState> maidsState;
         public VibeYourMaidCfgWriting cfgw;
         bool bVR = false;
-        
+
         //胸揺れを制御するクラス
         private List<OsawariRelease> listMuneRelease;
         private float muneMoveX = 50f;
@@ -18247,8 +18453,8 @@ namespace CM3D2.VibeYourMaid.Plugin {
 
         public void endOsawari()
         {
-          for (int i=osawariInput.Length-1; i>=0; i--) {
-            osawariInput[i].endOsawari();
+          foreach (OsawariInput input in osawariInput) {
+            input.endOsawari();
           }
         }
 
@@ -18269,45 +18475,47 @@ namespace CM3D2.VibeYourMaid.Plugin {
           osawariInput[idx] = new OsawariInput(idx, this, bLeft, osawariController);
         }
 
+        //stockMaidsの配列数が変わったら呼び出す
+        public void setStockMaidsCount(int count)
+        {
+          //配列が足りなかったら拡張
+          if (maidOsawariLevel.Length < count) {
+            Array.Resize(ref maidOsawariLevel, count + 10);
+          }
+        }
         //対応するメイドのお触りレベルを取得
         public int getOsawariLevel(int maidID)
         {
-          //配列が足りなかったら拡張
-          if (maidOsawariLevel.Length < stockMaids.Count) {
-            Array.Resize(ref maidOsawariLevel, stockMaids.Count + 10);
-          }
           return maidOsawariLevel[maidID];
           //同じメイドなら高い方を返す
           /*int osawariLevel = 0;
-          for (int i=osawariInput.Length-1; i>=0; i--) {
-            if (maidID == osawariInput[i].osawariID) osawariLevel = Math.Max(osawariLevel, osawariInput[i].osawariLevel);
+          foreach (OsawariInput input in osawariInput) {
+            if (maidID == input.osawariID) osawariLevel = Math.Max(osawariLevel, input.osawariLevel);
           }
           return osawariLevel;*/
         }
-        
+
         //おさわりレベルを更新する 各コントローラーの最大値を設定
         public void updateMaidOsawariLevel(int maidID)
         {
           //配列が足りなかったら拡張
-          if (maidOsawariLevel.Length < stockMaids.Count) {
-            Array.Resize(ref maidOsawariLevel, stockMaids.Count + 10);
-          }
-          //最大値をとるため一旦0に
+          setStockMaidsCount(stockMaids.Count);
+          //最大値を取得
           byte level = 0;
-          for (int i=osawariInput.Length-1; i>=0; i--) {
-            if (maidID == osawariInput[i].osawariID) {
-              level = Math.Max(level, osawariInput[i].osawariLevel);
+          foreach (OsawariInput input in osawariInput) {
+            if (maidID == input.osawariID) {
+              level = Math.Max(level, input.osawariLevel);
             }
           }
           maidOsawariLevel[maidID] = level;
-          Console.WriteLine("updateMaidOsawariLevel("+maidID+") "+maidOsawariLevel[maidID]);
+          //Console.WriteLine("updateMaidOsawariLevel("+maidID+") "+maidOsawariLevel[maidID]);
         }
 
         //メイドがお触り状態か
         public bool isOsawari(int maidID)
         {
-          for (int i=osawariInput.Length-1; i>=0; i--) {
-            if (maidID == osawariInput[i].osawariID) {
+          foreach (OsawariInput input in osawariInput) {
+            if (maidID == input.osawariID) {
               return true;
             }
           }
@@ -18317,37 +18525,36 @@ namespace CM3D2.VibeYourMaid.Plugin {
         //OsawariInputから呼ぶ場合は自分もチェックされるので注意
         public bool isOsawari(int maidID, string osawariPoint)
         {
-          for (int i=osawariInput.Length-1; i>=0; i--) {
-            if (maidID == osawariInput[i].osawariID) {
-              if (osawariPoint == osawariInput[i].osawariPoint) return true;
-            }
+          foreach (OsawariInput input in osawariInput) {
+            if (maidID == input.osawariID && osawariPoint == input.osawariPoint) return true;
           }
           return false;
         }
         //胸を触っていたらtrue
         /*public bool isMuneOsawari(int maidID)
         {
-          for (int i=osawariInput.Length-1; i>=0; i--) {
-            if (maidID == osawariInput[i].osawariID) {
-              if ("ML_" == osawariInput[i].osawariPoint) return true;
-              if ("MR_" == osawariInput[i].osawariPoint) return true;
+          foreach (OsawariInput input in osawariInput) {
+            if (maidID == input.osawariID) {
+              if ("ML_" == input.osawariPoint) return true;
+              if ("MR_" == input.osawariPoint) return true;
             }
           }
           return false;
         }*/
 
-        public float getMouseMove(int maidID) {
+        public float getMouseMove(int maidID)
+        {
           float mouse_move = 0f;
-          for (int i=osawariInput.Length-1; i>=0; i--) {
-            if (maidID == osawariInput[i].osawariID) mouse_move += osawariInput[i].mouse_move;
+          foreach (OsawariInput input in osawariInput) {
+            if (maidID == input.osawariID) mouse_move += input.mouse_move;
           }
           return mouse_move;
         }
+
         //VYM側から利用 基本は-1～1に制限した値 形状に応じて値変更
         public float getMoveAtpY(int maidID, string osawariPoint)
         {
-          for (int i=osawariInput.Length-1; i>=0; i--) {
-            OsawariInput input = osawariInput[i];
+          foreach (OsawariInput input in osawariInput) {
             if (maidID == input.osawariID && osawariPoint == input.osawariPoint) {
               if (osawariPoint == "VA_") {
                 if (input.handType != 10 & input.handType != 11) {
@@ -18386,12 +18593,22 @@ namespace CM3D2.VibeYourMaid.Plugin {
         //bornmorph.Blend() は不要
         public void muneMorph(bool bLeft, int osawariID, OsawariRelease.MuneValue muneValue, Vector3 Mune_atp)
         {
-          Maid maid = stockMaids[osawariID].mem;
-          jiggleBone jbMune = bLeft ? maid.body0.jbMuneL : maid.body0.jbMuneR;
+          muneMorph(bLeft, osawariID, stockMaids[osawariID].mem, muneValue, Mune_atp);
+        }
+        public void muneMorph(bool bLeft, int osawariID, Maid maid, OsawariRelease.MuneValue muneValue, Vector3 Mune_atp)
+        {
+          jiggleBone jbMune;
+          float x;
+          if (bLeft) {
+            jbMune = maid.body0.jbMuneL;
+            x = Mune_atp.x;
+          } else {
+            jbMune = maid.body0.jbMuneR;
+            x = -Mune_atp.x; //右は反転
+          }
 
           if (!jbMune) return;
 
-          float x = bLeft ? Mune_atp.x : -Mune_atp.x; //左右は反転
           float y = Mune_atp.y;
           //円の中に収める
           double theta = Math.Atan2(y, x);
@@ -18414,7 +18631,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
           jbMune.MuneUpDown = muneValue.MuneUpDown + y * muneMoveY * muneSize;
           //jbMune.BlendValue2 = muneValue.MuneBlend + y; //先端の動きがおかしい Blend()していないから？ 左右の胸で先端の動きが逆？
           jbMune.MuneUpDown_f = muneValue.MuneUpDown_f + Math.Abs(y) * 2f;
-          
+
           jbMune.MuneYori = muneValue.MuneYori + x * muneMoveX * muneSize;
           jbMune.MuneYori_f = muneValue.MuneYori_f + Math.Abs(x) * 2f;
 
@@ -18460,7 +18677,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
         public bool bActive = true;
 
         Osawari osawari;
-        
+
         public bool bLeft;
         public int osawariID;
 
@@ -18471,8 +18688,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
           public float MuneUpDown_f;
           public float MuneYori;
           public float MuneYori_f;
-          public MuneValue(jiggleBone jbMune)
-          {
+          public MuneValue(jiggleBone jbMune) {
             MuneUpDown = jbMune.MuneUpDown;
             MuneBlend = jbMune.BlendValue2;
             MuneUpDown_f = jbMune.MuneUpDown_f;
@@ -18537,13 +18753,13 @@ namespace CM3D2.VibeYourMaid.Plugin {
           else if (MuneX < 0) MuneX = Math.Min(0f, MuneX + Time.deltaTime * delta_x);
           if (MuneY > 0) MuneY = Math.Max(0f, MuneY - Time.deltaTime * delta_y);
           else if (MuneY < 0) MuneY = Math.Min(0f, MuneY + Time.deltaTime * delta_y);
-          
+
           float sin = (float)-Math.Sin(2 * Math.PI * 3 * Mune_time); //1秒に3周期
           Mune_time += Time.deltaTime * delta_time;
-          
+
           Mune_atp.x = sin * MuneX;
           Mune_atp.y = sin * MuneY;
-          
+
           //胸変形 共通関数利用
           osawari.muneMorph(bLeft, osawariID, muneValue, Mune_atp);
 
@@ -18677,6 +18893,10 @@ namespace CM3D2.VibeYourMaid.Plugin {
         public string osawariPoint = "";
         public int osawariLock = 0;
 
+        //osawariID変更時にメイドを設定しておく
+        public Maid osawariMaid = null;
+        public MaidState osawariMaidState = null;
+
         //レベル計算用移動量
         public float mouse_move = 0f;
 
@@ -18694,14 +18914,14 @@ namespace CM3D2.VibeYourMaid.Plugin {
 
         //private Vector3 back_IK_Pos;
         //private string hitName = "";
-        
+
         //胸初期位置 左右入れ替え処理で上書きされないように左右別
         private OsawariRelease.MuneValue muneValueL;
         private OsawariRelease.MuneValue muneValueR;
 
         private float vrSensitive = 0.2f; //VR動作感度 胸の動きに合わせる
-        private float holeSensitive = 5.0f; //感度増幅 前後の穴のみ
-        
+        private float holeSensitive = 5.0f; //感度増幅 前後の穴のみ VR以外は初期化時に1.0に戻す
+
         public float releaseDistance = 0.25f; //VR時 対象からこの距離離れたらマウスリリース扱い
         private float overlapRadius = 0.015f; //コントローラーの当たり判定半径
         public float osawariHandRadius = 0.015f; //手の当たり判定半径
@@ -18724,7 +18944,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
         public int handType;
         //bool checkHandType = false;
         float checkHandTime = float.PositiveInfinity;
-        
+
         //VR標準の胸変形コライダー 胸お触り時は無効にする
         Collider touchCollider = null;
 
@@ -18749,6 +18969,8 @@ namespace CM3D2.VibeYourMaid.Plugin {
         {
           this.idx = idx;
           this.osawari = osawari;
+          //VR以外は感度倍率を上げない
+          this.holeSensitive = 1.0f;
         }
         /** コンストラクタ Questコントローラー用
          * <param name="osawari">各OsawariInputクラスを管理するクラス</param>
@@ -18830,13 +19052,13 @@ namespace CM3D2.VibeYourMaid.Plugin {
             if (osawariPoint == "ML_") {
               OsawariRelease osawariRelease = osawari.getMuneRelease(true, osawariID);
               if (osawariRelease != null) osawariRelease.cancel();
-              osawari.muneMorph(true, osawariID, muneValueL, Move_atp);
+              osawari.muneMorph(true, osawariID, osawariMaid, muneValueL, Move_atp);
               if (touchCollider != null) touchCollider.enabled = true; //VR用コライダー有効
               osawariPoint = "";
             } else if (osawariPoint == "MR_") {
               OsawariRelease osawariRelease = osawari.getMuneRelease(false, osawariID);
               if (osawariRelease != null) osawariRelease.cancel();
-              osawari.muneMorph(false, osawariID, muneValueR, Move_atp);
+              osawari.muneMorph(false, osawariID, osawariMaid, muneValueR, Move_atp);
               if (touchCollider != null) touchCollider.enabled = true; //VR用コライダー有効
               osawariPoint = "";
             }
@@ -18875,7 +19097,7 @@ namespace CM3D2.VibeYourMaid.Plugin {
         static readonly Vector3 cameraDirection = new Vector3(0.03f, -0.15f, 0.04f);
         static readonly Vector3 handDirection = new Vector3(0f, -0.03f, 0.01f);
 
-        /** コントローラー座標のカプセル形状内のColliderをすべて取得 
+        /** コントローラー座標のカプセル形状内のColliderをすべて取得
          * @param result 判定結果を格納する固定長の配列 */
         private int getOverlapSphereCollider(Collider[] result)
         {
@@ -18981,11 +19203,11 @@ namespace CM3D2.VibeYourMaid.Plugin {
         public void osawariHand(List<int> vmId)
         {
 
-          if(osawariLock == 0){
+          if (osawariLock == 0) {
 
             int hitMaidID = -1;
             string hitPoint = "";
-            
+
             if (bVR) {
               if (osawariController.GetDown()) {
                 handType = getHandType(); //コントローラーの種類を取得
@@ -19051,32 +19273,34 @@ namespace CM3D2.VibeYourMaid.Plugin {
               }
             }
             if (hitPoint != "") {
-               
+
                 osawariID = hitMaidID;
                 osawariPoint = hitPoint;
+                //変数に格納
+                osawariMaid = osawari.stockMaids[osawariID].mem;
+                osawariMaidState = osawari.maidsState[osawariID];
 
-                //if(isMouseDown){
+                //if (isMouseDown) {
                   osawariLock = 1;
                   //osawariID = intCnv(osawariReg.Replace(hitName, ""));
-                  Maid maid = osawari.stockMaids[osawariID].mem;
 
-                  if(hitPoint.StartsWith("ML_")){
-                    startMuneL(maid);
+                  if (hitPoint.StartsWith("ML_")) {
+                    startMuneL(osawariMaid);
                     if (touchCollider != null) touchCollider.enabled = false; //VR用コライダー無効
                   }
-                  else if(hitPoint.StartsWith("MR_")){
-                    startMuneR(maid);
+                  else if (hitPoint.StartsWith("MR_")) {
+                    startMuneR(osawariMaid);
                     if (touchCollider != null) touchCollider.enabled = false; //VR用コライダー無効
                   }
 
                   //checkBlowjobing(osawariID);
-                  if (!osawari.maidsState[osawariID].stunFlag && osawari.maidsState[osawariID].bIsBlowjobing != 2) maid.EyeToCamera((Maid.EyeMoveType)5, 0.8f);
-                  //if(maidsState[osawariID].vStateMajor == 10)ReactionPlay(osawariID);
+                  if (!osawariMaidState.stunFlag && osawariMaidState.bIsBlowjobing != 2) osawariMaid.EyeToCamera((Maid.EyeMoveType)5, 0.8f);
+                  //if (maidsState[osawariID].vStateMajor == 10) ReactionPlay(osawariID);
                 //}
             }
-            
+
           } else if (osawariLock == 1) {
-          
+
             //マウスリリース判定
             bool bUp = false;
             //マウスドラッグ判定
@@ -19126,15 +19350,15 @@ namespace CM3D2.VibeYourMaid.Plugin {
                     //左リリース
                     osawari.addMuneRelease(new OsawariRelease(osawari, true, osawariID, muneValueL, Mune_atp));
                     osawariPoint = "MR_";
-                    dragObject = osawari.maidsState[osawariID].targetSphere_muneR; //VRの距離判定用
-                    startMuneR(osawari.stockMaids[osawariID].mem);
+                    dragObject = osawariMaidState.targetSphere_muneR; //VRの距離判定用
+                    startMuneR(osawariMaid);
                   } else if (muneRtoL && !onMuneR) {
                     bDrag = false;
                     //右リリース
                     osawari.addMuneRelease(new OsawariRelease(osawari, false, osawariID, muneValueR, Mune_atp));
                     osawariPoint = "ML_";
-                    dragObject = osawari.maidsState[osawariID].targetSphere_muneL; //VRの距離判定用
-                    startMuneL(osawari.stockMaids[osawariID].mem);
+                    dragObject = osawariMaidState.targetSphere_muneL; //VRの距離判定用
+                    startMuneL(osawariMaid);
                   }
                 }
               } else {
@@ -19165,14 +19389,14 @@ namespace CM3D2.VibeYourMaid.Plugin {
                         //左リリース
                         osawari.addMuneRelease(new OsawariRelease(osawari, true, osawariID, muneValueL, Mune_atp));
                         osawariPoint = "MR_";
-                        startMuneR(osawari.stockMaids[osawariID].mem);
+                        startMuneR(osawariMaid);
                       }
                       else if (osawariPoint == "MR_" && name.StartsWith("ML_") && !osawari.isOsawari(osawariID, "ML_")) {
                         bDrag = false;
                         //右リリース
                         osawari.addMuneRelease(new OsawariRelease(osawari, false, osawariID, muneValueR, Mune_atp));
                         osawariPoint = "ML_";
-                        startMuneL(osawari.stockMaids[osawariID].mem);
+                        startMuneL(osawariMaid);
                       }
                     }
                   }
@@ -19203,16 +19427,16 @@ namespace CM3D2.VibeYourMaid.Plugin {
             //マウスドラッグ時の処理
             else if (bDrag) {
               //マウスの移動値取得
-              if(moveCheck > 0f){
+              if (moveCheck > 0f) {
                 float moveRate = osawari.cfgw.osawariMoveRate;
                 Quaternion bodyRot; //体の回転
                 if (osawariPoint == "ML_" || osawariPoint == "MR_") {
-                  bodyRot = osawari.maidsState[osawariID].maidMune.rotation * rotMune;
+                  bodyRot = osawariMaidState.maidMune.rotation * rotMune;
                   moveRate *= 0.5f; //胸の移動量は半分に調整
                 } else if (osawariPoint == "MO_") {
-                  bodyRot = osawari.maidsState[osawariID].maidHead.rotation * rotHead;
+                  bodyRot = osawariMaidState.maidHead.rotation * rotHead;
                 } else { //"VA_", "AN_"
-                  bodyRot = osawari.maidsState[osawariID].maidXxx.rotation * rotXxx;
+                  bodyRot = osawariMaidState.maidXxx.rotation * rotXxx;
                 }
                 if (bVR) {
                   Vector3 vec = osawariController.GetLocalControllerVelocity();
@@ -19259,154 +19483,161 @@ namespace CM3D2.VibeYourMaid.Plugin {
                   move.x += System.Math.Abs(mouseX * moveRate);
                   move.y += System.Math.Abs(mouseY * moveRate);
                 }
-                
+
                 moveCheck -= Time.deltaTime * 60;
 
-              }else{
+              } else {
                 mouse_move = (mouse_move + Math.Max(Math.Max(move.x, move.y) ,move.z)) * 0.5f;
                 move.x = 0f;
                 move.y = 0f;
                 move.z = 0f;
                 moveCheck = 20f;
 
-                //VRのお触りレベル上昇感度調整
-                if (bVR) {
-                  //mouse_move *= 2f;
-                  //感度増幅 VRのみ
-                  if (osawariPoint == "VA_" || osawariPoint == "AN_") {
-                    mouse_move *= holeSensitive;
-                  }
+                //お触りレベル上昇感度調整 VR以外は1倍
+                //mouse_move *= 2f;
+                //感度増幅 VRのみ
+                if (osawariPoint == "VA_" || osawariPoint == "AN_") {
+                  mouse_move *= holeSensitive;
                 }
-                //お触りレベル判定 すべてのコントローラーの合計
+                //お触りレベル判定 キャッシュも更新
                 float mm = osawari.getMouseMove(osawariID);
                 if (osawariLevel == 0) {
-                  if (mm > 2f) { osawariLevel = 1; osawari.updateMaidOsawariLevel(osawariID); }
+                  if (mm > 2f) {
+                    osawariLevel = 1;
+                    osawari.updateMaidOsawariLevel(osawariID);
+                  }
                 } else if (osawariLevel == 1) {
-                  if (mm < 0.5f) { osawariLevel = 0; osawari.updateMaidOsawariLevel(osawariID); }
-                  if (mm > 4f) { osawariLevel = 2; osawari.updateMaidOsawariLevel(osawariID); }
+                  if (mm < 0.5f) {
+                    osawariLevel = 0;
+                    osawari.updateMaidOsawariLevel(osawariID);
+                  } else if (mm > 4f) {
+                    osawariLevel = 2;
+                    osawari.updateMaidOsawariLevel(osawariID);
+                  }
                 } else if (osawariLevel == 2) {
-                  if (mm < 2f) { osawariLevel = 1; osawari.updateMaidOsawariLevel(osawariID); }
+                  if (mm < 2f) {
+                    osawariLevel = 1; osawari.updateMaidOsawariLevel(osawariID);
+                  }
                 }
-                
+
               }
             }
 
           }
-          
+
           if (osawariLock == 1) { //変形処理
 
-            Maid maid = osawari.stockMaids[osawariID].mem;
-            
+            TBody body0 = osawariMaid.body0;
+
             //お触りポイント別の変形処理
-            if(osawariPoint == "VA_"){
+            if (osawariPoint == "VA_") {
               float x = Move_atp.x = Math.Max(-1f, Math.Min(1f, Move_atp.x)); //xは-1～1に毎回置き換え
               float y = Math.Max(-1f, Math.Min(1f, Move_atp.y*0.5f)); //Y方向は移動量を調整 -1～1以上も保持する
               //float z = Move_atp.z = Math.Max(-1f, Math.Min(1f, Move_atp.z)); //zは-1～1に毎回置き換え
-              
-              //try { VertexMorph_FromProcItem(maid.body0, "atp_vagina", (y - 1f) * -0.5f); } catch { /*LogError(ex);*/ }
+
+              //try { VertexMorph_FromProcItem(body0, "atp_vagina", (y - 1f) * -0.5f); } catch { /*LogError(ex);*/ }
               //"kupa"がhibuValueで広がっているのでY方向の最大値は調整
               float kupa = 0.60f;
-              if (osawari.maidsState[osawariID].vStateMajor != 10) { kupa = Math.Max(0f, kupa - osawari.maidsState[osawariID].hibuValue / 100f); }
-              try { VertexMorph_FromProcItem(maid.body0, "vaginakupa", (y - 0.2f) * kupa / 0.8f); } catch { /*LogError(ex);*/ } //20%入るまで広げない
-              try { VertexMorph_FromProcItem(maid.body0, "labiakupa_dia", (x*x)*0.2f + y * kupa ); } catch { /*LogError(ex);*/ }
+              if (osawariMaidState.vStateMajor != 10) { kupa = Math.Max(0f, kupa - osawariMaidState.hibuValue * 0.01f); }
+              try { VertexMorph_FromProcItem(body0, "vaginakupa", (y - 0.2f) * kupa / 0.8f); } catch { /*LogError(ex);*/ } //20%入るまで広げない
+              try { VertexMorph_FromProcItem(body0, "labiakupa_dia", (x*x)*0.2f + y * kupa ); } catch { /*LogError(ex);*/ }
               //左右kupa Yにあわせて狭める 1～1/2
               kupa = 0.4f / (1f+Math.Max(0, y)*2f);
-              if (x >= 0) try { VertexMorph_FromProcItem(maid.body0, "labiakupa_dia_L", (x*x) * kupa); } catch { /*LogError(ex);*/ }
-              if (x < 0)  try { VertexMorph_FromProcItem(maid.body0, "labiakupa_dia_R", (x*x) * kupa); } catch { /*LogError(ex);*/ }
+              if (x >= 0) try { VertexMorph_FromProcItem(body0, "labiakupa_dia_L", (x*x) * kupa); } catch { /*LogError(ex);*/ }
+              if (x < 0)  try { VertexMorph_FromProcItem(body0, "labiakupa_dia_R", (x*x) * kupa); } catch { /*LogError(ex);*/ }
 
               //スライダ最小値調整 Yに応じて設定
-              if (osawari.maidsState[osawariID].hibuSlider1Value < osawariHSliderMin * y) osawari.maidsState[osawariID].hibuSlider1Value = osawariHSliderMin * y;
-              if (osawari.maidsState[osawariID].hibuSlider2Value < osawariHSliderMin * y) osawari.maidsState[osawariID].hibuSlider2Value = osawariHSliderMin * y;
+              if (osawariMaidState.hibuSlider1Value < osawariHSliderMin * y) osawariMaidState.hibuSlider1Value = osawariHSliderMin * y;
+              if (osawariMaidState.hibuSlider2Value < osawariHSliderMin * y) osawariMaidState.hibuSlider2Value = osawariHSliderMin * y;
 
               //骨盤の前後 XZ 親のBoneの向き Bip01 L Thigh Bip01 R Thigh も一緒に動いてしまう
-              //osawari.maidsState[osawariID].maidXxx.transform.localPosition = Quaternion.Inverse(rotXxx) * new Vector3(
+              //osawariMaidState.maidXxx.transform.localPosition = Quaternion.Inverse(rotXxx) * new Vector3(
               //  (float)(x > 0 ? -Math.Sqrt(x) : Math.Sqrt(-x)) *0.001f, 0f, (float)(z > 0 ? Math.Sqrt(z) : -Math.Sqrt(-z))*0.003f
               //);
             }
-            
-            else if(osawariPoint == "ML_"){
+
+            else if (osawariPoint == "ML_") {
               Move_atp.x = Math.Max(-1f, Math.Min(1f, Move_atp.x));
               Move_atp.y = Math.Max(-1f, Math.Min(1f, Move_atp.y));
               //毎フレーム1/5だけ移動
-              if (Math.Abs(Move_atp.x - Mune_atp.x) > 0.001) Mune_atp.x += Math.Min(0.05f, (Move_atp.x - Mune_atp.x) * 0.2f) * Time.deltaTime * 120f;
-              if (Math.Abs(Move_atp.y - Mune_atp.y) > 0.001) Mune_atp.y += Math.Min(0.05f, (Move_atp.y - Mune_atp.y) * 0.2f) * Time.deltaTime * 120f;
+              if (Math.Abs(Move_atp.x - Mune_atp.x) > 0.001f) Mune_atp.x += Math.Min(0.05f, (Move_atp.x - Mune_atp.x) * 0.2f) * Time.deltaTime * 120f;
+              if (Math.Abs(Move_atp.y - Mune_atp.y) > 0.001f) Mune_atp.y += Math.Min(0.05f, (Move_atp.y - Mune_atp.y) * 0.2f) * Time.deltaTime * 120f;
               //胸変形 共通関数利用
-              osawari.muneMorph(true, osawariID, muneValueL, Mune_atp);
+              osawari.muneMorph(true, osawariID, osawariMaid, muneValueL, Mune_atp);
             }
-            
-            else if(osawariPoint == "MR_"){
+
+            else if (osawariPoint == "MR_") {
               Move_atp.x = Math.Max(-1f, Math.Min(1f, Move_atp.x));
               Move_atp.y = Math.Max(-1f, Math.Min(1f, Move_atp.y));
               //毎フレーム1/5だけ移動
-              if (Math.Abs(Move_atp.x - Mune_atp.x) > 0.001) Mune_atp.x += Math.Min(0.05f, (Move_atp.x - Mune_atp.x) * 0.2f) * Time.deltaTime * 120f;
-              if (Math.Abs(Move_atp.y - Mune_atp.y) > 0.001) Mune_atp.y += Math.Min(0.05f, (Move_atp.y - Mune_atp.y) * 0.2f) * Time.deltaTime * 120f;
+              if (Math.Abs(Move_atp.x - Mune_atp.x) > 0.001f) Mune_atp.x += Math.Min(0.05f, (Move_atp.x - Mune_atp.x) * 0.2f) * Time.deltaTime * 120f;
+              if (Math.Abs(Move_atp.y - Mune_atp.y) > 0.001f) Mune_atp.y += Math.Min(0.05f, (Move_atp.y - Mune_atp.y) * 0.2f) * Time.deltaTime * 120f;
               //胸変形 共通関数利用
-              osawari.muneMorph(false, osawariID, muneValueR, Mune_atp);
+              osawari.muneMorph(false, osawariID, osawariMaid, muneValueR, Mune_atp);
             }
-            
-            else if(osawariPoint == "HL_" || osawariPoint == "HR_"){
+
+            else if (osawariPoint == "HL_" || osawariPoint == "HR_") {
               Move_atp.x = Math.Max(-1f, Math.Min(1f, Move_atp.x));
               Move_atp.y = Math.Max(-1f, Math.Min(1f, Move_atp.y));
               float hipX = osawariPoint == "HL_" ? Move_atp.x : -Move_atp.x;
 
-              try { VertexMorph_FromProcItem(maid.body0, "hip_type_A", Move_atp.y *0.3f); } catch { /*LogError(ex);*/ }
-              try { VertexMorph_FromProcItem(maid.body0, "hip_type_V", -hipX *0.3f); } catch { /*LogError(ex);*/ }
-              try { VertexMorph_FromProcItem(maid.body0, "slim_hip1", Move_atp.y *0.3f); } catch { /*LogError(ex);*/ }
-              try { VertexMorph_FromProcItem(maid.body0, "slim_hip2", Move_atp.y *0.3f); } catch { /*LogError(ex);*/ }
-              try { VertexMorph_FromProcItem(maid.body0, "slim_oshiri", (float)Math.Sqrt(Move_atp.y*Move_atp.y + Move_atp.x*Move_atp.x) *0.2f); } catch { /*LogError(ex);*/ }
-              try { VertexMorph_FromProcItem(maid.body0, "debu_pelvis_x", hipX * 0.3f); } catch { /*LogError(ex);*/ }
+              try { VertexMorph_FromProcItem(body0, "hip_type_A", Move_atp.y *0.3f); } catch { /*LogError(ex);*/ }
+              try { VertexMorph_FromProcItem(body0, "hip_type_V", -hipX *0.3f); } catch { /*LogError(ex);*/ }
+              try { VertexMorph_FromProcItem(body0, "slim_hip1", Move_atp.y *0.3f); } catch { /*LogError(ex);*/ }
+              try { VertexMorph_FromProcItem(body0, "slim_hip2", Move_atp.y *0.3f); } catch { /*LogError(ex);*/ }
+              try { VertexMorph_FromProcItem(body0, "slim_oshiri", (float)Math.Sqrt(Move_atp.y*Move_atp.y + Move_atp.x*Move_atp.x) *0.2f); } catch { /*LogError(ex);*/ }
+              try { VertexMorph_FromProcItem(body0, "debu_pelvis_x", hipX * 0.3f); } catch { /*LogError(ex);*/ }
             }
-            
-            else if(osawariPoint == "AN_"){
+
+            else if (osawariPoint == "AN_") {
               Move_atp.x = Math.Max(-1f, Math.Min(1f, Move_atp.x)); //xは-1～1に毎回置き換え
               float y = Math.Max(-1f, Math.Min(1f, Move_atp.y*0.5f)); //Y方向は移動量を調整 -1～1以上も保持する
-              try { VertexMorph_FromProcItem(maid.body0, "anal_swell2", (y) * -0.5f); } catch { /*LogError(ex);*/ }
-              try { VertexMorph_FromProcItem(maid.body0, "anal_swell3", (y - 1f) * -0.5f); } catch { /*LogError(ex);*/ }
+              try { VertexMorph_FromProcItem(body0, "anal_swell2", (y) * -0.5f); } catch { /*LogError(ex);*/ }
+              try { VertexMorph_FromProcItem(body0, "anal_swell3", (y - 1f) * -0.5f); } catch { /*LogError(ex);*/ }
 
               //スライダ最小値調整 Yに応じて設定
-              if (osawari.maidsState[osawariID].analSlider1Value < osawariASliderMin * y) osawari.maidsState[osawariID].analSlider1Value = osawariASliderMin * y;
-              if (osawari.maidsState[osawariID].analSlider2Value < osawariASliderMin * y) osawari.maidsState[osawariID].analSlider2Value = osawariASliderMin * y;
+              if (osawariMaidState.analSlider1Value < osawariASliderMin * y) osawariMaidState.analSlider1Value = osawariASliderMin * y;
+              if (osawariMaidState.analSlider2Value < osawariASliderMin * y) osawariMaidState.analSlider2Value = osawariASliderMin * y;
             }
-          
+
           }
-          
+
           else if (osawariLock == 3) { //変形を初期化する処理
 
-            Maid maid = osawari.stockMaids[osawariID].mem;
-          
-            if(osawariPoint == "VA_"){
+            TBody body0 = osawariMaid.body0;
+
+            if (osawariPoint == "VA_") {
               //try { VertexMorph_FromProcItem(maid.body0, "atp_vagina", 0f); } catch { /*LogError(ex);*/ }
-              try { VertexMorph_FromProcItem(maid.body0, "vaginakupa", 0f); } catch { /*LogError(ex);*/ }
-              try { VertexMorph_FromProcItem(maid.body0, "labiakupa_dia", 0f); } catch { /*LogError(ex);*/ }
-              try { VertexMorph_FromProcItem(maid.body0, "labiakupa_dia_L", 0f); } catch { /*LogError(ex);*/ }
-              try { VertexMorph_FromProcItem(maid.body0, "labiakupa_dia_R", 0f); } catch { /*LogError(ex);*/ }
+              try { VertexMorph_FromProcItem(body0, "vaginakupa", 0f); } catch { /*LogError(ex);*/ }
+              try { VertexMorph_FromProcItem(body0, "labiakupa_dia", 0f); } catch { /*LogError(ex);*/ }
+              try { VertexMorph_FromProcItem(body0, "labiakupa_dia_L", 0f); } catch { /*LogError(ex);*/ }
+              try { VertexMorph_FromProcItem(body0, "labiakupa_dia_R", 0f); } catch { /*LogError(ex);*/ }
               //腰の前後
-              //osawari.maidsState[osawariID].maidXxx.transform.localPosition = Vector3.zero;
-            
-            }else if(osawariPoint == "AN_"){
-              try { VertexMorph_FromProcItem(maid.body0, "anal_swell2", 0f); } catch { /*LogError(ex);*/ }
-              try { VertexMorph_FromProcItem(maid.body0, "anal_swell3", 0f); } catch { /*LogError(ex);*/ }
-            
-            }else if(osawariPoint == "HL_" || osawariPoint == "HR_"){
-              try { VertexMorph_FromProcItem(maid.body0, "hip_type_A", 0f); } catch { /*LogError(ex);*/ }
-              try { VertexMorph_FromProcItem(maid.body0, "hip_type_V", 0f); } catch { /*LogError(ex);*/ }
-              try { VertexMorph_FromProcItem(maid.body0, "slim_hip1", 0f); } catch { /*LogError(ex);*/ }
-              try { VertexMorph_FromProcItem(maid.body0, "slim_hip2", 0f); } catch { /*LogError(ex);*/ }
-              try { VertexMorph_FromProcItem(maid.body0, "slim_oshiri", 0f); } catch { /*LogError(ex);*/ }
-              try { VertexMorph_FromProcItem(maid.body0, "debu_pelvis_x", 0f); } catch { /*LogError(ex);*/ }
+              //osawariMaidState.maidXxx.transform.localPosition = Vector3.zero;
+
+            } else if (osawariPoint == "AN_") {
+              try { VertexMorph_FromProcItem(body0, "anal_swell2", 0f); } catch { /*LogError(ex);*/ }
+              try { VertexMorph_FromProcItem(body0, "anal_swell3", 0f); } catch { /*LogError(ex);*/ }
+
+            } else if (osawariPoint == "HL_" || osawariPoint == "HR_") {
+              try { VertexMorph_FromProcItem(body0, "hip_type_A", 0f); } catch { /*LogError(ex);*/ }
+              try { VertexMorph_FromProcItem(body0, "hip_type_V", 0f); } catch { /*LogError(ex);*/ }
+              try { VertexMorph_FromProcItem(body0, "slim_hip1", 0f); } catch { /*LogError(ex);*/ }
+              try { VertexMorph_FromProcItem(body0, "slim_hip2", 0f); } catch { /*LogError(ex);*/ }
+              try { VertexMorph_FromProcItem(body0, "slim_oshiri", 0f); } catch { /*LogError(ex);*/ }
+              try { VertexMorph_FromProcItem(body0, "debu_pelvis_x", 0f); } catch { /*LogError(ex);*/ }
             }
             //胸は別処理 MuneOsawariクラスで戻す
 
             //LateUpdate()で変形のFixがあるので一応次フレームで終了処理
             osawariLock = 9;
-          
-          
+
           }
-          
+
           else if (osawariLock == 9) {
             //おさわり終了処理
             osawariLevel = 0;
-            if (osawariID != -1) osawari.updateMaidOsawariLevel(osawariID); //終了は逆の手も判定する
+            if (osawariID != -1) osawari.updateMaidOsawariLevel(osawariID); //終了時は逆の手もチェックしてレベル更新
             osawariLock = 0;
             osawariID = -1;
             osawariPoint = "";
@@ -19417,10 +19648,13 @@ namespace CM3D2.VibeYourMaid.Plugin {
             Mune_atp.x = 0f;
             Mune_atp.y = 0f;
             Mune_atp.z = 0f;
+
+            osawariMaid = null;
+            osawariMaidState = null;
           }
 
         } //osawariHand()
-        
+
 
         //int変換
         private int intCnv(string s) {
@@ -19430,12 +19664,8 @@ namespace CM3D2.VibeYourMaid.Plugin {
         }
 
       } //class OsawariInput
-      
-      
-      
+
       //おさわり処理関係終了-----------------------
-
-
 
 
     } //class VibeYourMaid
