@@ -14828,19 +14828,15 @@ namespace CM3D2.VibeYourMaid.Plugin
 				      GUI.Label (new Rect (310, 100, 300, 20), "興奮値：" + maidsState[tgID].exciteValue , gsLabel);
 				      GUI.Label (new Rect (310, 120, 300, 20), "絶頂値：" + maidsState[tgID].orgasmValue , gsLabel);
 				      GUI.Label (new Rect (310, 150, 300, 20), "抵抗値：" + maidsState[tgID].resistValue , gsLabel);
-				
               GUI.Label (new Rect (310, 180, 300, 20), "女仆耐力：" + maidsState[tgID].maidStamina , gsLabel);
               GUI.Label (new Rect (310, 200, 300, 20), "勃起値：" + maidsState[tgID].bokkiValue1 , gsLabel);
 				      GUI.Label (new Rect (310, 220, 300, 20), "感度value：" + maidsState[tgID].boostValue , gsLabel);
 				      GUI.Label (new Rect (310, 240, 300, 20), "感度base：" + maidsState[tgID].boostBase , gsLabel);
               GUI.Label (new Rect (310, 260, 300, 20), "高潮数：" + maidsState[tgID].orgasmCount , gsLabel);
 				      GUI.Label (new Rect (310, 280, 300, 20), "乳首肥大度：" + Math.Round(maidsState[tgID].chikubiHidai, 1,  MidpointRounding.AwayFromZero) , gsLabel);
-              GUI.Label (new Rect (310, 300, 300, 20), "uDatsu 子宮脱值：" + maidsState[maidID].uDatsu , gsLabel);
-              GUI.Label (new Rect (310, 320, 300, 20), "uDatsuStock 子宮脱值：" + maidsState[maidID].uDatsuStock , gsLabel);
-              GUI.Label (new Rect (310, 350, 300, 20), "uDatsuWait 子宮脱值：" + maidsState[maidID].uDatsuWait , gsLabel);
-
-
-              
+              GUI.Label (new Rect (310, 300, 300, 20), "uDatsu 子宮脱值：" + maidsState[tgID].uDatsu , gsLabel);
+              GUI.Label (new Rect (310, 320, 300, 20), "uDatsuStock 子宮脱值：" + maidsState[tgID].uDatsuStock , gsLabel);
+              GUI.Label (new Rect (310, 350, 300, 20), "uDatsuWait 子宮脱值：" + maidsState[tgID].uDatsuWait , gsLabel);
               //hidden info #109	
 
               /*自分用
