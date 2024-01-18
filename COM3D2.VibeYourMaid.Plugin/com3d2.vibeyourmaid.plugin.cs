@@ -28,17 +28,17 @@ using CM3D2.ExternalSaveData.Managed;
 #else
 [assembly: AssemblyTitle("VibeYourMaid COM3D2")]
 #endif
-[assembly: AssemblyVersion("2.0.6.2")]
+[assembly: AssemblyVersion("2.0.6.22")]
 namespace CM3D2.VibeYourMaid.Plugin
 {
     [
       PluginFilter("COM3D2x64"), PluginFilter("COM3D2VRx64"), PluginFilter("COM3D2OHx64"), PluginFilter("COM3D2OHVRx64"),
-      PluginName("VibeYourMaid"), PluginVersion("2.0.6.2.ovr"),
+      PluginName("VibeYourMaid"), PluginVersion("2.0.6.22.ovr"),
       DefaultExecutionOrder(-1) //プラグインの実行順を最初にする
     ]
     public class VibeYourMaid : PluginBase
     {
-        string PluginVersionLabel = "2.0.6.2";
+        string PluginVersionLabel = "2.0.6.22-Inory";
 
         //GUIで設定保存したい変数はここ
         public class VibeYourMaidCfgWriting  //@API実装//→API用にpublicに変更
