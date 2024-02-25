@@ -11787,13 +11787,6 @@ namespace CM3D2.VibeYourMaid.Plugin
                     if (maidsState[tgID].pAutoSelect > 3) maidsState[tgID].pAutoSelect = 0;
                   }
 
-                  //子宮脱按钮 #109
-                  if (GUI.Button(new Rect(10, 165, 40, 10), "に押します子宮脱", gsButton))
-                  {
-                    manualTriggeredUterusDatsu = true;
-                  }
-                  //子宮脱按钮 #109
-
 
                   if (stockMaids[tgID].mem.body0.LastAnimeFN != null && stockMaids[tgID].mem.body0.LastAnimeFN.Contains( "_shaseigo_" ) ) { //エラー対策
                     if (GUI.Button(new Rect (125, 190, 40, 20), "挿入", gsButton)) {
@@ -12594,6 +12587,14 @@ namespace CM3D2.VibeYourMaid.Plugin
                     int y = 25;
                     GUI.Label(new Rect (5, y, 75, 20), "【脱衣】" , gsLabel);
                     cfgw.UndressingReaction = GUI.Toggle(new Rect(80, y, 140, 20), cfgw.UndressingReaction, "脱衣時のリアクション", gsToggle);
+
+                    //子宮脱按钮 #109
+                    if (GUI.Button(new Rect(240, y, 120, 20), "に押します子宮脱", gsButton))
+                    {
+                      manualTriggeredUterusDatsu = true;
+                    }
+                    //子宮脱按钮 #109
+                    
                     y += 20;
 
                     if (GUI.Button(new Rect (10, y, 85, 20), "全着衣", gsButton)){
