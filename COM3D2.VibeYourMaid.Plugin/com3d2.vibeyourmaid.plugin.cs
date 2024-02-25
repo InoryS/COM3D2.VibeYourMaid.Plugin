@@ -1,20 +1,15 @@
 using System;
-using System.Linq;
-using System.Diagnostics;
-using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Text.RegularExpressions;
 using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Text.RegularExpressions;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityInjector.Attributes;
 using UnityInjector;
-using System.Xml;
-using System.Threading;
-using CM3D2.ExternalSaveData.Managed;
+using UnityInjector.Attributes;
 
+using CM3D2.ExternalSaveData.Managed;
 
 // コンパイル用コマンド （ ..\COM3D2\ 部分は環境に合わせて変更 足りないdllはソースと同じ場所にコピーでも可）
 //   C:\Windows\Microsoft.NET\Framework\v3.5\csc.exe /o /t:library /lib:"..\COM3D2\Sybaris" /lib:"..\COM3D2\Sybaris\UnityInjector" /lib:"..\COM3D2\COM3D2x64_Data\Managed" /r:UnityEngine.dll /r:UnityEngine.VR.dll /r:UnityInjector.dll /r:Assembly-CSharp.dll /r:Assembly-CSharp-firstpass.dll /r:COM3D2.ExternalSaveData.Managed.dll COM3D2.VibeYourMaid.Plugin.cs
@@ -28,22 +23,29 @@ using CM3D2.ExternalSaveData.Managed;
 #else
 [assembly: AssemblyTitle("VibeYourMaid COM3D2")]
 #endif
-[assembly: AssemblyVersion("2.0.6.22")]
+[assembly: AssemblyVersion("2.0.6.3")]
+
 namespace CM3D2.VibeYourMaid.Plugin
 {
     [
       PluginFilter("COM3D2x64"), PluginFilter("COM3D2VRx64"), PluginFilter("COM3D2OHx64"), PluginFilter("COM3D2OHVRx64"),
-      PluginName("VibeYourMaid"), PluginVersion("2.0.6.22.ovr"),
+      PluginName("VibeYourMaid"), PluginVersion("2.0.6.33.ovr"),
       DefaultExecutionOrder(-1) //プラグインの実行順を最初にする
     ]
     public class VibeYourMaid : PluginBase
     {
-        string PluginVersionLabel = "2.0.6.22-Inory";
+        const string PluginVersionLabel = "2.0.6.33-Inory";
 
         //GUIで設定保存したい変数はここ
         public class VibeYourMaidCfgWriting  //@API実装//→API用にpublicに変更
         {
           public VibeYourMaidCfgWriting() { }
+
+          public bool bPluginEnabledV = true;                 //　本プラグインの有効状態（下記キーでON/OFFトグル）
+          public int mainGuiFlag = 1;                         //　GUIの表示フラグ（0：非表示、1：表示、2：最小化）
+          public int subGuiFlag = 1;                          //　サブキャラ操作画面の表示フラグ
+          public bool configGuiFlag = false;                  //　設定画面の表示フラグ
+          public bool unzipGuiFlag = false;                   //　命令画面の表示フラグ
 
           //　表情テーブル　（バイブ）
           public string[][] sFaceAnime20Vibe = new string[][] {
@@ -81,12 +83,6 @@ namespace CM3D2.VibeYourMaid.Plugin
           public KeyCode keyPluginToggleV9 = KeyCode.Keypad3;        //　絶頂値ロック（テンキー３）
           public KeyCode keyPluginToggleV10 = KeyCode.Keypad4;       //　オートモード切り替え
           public KeyCode keyPluginToggleV11 = KeyCode.Keypad9;       //　エンパイアズライフスタート
-
-          public bool bPluginEnabledV = true;                 //　本プラグインの有効状態（下記キーでON/OFFトグル）
-          public int mainGuiFlag = 1;                         //　GUIの表示フラグ（0：非表示、1：表示、2：最小化）
-          public int subGuiFlag = 1;                          //　サブキャラ操作画面の表示フラグ
-          public bool configGuiFlag = false;                  //　設定画面の表示フラグ
-          public bool unzipGuiFlag = false;                   //　命令画面の表示フラグ
 
           //GUIパネル
           public bool guiStopPropagation = true;  //マウスクリックを伝播しない
@@ -216,7 +212,6 @@ namespace CM3D2.VibeYourMaid.Plugin
           public float AiekiGravity = 0.05f;  //愛液1～3飛散時の重力
           public float AiekiDuration = 0.25f; //愛液1～3吹き終わりまでの秒数 短いとまとめて出る
 
-
           public bool aseAnimeEnabled = true;
           public float aseDryMin = 60f;    //dry最小値
           public float aseSwet = 0.5f;     //汗シェイプキー倍率
@@ -257,6 +252,8 @@ namespace CM3D2.VibeYourMaid.Plugin
           public bool majItemClear = true;
           public bool majKupaEnabled = true;
           public float majFadeTime = 0.7f;
+          //設置アイテム高さ初期値
+          public float[] majPrefabOffset = new float[] { 0f, 0f, -0.6f, -0.4f, -0.35f, -0.11f, 0f, 0f, 0f, -0.8f, -0.7f};
 
           //地面判定
           public int[] BoneHitHeight = {40, 55, 65, 85};
@@ -284,16 +281,17 @@ namespace CM3D2.VibeYourMaid.Plugin
           public bool muneDrawGizmo = false;
 
           //変形速度 目標位置まで1秒で移動する距離の倍率 毎フレーム実行ごとに距離が短くなるため近づくほど遅くなる
-          public float muneMoveSpeed = 5f;
-          public float muneRetuenSpeed = 10f;
+          public float muneMoveSpeedTime = 10f;
+          public float muneMoveSpeedAmp = 20f;
+
           //衝突時の移動量倍率
           public float muneMoveRatioX = 1.2f;
-          public float muneMoveRatioY = 0.8f;
-          public float muneMoveLimitX = 0.8f; //移動倍率で大きくなりすぎたときの移動制限
-          public float muneMoveLimitY = 0.7f; //移動倍率で大きくなりすぎたときの移動制限
+          public float muneMoveRatioY = 0.7f;
+          public float muneMoveLimitX = 1.0f; //Ratioの倍率になる前にこの倍率で制限
+          public float muneMoveLimitY = 0.6f; //Ratioの倍率になる前にこの倍率で制限
           //移動量の両端を2次曲線にするときの0～1の分割位置
-          public float muneCurvePointX = 0.6f;
-          public float muneCurvePointY = 0.3f;
+          public float muneCurvePointX = 0.7f;
+          public float muneCurvePointY = 0.5f;
 
           //腕側の判定原点オフセット Yはサイズでの補正あり
           public float muneArmX   =  0.0f;  //左右 外が+
@@ -301,14 +299,14 @@ namespace CM3D2.VibeYourMaid.Plugin
           public float muneArmZ   =  0.0f;  //前後 前が+
 
           //胸の回転 胸寄り50のときの正面に対する胸の角度
-          public float muneAngleX = 5.0f;  //X軸 +で前が上がる
-          public float muneAngleY = 20.0f; //Y軸 +で外に広がる 胸寄り設定値がこれに加算される
-          public float muneAngleZ = 0.0f;  //Z軸 基本は0 正面から見て時計回りが+
+          public float muneAngleX =  5.0f; //X軸 +で前が上がる
+          public float muneAngleY = 22.5f; //Y軸 +で外に広がる 胸寄り設定値がこれに加算される
+          public float muneAngleZ =  0.0f; //Z軸 基本は0 正面から見て時計回りが+
 
           //Mune L/R の原点からの範囲 (単位メートル)
           //左右座標 (外側が+)
           public float muneOutside     =  0.09f; //乳外端
-          public float muneCenterX     =  0.0f;  //乳の左右の中心
+          public float muneCenterX     = -0.01f; //乳の左右の中心
           //上下座標 (上が+)
           public float muneTop         =  0.07f; //乳上側高さ
           public float muneCenterY     = -0.02f; //乳の上下の中心
@@ -319,23 +317,71 @@ namespace CM3D2.VibeYourMaid.Plugin
           public float muneCenterBackZ =  0.02f; //乳中心 後方  (下げると後ろ側の移動量が増える)
           public float muneBack        = -0.04f; //乳後  胴体の真ん中～後ろのあたり
           //乳上下 乳下げ時に利用
-          public float muneDownOutside =  0.07f; //乳下げ時の横幅
+          public float muneDownOutside =  0.06f; //乳下げ時の横幅
           public float muneDownCenterX = -0.01f; //乳下げ時の左右中心
-          public float muneDownTop     =  0.08f; //乳下げ時の高さ 上側
-          public float muneDownCenterY =  0.01f; //乳下げ時の上下中心  (乳の中心より上寄 乳下げはここが最大になる)
+          public float muneDownTop     =  0.07f; //乳下げ時の高さ 上側
+          public float muneDownCenterY =  0.0f;  //乳下げ時の上下中心  (乳の中心より上寄 乳下げはここが最大になる)
           public float muneDownBottom  = -0.02f; //乳下げ時の高さ 下側
           public float muneDownFront   =  0.12f; //乳下げ時の前
           public float muneDownCenterZ =  0.04f; //乳下げ時の前後中心
           public float muneDownBack    =  0.0f;  //乳下げ時の後
 
-          //胸サイズに応じた拡大 (単位cm) (胸サイズに1:1で比例) 50以下は補正なし (0.1なら 50以下0cm 70+2cm 100+5cm 150+10cm)
+          //胸サイズに応じた拡大 (単位cm) (胸サイズに1:1で比例) 40以下は補正なし (0.02なら 40以下:-0.2cm 50:0cm 70:0.4cm 100:1cm 150:2cm)
           public float muneArmOffsetY  = 0.02f;  //胸サイズ+1での腕の原点の下移動量
-          public float muneSizeExpandX = 0.03f;  //胸サイズ+1での横拡張量
+          public float muneSizeExpandX = 0.02f;  //胸サイズ+1での横拡張量
           public float muneSizeExpandY = 0.05f;  //胸サイズ+1での下移動量 bottomのみ下がる
           public float muneSizeExpandZ = 0.07f;  //胸サイズ+1での前拡張量
           //胸位置に応じた移動量 (単位cm) (サイズで補正あり 0→0倍 50→1倍 100→2倍)
           public float muneUpDownAdjust = 0.01f; //胸上下+1での上への移動量
           public float muneTareAdjust   = 0.01f; //胸たれ+1での下への移動量
+
+
+          //胸位置の球状のコライダー 各コライダー（前腕、竿、ポール、VRハンド）との当たり判定用  VR用は入れ替える
+          public bool muneColliderEnabled = true;         //胸コライダー有効
+          public float muneColliderRadiusExpand = 0.025f; //胸コライダー半径拡張
+          public float muneColliderOffsetX = -0.02f;      //胸コライダー位置 左右 +が外
+          public float muneColliderOffsetY = -0.02f;      //胸コライダー位置 上下 +が上
+          public float muneColliderOffsetZ = -0.055f;     //胸コライダー位置 前後 +が前
+          public float muneColliderOffsetCrcX = -0.03f;   //胸コライダー位置 左右 CRCボディ用
+          public float muneColliderOffsetCrcY = -0.0f;    //胸コライダー位置 上下 CRCボディ用
+          public float muneColliderOffsetCrcZ = -0.08f;   //胸コライダー位置 前後 CRCボディ用
+          public float muneColliderOffsetXRatio = 0.8f;   //胸コライダー左右補正倍率 半径増加分をこの倍率で外側に移動する
+          public float muneColliderOffsetYRatio = 1.0f;   //胸コライダー上下補正倍率 半径増加分をこの倍率で下に移動する 胸サイズ50以下は補正しない
+          public float muneColliderOffsetZRatio = 2.0f;   //胸コライダー前後補正倍率 半径増加分をこの倍率で前に移動する
+          //胸のコライダーでの稼働範囲
+          public float muneColliderFrontLimit = 0f;       //胸コライダー 前側移動制限 +で通常位置より前に出る
+          public float muneHitLimitDistanceMin = 0.01f;   //胸のコライダーでの稼働範囲 0.01
+          public float muneHitLimitDistanceMax = 0.06f;   //胸のコライダーでの稼働範囲 0.04 大きいほど凹む
+          //胸コライダーのばね設定 (UnityのSpringJointの設定)
+          public float muneColliderSpring = 300f;         //ばねの弾性力 (初期値:500)
+          public float muneColliderDamper = 0.5f;         //バネの力を減衰するのに使用します (初期値:0.5)
+          public float muneColliderMinDistance = 0f;      //身体からの距離の初期値に対する最小距離 (初期値:0)
+          public float muneColliderMaxDistance = 0f;      //身体からの距離の初期値に対する最大距離 (初期値:0)
+          public float muneColliderTolerance = 0.001f;    //現在のばねの長さと minDistance と maxDistance によって定義される長さの間の最大許容誤差 (初期値:0.001)
+          //前腕コライダー
+          public bool muneHitForearmEnabled = true;       //前腕コライダー有効
+          public float muneHitForearmRadius = 0.015f;     //前腕側のコライダーの半径 m
+          public float muneHitForearmLength = 0.21f;      //前腕側のコライダーの長さ m
+          public float muneHitForearmOffsetX =  0.01f;    //前腕側のコライダーの位置 m
+          public float muneHitForearmOffsetY = -0.005f;   //前腕側のコライダーの位置 m +が指先側
+          public float muneHitForearmOffsetZ =  0.0f;     //前腕側のコライダーの位置 m 右は反転
+          public float muneHitForearmAngleX = 4f;         //前腕側のコライダーの角度
+          public float muneHitForearmAngleZ = 0f;         //前腕側のコライダーの角度
+          //竿のコライダー
+          public bool muneHitChinkoEnabled = true;        //竿のコライダー有効
+          public float muneHitChinkoCheckInterval = 1.0f; //男の表示状態チェック間隔の秒数
+          public float muneHitChinkoRadius = 0.015f;      //竿のコライダーの半径 m
+          public float muneHitChinkoLength = 0.20f;       //竿のコライダーの長さ m
+          public float muneHitChinkoOffsetX = -0.08f;     //竿のコライダーの位置 m
+          public float muneHitChinkoOffsetY = -0.002f;    //竿のコライダーの位置 m
+          public float muneHitChinkoAngle = 93f;          //竿のコライダーの角度 +で上 反り返る分を少し上に
+          public bool muneHitChinkoDisabledDanceStart = true;  //ダンス開始時に竿のコライダーと男の表示状態チェックを無効にする 開始前にONなら終了後に戻す
+          //VRコントローラー
+          public bool muneTouchColliderEnabled = true;    //VRコントローラーの胸のあたり判定有効 タブレットUIの操作もできなくなります
+          public float muneTouchColliderRadius = 0.03f;   //VRコントローラーのコライダーサイズ (初期値:0.05)
+          public bool muneTouchColliderDisabledDanceStart = false;  //ダンス開始時にVRコントローラーのコライダーを無効にする 開始前にONなら終了後に戻す
+          //ポールダンスのポール
+          public float muneHitPoleRadius = 0.03f;        //ポールの太さ 実サイズは半径2.5cm あまり当たらないので少し太くする 0以下なら無効
 
 
           //おさわり
@@ -345,34 +391,35 @@ namespace CM3D2.VibeYourMaid.Plugin
           public string osawariButton = "AX";      //VRおさわりボタン (AX,BY,Tigger,Grip)
           public float osawariRelease = 0.2f;      //VRのおさわり解除距離
           public float osawariHandRadius = 0.015f; //手の当たり判定の球半径
-          public float osawariHSliderMin = 20f;    //おさわり挿入時のスライダ最小値 前
-          public float osawariASliderMin = 15f;    //おさわり挿入時のスライダ最小値 後
+          public float osawariHSliderMin = 20f;    //おさわり挿入後のスライダ最小値 前
+          public float osawariASliderMin = 15f;    //おさわり挿入後のスライダ最小値 後
 
           //メイド切り替え
           public bool CamChangeEnabled = true;
-          public float cameraChangeDistance = 1.8f;     //メイド切り替え時の距離 0なら距離は変更しない
+          public float cameraChangeDistance = 1.5f;      //メイド切り替え時の距離 0なら距離は変更しない
           public bool onloadAdjustCameraDistance = true; //シーン切り替わり時にカメラのターゲットが近すぎたらターゲットをメイドの位置に修正する
 
           //メイド固定
-          public int maidFollowLookPoint = 0;           //メイド固定のデフォルトの注視点 (胸:0 顔:1 腰:2)
-          public float maidFollowKeepHeightTop = 0.5f;  //メイド固定時の高さ戻り許容範囲 上側 メートル
-          public float maidFollowKeepHeightBottom = 0f; //メイド固定時の高さ戻り許容範囲 下側 メートル (0以上で設定)
-          public bool maidFollowCameraAdjust = true;    //メイド固定開始時のカメラ位置の調整 trueならHMDの位置と向きに合わせてメイド固定開始(GripMoveの移動量もリセット)
+          public int maidFollowLookPoint = 0;              //メイド固定のデフォルトの注視点 (胸:0 顔:1 腰:2)
+          public float maidFollowKeepHeightTop = 0.1f;     //メイド固定時の高さ戻り許容範囲 上側 メートル
+          public float maidFollowKeepHeightBottom = 0f;    //メイド固定時の高さ戻り許容範囲 下側 メートル (0以上で設定)
+          public bool maidFollowCameraAdjust = true;       //メイド固定開始時のカメラ位置の調整 trueならHMDの位置と向きに合わせてメイド固定開始 GripMoveの移動量もリセット 正面も変わる
           public bool maidFollowDisabledDanceStart = true; //ダンス開始時にメイド固定を解除
-          public float maidFollowSpeed = 1f;            //メイド固定戻り速度
-          public float cameraMoveReturnSpeedY = 1f;     //メイド固定時のカメラ高さ方向の戻り速度 0なら高さは戻らなくなる 5で通常速度 メイド切り替え時は常に通常速度
+          public float maidFollowSpeed = 1f;               //メイド固定戻り速度
+          public float cameraMoveReturnSpeedY = 1f;        //メイド固定時のカメラ高さ方向の戻り速度 0なら高さは戻らなくなる 5で通常速度 メイド切り替え時は常に通常速度
 
 
           //VRショートカット
-          public bool vrShortCut = false;              //VRショートカット有効
+          public bool vrShortCut = false;                 //VRショートカット有効
           //トリガー・グリップは文字列で設定 (左トリガー:LT , 右トリガー:RT , 左グリップ:LG , 右グリップ:RG , 常時有効:ALWAYS , それ以外なら操作無効)
-          public string vrShortCutFollowOn = "RT";     //VRメイド固定 開始 右トリガー(変更可) + AXボタンでメイド固定ON (固定開始時にHMD中央のメイドに自動切換え)
-          public string vrShortCutFollowOff = "RG";    //VRメイド固定 解除 右グリップ(変更可) + AXボタンでメイド固定OFF (※開始と同じボタンならトグル動作になる)
-          public string vrShortCutMaidTarget = "RT";   //VRメイド切替 グリップ+スティック左右でメイド切り替え
-          public string vrShortCutMaidFocus = "RG";    //VRメイド切替 ↑の切り替えでメイド固定中でもカメラを即時切り替える スティックは↑と同じ側を利用
-          public string vrShortCutVibe = "RG";         //VRバイブ操作 グリップ+スティック上下で強弱切 (※トリガーとグリップ同時押し時は動作しない)
-          public string vrShortCutMotion = "RTG";      //VRモーション切替 ボタンとスティック上下 LT,LG,LTG,RT,RG,RTG 設定時のみ有効
-          public bool vrShortCutVibeLookingMaid = true; //VRバイブ操作 HMD視野の中心のメイドを対象にする
+          public string vrShortCutFollowOn = "RT";        //VRメイド固定 開始 右トリガー(変更可) + AXボタンでメイド固定ON (固定開始時にHMD中央のメイドに自動切換え)
+          public string vrShortCutFollowOff = "RG";       //VRメイド固定 解除 右グリップ(変更可) + AXボタンでメイド固定OFF (※開始と同じボタンならトグル動作になる)
+          //public string vrShortCutDirectionReset = "RT";  //VRメイド固定解除操作でHMD方向に正面をリセットする 右トリガー(変更可) + メイド固定解除ボタン（右グリップ＋AX）
+          public string vrShortCutMaidTarget = "RT";      //VRメイド切替 グリップ+スティック左右でメイド切り替え
+          public string vrShortCutMaidFocus = "RG";       //VRメイド切替 ↑の切り替えでメイド固定中でもカメラを即時切り替える スティックは↑と同じ側を利用
+          public string vrShortCutVibe = "RG";            //VRバイブ操作 グリップ+スティック上下で強弱切 (※トリガーとグリップ同時押し時は動作しない)
+          public string vrShortCutMotion = "RTG";         //VRモーション切替 ボタンとスティック上下 LT,LG,LTG,RT,RG,RTG 設定時のみ有効
+          public bool vrShortCutVibeLookingMaid = true;   //VRバイブ操作 HMD視野の中心のメイドを対象にする
 
           //VRカメラ移動
           public bool vrCameraMove = true;                //VRカメラ移動有効 vrShortCutがtrueの場合のみ
@@ -384,24 +431,26 @@ namespace CM3D2.VibeYourMaid.Plugin
           public bool vrCameraMoveHeadDirection = true;   //VR自由移動をHMDの向きに合わせる
 
           //最短距離制限対象メイド自動切替
-          public float vrFrontMaidAngle = 30f;       //正面のメイド判定 正面左右の角度
-          public string vrFrontMaidTrigger = "RG";   //正面判定の制御変更 このボタン+カメラ移動制限トリガー+スティック上→強制正面チェック スティック下→正面の判定範囲を拡大 (範囲外判定は無効)
-          public float vrFrontMaidExtendAngle = 80f; //正面のメイド判定 拡大時 正面左右の角度
-          public float vrFrontExtendBackward = 2.5f; //正面のメイド判定 拡大時 後方移動量
-          public bool vrAutoMaidChange = true;       //カメラジャンプ時に正面のメイドに切り替える
-          public float vrAutoMaidBackward = 0.5f;    //カメラジャンプ時の最短メイド判定を行う位置補正 自由移動前の初期位置を後ろへ移動する
-          public bool vrOutsideMaidChange = true;    //対象のメイドがカメラ範囲外になった時に正面のメイドに切り替える
-          public float vrOutsideMaidAngle = 30f;     //カメラ範囲外判定 正面左右の角度
-          public float vrOutsideMaidSide = 0.5f;     //カメラ範囲外判定 左右の距離
-          public float vrOutsideMaidBackward = 0.5f; //カメラ範囲外判定 後ろ距離
-
+          public string vrFrontMaidTrigger = "RG";    //正面判定の制御変更 このボタン+カメラ移動制限トリガー+スティック上→強制正面チェック スティック下→正面の判定範囲を拡大 (範囲外判定は無効)
+          public float vrFrontMaidAngle = 15f;        //正面のメイド判定 正面左右の角度 スティック上時（カメラ位置から）
+          public float vrFrontMaidBackward = 0.5f;      //正面のメイド判定 角度原点後方移動量 スティック上時
+          public float vrFrontMaidExtendAngle = 80f;  //正面のメイド判定 拡大時 正面左右の角度 スティック下時（自由移動前の位置から）
+          public float vrFrontExtendBackward = 3.0f;  //正面のメイド判定 拡大時 角度原点後方移動量 スティック下時
+          public bool vrAutoMaidChange = true;        //カメラジャンプ時に正面のメイドに切り替える
+          public float vrAutoMaidAngle = 30f;         //カメラジャンプ時の正面メイド判定 正面左右の角度（自由移動前の位置から）
+          public float vrAutoMaidBackward = 0.5f;     //カメラジャンプ時の正面メイド判定位置 自由移動前の初期位置を後ろへ移動する
+          public bool vrOutsideMaidChange = true;     //対象のメイドがカメラ範囲外になった時に正面のメイドに切り替える
+          public float vrOutsideMaidAngle = 20f;      //カメラ範囲外判定 正面左右の角度（カメラ位置から）
+          public float vrOutsideMaidBackward = 0.1f; //カメラ範囲外判定 角度原点後方移動量
 
           //トリガー・グリップは文字列で設定 (左トリガー:LT , 右トリガー:RT , 左グリップ:LG , 右グリップ:RG , それ以外なら操作無効)
-          public string vrCameraSpeedTrigger = "LT";   //VRカメラ移動速度トリガー トリガー/グリップが押されている場合のみスティック移動が有効
+          public string vrCameraSpeedTrigger = "LT";     //VRカメラ移動速度トリガー トリガー/グリップが押されている場合のみスティック移動が有効
           public string vrCameraMoveLimitTrigger = "LT"; //VRカメラ移動制限トリガー
-          //スティック感度          
-          public float vrCameraSpeedStart = 0.1f;      //VRカメラ移動開始速度トリガーの入力開始時の速度 (トリガーの0位置に遊びがあるため)
+          //スティック感度
+          public float vrCameraSpeedStart = 0.05f;      //VRカメラ移動開始速度トリガーの入力開始時の速度 (トリガーの0位置に遊びがあるため)
           public float vrCameraSpeedMax = 1.0f;        //VRカメラ移動速度の倍率
+          public string vrCameraBreakTrigger = "LG";   //VRカメラ移動速度減速グリップ ↑のトリガーと同時押しで有効
+          public float vrCameraBreakSpeed = 0.25f;     //減速最大時の速度 1より大きい場合は加速する
           public float vrCameraMoveZoomMin = 0.3f;     //ズーム時の最短距離
           //各スティックのコントローラーと速度 (左:L 右:R それ以外ならスティック操作無効)
           public string vrCameraMoveStickZoom = "L";   //ズーム   スティック上下
@@ -409,13 +458,14 @@ namespace CM3D2.VibeYourMaid.Plugin
           public string vrCameraMoveStickAround = "L"; //周回     スティック左右 (メイド固定時)
           public string vrCameraMoveStickLR = "L";     //左右移動 スティック左右 (メイド固定解除時)
           public string vrCameraMoveStickTurn = "R";   //左右回転 スティック左右 (メイド固定解除時)
+          //移動速度倍率
           public float vrCameraFollowSpeedZoom = 1f;   //移動速度倍率 ズーム (メイド固定時)
           public float vrCameraFollowSpeedAround = 1f; //移動速度倍率 周回 (メイド固定時)
-          public float vrCameraFollowSpeedUD = 1f;     //移動速度倍率 上下移動 (メイド固定時)
+          public float vrCameraFollowSpeedUD = 0.8f;     //移動速度倍率 上下移動 (メイド固定時)
           //public float vrCameraFollowSpeedLR = 1f;     //移動速度倍率 左右移動 (メイド固定時)
           public float vrCameraMoveSpeedZoom = 1.5f;   //移動速度倍率 ズーム
-          public float vrCameraMoveSpeedUD = 1f;       //移動速度倍率 上下移動
-          public float vrCameraMoveSpeedLR = 1.5f;     //移動速度倍率 左右移動
+          public float vrCameraMoveSpeedUD = 0.8f;       //移動速度倍率 上下移動
+          public float vrCameraMoveSpeedLR = 1f;       //移動速度倍率 左右移動
           public float vrCameraMoveSpeedTurn = 1f;     //移動速度倍率 左右回転
 
 
@@ -2018,7 +2068,12 @@ namespace CM3D2.VibeYourMaid.Plugin
         private float WaitTime = 0;                         //　シーン15開始時の待機時間用
         private float timerRate = Time.deltaTime * 60;
 
+        private float chinkoCheckTime = float.PositiveInfinity; //男の表示時のコライダー設定タイマー
+
         private bool scKeyOff = false;
+
+        //胸コライダー制御用クラス
+        MuneCollider muneCollider;
 
         //　Chu-B Lip / VR
         private bool bChuBLip;
@@ -2044,6 +2099,7 @@ namespace CM3D2.VibeYourMaid.Plugin
         private string[] SucoreText3 = new string[] { "☆ ☆ ☆" , "★ ☆ ☆" , "★ ★ ☆" , "★ ★ ★" };
 
         #if COM3D2_5
+        //胸変形用
         static FieldInfo MunePropValueDicInfo;
         #endif
 
@@ -2055,7 +2111,6 @@ namespace CM3D2.VibeYourMaid.Plugin
         //子宮脱按钮用 #109
         private bool manualTriggeredUterusDatsu = false;
         //子宮脱按钮用 #109
-
 
         //--------------------------------------------
 
@@ -2145,6 +2200,8 @@ namespace CM3D2.VibeYourMaid.Plugin
           //脱衣設定読み込み ファイルがなければデフォルトを保存
           if (UndressingVoiceLoad()) UndressingVoiceSave();
 
+          muneCollider = new MuneCollider(cfgw);
+
           XmlFilesCheck();
 
           //configからデフォルト値を設定
@@ -2211,64 +2268,7 @@ namespace CM3D2.VibeYourMaid.Plugin
         public void Start() {
 
           //GUI Style初期化
-          gsWin = new GUIStyle("box");
-          gsWin.fontSize = 12;
-          gsWin.alignment = TextAnchor.UpperLeft;
-
-          gsLabel = new GUIStyle("label");
-          gsLabel.fontSize = 12;
-          gsLabel.alignment = TextAnchor.MiddleLeft;
-          gsLabelY = new GUIStyle("label");
-          gsLabelY.fontSize = 12;
-          gsLabel.alignment = TextAnchor.MiddleLeft;
-          gsLabelY.normal = new GUIStyleState();
-          gsLabelY.normal.textColor = Color.yellow;
-          gsLabel2 = new GUIStyle("label");
-          gsLabel2.fontSize = 12;
-          gsLabel2.alignment = TextAnchor.MiddleCenter;
-          gsLabel2Y = new GUIStyle("label");
-          gsLabel2Y.fontSize = 12;
-          gsLabel2Y.alignment = TextAnchor.MiddleCenter;
-          gsLabel2Y.normal = new GUIStyleState();
-          gsLabel2Y.normal.textColor = Color.yellow;
-          gsLabel3 = new GUIStyle("label");
-          gsLabel3.fontSize = 12;
-          gsLabel3.alignment = TextAnchor.MiddleLeft;
-          gsLabel3.fontStyle  = FontStyle.Bold;
-          gsLabelR = new GUIStyle("label");
-          gsLabelR.fontSize = 12;
-          gsLabelR.alignment = TextAnchor.MiddleRight;
-          gsLabelErr = new GUIStyle("label");
-          gsLabelErr.fontSize = 12;
-          gsLabelErr.alignment = TextAnchor.UpperLeft;
-          gsLabelErr.normal = new GUIStyleState();
-          gsLabelErr.normal.textColor = Color.red;
-
-          gsButton = new GUIStyle("button");
-          gsButton.fontSize = 12;
-          gsButton.alignment = TextAnchor.MiddleCenter;
-          gsButtonY = new GUIStyle("button");
-          gsButtonY.fontSize = 12;
-          gsButtonY.alignment = TextAnchor.MiddleCenter;
-          gsButtonY.normal.textColor = Color.yellow;
-          gsButtonY.hover.textColor = Color.yellow;
-          gsButton2 = new GUIStyle("button");
-          gsButton2.fontSize = 10;
-          gsButton2.alignment = TextAnchor.MiddleCenter;
-
-          gsToggle = new GUIStyle("toggle");
-          gsToggle.fontSize = 12;
-          gsToggle.alignment = TextAnchor.MiddleLeft;
-
-          //背景色設定
-          gsWin.onHover.background = guiBgTexture;
-          gsWin.hover.background = guiBgTexture;
-          gsWin.onFocused.background = guiBgTexture;
-          gsWin.focused.background = guiBgTexture;
-          gsWin.onHover.textColor = Color.white;
-          gsWin.hover.textColor = Color.white;
-          gsWin.onFocused.textColor = Color.white;
-          gsWin.focused.textColor = Color.white;
+          initGUIStyle();
 
           //Questかどうか
           if (bVR) {
@@ -2282,6 +2282,9 @@ namespace CM3D2.VibeYourMaid.Plugin
           //VRショートカット用コントローラー初期化 VR以外でも判定に利用する
           vrShortCutController = new VRShortCutController(cfgw, bOculusVR);
 
+          //キスボイスと連動するならキスボイスを初期表示
+          if (cfgw.camCheckVoiceEnabled) vsNormalMode = false;
+
           //おさわり機能初期化
           initOsawari();
         }
@@ -2294,6 +2297,7 @@ namespace CM3D2.VibeYourMaid.Plugin
         //--------------------------------------------
         //シーン開始時の処理--------------------------
         void OnLevelWasLoaded(int level) {
+          try {
 
           //レベルの取得
           vSceneLevel = level;
@@ -2312,13 +2316,8 @@ namespace CM3D2.VibeYourMaid.Plugin
           //メイドさんの取得
           GetStockMaids();
 
-          //アクティブなメイドさんのIDを取得
+          //アクティブなメイドさんのIDを取得 初期化処理はフェード終了後に実行
           VisibleMaidCheck(false);
-
-          //モーションのリンク情報をクリア
-          foreach (int maidID in vmId) {
-            maidsState[maidID].motionLinkID = -1;
-          }
 
           #if EmpiresLife
           //エンパイアズライフのフラグ初期化
@@ -2330,7 +2329,7 @@ namespace CM3D2.VibeYourMaid.Plugin
           for (int i = 0; i < SubMans.Length; i++) {
             SubMans[i] = GameMain.Instance.CharacterMgr.GetMan(i);
           }
-          //男Body取得のため、一度呼び出しておく 初回に2回だけ実行？
+          //男Body取得のため、一度呼び出しておく → 遅延実行で取得するようにしたので不要
           /*if (vSceneLevel == 15 && MansFGet < 2) {
             ++MansFGet;
             foreach (Maid m in SubMans) {
@@ -2340,6 +2339,13 @@ namespace CM3D2.VibeYourMaid.Plugin
               }
             }
           }*/
+          //股間のチェック有効/無効
+          if (cfgw.muneHitChinkoEnabled) {
+            chinkoCheckTime = Time.time + cfgw.muneHitChinkoCheckInterval; //インターバル秒数後
+          } else {
+            muneCollider.destroyChinkoColliderAll(); //すべて破棄
+            chinkoCheckTime = float.PositiveInfinity; //チェック無効
+          }
 
           //メイド固定の調整値は戻す
           maidFollowHeightOffset = 0f; //高さのずれを0
@@ -2349,116 +2355,53 @@ namespace CM3D2.VibeYourMaid.Plugin
           //カラオケ開始時はメイド固定解除
           if (vSceneLevel == 36) maidFollowEnabled = false;
 
-          //ダンス開始時にメイド固定解除
-          if (cfgw.maidFollowDisabledDanceStart) {
-            if (GameMain.Instance.GetNowSceneName().StartsWith("SceneDance_")) maidFollowEnabled = false;
-          }
-
           //カメラジャンプ時の位置初期化無効化 無効時間で制御
           if (cfgw.vrCameraJumpFix) cameraJumpFixTime = 0;
           else cameraJumpFixTime = float.PositiveInfinity;
 
           man = SubMans[0];
-        }
-        //--------------------------------------------
 
+          bool isDance = GameMain.Instance.GetNowSceneName().StartsWith("SceneDance_");
 
+          //ダンス開始時にメイド固定解除
+          if (cfgw.maidFollowDisabledDanceStart) {
+            if (isDance) maidFollowEnabled = false;
+          }
+          
+          //ダンス開始時に竿のコライダーを解除して男表示チェックを無効化
+          if (cfgw.muneHitChinkoDisabledDanceStart) {
+            if (isDance) {
+              muneCollider.muneHitChinkoEnabledBak = cfgw.muneHitChinkoEnabled;
+              muneCollider.setChinkoColliderEnabledAll(false);
+              chinkoCheckTime = float.PositiveInfinity; //無効ならチェックさせない
+              cfgw.muneHitChinkoEnabled = false;
 
-
-
-        //--------------------------------------------
-        //GUI表示処理---------------------------------
-        Rect node;
-        Rect node2;
-        Rect node3;
-        Rect node4;
-        //Rect node4a;
-        Rect node5;
-
-        GUIStyle gsWin;
-        GUIStyle gsLabel;
-        GUIStyle gsLabelY;
-        GUIStyle gsLabel2;
-        GUIStyle gsLabel2Y;
-        GUIStyle gsLabel3;
-        GUIStyle gsLabelR;
-        GUIStyle gsLabelErr;
-        GUIStyle gsButton;
-        GUIStyle gsButtonY;
-        GUIStyle gsButton2;
-        GUIStyle gsToggle;
-        Texture2D guiBgTexture; //背景色
-        Texture2D guiLineTexture;
-
-
-        void OnGUI() {
-          if (!cfgw.bPluginEnabledV || cfgw.mainGuiFlag == 0) return;
-
-            if (tgID != -1 && !reGetMaid){ //フェードアウト中はGUIを更新しない
-
-              if (SceneLevelEnable){
-
-                if (vSceneLevel == 15 && WaitTime < 120 ){
-
-                  WaitTime += timerRate;
-
-                } else {
-
-                  node = GUI.Window(324101, node, WindowCallback, "リモコンスイッチ  Ver"+PluginVersionLabel, gsWin);
-
-                  if (cfgw.mainGuiFlag == 1){
-                    node.height = 220;
-
-                  if (cfgw.configGuiFlag) {
-                    string configTitle;
-                    switch (ConfigFlag) {
-                      case 3: configTitle = "オリジナルボイス設定"; break;
-                      case 4: configTitle = "ランダムモーション設定"; break;
-                      case 5: configTitle = "髪型・服装の登録"; break;
-                      case 6: configTitle = "モーションアジャスト設定"; break;
-                      case 8: configTitle = "エロステータス"; break;
-                      case 9: configTitle = "乳首設定の登録"; break;
-                      default: configTitle = "VibeYourMaid 設定画面"; break;
-                    }
-                    node3 = GUI.Window(324103, node3, WindowCallback3, configTitle, gsWin);
-                  }
-
-                  if (cfgw.unzipGuiFlag) {
-                    node4 = GUI.Window(324104, node4, WindowCallback4, "ムラムラしたのでメイドさんを押し倒す", gsWin);
-
-                    /*調整中
-                    if (maidsState[tgID].senyouTokusyuMotion.Count > 0) {
-                      node4a = new Rect( node4.x - 220 , node4.y , 220 , 220 );
-                      node4a = GUI.Window(3241042, node4a, WindowCallback4a, "特殊モーション", gsWin);
-                    }*/
-
-                  }
-
-                  } else if (cfgw.mainGuiFlag == 2) {
-                    node.height = 20;
-                  }
-                }
+            } else {
+              if (muneCollider.muneHitChinkoEnabledBak) {
+                muneCollider.setChinkoColliderEnabledAll(true);
+                chinkoCheckTime = 0;
+                cfgw.muneHitChinkoEnabled = true;
               }
             }
-
-            if (cfgw.mainGuiFlag == 1) { //リモコン展開時のみ
-            #if EmpiresLife
-            if (tgID != -1 || (lifeStart > 0 && !elFade)) {
-            #else
-            if (tgID != -1) {
-            #endif
-              if (cfgw.subGuiFlag == 2) {
-                node2 = GUI.Window(324102, node2, WindowCallback2b, "メイド呼び出し", gsWin);
-              } else {
-                node2 = GUI.Window(324102, node2, WindowCallback2a, "サブキャラ操作", gsWin);
+          }
+          //ダンス開始時に手のコライダー解除
+          if (bVR && cfgw.muneTouchColliderDisabledDanceStart) {
+            if (isDance) {
+              if (cfgw.muneTouchColliderEnabled) {
+                muneCollider.muneTouchColliderEnabledBak = cfgw.muneTouchColliderEnabled;
+                osawari.setTouchColliderEnabled(false);
+                cfgw.muneTouchColliderEnabled = false;
+              }
+              //スカートのつかみ判定無効化はDynamicSkirtBoneが取得できない？
+            } else{
+              if (muneCollider.muneTouchColliderEnabledBak) {
+                osawari.setTouchColliderEnabled(true);
+                cfgw.muneTouchColliderEnabled = true;
               }
             }
+          }
 
-            #if EmpiresLife
-              if (lifeStart > 0 && !elFade) node5 = GUI.Window(324105, node5, WindowCallback5, "エンパイアズライフ", gsWin);
-            #endif
-            }
-
+          } catch (Exception e) { Debug.LogError("[VibeYourMaid] OnLevelWasLoaded : "+e.StackTrace); }
         }
         //--------------------------------------------
 
@@ -2468,6 +2411,9 @@ namespace CM3D2.VibeYourMaid.Plugin
 
         //--------------------------------------------
         //フレーム毎の処理----------------------------
+        
+        bool isPreFade = true; //前フレームのフェード状態 フェードして黒い画面 FadeState.Out ならtrue
+
         void Update() {
 
           if (Input.anyKeyDown) {
@@ -2476,7 +2422,7 @@ namespace CM3D2.VibeYourMaid.Plugin
               cfgw.bPluginEnabledV = !cfgw.bPluginEnabledV;
               if (cfgw.bPluginEnabledV) {
                 Console.WriteLine("VibeYourMaid Plugin 有効化");
-                reGetMaid = true; //再取得
+                GetStockMaids(); //メイドさんの取得
                 VisibleMaidCheck(true); //再チェック
               } else {
                 Console.WriteLine("VibeYourMaid Plugin 無効化");
@@ -2489,46 +2435,77 @@ namespace CM3D2.VibeYourMaid.Plugin
           //無効化時は終了
           if (!cfgw.bPluginEnabledV) return;
 
-          //画面がフェードするたびに、メイド情報の再取得フラグを立てる
-          if (FadeMgr.GetFadeIn()) {
+          //フェードして黒い画面ならtrue
+          bool isFade = GameMain.Instance.MainCamera.GetFadeState() == CameraMain.FadeState.Out;
 
-            //おさわり中なら終了させる
+          //フェード中なら終了
+          if (isFade) {
+            isPreFade = isFade;
+
+            //フェード中でも実行する処理
+            if (Input.anyKey) {
+              //VRショートカット
+              ShortCutVR(vrShortCutController);
+            }
+            //ここで終了
+            return;
+          }
+
+          //画面がフェードから抜けたら
+          if (isPreFade) {
+            //メイド情報の再取得フラグを立てる
+            reGetMaid = true;
+
+            //おさわり中なら終了状態に戻す フェード中は動かないのでフォード解除後でOK
             osawari.endOsawari();
 
-            if (!reGetMaid) reGetMaid = true;
+            //ポールダンスのポールにコライダー設定
+            muneCollider.addPoleDanceCollider();
 
-          } else {
-            //フェード終了後、再取得フラグが立っていたらメイド情報取得
-            if (reGetMaid) {
-              GetStockMaids(); //メイドさんの取得
-              VisibleMaidCheck(true); //アクティブなメイドさんのIDを取得
-              reGetMaid = false;
-            }
-            //カメラが近すぎる場合は距離を修正
+            //前フレームのフェード状態入れ替え
+            isPreFade = isFade;
+          }
+
+          //メイドを再取得
+          if (reGetMaid) {
+            GetStockMaids(); //メイドさんの取得
+            VisibleMaidCheck(true); //アクティブなメイドさんのIDを取得
+
+            reGetMaid = false;
+
+            //カメラのターゲットが距離が近すぎる場合は現在のメイドに位置に修正
             if (cfgw.onloadAdjustCameraDistance) adjustCameraDistance();
           }
 
           bool onWindow = false; //マウスがGUIウィンドウ上にあるか
 
-          //メイン処理---
-          if (tgID != -1 && SceneLevelEnable && !reGetMaid) {
+          //メイン処理 ----------------------------
+          if (tgID == -1) {
+            //メイドがいなくても実行する処理
+            if (Input.anyKey) {
+              //VRショートカット
+              ShortCutVR(vrShortCutController);
+            }
+          }
+          //メイド選択中のメイン処理
+          else { //&& SceneLevelEnable は常にtrueなので不要
 
             timerRate = Time.deltaTime * 60;
 
-            foreach (int maidID in vmId) {
+            int vmLength = vmId.Count();
+            for (int i=0; i<vmLength; i++) {
+              int maidID = vmId[i];
 
               Maid maid = stockMaids[maidID].mem;
               MaidState mState = maidsState[maidID];
 
-              //非表示のメイドがいたらアクティブメイドをチェックし直す
-              /*if (!maid.Visible || !mState.maidHead) {
-                VisibleMaidCheck(true); //vmIdがずれるので処理は終了
-                if (tgID == -1) GameMain.Instance.SoundMgr.StopSe();
-                return; //このフレームの処理は終了
-              }*/
+              //非表示のメイドがいたらスキップしてアクティブメイドをチェックし直す
+              //スタジオで配置解除した等でフェードしない場合
               if (!maid.Visible) {
-                reGetMaid = true; //次フレームで再取得
-                continue; //見えないメイドはスキップ
+                Debug.Log("[VibeYourMaid] Maid invisible : "+maidID+" "+maid.body0);
+                //次フレームで再取得
+                reGetMaid = true;
+                continue;
               }
 
               //オートモード処理
@@ -2570,14 +2547,20 @@ namespace CM3D2.VibeYourMaid.Plugin
               }
 
               //胸と腕の衝突判定 オフセットを調整してosawariのmuneMorphを利用して変形
-              checkMuneYori(maid, mState);
+              //初期化前 または 無効時
+              if (mState.muneParam != null) checkMuneYori(maid, mState);
+              //胸のコライダー判定 衝突で移動したm_trHitChildLの位置にあわせてm_trsMuneLsubを移動
+              if (mState.muneColliderInfo != null) mState.muneColliderInfo.Update(maid);
               
               //おさわりコライダー位置移動
-              if (cfgw.osawariEnabled) targetInstallation(maidID, mState);
+              if (cfgw.osawariEnabled) targetUpdate(maidID, maid, mState);
 
               //ステート10が継続している場合はここで処理終了
               if (mState.vStateMajor == 10 && mState.vStateMajorOld == 10) continue;
 
+              //----------------------------------------------------------------
+              // バイブ動作または余韻時なら以下も実行
+              //----------------------------------------------------------------
 
               //各メイドの興奮値を連動
               ChangeYotogiParamSlider(maidID, maid, mState);
@@ -2662,12 +2645,12 @@ namespace CM3D2.VibeYourMaid.Plugin
                 )) {
                   MaidVoicePlay(maidID, maid, mState);  //音声変更実行
                   mState.voiceHoldTime = cfgw.voiceHoldTimeBase + UnityEngine.Random.Range(0f , cfgw.voiceHoldTimeRandomExtend); //次の音声変更タイマーセット
-}
+              }
                   
-                  if (mState.voiceHoldTime > 0 && mState.vsFlag != 2) mState.voiceHoldTime -= timerRate;  //音声変更タイマー減少
+              if (mState.voiceHoldTime > 0 && mState.vsFlag != 2) mState.voiceHoldTime -= timerRate;  //音声変更タイマー減少
               if (mState.voiceHoldTime <= 0 && maid.AudioMan.audiosource.loop && (mState.vStateMajor == 20 || mState.vStateMajor == 30)) {
                     maid.AudioMan.Stop(0f);  //ADVのオートモードが機能するよう、ループ音声を切り替える前に一旦止める
-                  }
+              }
                 
 
               //余韻状態の処理
@@ -2689,22 +2672,30 @@ namespace CM3D2.VibeYourMaid.Plugin
                   }
                 }
               }
-            } //foreach
+            } //for vmId
 
 
-            //男の射精値増加処理
+            //男の射精値増加処理 見えていなければスキップ
             for (int im = 0; im < SubMans.Length; im++) {
-              if (syaseiLock[im]) continue;
-              if (!SubMans[im].Visible || MansTg[im] == -1) mansLevel[im] = 0;
-              if (mansLevel[im] == 0) {
-                syaseiValue[im] -= 0.02f * timerRate;
-              } else if (mansLevel[im] == 1) {
-                syaseiValue[im] += 0.01f * timerRate;
-              } else {
-                syaseiValue[im] += 0.017f * timerRate;
+              if (SubMans[im].Visible) {
+                if (syaseiLock[im]) continue;
+                if (mansLevel[im] == 0 || MansTg[im] == -1) {
+                  mansLevel[im] = 0;
+                  syaseiValue[im] =  Math.Max(0f, syaseiValue[im] - 0.02f * timerRate);
+                } else if (mansLevel[im] == 1) {
+                  syaseiValue[im] = Math.Min(100f, syaseiValue[im] + 0.01f * timerRate);
+                } else {
+                  syaseiValue[im] = Math.Min(100f, syaseiValue[im] + 0.017f * timerRate);
+                }
               }
-              if (syaseiValue[im] < 0f) syaseiValue[im] = 0f;
-              if (syaseiValue[im] > 100f) syaseiValue[im] = 100f;
+            }
+
+            //男の表示状態を定期的にチェックしてコライダーを設定
+            if (chinkoCheckTime < Time.time) {
+              if (cfgw.muneHitChinkoEnabled) {
+                muneCollider.checkChinkoColliderAll();
+              }
+              chinkoCheckTime = Time.time + cfgw.muneHitChinkoCheckInterval; //デフォルトは1秒後
             }
 
             if (Input.anyKey) {
@@ -2716,7 +2707,6 @@ namespace CM3D2.VibeYourMaid.Plugin
 
               //VRショートカット
               ShortCutVR(vrShortCutController);
-
             }
 
             //一人称視点処理
@@ -2736,16 +2726,11 @@ namespace CM3D2.VibeYourMaid.Plugin
             }
 
             //おさわり処理 (ウィンドウ上にある場合は処理しない)
-            if (cfgw.osawariEnabled && !onWindow) osawariHand();
+            if (cfgw.osawariEnabled && !onWindow) osawari.osawariHand();
 
-          } else {
-            //メイドがいなくても処理する
-            if (Input.anyKey) {
-              //VRショートカット
-              ShortCutVR(vrShortCutController);
-            }
           }
-          //メイン処理終了---
+          //メイン処理終了 ----------------------------
+
 
           //子宮脱按钮 #109
           if (manualTriggeredUterusDatsu)
@@ -2767,10 +2752,10 @@ namespace CM3D2.VibeYourMaid.Plugin
           //子宮脱按钮用 #109
 
 
+
           #if EmpiresLife
           //エンパイアズライフ開始
           if (vSceneLevel == 3 && Input.GetKeyDown(cfgw.keyPluginToggleV11)) {
-
             //背景が存在するかどうかチェック
             UnityEngine.Object @object = GameMain.Instance.BgMgr.CreateAssetBundle("Shitsumu_ChairRot");
             if (@object == null) {
@@ -2779,25 +2764,20 @@ namespace CM3D2.VibeYourMaid.Plugin
                 @object = Resources.Load("BG/2_0/Shitsumu_ChairRot");
               }
             }
-
             if (@object != null) {
               if (lifeStart == 0) {
                 if (!bVR) Camera.main.fieldOfView = 50.0f;
                 gameObject_ui.SetActive(false);
                 flagN = GameMain.Instance.CharacterMgr.status.GetFlag("時間帯") == 3;
-
                 ElStart();
-
                 if (!flagN) StartCoroutine("ElChange", 0);
                 if (flagN) StartCoroutine("ElChange", 1);
               } else {
                 gameObject_ui.SetActive(true);
                 ElEnd();
-
               }
             }
           }
-
           //エンパイアズライフモードの処理
           if (vSceneLevel == 3) StartCoroutine("EmpiresLife");
           #endif
@@ -2816,21 +2796,26 @@ namespace CM3D2.VibeYourMaid.Plugin
         //フレーム終了時の処理------------------------
         void LateUpdate() {
 
+          //フェード中は処理をすべてスキップ
+          if (GameMain.Instance.MainCamera.GetFadeState() == CameraMain.FadeState.Out) return;
+
           //VR移動
-          ShortCutVRMove(vrShortCutController);
+          if (cfgw.vrShortCut) ShortCutVRMove(vrShortCutController);
 
-          //処理フレーム分割数 2～4
-          int mc = Math.Min(4, maidCount+1);
+          if (tgID != -1) { //&& SceneLevelEnable は常にtrueなので不要
 
-          if (tgID != -1 && SceneLevelEnable) {
+            //処理フレーム分割数 2～4
+            int mc = Math.Min(4, maidCount+1);
 
             int shapeTgNum1 = 0;
 
-            foreach (int maidID in vmId) {
+            int vmLength = vmId.Count();
+            for (int i=0; i<vmLength; i++) {
+              int maidID = vmId[i];
 
               Maid maid = stockMaids[maidID].mem;
               MaidState mState = maidsState[maidID];
-
+              
               //口元の変更処理
               MouthChange(maid, mState);
 
@@ -2883,7 +2868,6 @@ namespace CM3D2.VibeYourMaid.Plugin
             shapeTgNum2++; //毎フレーム1人ずらす
             if (shapeTgNum2 >= mc) shapeTgNum2 = 0;
 
-
             //メインメイドが変わったときの処理
             if (tgID != tgIDBack) {
               if (man.Visible && cfgw.autoMoveEnabled) {
@@ -2896,7 +2880,154 @@ namespace CM3D2.VibeYourMaid.Plugin
               ChangeSE(tgID, true);
             }
           }
+
           if (tgID != tgIDBack) tgIDBack = tgID;
+
+        }
+        //--------------------------------------------
+
+
+
+
+
+        //--------------------------------------------
+        //GUI表示処理---------------------------------
+        Rect node;
+        Rect node2;
+        Rect node3;
+        Rect node4;
+        //Rect node4a;
+        Rect node5;
+
+        GUIStyle gsWin;
+        GUIStyle gsLabel;
+        GUIStyle gsLabelY;
+        GUIStyle gsLabel2;
+        GUIStyle gsLabel2Y;
+        GUIStyle gsLabel3;
+        GUIStyle gsLabelR;
+        GUIStyle gsLabelErr;
+        GUIStyle gsButton;
+        GUIStyle gsButtonY;
+        GUIStyle gsButton2;
+        GUIStyle gsToggle;
+        Texture2D guiBgTexture; //背景色
+        Texture2D guiLineTexture;
+
+        private void initGUIStyle()
+        {
+          gsWin = getGUIStyle("box", 12, TextAnchor.UpperLeft);
+
+          gsLabel = getGUIStyle("label", 12, TextAnchor.MiddleLeft);
+          gsLabelY = getGUIStyle("label", 12, TextAnchor.MiddleLeft);
+          gsLabelY.normal = new GUIStyleState();
+          gsLabelY.normal.textColor = Color.yellow;
+          gsLabel2 = getGUIStyle("label", 12, TextAnchor.MiddleCenter);
+          gsLabel2Y = getGUIStyle("label", 12, TextAnchor.MiddleCenter);
+          gsLabel2Y.normal = new GUIStyleState();
+          gsLabel2Y.normal.textColor = Color.yellow;
+          gsLabel3 = getGUIStyle("label", 12, TextAnchor.MiddleLeft);
+          gsLabel3.fontStyle  = FontStyle.Bold;
+          gsLabelR = getGUIStyle("label", 12, TextAnchor.MiddleRight);
+          gsLabelErr = getGUIStyle("label", 12, TextAnchor.UpperLeft);
+          gsLabelErr.normal = new GUIStyleState();
+          gsLabelErr.normal.textColor = Color.red;
+
+          gsButton = getGUIStyle("button", 12, TextAnchor.MiddleCenter);
+          gsButtonY = getGUIStyle("button", 12, TextAnchor.MiddleCenter);
+          gsButtonY.normal.textColor = Color.yellow;
+          gsButtonY.hover.textColor = Color.yellow;
+          gsButton2 = getGUIStyle("button", 10, TextAnchor.MiddleCenter);
+
+          gsToggle = getGUIStyle("toggle", 12, TextAnchor.MiddleLeft);
+
+          //背景色設定
+          gsWin.onHover.background = guiBgTexture;
+          gsWin.hover.background = guiBgTexture;
+          gsWin.onFocused.background = guiBgTexture;
+          gsWin.focused.background = guiBgTexture;
+          gsWin.onHover.textColor = Color.white;
+          gsWin.hover.textColor = Color.white;
+          gsWin.onFocused.textColor = Color.white;
+          gsWin.focused.textColor = Color.white;
+        }
+        private GUIStyle getGUIStyle(string type, int fontSize, TextAnchor alignment)
+        {
+          GUIStyle gs = new GUIStyle(type);
+          gs.fontSize = fontSize;
+          gs.alignment = alignment;
+          return gs;
+        }
+
+
+        void OnGUI() {
+          if (!cfgw.bPluginEnabledV || cfgw.mainGuiFlag == 0) return;
+          //フェード中も非表示
+          if (GameMain.Instance.MainCamera.IsFadeProc()) return;
+          //メイドがいなかったら非表示
+          if (tgID == -1) return;
+
+              if (SceneLevelEnable){
+
+                if (vSceneLevel == 15 && WaitTime < 120 ){
+
+                  WaitTime += timerRate;
+
+                } else {
+
+                  node = GUI.Window(324101, node, WindowCallback, "リモコンスイッチ  Ver"+PluginVersionLabel, gsWin);
+
+                  if (cfgw.mainGuiFlag == 1){
+                    node.height = 220;
+
+                  if (cfgw.configGuiFlag) {
+                    string configTitle;
+                    switch (ConfigFlag) {
+                      case 3: configTitle = "オリジナルボイス設定"; break;
+                      case 4: configTitle = "ランダムモーション設定"; break;
+                      case 5: configTitle = "髪型・服装の登録"; break;
+                      case 6: configTitle = "モーションアジャスト設定"; break;
+                      case 8: configTitle = "エロステータス"; break;
+                      case 9: configTitle = "乳首設定の登録"; break;
+                      default: configTitle = "VibeYourMaid 設定画面"; break;
+                    }
+                    node3 = GUI.Window(324103, node3, WindowCallback3, configTitle, gsWin);
+                  }
+
+                  if (cfgw.unzipGuiFlag) {
+                    node4 = GUI.Window(324104, node4, WindowCallback4, "ムラムラしたのでメイドさんを押し倒す", gsWin);
+
+                    /*調整中
+                    if (maidsState[tgID].senyouTokusyuMotion.Count > 0) {
+                      node4a = new Rect( node4.x - 220 , node4.y , 220 , 220 );
+                      node4a = GUI.Window(3241042, node4a, WindowCallback4a, "特殊モーション", gsWin);
+                    }*/
+
+                  }
+
+                  } else if (cfgw.mainGuiFlag == 2) {
+                    node.height = 20;
+                  }
+                }
+              }
+
+            if (cfgw.mainGuiFlag == 1) { //リモコン展開時のみ
+            #if EmpiresLife
+            if (tgID != -1 || (lifeStart > 0 && !elFade)) {
+            #else
+            if (tgID != -1) {
+            #endif
+              if (cfgw.subGuiFlag == 2) {
+                node2 = GUI.Window(324102, node2, WindowCallback2b, "メイド呼び出し", gsWin);
+              } else {
+                node2 = GUI.Window(324102, node2, WindowCallback2a, "サブキャラ操作", gsWin);
+              }
+            }
+
+            #if EmpiresLife
+              if (lifeStart > 0 && !elFade) node5 = GUI.Window(324105, node5, WindowCallback5, "エンパイアズライフ", gsWin);
+            #endif
+            }
 
         }
         //--------------------------------------------
@@ -2953,6 +3084,9 @@ namespace CM3D2.VibeYourMaid.Plugin
           public MuneOffset muneOffsetR = new MuneOffset();
           public MuneParam muneParam;
 
+          //胸のコライダーUpdate処理用 前腕やポール等との衝突判定用
+          public MuneColliderInfo muneColliderInfo = null;
+
           public int vStateMajor = 10;        //強弱によるステート
           public int vStateMajorOld = 10;     //強弱によるステート（前回値）
           public int vLevel = 0;                //バイブ状態
@@ -2993,6 +3127,7 @@ namespace CM3D2.VibeYourMaid.Plugin
           public string kissVoiceSetName = "";
           public List<string[]> kissVoiceSet = null;
           public float vsTime = 0f;
+          public float vsKissTime = 0f;
           public int vsFlag = 0;
           public string playedVoiceName = ""; //再生されたボイス
           //public float vsInterval = 10f;
@@ -3094,18 +3229,18 @@ namespace CM3D2.VibeYourMaid.Plugin
 
           //痙攣関係
           public bool gakupikuResetFlag= false;
-          public float gakupikuTime = 0;                          //痙攣時間判定
-          public bool gakupikuFlag = true;                        //痙攣動作フラグ
+          public float gakupikuTime = 0;            //痙攣時間判定
+          public bool gakupikuFlag = true;          //痙攣動作フラグ
           public bool gakupikuOn = false;
           public float gakupikuValue = 0f;
 
           //ちんぽ操作関連
-          public float chinpoValue1 = 0f;              //　ちんぽ勃起値
-          public float soriValue1 = 0f;                //　ちんぽ反り値
+          public float chinpoValue1 = 0f;           //　ちんぽ勃起値
+          public float soriValue1 = 0f;             //　ちんぽ反り値
 
           //汗関連
-          public bool aseResetFlag = false;
-          public float aseTime = 0f; //汗変更タイミング調整に利用
+          public bool aseResetFlag = true;  //無効時もdryを1にする
+          public float aseTime = 0f;        //汗変更タイミング調整に利用
 
           //カメラが顔に近づいているかどうか
           public float cameraCheckTime = 0f;
@@ -3232,18 +3367,21 @@ namespace CM3D2.VibeYourMaid.Plugin
         void GetStockMaids() {
           stockMaids.Clear();
           for (int i = 0; i < GameMain.Instance.CharacterMgr.GetStockMaidCount(); i++) {
-            Maid sm = GameMain.Instance.CharacterMgr.GetStockMaid(i);
-            string fn = sm.status.firstName;
-            string ln = sm.status.lastName;
-            string ps = sm.status.personal.uniqueName;
-            string con = sm.status.contract.ToString();
+            Maid maid = GameMain.Instance.CharacterMgr.GetStockMaid(i);
+            string fn = maid.status.firstName;
+            string ln = maid.status.lastName;
+            string ps = maid.status.personal.uniqueName;
+            string con = maid.status.contract.ToString();
 
-            stockMaids.Add(new MaidInfo(sm, i, fn, ln, ps, con));
+            MaidInfo maidInfo = new MaidInfo(maid, i, fn, ln, ps, con);
+            stockMaids.Add(maidInfo);
 
             //State枠がまだ作られていないメイドの場合は追加
             if (maidsState.Count <= i) maidsState.Add(new MaidState());
             //初期化
-            maidsState[i].vsTime = UnityEngine.Random.Range(cfgw.voiceSetInterval-cfgw.voiceSetIntervalRange*0.5f, cfgw.voiceSetInterval+cfgw.voiceSetIntervalRange*0.5f);
+            float vsTime = UnityEngine.Random.Range(cfgw.voiceSetInterval-cfgw.voiceSetIntervalRange*0.5f, cfgw.voiceSetInterval+cfgw.voiceSetIntervalRange*0.5f);
+            maidsState[i].vsTime = vsTime;
+            maidsState[i].vsKissTime = vsTime * 0.5f; //キスは半分にする
           }
 
           //おさわり機能のキャッシュ配列が足りなくならないように拡張
@@ -3254,19 +3392,28 @@ namespace CM3D2.VibeYourMaid.Plugin
         void VisibleMaidCheck(bool checkActibvte)
         {
           vmId.Clear();
-          foreach (var sm in stockMaids) {
+          foreach (MaidInfo sm in stockMaids) {
             MaidState maidState = maidsState[sm.id];
             if (sm.mem.Visible) {
               vmId.Add(sm.id); //メイドIDをリストに追加
 
-              //if (forceCheck || !maidState.visibleBack) { //新たにメイドが表示されていた場合の処理
+              //if (!maidState.visibleBack) { //新たにメイドが表示されていた場合の処理
+              // →  プライベートモードはVisibleのままbody0が入れ替わるのでフェード終了で常に再取得
               if (checkActibvte) { //シーンロード時以外は再取得
                 VisibleMaidCheckActivate(sm.id, sm.mem, maidState);
+
+                //汗が表示されないようにする
+                try { VertexMorph_FromProcItem(sm.mem.body0, "dry", 1f); } catch { /*LogError(ex);*/ }
               }
 
             } else {
               if (maidState.visibleBack) { //表示されていたメイドが消えた場合の処理
                 targetDestroy(sm.id, maidState); //おさわり用ターゲット消去
+                //胸コライダーを破棄
+                if (maidState.muneColliderInfo != null) {
+                  maidState.muneColliderInfo.destroyMuneCollider();
+                  maidState.muneColliderInfo = null;
+                }
                 maidsState[sm.id] = new MaidState();
                 maidsState[sm.id].visibleBack = false;
               }
@@ -3278,11 +3425,9 @@ namespace CM3D2.VibeYourMaid.Plugin
             if (vmId.IndexOf(tgID) == -1) tgID = vmId[0];
           } else {
             tgID = -1;
+            GameMain.Instance.SoundMgr.StopSe();
           }
           
-          //自由移動制限対象を変更
-          moveLimitTgID = tgID;
-
           maidCount = vmId.Count;
         }
 
@@ -3292,54 +3437,16 @@ namespace CM3D2.VibeYourMaid.Plugin
           //読み込み済みフラグは先にON
           maidState.visibleBack = true;
 
-          //メイドさんの顔と胸を取得する
-          Transform[] objList = maid.transform.GetComponentsInChildren<Transform>();
-          if (objList.Count() != 0) {
-            maidState.maidHead = null;
-            maidState.maidMune = null;
-            maidState.maidHara = null;
-            maidState.maidXxx = null;
-            maidState.maidMuneA = null; //胸衝突判定用 無効にしたいときはnullにする
-            maidState.maidArmL = null;  //胸衝突判定用 "Bip01 L UpperArm"は取得できないので"_IK_UpperArmL"
-            maidState.maidArmR = null;  //胸衝突判定用
-            foreach (var gameobject in objList) {
-              if (maidState.maidHead == null && gameobject.name == "Bone_Face") maidState.maidHead = gameobject;
-              else if (maidState.maidMune == null && gameobject.name == "Bip01 Spine1") maidState.maidMune = gameobject;
-              else if (maidState.maidHara == null && gameobject.name == "Bip01 Spine") maidState.maidHara = gameobject;
-              else if (maidState.maidXxx == null && gameobject.name == "Bip01 Pelvis") maidState.maidXxx = gameobject;
-              else if (maidState.maidMuneA == null && gameobject.name == "Bip01 Spine1a") maidState.maidMuneA = gameobject;
-              else if (maidState.maidArmL == null && gameobject.name == "_IK_UpperArmL") maidState.maidArmL = gameobject;
-              else if (maidState.maidArmR == null && gameobject.name == "_IK_UpperArmR") maidState.maidArmR = gameobject;
-            }
-          }
+          maidState.maidHead = maid.body0.trsHead;
+          maidState.maidMune = CMT.SearchObjName(maid.body0.m_trBones, "Bip01 Spine1", true);
+          maidState.maidHara = maid.body0.Spine;
+          maidState.maidXxx = maid.body0.Pelvis;
+          maidState.maidMuneA = maid.body0.Spine1a; //胸衝突判定用
+          maidState.maidArmL = maid.body0.UpperArmL;  //胸衝突判定用
+          maidState.maidArmR = maid.body0.UpperArmR;  //胸衝突判定用
 
-          //胸衝突判定関連
-          //メイド個別の有効設定
-          bool muneYoriEnabled = ExSaveData.GetBool(maid, "CM3D2.VibeYourMaid.Plugin", "muneYoriEnabled", true);
-          //無効設定 または エディット画面なら無効
-          if (muneYoriEnabled && !isEditScene) {
-            //胸の初期状態設定
-            if (maidState.muneValue == null) maidState.muneValue = new MuneValue(maid);
-            //胸衝突判定用のパラメータを作成
-            maidState.muneParam = new MuneParam(cfgw, maid);
-          } else {
-            //nullにして処理させない
-            maidState.maidMuneA = null;
-          }
-          //胸衝突範囲ギズモ設定
-          if (maidState.maidMuneA != null && cfgw.muneDrawGizmo) {
-            MuneYoriRenderer muneYoriRenderer = maid.transform.gameObject.GetComponent<MuneYoriRenderer>();
-            if (!muneYoriRenderer) {
-              //ギズモ追加
-              muneYoriRenderer = maid.transform.gameObject.AddComponent<MuneYoriRenderer>();
-            }
-            //有効なら毎回初期化
-            muneYoriRenderer.init(maid, maidState);
-          } else {
-            //無効ならギズモ破棄
-            MuneYoriRenderer muneYoriRenderer = maid.transform.gameObject.GetComponent<MuneYoriRenderer>();
-            if (muneYoriRenderer) GameObject.Destroy(muneYoriRenderer);
-          }
+          //胸コライダーと上腕衝突範囲初期化
+          initVisibleMaidMune(maidID, maid, maidState);
 
           //おさわり用ターゲットセット
           if (cfgw.osawariEnabled) {
@@ -3381,6 +3488,77 @@ namespace CM3D2.VibeYourMaid.Plugin
             }
           }
         }
+
+        //遅延初期化用コルーチン
+        /*private IEnumerator initVisibleMaidMuneCoroutine(int maidID, Maid maid, MaidState maidState, float wait)
+        {
+          //ボディロード後にwaitの秒数待機
+          if (wait > 0) yield return new WaitForSeconds(wait);
+          //待機中にボディが破棄されていたら終了
+          if (!maid.body0.m_trBones) yield break;
+
+          initVisibleMaidMune(maidID, maid, maidState);
+        }*/
+        //胸衝突回りの初期化処理
+        private void initVisibleMaidMune(int maidID, Maid maid, MaidState maidState)
+        {
+          //胸コライダーを初期化 VRは既存を破棄してから追加
+          if (cfgw.muneColliderEnabled) {
+            //初期化されていないか胸が消えていたら初期化実行
+            if (maidState.muneColliderInfo == null || !maidState.muneColliderInfo.m_trsMuneL) {
+              maidState.muneColliderInfo = this.muneCollider.initMuneCollider(maid, maidState);
+              this.muneCollider.updateTouchCollider(osawari.getTouchCollider());
+            }
+            //竿のチェックタイマーを有効化
+            if (cfgw.muneHitChinkoEnabled) chinkoCheckTime = 0;
+          } else {
+            //胸と前腕のコライダーを破棄
+            if (maidState.muneColliderInfo != null) maidState.muneColliderInfo.destroyMuneCollider();
+            maidState.muneColliderInfo = null;
+            //竿コライダーを破棄してチェックタイマーを無効化
+            muneCollider.destroyChinkoColliderAll();
+            chinkoCheckTime = float.PositiveInfinity;
+          }
+
+          //胸と上腕の衝突判定 初期化
+          //メイド個別の無効設定を優先
+          bool muneYoriEnabled = ExSaveData.GetBool(maid, "CM3D2.VibeYourMaid.Plugin", "muneYoriEnabled", true);
+          if (isEditScene) muneYoriEnabled = false; //エディット画面では無効  胸のパラメータ変更のチェックする余計な処理を組み込いたくないため非対応
+          if (!cfgw.muneYoriEnabled) muneYoriEnabled = false;
+          if (muneYoriEnabled) {
+            //胸の初期状態取得
+            maidState.muneValue = new MuneValue(maid);
+            //胸衝突判定用のパラメータを作成
+            maidState.muneParam = new MuneParam(cfgw, maid);
+            //胸は回転していない状態に戻す speedが残っていると胸が暴れるので注意
+            resetMuneYoriL(maid, maidState);
+            resetMuneYoriR(maid, maidState);
+          } else {
+            if (maidState.muneParam != null) { 
+              //先に位置をリセット
+              resetMuneYoriL(maid, maidState);
+              resetMuneYoriR(maid, maidState);
+            }
+            //nullにして処理させない
+            maidState.muneParam = null;
+          }
+
+          //胸衝突範囲ギズモ設定
+          if (cfgw.muneDrawGizmo && (cfgw.muneColliderEnabled || muneYoriEnabled)) {
+            MuneColliderRenderer muneColliderRenderer = maid.transform.gameObject.GetComponent<MuneColliderRenderer>();
+            if (!muneColliderRenderer) {
+              //ギズモ追加
+              muneColliderRenderer = maid.transform.gameObject.AddComponent<MuneColliderRenderer>();
+            }
+            //有効なら毎回初期化
+            muneColliderRenderer.init(maid, maidState, muneCollider.chinkoCollider, osawari.getTouchCollider());
+          } else {
+            //無効ならギズモ破棄
+            MuneColliderRenderer muneColliderRenderer = maid.transform.gameObject.GetComponent<MuneColliderRenderer>();
+            if (muneColliderRenderer) GameObject.Destroy(muneColliderRenderer);
+          }
+        }
+
 
         //エロステータスLOAD
         private void LoadEroState(int maidID) {
@@ -3460,7 +3638,7 @@ namespace CM3D2.VibeYourMaid.Plugin
             }
             if (k > 20) //アクティブメイドの最大数は21
             {
-                Console.WriteLine("アクティブメイド登録 インデックスエラー: " + k);
+                Console.WriteLine("[VibeYourMaid] アクティブメイド登録 インデックスエラー: " + k);
                 return;
             }
 
@@ -3549,7 +3727,9 @@ namespace CM3D2.VibeYourMaid.Plugin
           }
 
           maid.AllProcPropSeqStart();
+          #if EmpiresLife
           dCheck = true;
+          #endif
 	      }
 
         private bool isPorori(int maidID, string name)
@@ -3587,24 +3767,32 @@ namespace CM3D2.VibeYourMaid.Plugin
             if (autoMode) {
               maid.SetProp(mpn, maid.GetProp(mpn).strFileName.Replace("_porori", ""), 0, true, false);
               maid.AllProcPropSeqStart();
+              #if EmpiresLife
               dCheck = true;
+              #endif
             }
           } else if (state == "仮：ぽろり") { //仮衣装のぽろり状態だった場合
             if (autoMode) {
               maid.SetProp(mpn, maid.GetProp(mpn).strTempFileName.Replace("_porori", ""), 0, true, false);
               maid.AllProcPropSeqStart();
+              #if EmpiresLife
               dCheck = true;
+              #endif
             }
           } else if (state == "仮：通常") { //仮衣装の通常状態だった場合
             if (ItemChangeTempSuffix(maid, name, "_porori", true)) {
               maid.AllProcPropSeqStart();
+              #if EmpiresLife
               dCheck = true;
+              #endif
               return true;
             }
           } else if (state != "無し") { //本衣装の通常状態だった場合
             if (ItemChangeTempSuffix(maid, name, "_porori", false)) {
               maid.AllProcPropSeqStart();
+              #if EmpiresLife
               dCheck = true;
+              #endif
               return true;
             }
           }
@@ -3630,7 +3818,9 @@ namespace CM3D2.VibeYourMaid.Plugin
           }
           if (changed) {
             maid.AllProcPropSeqStart();
+            #if EmpiresLife
             dCheck = true;
+            #endif
           }
           return changed;
         }
@@ -3713,7 +3903,7 @@ namespace CM3D2.VibeYourMaid.Plugin
 
         //めくれ、ずらし処理
         public void ItemChangeTemp(int maidID, string mpn, string name, bool temp) {
-                Maid maid = stockMaids[maidID].mem;
+          Maid maid = stockMaids[maidID].mem;
           MaidProp prop = maid.GetProp(mpn);
           SortedDictionary<string, string> sortedDictionary;
           string filename;
@@ -3893,7 +4083,6 @@ namespace CM3D2.VibeYourMaid.Plugin
           if (!mainCamera) return;
 
           bool bInRange = DistanceToMaid(maid, maidState, cfgw.camCheckRange);
-          //Console.WriteLine("CameraPosCheck bInRange="+bInRange);
           //ボイスセット連動
           maidState.cameraCheckVoice = bInRange && cfgw.camCheckVoiceEnabled;
 
@@ -4212,7 +4401,7 @@ namespace CM3D2.VibeYourMaid.Plugin
           //興奮値を設定し、夜伽ならスライダーを変更
           if (maidState.orgasmLevel != oLevel) { //レベルが変わったときのみ
             #if DEBUG
-            Console.WriteLine("orgasmValue="+maidState.orgasmValue+" kaikanLevel="+maidState.kaikanLevel+" oLevel="+oLevel+" currentExcite="+cfgw.yotogiExciteLinkValue[oLevel]);
+            Debug.Log("orgasmValue="+maidState.orgasmValue+" kaikanLevel="+maidState.kaikanLevel+" oLevel="+oLevel+" currentExcite="+cfgw.yotogiExciteLinkValue[oLevel]);
             #endif
             setExcite(maidID, maid, cfgw.yotogiExciteLinkValue[oLevel]);
           }
@@ -4279,7 +4468,7 @@ namespace CM3D2.VibeYourMaid.Plugin
             }
           }*/
 
-          //Console.WriteLine("OrgasmProcess maidID="+maidID+" giveSexual[0]="+maidState.giveSexual[0]+" sioVolume="+maidState.sioVolume+" nyoVolume="+maidState.nyoVolume);
+          //Debug.Log("OrgasmProcess maidID="+maidID+" giveSexual[0]="+maidState.giveSexual[0]+" sioVolume="+maidState.sioVolume+" nyoVolume="+maidState.nyoVolume);
 
 
           //絶頂時の音声処理
@@ -4669,7 +4858,7 @@ namespace CM3D2.VibeYourMaid.Plugin
 
                 } else {  //絶頂時音声
                     #if DEBUG
-                    Console.WriteLine("exciteLevel="+maidState.exciteLevel+" kaikanLevel="+maidState.kaikanLevel+" orgasmCmb="+maidState.orgasmCmb+" orgasmCount="+maidState.orgasmCount);
+                    Debug.Log("exciteLevel="+maidState.exciteLevel+" kaikanLevel="+maidState.kaikanLevel+" orgasmCmb="+maidState.orgasmCmb+" orgasmCount="+maidState.orgasmCount);
                     #endif
 
                     if (maidState.stunFlag) {
@@ -4723,9 +4912,8 @@ namespace CM3D2.VibeYourMaid.Plugin
               maid.AudioMan.LoadPlay(VoiceList[iRandomVoice], 0f, false, false);
               maidState.orgasmVoice = 2;   //絶頂音声再生中のフラグ
             }
-            //#if DEBUG
+
             Console.WriteLine(stockMaids[maidID].personal +" ["+(maidState.orgasmVoice == 0?"L":"O")+maidState.vStateMajor+":"+vi+":"+iRandomVoice+"] "+VoiceList[iRandomVoice]);
-            //#endif
           }
 
 
@@ -4752,7 +4940,7 @@ namespace CM3D2.VibeYourMaid.Plugin
                     }
                     VoiceValue = Math.Min(4, Math.Max(maidState.exciteLevel, kaikan-1) - 1 + vi);
                     #if DEBUG
-                    Console.WriteLine("exciteLevel="+maidState.exciteLevel+" kaikanLevel="+maidState.kaikanLevel+" motionHoldTime="+maidState.motionHoldTime);
+                    Debug.Log("exciteLevel="+maidState.exciteLevel+" kaikanLevel="+maidState.kaikanLevel+" motionHoldTime="+maidState.motionHoldTime);
                     #endif
                 }
 
@@ -4770,9 +4958,8 @@ namespace CM3D2.VibeYourMaid.Plugin
                 VoiceList = bvs[iPersonal].sLoopVoice40Vibe;
                 maid.AudioMan.audiosource.time = 0;
                 maid.AudioMan.LoadPlay(VoiceList[VoiceValue], 0f, false, true);
-                //#if DEBUG
+
                 Console.WriteLine(stockMaids[maidID].personal +" ["+maidState.vStateMajor+":"+VoiceValue+"] "+VoiceList[VoiceValue]);
-                //#endif
           }
 
 
@@ -4954,6 +5141,7 @@ namespace CM3D2.VibeYourMaid.Plugin
 
           //モーションファイル一覧を出力したいとき
           if (cfgw.outputMotionList) {
+            Debug.Log("[VibeYourMaid] モーション一覧出力 : "+@"Sybaris\UnityInjector\Config\VibeYourMaid\モーションリスト.csv , モーションリストOLD.csv");
             foreach (string file in allFiles) {
               File.AppendAllText(@"Sybaris\UnityInjector\Config\VibeYourMaid\モーションリスト.csv", file + Environment.NewLine);
             }
@@ -4963,11 +5151,11 @@ namespace CM3D2.VibeYourMaid.Plugin
           }
 
           sw.Stop();
-          Console.WriteLine("モーションファイル読み込み終了 : "+(sw.ElapsedMilliseconds)+"ms");
+          Console.WriteLine("[VibeYourMaid] モーションファイル読み込み終了 : "+(sw.ElapsedMilliseconds)+"ms");
 
 
           //読み込んだモーションファイルの中からモーション変更可能なものを抽出
-            Console.WriteLine("夜伽リスト抽出開始");
+            Console.WriteLine("[VibeYourMaid] 夜伽リスト抽出開始");
             sw.Reset();
             sw.Start();
             string m2 = "";
@@ -5285,7 +5473,7 @@ namespace CM3D2.VibeYourMaid.Plugin
         //イタズラ用モーションリストの読み込み
         void ItazuraMotionLoad()
         {
-          Console.WriteLine("イタズラモーションリスト結合開始");
+          Console.WriteLine("[VibeYourMaid] イタズラモーションリスト結合開始");
 
           List<string>[] motionList = ReadListFile(@"Sybaris\UnityInjector\Config\VibeYourMaid\MList.txt",
             new string[]{"tati_list", "suwari_list", "zoukin_list", "kyuuzi_list", "fukisouji_list", "mop_list"});
@@ -5320,7 +5508,7 @@ namespace CM3D2.VibeYourMaid.Plugin
               MotionList_vibe.Add(xx);
             }
           }
-          Console.WriteLine("イタズラモーションリスト結合終了");
+          Console.WriteLine("[VibeYourMaid] イタズラモーションリスト結合終了");
         }
 
         //MList.txtから口モードの例外設定を読み込む
@@ -5428,13 +5616,13 @@ namespace CM3D2.VibeYourMaid.Plugin
           new string[] {
             "無し", "スケベ椅子", "拘束騎乗位椅子", "椅子拘束台", "ラブソファ",
             "マット", "ギロチン台01", "ギロチン台02", "ディルド＆台", "拘束台",
-            "拘束台座H型", "三角木馬", "座位椅子", "足コキ台" },
+            "拘束台座H型", "三角木馬", "座位椅子", "足コキ台", "シンプルテーブル", "教室机" },
           new string[] {
             "", "Odogu_Sukebeisu", "Odogu_KousokuKijyouiChair", "Odogu_KousokuKijyouiChair", "Odogu_LoveSofa",
             "Odogu_Mat", "Odogu_Girochin_A", "Odogu_Girochin_B", "Odogu_DildoBox", "Odogu_Kousokudai",
-            "Odogu_KousokudaiHgata", "Odogu_Sankakumokuba", "Odogu_Sexisu", "Odogu_ashikokidai" }
+            "Odogu_KousokudaiHgata", "Odogu_Sankakumokuba", "Odogu_Sexisu", "Odogu_ashikokidai", "Odogu_SimpleTable", "Mrc_ClassRoom_desk" }
         };
-        private float[] prefabAdjust = new float[] { 0f, 0f, 0f, 0f, 0.0011f, 0f, 0f, 0f, 0.0008f, 0.00105f, 0.00105f, 0.00185f, 0f, 0f};
+        private float[] prefabAdjust = new float[] { 0f, 0f, 0f, 0f, 0.0011f, 0f, 0f, 0f, 0.0008f, 0.00105f, 0.00105f, 0.00185f, 0f, 0f, 0f, 0f};
 
         public MotionAdjust maj = new MotionAdjust();
         public class MotionAdjust{
@@ -5700,11 +5888,11 @@ namespace CM3D2.VibeYourMaid.Plugin
         }
 
         //メイドを上下と前後にオフセット移動させる メインメイドなら他も追従させる
-        void setBasicMotionPositionOffset(int maidID, float offsetHeight, float offsetForward, float offsetRight, float offsetAngleY)
+        void setBasicMotionPositionOffset(int maidID, Maid maid, float offsetHeight, float offsetForward, float offsetRight, float offsetAngleY)
         {
           int mid = maidsState[maidID].motionID;
           if (mid < 0) return;
-          Maid maid = stockMaids[maidID].mem;
+          //Maid maid = stockMaids[maidID].mem;
           float majHeight = offsetHeight * maid.status.body.height;
           float majForward = offsetForward * maid.status.body.height;
           float majRight = offsetRight * maid.status.body.height;
@@ -5971,7 +6159,11 @@ namespace CM3D2.VibeYourMaid.Plugin
                 }
                 if (obj) {
                   Vector3 zero = maid.transform.position;
-                  zero.y = zero.y - (prefabAdjust[si] * (50 - maid.GetProp(MPN.sintyou).value));
+                  float zeroOffsetY = 0;
+                  if (cfgw.majPrefabOffset.Length > si) zeroOffsetY = cfgw.majPrefabOffset[si];
+                  float adjust = 0;
+                  if (prefabAdjust.Length > si) adjust = prefabAdjust[si];
+                  zero.y = zero.y - (adjust * (50 - maid.GetProp(MPN.sintyou).value)) + zeroOffsetY;
                   Vector3 zero2 = maid.transform.eulerAngles;
                   zero2.x = -90f;
                   //オフセット+メイド回転 回転の影響でYとZは逆
@@ -6940,7 +7132,7 @@ namespace CM3D2.VibeYourMaid.Plugin
 
             //ファイルを閉じる
             sr.Close();
-            Console.WriteLine("読み込み完了");
+            //Console.WriteLine("読み込み完了");
           }
         }
 
@@ -7291,8 +7483,8 @@ namespace CM3D2.VibeYourMaid.Plugin
           //float hValue = Math.Max(maidState.hibuValue, maidState.hibuTempValue)*0.01f;
           float hValue = GetBlendValues(maid.body0, "body", "kupa");
           //尿道が下にある場合の追加補正
-          Transform tm = CMT.SearchObjName(maid.body0.m_Bones.transform, "Bip01 Pelvis", true);
-          Vector3 vec = tm.rotation * Vector3.up; //仰向 vec.y=1 俯せ vec.y=-1
+          //Transform tm = CMT.SearchObjName(maid.body0.m_Bones.transform, "Bip01 Pelvis", true);
+          Vector3 vec = maid.body0.Pelvis.rotation * Vector3.up; //仰向 vec.y=1 俯せ vec.y=-1
           //Console.WriteLine("Forward x="+vec.x+" y="+vec.y+" z="+vec.z);
           float yOffset = Math.Max(0, - vec.y * cfgw.NyoInvertOffsetY);
 
@@ -7355,9 +7547,7 @@ namespace CM3D2.VibeYourMaid.Plugin
               float xyScale = UnityEngine.Random.Range(0.9f, 1.1f);
               prefab.transform.localScale = new Vector3(cfgw.SioScale[0]*xyScale, cfgw.SioScale[1]*xyScale, cfgw.SioScale[2]*UnityEngine.Random.Range(0.9f, 1.1f)); //スケール変更
               float floor = maid.body0.BoneHitHeightY;
-              /*Transform footTm = CMT.SearchObjName(maid.body0.m_Bones.transform, "Bip01 L Foot", true); //左足
-              if (footTm) floor = Math.Min(floor, footTm.position.y-0.05f);
-              footTm = CMT.SearchObjName(maid.body0.m_Bones.transform, "Bip01 R Foot", true); //右足
+              /*Transform footTm = maid.body0.FootStep; //CMT.SearchObjName(maid.body0.m_Bones.transform, "Bip01 L Foot", true); //足
               if (footTm) floor = Math.Min(floor, footTm.position.y-0.05f);*/
               foreach (ParticleSystem particle in prefab.GetComponentsInChildren<ParticleSystem>()) {
                 var main = particle.main;
@@ -8748,7 +8938,8 @@ namespace CM3D2.VibeYourMaid.Plugin
         //戻り値はsTagの存在有無にしているので必要に応じて変更してください
         static public void VertexMorph_FromProcItem(TBody body, string sTag, float f)
         {
-          if (!body || sTag == null || sTag == "") return;
+          //if (!body || sTag == null || sTag == "") return;
+          if (!body) return;
 
           //bool result = false;
           for (int i = 0, cnt = body.goSlot.Count; i < cnt; i++) {
@@ -9289,7 +9480,7 @@ namespace CM3D2.VibeYourMaid.Plugin
             bvs[i].sLoopVoice40Vibe = _vf.ToArray();
 
             if (buf.Length > 0) {
-              Console.WriteLine("音声ファイルが存在しないため除外 :"+buf);
+              Console.WriteLine("[VibeYourMaid] 音声ファイルが存在しないため除外 :"+buf);
 
             }
           }
@@ -9476,7 +9667,7 @@ namespace CM3D2.VibeYourMaid.Plugin
 
             serializer.Serialize(sw, cds);  //シリアル化し、XMLファイルに保存する
 
-            Console.WriteLine("共通衣装セット保存完了：" + name);
+            Console.WriteLine("[VibeYourMaid] 共通衣装セット保存完了：" + name);
             dsErrer = 0;
         }
         private void CdsFileLoad(string xml) {
@@ -9522,7 +9713,7 @@ namespace CM3D2.VibeYourMaid.Plugin
 
             AllDressVisible(tgID, true);
             maid.AllProcPropSeqStart();
-            Console.WriteLine("共通衣装 セット完了");
+            Console.WriteLine("[VibeYourMaid] 共通衣装 セット完了");
         }
 
         private void AllDressVisible(int maidID, bool b) {
@@ -9639,7 +9830,7 @@ namespace CM3D2.VibeYourMaid.Plugin
 
             //ファイルを閉じる
             sr.Close();
-            Console.WriteLine("ボイスセット読み込み完了: "+voiceSet.saveVoiceSetName);
+            Console.WriteLine("[VibeYourMaid] ボイスセット読み込み完了: "+voiceSet.saveVoiceSetName);
             return voiceSet;
           }
           return null;
@@ -9689,42 +9880,78 @@ namespace CM3D2.VibeYourMaid.Plugin
         private void VoiceSetPlay(int maidID, Maid maid, MaidState maidState) {
 
           //音声が終わった時の処理 キスのループボイスからの切り替わり漏れがあるので同一音声かもチェック
-          if (maidState.vsFlag == 2 && (!maid.AudioMan.audiosource.isPlaying || maidState.playedVoiceName != maid.AudioMan.FileName)) {
-            maid.AudioMan.audiosource.time = 0; //開始秒は別のボイスに影響するのでリセット
-            maidState.vsFlag = 0;        //再生中フラグOFF
-            if (!maid.AudioMan.audiosource.loop) maidState.voiceHoldTime = 0;  //メイドのループ音声を終了後に再生するため、タイマーリセット
+          if (maidState.vsFlag == 2) {
+            if (!maid.AudioMan) {
+              maidState.vsFlag = 0;
+              return;
+            }
+            if (!maid.AudioMan.audiosource.isPlaying || maidState.playedVoiceName != maid.AudioMan.FileName) {
+              maid.AudioMan.audiosource.time = 0; //開始秒は別のボイスに影響するのでリセット
+              maidState.vsFlag = 0;        //再生中フラグOFF
+              if (!maid.AudioMan.audiosource.loop) maidState.voiceHoldTime = 0;  //メイドのループ音声を終了後に再生するため、タイマーリセット
+            }
           }
 
           //絶頂中は処理しない
           if (maidState.orgasmVoice != 0) return;
-          //ボイスセットが設定されていない
-          if (maidState.editVoiceSetName == "" && maidState.kissVoiceSetName == "") return;
 
-          if (maidState.vsFlag == 0) maidState.vsTime -= Time.deltaTime; //再生していないときだけタイマーを動かす
+          if (maidState.vsFlag == 0) {
+            maidState.vsTime -= Time.deltaTime; //再生していないときだけタイマーを動かす
+            if (maidState.cameraCheckVoice) maidState.vsKissTime -= Time.deltaTime; //顔が近いときだけキス音声開始時間を減らす
+          }
 
           if (maidState.vsTime < 0) {
+            if (!maid.AudioMan) return;
             //ループ音声以外の再生中はスキップ
             if (maid.AudioMan.audiosource.isPlaying && !maid.AudioMan.audiosource.loop) {
               return;
             }
 
-            List<string[]> editVoiceSet = maidState.editVoiceSet;
+            List<string[]> editVoiceSet = null;
 
-            //キスのボイス連動する場合はボイスセットをキスに変更 ロードも行う
+            //キスのボイス連動する場合はボイスセットをキスに変更 ロードも行う  距離判定はCameraPosCheckで行いcameraCheckVoiceにフラグがセットされる
+            //ボイスセットが設定されていない
+            if (maidState.editVoiceSetName != "") {
+              editVoiceSet = maidState.editVoiceSet;
+            }
             if (maidState.cameraCheckVoice && maidState.kissVoiceSetName != "") {
               if (maidState.kissVoiceSet == null) kissVoiceSetLoad("evs_"+maidState.kissVoiceSetName+".xml", maidID);
-              if (maidState.kissVoiceSet != null) editVoiceSet = maidState.kissVoiceSet;
+              if (maidState.kissVoiceSet != null) {
+                //キスボイス再生時間が経過していなかったら次のチェック時間に設定して終了
+                if (maidState.vsKissTime  > 0) {
+                  maidState.vsTime = maidState.vsKissTime;
+                  return;
+                }
+                editVoiceSet = maidState.kissVoiceSet;
+                //リップシンク有効化
+                maid.LipSyncEnabled(true);
+              }
             }
+            //ボイスセットがなければ終了
+            if (editVoiceSet == null) return;
 
             string[][] vsList = VoiceSetCheck(maidID, maid, maidState, editVoiceSet); //該当する音声ファイルをリストアップ
 
             //音声再生
             if (maidState.vsFlag == 1) {
 
-              string[] vs = vsList[UnityEngine.Random.Range(0, vsList.Length)];
-              if (maidState.playedVoiceName == vs[0]) vs = vsList[UnityEngine.Random.Range(0, vsList.Length)]; //同じなら再度乱数取得
-              if (maidState.playedVoiceName == vs[0]) vs = vsList[UnityEngine.Random.Range(0, vsList.Length)]; //同じなら再度乱数取得
-              if (maidState.playedVoiceName == vs[0]) vs = vsList[UnityEngine.Random.Range(0, vsList.Length)]; //同じなら再度乱数取得
+              int idx = UnityEngine.Random.Range(0, vsList.Length);
+              string[] vs = vsList[idx];
+              //音声が同じなら再度乱数取得
+              if (maidState.playedVoiceName == vs[0]) {
+                int exceptIdx = idx; //除外するidx
+                idx = UnityEngine.Random.Range(0, vsList.Length);
+                if (idx == exceptIdx) {
+                  idx = UnityEngine.Random.Range(0, vsList.Length);
+                  if (idx == exceptIdx) {
+                    idx = UnityEngine.Random.Range(0, vsList.Length);
+                    if (idx == exceptIdx) {
+                      idx = UnityEngine.Random.Range(0, vsList.Length);
+                    }
+                  }
+                }
+                vs = vsList[idx];
+              }
               maidState.playedVoiceName = vs[0];
 
               float start = 0;
@@ -9735,7 +9962,7 @@ namespace CM3D2.VibeYourMaid.Plugin
               }
               maid.AudioMan.audiosource.time = start; //※他の音声にも影響するので次の再生前に0に戻す必要がある
               maid.AudioMan.LoadPlay(vs[0], 0f, false, false);
-              Console.WriteLine("ボイスセット再生開始：" + vs[0]);
+              Console.WriteLine("[VibeYourMaid] ボイスセット再生開始("+(idx+1)+"/"+vsList.Length+"): " + vs[0]);
 
               if (maid.AudioMan.FileName == vs[0]) {
                 maidState.vsFlag = 2; //再生中フラグON
@@ -9745,6 +9972,7 @@ namespace CM3D2.VibeYourMaid.Plugin
             }
             //maidState.vsTime = UnityEngine.Random.Range(maidState.vsInterval - 200f, maidState.vsInterval + 200f);
             maidState.vsTime = UnityEngine.Random.Range(cfgw.voiceSetInterval-cfgw.voiceSetIntervalRange*0.5f, cfgw.voiceSetInterval+cfgw.voiceSetIntervalRange*0.5f);
+            maidState.vsKissTime = maidState.vsTime * 0.5f; //半分にする
 
           }
         }
@@ -9785,7 +10013,9 @@ namespace CM3D2.VibeYourMaid.Plugin
           if (maidState.orgasmHoldTime > 0) iCondition = 3;
           if (maidState.stunFlag) iCondition = 4;
 
-          Console.WriteLine("VoiceSetCheck eLevel="+eLevel+" oLevel="+oLevel+" iState="+iState+" iCondition="+iCondition);
+          #if DEBUG
+          Debug.Log("VoiceSetCheck maid="+maidID+" eLevel="+eLevel+" oLevel="+oLevel+" State="+iState+" Cond="+iCondition);
+          #endif
 
           List<string[]> _vsList = new List<string[]>();
           List<string> chkList = new List<string>();
@@ -9802,7 +10032,7 @@ namespace CM3D2.VibeYourMaid.Plugin
               if (!chkList.Contains(key)) {
                 _vsList.Add(vs);
                 chkList.Add(key);
-                //Console.WriteLine("_vsList.Add : " + vs[0]);
+                //Debug.Log("_vsList.Add : " + vs[0]);
                 if (maidState.vsFlag == 0) maidState.vsFlag = 1;
               }
             }
@@ -9854,43 +10084,6 @@ namespace CM3D2.VibeYourMaid.Plugin
       //-------------------------------------------------
       //その他処理---------------------------------------
 
-        //フェードアウトチェック
-        private class FadeMgr
-        {
-            public static bool isFade { get; private set; }
-            public static bool isFadeMySelf { get; set; }
-
-            public static void FadeOut()
-            {
-                isFadeMySelf = true;
-                GameMain.Instance.LoadIcon.force_draw_new = true;
-                GameMain.Instance.MainCamera.FadeOut(0f, false, null, true, default(Color));
-            }
-
-            public static void FadeIn()
-            {
-                if (GameMain.Instance.MainCamera.IsFadeProc() && isFadeMySelf)
-                    return;
-
-                isFadeMySelf = false;
-                GameMain.Instance.LoadIcon.force_draw_new = false;
-                GameMain.Instance.MainCamera.FadeIn(0f, false, null, true, true, default(Color));
-
-            }
-
-            public static bool GetFadeIn()
-            {
-                if (GameMain.Instance.MainCamera.IsFadeProc())
-                    isFade = true;
-                else if (isFade && !GameMain.Instance.MainCamera.IsFadeProc())
-                {
-                    isFade = false;
-                    return true;
-                }
-                return false;
-            }
-        }
-
         //ダブルクリック判定処理
         private bool dClickL = false;
         private bool dClickR = false;
@@ -9920,7 +10113,7 @@ namespace CM3D2.VibeYourMaid.Plugin
             if (MotionOldCheck(mamMotion+"3") != -1) manNum++;
             if (MotionOldCheck(mamMotion+"4") != -1) manNum++;
             if (MotionOldCheck(mamMotion+"5") != -1) manNum++;
-            //Console.WriteLine("AutoMansVisible "+mamMotion+" manNum="+manNum);
+            //Debug.Log("AutoMansVisible "+mamMotion+" manNum="+manNum);
 
             //現在の人数カウント 余分な男は減らす
             for (int im = 0; im < SubMans.Length; im++) {
@@ -9960,7 +10153,20 @@ namespace CM3D2.VibeYourMaid.Plugin
             //男の位置調整 追加した男のみ
             setManMotionPosition(tgID, i);
           }
+          //遅延ロードチェック
+          //StartCoroutine(ManVisibleCoroutine(i));
         }
+        //男ボディがロード後に遅延実行する
+        /*private IEnumerator ManVisibleCoroutine(int manID)
+        {
+          Maid man = SubMans[manID];
+          int cnt = 0;
+          while (!man.body0 || man.body0.m_Bones == null) {
+            yield return new WaitForSeconds (0.1f);  // 0.1秒待つ
+            if (cnt++ > 50) yield break; //5秒たったら強制終了
+            if (!man.Visible) yield break; //非表示に代わっていたら終了
+          }
+        }*/
 
         //メイドが対象になっている男の人数を取得
         private int MansTgCheck(int maidID) {
@@ -10098,7 +10304,7 @@ namespace CM3D2.VibeYourMaid.Plugin
             }
 
             //ランダムモーション変更
-            if (maidsState[tgID].editMotionSetName != "") {
+            if (tgID != -1 && maidsState[tgID].editMotionSetName != "") {
               if (dClickL) maidsState[tgID].msTime1 = 0;  //左ダブルクリックでカテゴリチェンジ
               if (dClickR) maidsState[tgID].msTime2 = 0;  //右ダブルクリックでモーションチェンジ
             }
@@ -10123,6 +10329,7 @@ namespace CM3D2.VibeYourMaid.Plugin
           //ショートカット用トリガーorグリップ (LTrigger=0 RTrigger=1 LGrip=2 RGrip=3 設定なし(無効)=4)
           public int followButtonIdx = 0;
           public int followOffButtonIdx = 0;
+          //public int directionResetIdx = 0;
           public int maidButtonIdx = 1;
           public int focusButtonIdx = 0;
           public int vibeButtonIdx = 3;
@@ -10138,6 +10345,7 @@ namespace CM3D2.VibeYourMaid.Plugin
 
           //カメラ移動トリガーorグリップ (LTrigger=0 RTrigger=1 LGrip=2 RGrip=3 設定なし(無効)=4)
           public int speedButtonIdx = 0;
+          public int breakButtonIdx = 2;
           //カメラ移動制限 (LTrigger=0 RTrigger=1 LGrip=2 RGrip=3 設定なし(無効)=4)
           public int moveLimitButtonIdx = 0;
           //スティックのコントローラー 左右 (L=0 R=1 設定なし=2)
@@ -10184,6 +10392,8 @@ namespace CM3D2.VibeYourMaid.Plugin
           {
             //移動トリガー
             speedButtonIdx = getButtonIdx(cfgw.vrCameraSpeedTrigger);
+            //減速トリガー
+            breakButtonIdx = getButtonIdx(cfgw.vrCameraBreakTrigger);
             //移動制限トリガー
             moveLimitButtonIdx = getButtonIdx(cfgw.vrCameraMoveLimitTrigger);
             //Quest以外や移動無効ならspeedButtonIdx=4で常に0が返るようににして無効化
@@ -10191,6 +10401,7 @@ namespace CM3D2.VibeYourMaid.Plugin
 
             followButtonIdx = getButtonIdx(cfgw.vrShortCutFollowOn);
             followOffButtonIdx = getButtonIdx(cfgw.vrShortCutFollowOff);
+            //directionResetIdx = getButtonIdx(cfgw.vrShortCutDirectionReset);
             maidButtonIdx = getButtonIdx(cfgw.vrShortCutMaidTarget);
             focusButtonIdx = getButtonIdx(cfgw.vrShortCutMaidFocus);
             vibeButtonIdx = getButtonIdx(cfgw.vrShortCutVibe);
@@ -10312,7 +10523,7 @@ namespace CM3D2.VibeYourMaid.Plugin
           }
 
           //コントローラーのボタンが押されていない
-          // @param LR 0=左 1=右 -1=両方
+          // @param LR 0=左 1=右 それ以外=両方
           public bool isNoPress(int LR)
           {
             if (LR == 0) return press[0] == 0f && press[2] == 0f;
@@ -10336,35 +10547,46 @@ namespace CM3D2.VibeYourMaid.Plugin
             //メイド固定変更 メイドがいなくても設定
             float followPress = vrCtrl.getPress(vrCtrl.followButtonIdx);
             if (vrCtrl.followToggle) {
+              //ボタンでトグル
               if (followPress > 0f) {
-                //ボタンでトグル
                 if (OVRInput.GetDown(vrCtrl.followButton, vrCtrl.followController)) {
-                    maidFollowEnabled = !maidFollowEnabled;
-                    setDanceCameraDisabled(maidFollowEnabled); //ダンスカメラ有効無効切り替え
-                    if (maidFollowEnabled) {
-                      changeTargetMaid(GetLookingkMaid()); //正面にいるメイドに切り替え
-                      //followReturnSpeedY = -1f; //縦移動速度は標準に戻す → 開始時は戻さない
-                      bFollowLimitY = true; //メイド固定のY移動制限
-                      MaidFollowingCameraStart(tgID); //視点の向きを正面にしてメイド固定 VRのみ
-                    } else {
-                      mainCamera.SetRealHeadPos(mainCamera.GetRealHeadTransform().position, false); //GripMoveの移動をリセット
-                      mainCamera.SetRealHeadRot(new Vector3(0f, mainCamera.GetRealHeadTransform().eulerAngles.y, 0f), false); //GripMoveの移動をリセット
-                    }
+                  maidFollowEnabled = !maidFollowEnabled;
+                  setDanceCameraDisabled(maidFollowEnabled); //ダンスカメラ有効無効切り替え
+                  if (maidFollowEnabled) {
+                    changeTargetMaid(GetLookingkMaidID()); //正面にいるメイドに切り替え
+                    //followReturnSpeedY = -1f; //縦移動速度は標準に戻す → 開始時は戻さない
+                    bFollowLimitY = true; //メイド固定のY移動制限
+                    MaidFollowingCameraStart(tgID); //視点の向きを正面にしてメイド固定 VRのみ
+                  } else {
+                    //メイド固定解除
+                    float realAngleY = mainCamera.GetRealHeadTransform().rotation.eulerAngles.y;
+                    if (maidFollowEnabled) setDanceCameraDisabled(false); //ダンスカメラ有効無効切り替え メイド固定が切り替わった場合
+                    mainCamera.SetRealHeadPos(mainCamera.GetRealHeadTransform().position, false); //GripMoveの移動をリセット
+                    //if (vrCtrl.getPress(vrCtrl.directionResetIdx) > 0) {
+                      mainCamera.SetRealHeadRot(new Vector3(0f, realAngleY, 0f), false); //GripMoveの回転をリセット
+                    //}
+                  }
                 }
               }
-            } else { //ON/OFF別操作 同時押しは解除優先
+            } else {
+              //ON/OFF別ボタン 同時押しは解除優先 同時押しは向きもリセット
               if (OVRInput.Get(vrCtrl.followOffTrigger, vrCtrl.followOffController) && OVRInput.GetDown(vrCtrl.followOffButton, vrCtrl.followOffController)
                 || OVRInput.GetDown(vrCtrl.followOffTrigger, vrCtrl.followOffController) && OVRInput.Get(vrCtrl.followOffButton, vrCtrl.followOffController)) {
+                //メイド固定解除
+                float realAngleY = mainCamera.GetRealHeadTransform().rotation.eulerAngles.y;
                 if (maidFollowEnabled) setDanceCameraDisabled(false); //ダンスカメラ有効無効切り替え メイド固定が切り替わった場合
-                maidFollowEnabled = false;
                 mainCamera.SetRealHeadPos(mainCamera.GetRealHeadTransform().position, false); //GripMoveの移動をリセット
-                mainCamera.SetRealHeadRot(new Vector3(0f, mainCamera.GetRealHeadTransform().eulerAngles.y, 0f), false); //GripMoveの移動をリセット
+                //if (!maidFollowEnabled && vrCtrl.getPress(vrCtrl.directionResetIdx) > 0) { //メイド固定されていない＋同時押し
+                  mainCamera.SetRealHeadRot(new Vector3(0f, realAngleY, 0f), false); //GripMoveの回転をリセット
+                //}
+                maidFollowEnabled = false;
               } else {
+                //メイド固定開始
                 if (followPress > 0f) {
                   if (OVRInput.GetDown(vrCtrl.followButton, vrCtrl.followController)) {
                   if (!maidFollowEnabled) setDanceCameraDisabled(true); //ダンスカメラ有効無効切り替え メイド固定が切り替わった場合
                     maidFollowEnabled = true;
-                    changeTargetMaid(GetLookingkMaid()); //正面にいるメイドに切り替え
+                    changeTargetMaid(GetLookingkMaidID()); //正面にいるメイドに切り替え
                     //followReturnSpeedY = -1f; //縦移動速度は標準に戻す → 開始時は戻さない
                     bFollowLimitY = true; //メイド固定のY移動制限
                     MaidFollowingCameraStart(tgID); //視点の向きを正面にしてメイド固定 VRのみ
@@ -10386,26 +10608,35 @@ namespace CM3D2.VibeYourMaid.Plugin
                   if (xy.x < -0.8f) {
                     vrCtrl.maidAxisEnabled = false;
                     followReturnSpeedY = -1f; //縦移動速度は標準に戻す
-                    if (maidPress) {
-                      changeTargetMaid(getPrevMaid());
+                    if (maidPress) changeTargetMaid(getPrevMaid());
+                    if (focusPress) {
+                      if (vrCtrl.vrCameraOrigin) {
+                        //GripMoveの移動をリセット 回転はそのまま
+                        mainCamera.SetRealHeadPos(mainCamera.GetRealHeadTransform().position, false); //GripMoveの移動をリセット 回転はそのまま
+                      }
+                      //ダンス中でメイド固定でない
+                      if (maidFollowEnabled || RhythmAction_Mgr.Instance == null) CameraChange(tgID);
                     }
-                    //カメラ位置をメイド正面に切替 ダンス中でメイド固定でない場合は無効
-                    if (focusPress && (maidFollowEnabled || RhythmAction_Mgr.Instance == null)) CameraChange(tgID);
                   } else if (xy.x > 0.8f) {
                     vrCtrl.maidAxisEnabled = false;
                     followReturnSpeedY = -1f; //縦移動速度は標準に戻す
-                    if (maidPress) {
-                      changeTargetMaid(getNextMaid());
+                    if (maidPress) changeTargetMaid(getNextMaid());
+                    //カメラ位置をメイド正面に切替
+                    if (focusPress) {
+                      if (vrCtrl.vrCameraOrigin) {
+                        //GripMoveの移動をリセット 回転はそのまま
+                        mainCamera.SetRealHeadPos(mainCamera.GetRealHeadTransform().position, false); //GripMoveの移動をリセット 回転はそのまま
+                      }
+                      //ダンス中でメイド固定でない
+                      if (maidFollowEnabled || RhythmAction_Mgr.Instance == null) CameraChange(tgID);
                     }
-                    //カメラ位置をメイド正面に切替 ダンス中でメイド固定でない場合は無効
-                    if (focusPress && (maidFollowEnabled || RhythmAction_Mgr.Instance == null)) CameraChange(tgID);
                   }
                 }
               }
 
               float vibePress = vrCtrl.getPress(vrCtrl.vibeButtonIdx);
               if (vibePress > 0) {
-                //上下でバイブ切り替え リンクも対応
+                //上下でバイブ切り替え
                 Vector2 xy = vrCtrl.getAxis(vrCtrl.vibeAxisIdx);
                 if (xy.y > -0.7f && xy.y < 0.7f) { //軸が戻った判定
                   vrCtrl.vibeAxisEnabled = true;
@@ -10415,16 +10646,11 @@ namespace CM3D2.VibeYourMaid.Plugin
                     if (vrCtrl.isPressOnly(vrCtrl.vibeButtonIdx)) { //他のトリガー/グリップが押されていない
                       int targetID = tgID;
                       if (cfgw.vrShortCutVibeLookingMaid) {
-                        targetID = GetLookingkMaid(); //正面にいるメイド
+                        targetID = GetLookingkMaidID(); //正面にいるメイド
                       }
                       if (maidsState[targetID].vLevel > 0) {
                         maidsState[targetID].vLevel -= 1;
                         maidsState[targetID].pAutoSelect = 0;
-                        /*foreach (int maidID in vmId) {
-                          if (maidID != targetID && !LinkMaidCheck(targetID, maidID)) continue;
-                          maidsState[maidID].vLevel -= 1;
-                          maidsState[maidID].pAutoSelect = 0;
-                        }*/
                       }
                     }
                   } else if (xy.y > 0.8f) {
@@ -10432,27 +10658,22 @@ namespace CM3D2.VibeYourMaid.Plugin
                     if (vrCtrl.isPressOnly(vrCtrl.vibeButtonIdx)) { //他のトリガー/グリップが押されていない
                       int targetID = tgID;
                       if (cfgw.vrShortCutVibeLookingMaid) {
-                        targetID = GetLookingkMaid(); //正面にいるメイド
+                        targetID = GetLookingkMaidID(); //正面にいるメイド
                       }
                       if (maidsState[targetID].vLevel < 2) {
                         maidsState[targetID].vLevel += 1;
                         maidsState[targetID].pAutoSelect = 0;
-                        /*foreach (int maidID in vmId) {
-                          if (maidID != targetID && !LinkMaidCheck(targetID, maidID)) continue;
-                          maidsState[maidID].vLevel += 1;
-                          maidsState[maidID].pAutoSelect = 0;
-                        }*/
                       }
                     }
                   }
                 }
               }
 
-              //モーション切り替え 同時押しにも対応
-              if (vrCtrl.getPress(vrCtrl.motionButtonIdx) > 0 && (vrCtrl.motionButton2Idx == 4 ||vrCtrl.getPress(vrCtrl.motionButton2Idx) > 0)) {
+              //モーション切り替え パネル表示時のみ
+              if (cfgw.unzipGuiFlag && cfgw.mainGuiFlag != 0) {
+                //トリガーとグリップ同時押しにも対応
+                if (vrCtrl.getPress(vrCtrl.motionButtonIdx) > 0 && (vrCtrl.motionButton2Idx == 4 ||vrCtrl.getPress(vrCtrl.motionButton2Idx) > 0)) {
                 //if (vrCtrl.isNoPress(vrCtrl.motionAxisIdx)) { //トリガーもグリップも無し
-                if (cfgw.mainGuiFlag != 0 && cfgw.unzipGuiFlag) {
-                  //上下でバイブ切り替え リンクも対応
                   Vector2 xy = vrCtrl.getAxis(vrCtrl.motionAxisIdx);
                   if (xy.y > -0.7f && xy.y < 0.7f) { //軸が戻った判定
                     if (vrCtrl.motionAxisStartTime != 0 && Time.time - vrCtrl.motionAxisStartTime < 1f) { //1秒未満
@@ -10508,36 +10729,36 @@ namespace CM3D2.VibeYourMaid.Plugin
             }
             Vector2[] xyLR = null;
             //アクティブメイド変更 メイド固定中のみ
-              if (tgID != -1) {
-                bool maidPress = (cfgw.vrShortCutMaidTarget.StartsWith("L") ? OvrMgr.ovr_obj.left_controller : OvrMgr.ovr_obj.right_controller)
-                  .controller_buttons.GetPress(cfgw.vrShortCutMaidTarget.EndsWith("T") ? AVRControllerButtons.BTN.TRIGGER : AVRControllerButtons.BTN.GRIP);
-                bool focusPress = (cfgw.vrShortCutMaidFocus.StartsWith("L") ? OvrMgr.ovr_obj.left_controller : OvrMgr.ovr_obj.right_controller)
-                  .controller_buttons.GetPress(cfgw.vrShortCutMaidFocus.EndsWith("T") ? AVRControllerButtons.BTN.TRIGGER : AVRControllerButtons.BTN.GRIP);
-                if (xyLR == null) xyLR = new Vector2[]{OvrMgr.GetVRControllerButtons(true).GetAxis(), OvrMgr.GetVRControllerButtons(false).GetAxis()};
-                Vector2 xy = cfgw.vrShortCutMaidTarget.StartsWith("L") ? xyLR[0] : xyLR[1];
-                //アクティブメイド変更
-                if (xy.x > -0.7f && xy.x < 0.7f) { //軸が戻った判定
-                  vrCtrl.maidAxisEnabled = true;
-                } else if (vrCtrl.maidAxisEnabled) {
-                  if (xy.x < -0.8f) {
-                    vrCtrl.maidAxisEnabled = false;
-                    followReturnSpeedY = -1f; //縦移動速度は標準に戻す
-                    if (maidPress) {
-                      changeTargetMaid(getPrevMaid());
-                    }
-                    if (focusPress) CameraChange(tgID); //カメラ位置をメイド正面に切替
-                  } else if (xy.x > 0.8f) {
-                    vrCtrl.maidAxisEnabled = false;
-                    followReturnSpeedY = -1f; //縦移動速度は標準に戻す
-                    if (maidPress) {
-                      changeTargetMaid(getNextMaid());
-                    }
-                    if (focusPress) CameraChange(tgID); //カメラ位置をメイド正面に切替
+            if (tgID != -1) {
+              bool maidPress = (cfgw.vrShortCutMaidTarget.StartsWith("L") ? OvrMgr.ovr_obj.left_controller : OvrMgr.ovr_obj.right_controller)
+                .controller_buttons.GetPress(cfgw.vrShortCutMaidTarget.EndsWith("T") ? AVRControllerButtons.BTN.TRIGGER : AVRControllerButtons.BTN.GRIP);
+              bool focusPress = (cfgw.vrShortCutMaidFocus.StartsWith("L") ? OvrMgr.ovr_obj.left_controller : OvrMgr.ovr_obj.right_controller)
+                .controller_buttons.GetPress(cfgw.vrShortCutMaidFocus.EndsWith("T") ? AVRControllerButtons.BTN.TRIGGER : AVRControllerButtons.BTN.GRIP);
+              if (xyLR == null) xyLR = new Vector2[]{OvrMgr.GetVRControllerButtons(true).GetAxis(), OvrMgr.GetVRControllerButtons(false).GetAxis()};
+              Vector2 xy = cfgw.vrShortCutMaidTarget.StartsWith("L") ? xyLR[0] : xyLR[1];
+              //アクティブメイド変更
+              if (xy.x > -0.7f && xy.x < 0.7f) { //軸が戻った判定
+                vrCtrl.maidAxisEnabled = true;
+              } else if (vrCtrl.maidAxisEnabled) {
+                if (xy.x < -0.8f) {
+                  vrCtrl.maidAxisEnabled = false;
+                  followReturnSpeedY = -1f; //縦移動速度は標準に戻す
+                  if (maidPress) {
+                    changeTargetMaid(getPrevMaid());
                   }
+                  if (focusPress) CameraChange(tgID); //カメラ位置をメイド正面に切替
+                } else if (xy.x > 0.8f) {
+                  vrCtrl.maidAxisEnabled = false;
+                  followReturnSpeedY = -1f; //縦移動速度は標準に戻す
+                  if (maidPress) {
+                    changeTargetMaid(getNextMaid());
+                  }
+                  if (focusPress) CameraChange(tgID); //カメラ位置をメイド正面に切替
                 }
               }
+            }
 
-            //上下でバイブ切り替え リンクも対応
+            //上下でバイブ切り替え
             controller = cfgw.vrShortCutVibe.StartsWith("L") ? OvrMgr.ovr_obj.left_controller : OvrMgr.ovr_obj.right_controller;
             if (controller.controller_buttons.GetPress(cfgw.vrShortCutVibe.EndsWith("T") ? AVRControllerButtons.BTN.TRIGGER : AVRControllerButtons.BTN.GRIP)) {
               if (tgID != -1) {
@@ -10551,16 +10772,11 @@ namespace CM3D2.VibeYourMaid.Plugin
                     if (vrCtrl.isPressOnly(vrCtrl.vibeButtonIdx)) { //他のトリガー/グリップが押されていない
                       int targetID = tgID;
                       if (cfgw.vrShortCutVibeLookingMaid) {
-                        targetID = GetLookingkMaid(); //正面にいるメイド
+                        targetID = GetLookingkMaidID(); //正面にいるメイド
                       }
                       if (maidsState[targetID].vLevel > 0) {
                         maidsState[targetID].vLevel -= 1;
                         maidsState[targetID].pAutoSelect = 0;
-                        /*foreach (int maidID in vmId) {
-                          if (maidID != targetID && !LinkMaidCheck(targetID, maidID)) continue;
-                          maidsState[maidID].vLevel -= 1;
-                          maidsState[maidID].pAutoSelect = 0;
-                        }*/
                       }
                     }
                   } else if (xy.y > 0.8f) {
@@ -10568,16 +10784,11 @@ namespace CM3D2.VibeYourMaid.Plugin
                     if (vrCtrl.isPressOnly(vrCtrl.vibeButtonIdx)) { //他のトリガー/グリップが押されていない
                       int targetID = tgID;
                       if (cfgw.vrShortCutVibeLookingMaid) {
-                        targetID = GetLookingkMaid(); //正面にいるメイド
+                        targetID = GetLookingkMaidID(); //正面にいるメイド
                       }
                       if (maidsState[targetID].vLevel < 2) {
                         maidsState[targetID].vLevel += 1;
                         maidsState[targetID].pAutoSelect = 0;
-                        /*foreach (int maidID in vmId) {
-                          if (maidID != targetID && !LinkMaidCheck(targetID, maidID)) continue;
-                          maidsState[maidID].vLevel += 1;
-                          maidsState[maidID].pAutoSelect = 0;
-                        }*/
                       }
                     }
                   }
@@ -10591,14 +10802,11 @@ namespace CM3D2.VibeYourMaid.Plugin
         //VRショートカットキー操作 移動
         private void ShortCutVRMove(VRShortCutController vrCtrl)
         {
-          //VRショートカットが無効なら終了 ShortCutVRから呼ぶ場合は不要
-          if (!cfgw.vrShortCut) return;
-
-          if (fpsModeEnabled) return; //一人称モードは移動しない
+            if (fpsModeEnabled) return; //一人称モードは移動しない
 
             //speedトリガーが押されている場合に各スティックをチェック
-            //カメラ移動無効ならspeedButtonIdx=4でspeedが0になり処理されない
-            float speed = vrCtrl.getPress(vrCtrl.speedButtonIdx);
+            //カメラ移動無効ならspeedButtonIdx=4でspeedが0になり処理されない 減速は 1倍～指定倍率(1未満なら減速) になるようにする
+            float speed = vrCtrl.getPress(vrCtrl.speedButtonIdx) * (1f - (1f - cfgw.vrCameraBreakSpeed) * vrCtrl.getPress(vrCtrl.breakButtonIdx));
 
             if (maidFollowEnabled && tgID != -1) {
 
@@ -10626,16 +10834,18 @@ namespace CM3D2.VibeYourMaid.Plugin
                   dist -= (xy.y-0.1f) * 2f * speed*cfgw.vrCameraFollowSpeedZoom * (float)Math.Sqrt(dist*0.5f) * Time.deltaTime;
                   if (dist > cfgw.vrCameraMoveZoomMin) mainCamera.SetDistance(dist, true);
                 }
-                //左右移動 移動制限が難しいので無効 メイド切り替えと被る
-                /*xy = vrCtrl.getAxis(vrCtrl.leftrightAxisIdx);
-                if (xy.x <= -0.1f) { //左
-                  Transform realTm = mainCamera.GetRealHeadTransform();
-                  mainCamera.SetTargetPos(mainCamera.GetTargetPos() + Quaternion.AngleAxis(realTm.rotation.eulerAngles.y, Vector3.up) * new Vector3((xy.x+0.1f)
-                    * (float)Math.Sqrt(mainCamera.GetDistance()*0.5f) * speed*cfgw.vrCameraFollowSpeedLR * Time.deltaTime, 0f, 0f), true);
-                } else if (xy.x >= 0.1f) { //右
-                  Transform realTm = mainCamera.GetRealHeadTransform();
-                  mainCamera.SetTargetPos(mainCamera.GetTargetPos() + Quaternion.AngleAxis(realTm.rotation.eulerAngles.y, Vector3.up) * new Vector3((xy.x-0.1f)
-                    * (float)Math.Sqrt(mainCamera.GetDistance()*0.5f) * speed*cfgw.vrCameraFollowSpeedLR * Time.deltaTime, 0f,  0f), true);
+                //左右移動 移動制限が難しいので無効
+                /*if (vrCtrl.isNoPress(vrCtrl.leftrightAxisIdx)) {
+                  xy = vrCtrl.getAxis(vrCtrl.leftrightAxisIdx);
+                  if (xy.x <= -0.1f) { //左
+                    Transform realTm = mainCamera.GetRealHeadTransform();
+                    mainCamera.SetTargetPos(mainCamera.GetTargetPos() + Quaternion.AngleAxis(realTm.rotation.eulerAngles.y, Vector3.up) * new Vector3((xy.x+0.1f)
+                      * (float)Math.Sqrt(mainCamera.GetDistance()*0.5f) * speed*cfgw.vrCameraFollowSpeedLR * Time.deltaTime, 0f, 0f), true);
+                  } else if (xy.x >= 0.1f) { //右
+                    Transform realTm = mainCamera.GetRealHeadTransform();
+                    mainCamera.SetTargetPos(mainCamera.GetTargetPos() + Quaternion.AngleAxis(realTm.rotation.eulerAngles.y, Vector3.up) * new Vector3((xy.x-0.1f)
+                      * (float)Math.Sqrt(mainCamera.GetDistance()*0.5f) * speed*cfgw.vrCameraFollowSpeedLR * Time.deltaTime, 0f,  0f), true);
+                  }
                 }*/
                 //上下移動
                 xy = vrCtrl.getAxis(vrCtrl.udAxisIdx);
@@ -10711,7 +10921,6 @@ namespace CM3D2.VibeYourMaid.Plugin
                 }
 
               } else {
-
                 //メイド固定でない & HANDと同様の移動
                 if (speed > 0f) {
                   speed = speed*(cfgw.vrCameraSpeedMax-cfgw.vrCameraSpeedStart) + cfgw.vrCameraSpeedStart; //開始速度と最大速度調整
@@ -10768,20 +10977,17 @@ namespace CM3D2.VibeYourMaid.Plugin
         //ジャンプ判定無効時間設定用 常時無効ならPositiveInfinity
         float cameraJumpFixTime = 0f;
 
-        //移動制限対象のメイド 自動切換え用
-        int moveLimitTgID = -1;
-
         //BaseRoomBaseのZ方向の移動量をメイドより手前になるように補正 移動制限したらtrueを返す
         public bool fixRoomBaseTransform(VRShortCutController vrCtrl)
         {
           Transform roomTm = vrCtrl.vrCameraOrigin; //GripMove移動用
           Transform headTm = vrCtrl.headTransform; //HMD位置と向き
-          Vector3 maidPos = maidsState[moveLimitTgID].maidHead.transform.position;
+          Vector3 maidPos = maidsState[tgID].maidHead.transform.position;
           //HMD向きでのカメラとメイドの方角 HMD正面がZ軸になるようにY軸のみ回転
           Vector3 maidOffset = Quaternion.Inverse(Quaternion.AngleAxis(headTm.rotation.eulerAngles.y, Vector3.up)) * (maidPos - headTm.position);
 
           //Vector3 basePos = mainCamera.GetBaseHeadTransform().position;
-          //Console.WriteLine("room pos=("+roomTm.position.x+","+roomTm.position.y+","+roomTm.position.z+") base pos=("+basePos.x+","+basePos.y+","+basePos.z+")");
+          //Debug.Log("room pos=("+roomTm.position.x+","+roomTm.position.y+","+roomTm.position.z+") base pos=("+basePos.x+","+basePos.y+","+basePos.z+")");
 
           //カメラがジャンプした場合(秒速100m以上) && 顔からの高さが 上0.5m以上+前0.5m以内
           if (cameraJumpFixTime < Time.time && Vector3.Distance(headTm.position, preHeadPos) > 100f * Time.deltaTime) {
@@ -10802,67 +11008,67 @@ namespace CM3D2.VibeYourMaid.Plugin
             if (vmId.Count > 1 && cfgw.vrAutoMaidChange) {
               //ベース位置からの正面のメイドを取得
               int frontMaidID;
-              if (vrCtrl.getPress(vrCtrl.frontMaidIdx) == 0 && vrCtrl.getAxis(vrCtrl.frontMaidAxisIdx).y < 0.1f) { //ボタン+スティック下
-                frontMaidID = GetFrontMaid(mainCamera.GetBaseHeadTransform(), cfgw.vrFrontMaidAngle, cfgw.vrAutoMaidBackward);
-              } else { //範囲拡張
-                frontMaidID = GetFrontMaid(mainCamera.GetBaseHeadTransform(), cfgw.vrFrontMaidExtendAngle, cfgw.vrFrontExtendBackward);
+              if (vrCtrl.getPress(vrCtrl.frontMaidIdx) > 0 && vrCtrl.getAxis(vrCtrl.frontMaidAxisIdx).y > 0.1f) {
+                //ボタン+スティック上 縮小拡張で正面メイド取得 現在の位置から
+                frontMaidID = GetFrontMaid(mainCamera.GetBaseHeadTransform(), cfgw.vrFrontMaidAngle, cfgw.vrFrontMaidBackward); //スティック上の時
+              } else if (vrCtrl.getPress(vrCtrl.frontMaidIdx) > 0 && vrCtrl.getAxis(vrCtrl.frontMaidAxisIdx).y < -0.1f) {
+                //ボタン+スティック下 範囲拡張で正面メイド取得 自由移動前の位置から
+                frontMaidID = GetFrontMaid(mainCamera.GetBaseHeadTransform(), cfgw.vrFrontMaidExtendAngle, cfgw.vrFrontExtendBackward); //正面判定範囲拡張時
+              } else {
+                //通常範囲で正面メイド取得
+                frontMaidID = GetFrontMaid(mainCamera.GetBaseHeadTransform(), cfgw.vrAutoMaidAngle, cfgw.vrAutoMaidBackward); //カメラジャンプ時
               }
-              if (frontMaidID != -1 && frontMaidID != moveLimitTgID) {
-                Console.WriteLine("autoMaidChange "+moveLimitTgID+" -> "+frontMaidID);
-                moveLimitTgID = frontMaidID;
-                maidPos = maidsState[moveLimitTgID].maidHead.transform.position;
+              if (frontMaidID != -1 && frontMaidID != tgID) {
+                //Debug.Log("autoMaidChange "+tgID+" -> "+frontMaidID);
+                tgID = frontMaidID;
+                maidPos = maidsState[tgID].maidHead.transform.position;
                 maidOffset = Quaternion.Inverse(Quaternion.AngleAxis(headTm.rotation.eulerAngles.y, Vector3.up)) * (maidPos - headTm.position);
               }
             }
           }
           else {
-            //ジャンプでなければフレームアウトで切り替え
-            //2人以上なら正面のメイドに切り替え
-            if (vmId.Count > 1 && cfgw.vrOutsideMaidChange) {
-              if (vrCtrl.getPress(vrCtrl.frontMaidIdx) == 0) {
-                //範囲外チェック カメラから左右と後ろが指定距離より離れている && 左右指定角度より外側
-                if ( (maidOffset.x < -cfgw.vrOutsideMaidSide || cfgw.vrOutsideMaidSide < maidOffset.x || maidOffset.z < -cfgw.vrOutsideMaidBackward)
-                  && Math.Abs(Mathf.Atan2(maidOffset.x, maidOffset.z)) > vrCtrl.outsideMaidAngle ) {
-                  //HMD位置からの正面のメイドを取得
-                  int frontMaidID = GetFrontMaid(mainCamera.GetRealHeadTransform(), cfgw.vrFrontMaidAngle, cfgw.vrOutsideMaidBackward);
-                  if (frontMaidID != -1 && frontMaidID != moveLimitTgID) {
-                    Console.WriteLine("outsideMaidChange "+moveLimitTgID+" -> "+frontMaidID);
-                    moveLimitTgID = frontMaidID;
-                    maidPos = maidsState[moveLimitTgID].maidHead.transform.position;
-                    maidOffset = Quaternion.Inverse(Quaternion.AngleAxis(headTm.rotation.eulerAngles.y, Vector3.up)) * (maidPos - headTm.position);
-                  }
-                }
-              } else { //グリップが押されている
+            //ジャンプでない場合
+            //右グリップ＋上スティックで狭い範囲で正面判定、右グリップのみなら対象がフレームアウトしたら正面再判定
+            if (vmId.Count > 1) {
+              //グリップが押されている
+              if (vrCtrl.getPress(vrCtrl.frontMaidIdx) > 0) {
+                bool checkOutside = true;
                 float axisY = vrCtrl.getAxis(vrCtrl.frontMaidAxisIdx).y;
                 //ボタン+スティック上 1回実行したらスティックを戻すまで無効
-                if (vrCtrl.frontMaidAxisEnabled && axisY > 0.1f) {
-                  vrCtrl.frontMaidAxisEnabled = false; //上スティック無効化
-                  //HMD位置からの正面のメイドを取得
-                  int frontMaidID = GetFrontMaid(mainCamera.GetRealHeadTransform(), cfgw.vrFrontMaidAngle, cfgw.vrOutsideMaidBackward);
-                  if (frontMaidID != -1 && frontMaidID != moveLimitTgID) {
-                    Console.WriteLine("frontMaidChange "+moveLimitTgID+" -> "+frontMaidID);
-                    moveLimitTgID = frontMaidID;
-                    maidPos = maidsState[moveLimitTgID].maidHead.transform.position;
-                    maidOffset = Quaternion.Inverse(Quaternion.AngleAxis(headTm.rotation.eulerAngles.y, Vector3.up)) * (maidPos - headTm.position);
+                if (axisY > 0.1f) {
+                  if (vrCtrl.frontMaidAxisEnabled) { //初回のみ
+                    vrCtrl.frontMaidAxisEnabled = false; //上スティック無効化
+                    //HMD位置からの正面のメイドを取得
+                    int frontMaidID = GetFrontMaid(mainCamera.GetRealHeadTransform(), cfgw.vrFrontMaidAngle, cfgw.vrFrontMaidBackward); //スティック上の時
+                    if (frontMaidID != -1 && frontMaidID != tgID) {
+                      //Debug.Log("frontMaidChange "+tgID+" -> "+frontMaidID);
+                      tgID = frontMaidID;
+                      maidPos = maidsState[tgID].maidHead.transform.position;
+                      maidOffset = Quaternion.Inverse(Quaternion.AngleAxis(headTm.rotation.eulerAngles.y, Vector3.up)) * (maidPos - headTm.position);
+                    }
+                    //範囲外チェックは無効
+                    checkOutside = false;
                   }
                 } else {
                   vrCtrl.frontMaidAxisEnabled = true; //上スティック有効化
-                  //ボタン+スティック
+                  //ボタン+スティック下
                   if (axisY < -0.1f) {
-                    //下スティックは無効
-                  } else { //↓ボタンなしの処理と同じ
-                    //範囲外チェック カメラから左右と後ろが指定距離より離れている && 左右指定角度より外側
-                    if ( (maidOffset.x < -cfgw.vrOutsideMaidSide || cfgw.vrOutsideMaidSide < maidOffset.x || maidOffset.z < -cfgw.vrOutsideMaidBackward)
-                      && Math.Abs(Mathf.Atan2(maidOffset.x, maidOffset.z)) > vrCtrl.outsideMaidAngle ) {
-                      //HMD位置からの正面のメイドを取得
-                      int frontMaidID = GetFrontMaid(mainCamera.GetRealHeadTransform(), cfgw.vrFrontMaidAngle, cfgw.vrOutsideMaidBackward);
-                      if (frontMaidID != -1 && frontMaidID != moveLimitTgID) {
-                        Console.WriteLine("outsideMaidChange "+moveLimitTgID+" -> "+frontMaidID);
-                        moveLimitTgID = frontMaidID;
-                        maidPos = maidsState[moveLimitTgID].maidHead.transform.position;
-                        maidOffset = Quaternion.Inverse(Quaternion.AngleAxis(headTm.rotation.eulerAngles.y, Vector3.up)) * (maidPos - headTm.position);
-                      }
-                    }
+                    //範囲外チェックは無効
+                    checkOutside = false;
+                  }
+                }
+
+                //前面再チェックをしていない & 無効指定でなければフレームアウトをチェック
+                //範囲外チェック カメラから左右と後ろが指定距離より離れている && 左右指定角度より外側
+                if (checkOutside && cfgw.vrOutsideMaidChange
+                  && Math.Abs(Mathf.Atan2(maidOffset.x, maidOffset.z)) > vrCtrl.outsideMaidAngle ) {
+                  //HMD位置からの正面のメイドを取得
+                  int frontMaidID = GetFrontMaid(mainCamera.GetRealHeadTransform(), cfgw.vrFrontMaidAngle, cfgw.vrOutsideMaidBackward); //フレームアウト範囲で判定
+                  if (frontMaidID != -1 && frontMaidID != tgID) {
+                    //Debug.Log("outsideMaidChange "+tgID+" -> "+frontMaidID);
+                    tgID = frontMaidID;
+                    maidPos = maidsState[tgID].maidHead.transform.position;
+                    maidOffset = Quaternion.Inverse(Quaternion.AngleAxis(headTm.rotation.eulerAngles.y, Vector3.up)) * (maidPos - headTm.position);
                   }
                 }
               }
@@ -11031,10 +11237,7 @@ namespace CM3D2.VibeYourMaid.Plugin
             Vector3 vNewPosition = Vector3.zero;
 
             //カメラの移動先決定
-            Transform maidObj = maidsState[maidID].maidMune;
-            if (lookPoint == 1) maidObj = maidsState[maidID].maidHead;
-            else if (lookPoint == 2) maidObj = maidsState[maidID].maidXxx;
-
+            Transform maidObj = getMaidLookpointTransform(maidID);
             if (!maidObj) return;
 
             vNewPosition = maidObj.transform.position;
@@ -11053,13 +11256,12 @@ namespace CM3D2.VibeYourMaid.Plugin
         private bool isActiveMaid(Maid maid)
         {
           if (maid && maid.Visible && maid.transform && maid.transform.localScale.x > 0.00001f) { //0.00001fなのはDCM対策
-            int slotID = maid.ActiveSlotNo;
             //ダミーメイドならfalse
             if (RhythmAction_Mgr.Instance) {
               //RhythmAction_Mgr.InstanceからDanceMainを取得
               DanceMain danceMain = (DanceMain)danceMainInfo.GetValue(RhythmAction_Mgr.Instance);
               //プリセット上書き指定があるメイドはモニター表示用としてダミー判定
-              if (danceMain.m_PresetCopyToDummyChara.Length > slotID && danceMain.m_PresetCopyToDummyChara[slotID] != slotID) return false;
+              if (danceMain.m_PresetCopyToDummyChara.Length > maid.ActiveSlotNo && danceMain.m_PresetCopyToDummyChara[maid.ActiveSlotNo] != maid.ActiveSlotNo) return false;
             }
             return true;
           }
@@ -11093,7 +11295,7 @@ namespace CM3D2.VibeYourMaid.Plugin
 
         //視点の中央に近いメイドのIDを取得 左右45度内のメイドのみ
         //距離が近い場合は体の幅相当の角度を考慮して一番近いものを取得
-        private int GetLookingkMaid()
+        private int GetLookingkMaidID()
         {
           //リアル視点 GripMoveの移動含む
           Transform realTm = mainCamera.GetRealHeadTransform();
@@ -11106,7 +11308,7 @@ namespace CM3D2.VibeYourMaid.Plugin
           int lookingMaidID = tgID;
           foreach (int maidID in vmId) {
             if (isActiveMaid(stockMaids[maidID].mem)) {
-              Transform maidTm = maidsState[maidID].maidMune.transform;
+              Transform maidTm = maidsState[maidID].maidMune;
               float angle = Quaternion.LookRotation(maidTm.position - realPos).eulerAngles.y % 360; //カメラからメイドへの方向
               if (angle < 0) angle = 360f + angle; //0-360に
               angle = Math.Abs(angle - realAngleY); //視野中央からの角度 0～
@@ -11128,7 +11330,13 @@ namespace CM3D2.VibeYourMaid.Plugin
           }
           return lookingMaidID;
         }
+        //外部連携用
+        public Maid GetLookingkMaid()
+        {
+          return stockMaids[GetLookingkMaidID()].mem;
+        }
 
+        //backOffsetは角度範囲を広げる用で後ろは対象外
         private int GetFrontMaid(Transform cameraTm, float frontAngle, float backOffset)
         {
           Vector3 camPos = cameraTm.position;
@@ -11138,6 +11346,10 @@ namespace CM3D2.VibeYourMaid.Plugin
           camPos.x -= forward.x * backOffset;
           camPos.z -= forward.z * backOffset;
 
+          //後ろに下がった分を除外する 距離の2乗
+          float distLimit = 0;
+          if (backOffset > 0) distLimit = backOffset * backOffset;
+
           float realAngleY = cameraTm.rotation.eulerAngles.y % 360;
           if (realAngleY < 0) realAngleY = 360f + realAngleY; //0-360に
 
@@ -11145,15 +11357,20 @@ namespace CM3D2.VibeYourMaid.Plugin
           int closestMaidID = -1;
           foreach (int maidID in vmId) {
             if (isActiveMaid(stockMaids[maidID].mem)) {
-              Transform maidTm = maidsState[maidID].maidMune.transform;
-              float angle = Quaternion.LookRotation(maidTm.position - camPos).eulerAngles.y % 360; //カメラからメイドへの方向
-              if (angle < 0) angle = 360f + angle; //0-360に
-              angle = Math.Abs(angle - realAngleY); //視野中央からの角度 0～
-              float dist = (maidTm.position.x-camPos.x)*(maidTm.position.x-camPos.x)+(maidTm.position.z-camPos.z)*(maidTm.position.z-camPos.z);
-              //正面範囲内で一番近いメイド
-              if (dist < minDist && angle <= frontAngle) {
-                minDist = dist;
-                closestMaidID = maidID;
+              Transform maidTm = maidsState[maidID].maidMune;
+              if (maidTm) {
+                float angle = Quaternion.LookRotation(maidTm.position - camPos).eulerAngles.y % 360; //下げたカメラからメイドへの方向
+                if (angle < 0) angle = 360f + angle; //0-360に
+                angle = Math.Abs(angle - realAngleY); //視野中央からの角度 0～
+                float dist = (maidTm.position.x-camPos.x)*(maidTm.position.x-camPos.x)+(maidTm.position.z-camPos.z)*(maidTm.position.z-camPos.z);
+                //後ろに下がった分の距離は無視
+                if (distLimit < dist) {
+                  //正面範囲内で一番近いメイド
+                  if (dist < minDist && angle <= frontAngle) {
+                    minDist = dist;
+                    closestMaidID = maidID;
+                  }
+                }
               }
             }
           }
@@ -11213,18 +11430,23 @@ namespace CM3D2.VibeYourMaid.Plugin
         private bool bFollowLimitY = false; //メイド固定で縦方向を移動時の制限フラグ
         private float followReturnSpeedY = -1f; //メイド固定で縦方向の秒速 -1なら減速処理しない
 
+        private Transform getMaidLookpointTransform(int maidID)
+        {
+          if (lookPoint == 0) return maidsState[maidID].maidMune;
+          if (lookPoint == 1) return maidsState[maidID].maidHead;
+          if (lookPoint == 2) return maidsState[maidID].maidXxx;
+          return null;
+
+        }
         //メイド固定開始処理
         private void MaidFollowingCameraStart(int maidID)
         {
-          if (fpsModeEnabled || !maidFollowEnabled || tgID == -1 || !cfgw.maidFollowCameraAdjust) return;
+          if (!maidFollowEnabled || tgID == -1 || !cfgw.maidFollowCameraAdjust || fpsModeEnabled) return;
 
           //VRのみ HMDの現在位置に合わせてメイド固定開始
           if (bOculusVR) {
-            Transform maidObj = maidsState[maidID].maidMune;
-            if (lookPoint == 1) maidObj = maidsState[maidID].maidHead;
-            if (lookPoint == 2) maidObj = maidsState[maidID].maidXxx;
-            if (maidObj == null) return; //エラー対策
-            Transform maidTm = maidObj.transform;
+            Transform maidTm = getMaidLookpointTransform(maidID);
+            if (maidTm == null) return; //エラー対策
 
             //リアル視点 GripMoveの移動含む
             Transform realTm = mainCamera.GetRealHeadTransform();
@@ -11247,13 +11469,13 @@ namespace CM3D2.VibeYourMaid.Plugin
             maidFollowHeightOffset = realPos.y - maidTm.position.y;
             maidFollowHeightOffset = Math.Max(-cfgw.maidFollowKeepHeightBottom, Math.Min(cfgw.maidFollowKeepHeightTop, maidFollowHeightOffset));
 
-            //GripMoveの移動をリセット
+            //GripMoveの移動をリセット 正面もHMD向きになる
             mainCamera.SetRealHeadRot(new Vector3(0f, realAngleY, 0f), true); //falseだと視線方向の2倍回転してしまう
           }
         }
 
         private void MaidFollowingCamera(int maidID) {
-          if (fpsModeEnabled || !maidFollowEnabled) return;
+          if (!maidFollowEnabled || fpsModeEnabled) return;
 
           var cameraTm = mainCamera.transform;
 
@@ -11267,11 +11489,8 @@ namespace CM3D2.VibeYourMaid.Plugin
             }
           }
 
-          Transform maidObj = maidsState[maidID].maidMune;
-          if (lookPoint == 1) maidObj = maidsState[maidID].maidHead;
-          if (lookPoint == 2) maidObj = maidsState[maidID].maidXxx;
-          if (maidObj == null) return; //エラー対策
-          Transform maidTm = maidObj.transform;
+          Transform maidTm = getMaidLookpointTransform(maidID);
+          if (maidTm == null) return; //エラー対策
 
           //ターゲットメイドのオート変更
           if (aoutTarget) {
@@ -11387,9 +11606,6 @@ namespace CM3D2.VibeYourMaid.Plugin
         //メイド切り替え時の処理
         private void changeTargetMaid(int newID) {
           if (tgID == newID) return;
-
-          //自由移動制限対象を変更
-          moveLimitTgID = newID;
 
           int oldID = tgID;
           tgID = newID;
@@ -11572,7 +11788,7 @@ namespace CM3D2.VibeYourMaid.Plugin
                   }
 
                   //子宮脱按钮 #109
-                  if (GUI.Button(new Rect(125, 175, 40, 10), "に押します子宮脱", gsButton))
+                  if (GUI.Button(new Rect(10, 165, 40, 10), "に押します子宮脱", gsButton))
                   {
                     manualTriggeredUterusDatsu = true;
                   }
@@ -11595,7 +11811,6 @@ namespace CM3D2.VibeYourMaid.Plugin
                         maidsState[tgID].uDatsu = 0;
                         try { VertexMorph_FromProcItem(stockMaids[tgID].mem.body0, "pussy_uterus_prolapse", 0f); } catch { /*LogError(ex);*/ }
                       }
-
 
                       //男のモーション変更
                       if (maidsState[tgID].inMotion == "Non") {
@@ -11633,7 +11848,6 @@ namespace CM3D2.VibeYourMaid.Plugin
                     }
                   }
 
-
                   if (maidsState[tgID].stunFlag) {
                     if (GUI.Button(new Rect (170, 190, 40, 20), "叩く", gsButton)) {
                       maidsState[tgID].stunFlag = false;
@@ -11658,6 +11872,7 @@ namespace CM3D2.VibeYourMaid.Plugin
                     //if (maidFollowEnabled) MaidFollowingCameraStart(tgID); //視点の向きを正面にしてメイド固定
                     if (maidFollowEnabled) adjustCameraDistance(); //距離補正
                   }
+
                   cfgw.osawariEnabled = GUI.Toggle(new Rect (5, 190, 120, 20), cfgw.osawariEnabled, "おさわり有効" , gsToggle );
 
                 } else if (cfgw.mainGuiFlag == 2) {
@@ -11726,20 +11941,21 @@ namespace CM3D2.VibeYourMaid.Plugin
 
 
           if (cfgw.subGuiFlag != 0) {
-            if (GUI.Button(new Rect (200, 0, 20, 20), "－", gsButton)) {
+            if (GUI.Button(new Rect (195, 0, 25, 20), "－", gsButton)) {
               cfgw.subGuiFlag = 0;
               node2.height = 20;
               if (cfgw.guiOffsetYSub < 450) node2.y += 430; //上にある場合
             }
 
-            if (GUI.Button(new Rect (105, 5, 85, 20), "メイド呼出", gsButton)) {
+            if (GUI.Button(new Rect (100, 5, 85, 20), "メイド呼出", gsButton)) {
               cfgw.subGuiFlag = 2;
             }
             y += 30;
 
             //移動距離スライダー
-            GUI.Label(new Rect (10, y, 80, 20), "移動距離：" + moveValue * 100 , gsLabel);
-            float _moveValue = GUI.HorizontalSlider(new Rect(90, y+5, 120, 20), moveValue, 0.001f, 0.3f);
+            GUI.Label(new Rect (5, y, 80, 20), "移動距離：" + moveValue * 100 , gsLabel);
+            float _moveValue = GUI.HorizontalSlider(new Rect(85, y+5, 130, 20), (float)Math.Sqrt(moveValue/0.3f), (float)Math.Sqrt(0.1f/30f), 1.0f); //スライダの値は0～1をSqrtした値
+            _moveValue = _moveValue*_moveValue*0.3f; //スライダの値をSqrtして0.3倍にする
             if (moveValue != _moveValue) { moveValue = (float)Math.Round(_moveValue, _moveValue < 0.01f ? 3 : 2, MidpointRounding.ToEven); }
             y += 22;
             GUI.DrawTexture(new Rect(1, y, 218, 1), guiLineTexture, ScaleMode.StretchToFill, true, 0);
@@ -11784,22 +12000,26 @@ namespace CM3D2.VibeYourMaid.Plugin
 
               if (GUI.Button(new Rect (95, y, 25, 20), "左", gsButton)) {
                 Vector3 em = SubMans[0].transform.eulerAngles;
-                SubMans[0].transform.eulerAngles = new Vector3(em.x, (em.y >= 355f ? em.y-360f : em.y)+5f, em.z);
+                em.y = em.y - 100f * moveValue;
+                if (em.y < 0) em.y += 360f;
+                SubMans[0].transform.eulerAngles = em;
               }
               if (GUI.Button(new Rect (120, y, 25, 20), "右", gsButton)) {
                 Vector3 em = SubMans[0].transform.eulerAngles;
-                SubMans[0].transform.eulerAngles = new Vector3(em.x, (em.y < 5f ? em.y+360f : em.y)-5f, em.z);
+                em.y = em.y + 100f * moveValue;
+                if (em.y > 360) em.y -= 360f;
+                SubMans[0].transform.eulerAngles = em;
               }
               if (GUI.Button(new Rect (150, y, 25, 20), "前", gsButton)) {
                 Vector3 em = SubMans[0].transform.eulerAngles;
-                float emValue = em.x + 2.5f;
+                float emValue = em.x + 100f * moveValue;
                 if (emValue >= 360f) emValue -= 360f;
                 if (emValue > 90f && emValue < 270f) emValue = 90f;
                 SubMans[0].transform.eulerAngles = new Vector3(emValue, em.y, em.z);
               }
               if (GUI.Button(new Rect (175, y, 25, 20), "後", gsButton)) {
                 Vector3 em = SubMans[0].transform.eulerAngles;
-                float emValue = em.x - 2.5f;
+                float emValue = em.x - 100f * moveValue;
                 if (emValue < 0f) emValue += 360f;
                 if (emValue > 90f && emValue < 270f) emValue = 270f;
                 SubMans[0].transform.eulerAngles = new Vector3(emValue, em.y, em.z);
@@ -11868,11 +12088,15 @@ namespace CM3D2.VibeYourMaid.Plugin
 
                   if (GUI.Button(new Rect (100, y, 25, 20), "左", gsButton)) {
                     Vector3 em = maid.transform.eulerAngles;
-                    MaidMove(tgID, "ey", (em.y >= 355f ? em.y-360f : em.y)+5f, true);
+                    em.y = em.y - 100f * moveValue;
+                    if (em.y < 0) em.y += 360f;
+                    MaidMove(tgID, "ey", em.y, true);
                   }
                   if (GUI.Button(new Rect (125, y, 25, 20), "右", gsButton)) {
                     Vector3 em = maid.transform.eulerAngles;
-                    MaidMove(tgID, "ey", (em.y < 5f ? em.y+360f : em.y)-5f, true);
+                    em.y = em.y + 100f * moveValue;
+                    if (em.y > 360) em.y -= 360f;
+                    MaidMove(tgID, "ey", em.y, true);
                   }
                   if (GUI.Button(new Rect (155, y, 46, 20), "反転", gsButton)) {
                     Vector3 em = maid.transform.eulerAngles;
@@ -11892,14 +12116,14 @@ namespace CM3D2.VibeYourMaid.Plugin
 
                   if (GUI.Button(new Rect (100, y, 25, 20), "前", gsButton)) {
                     Vector3 em = maid.transform.eulerAngles;
-                    float emValue = em.x + 2.5f;
+                    float emValue = em.x + 100f * moveValue;
                     if (emValue >= 360f) emValue -= 360f;
                     if (emValue > 90f && emValue < 270f) emValue = 90f;
                     MaidMove(tgID, "ex", emValue, true);
                   }
                   if (GUI.Button(new Rect (125, y, 25, 20), "後", gsButton)) {
                     Vector3 em = maid.transform.eulerAngles;
-                    float emValue = em.x - 2.5f;
+                    float emValue = em.x - 100f * moveValue;
                     if (emValue < 0f) emValue += 360f;
                     if (emValue > 90f && emValue < 270f) emValue = 270f;
                     MaidMove(tgID, "ex", emValue, true);
@@ -12091,22 +12315,26 @@ namespace CM3D2.VibeYourMaid.Plugin
                   }
                   if (GUI.Button(new Rect (95, y, 25, 20), "左", gsButton)) {
                     Vector3 em = SubMans[i].transform.eulerAngles;
-                    SubMans[i].transform.eulerAngles = new Vector3(em.x, (em.y >= 355f ? em.y-360f : em.y)+5f, em.z);
+                    em.y = em.y - 100f * moveValue;
+                    if (em.y < 0) em.y += 360f;
+                    SubMans[i].transform.eulerAngles = em;
                   }
                   if (GUI.Button(new Rect (120, y, 25, 20), "右", gsButton)) {
                     Vector3 em = SubMans[i].transform.eulerAngles;
-                    SubMans[i].transform.eulerAngles = new Vector3(em.x, (em.y < 5f ? em.y+360f : em.y)-5f, em.z);
+                    em.y = em.y + 100f * moveValue;
+                    if (em.y > 360) em.y -= 360f;
+                    SubMans[i].transform.eulerAngles = em;
                   }
                   if (GUI.Button(new Rect (150, y, 25, 20), "前", gsButton)) {
                     Vector3 em = SubMans[i].transform.eulerAngles;
-                    float emValue = em.x + 2.5f;
+                    float emValue = em.x + 100f * moveValue;
                     if (emValue >= 360f) emValue -= 360f;
                     if (emValue > 90f && emValue < 270f) emValue = 90f;
                     SubMans[i].transform.eulerAngles = new Vector3(emValue, em.y, em.z);
                   }
                   if (GUI.Button(new Rect (175, y, 25, 20), "後", gsButton)) {
                     Vector3 em = SubMans[i].transform.eulerAngles;
-                    float emValue = em.x - 2.5f;
+                    float emValue = em.x - 100f * moveValue;
                     if (emValue < 0f) emValue += 360f;
                     if (emValue > 90f && emValue < 270f) emValue = 270f;
                     SubMans[i].transform.eulerAngles = new Vector3(emValue, em.y, em.z);
@@ -12151,7 +12379,7 @@ namespace CM3D2.VibeYourMaid.Plugin
             else node2.y = node.y - 450 + cfgw.guiOffsetYSub; //下にある場合
             node2.height = 20;
 
-            if (GUI.Button(new Rect (200, 0, 20, 20), "＋", gsButton)) {
+            if (GUI.Button(new Rect (195, 0, 25, 20), "＋", gsButton)) {
               cfgw.subGuiFlag = 1;
               node2.height = 450;
               if (cfgw.guiOffsetYSub < 450) node2.y -= 430; //上にある場合
@@ -12297,31 +12525,48 @@ namespace CM3D2.VibeYourMaid.Plugin
 
             Maid maid = stockMaids[tgID].mem;
 
-            if (GUI.Button(new Rect (600, 0, 20, 20), "x", gsButton)) {
+            if (GUI.Button(new Rect (595, 0, 25, 20), "x", gsButton)) {
               cfgw.configGuiFlag = false;
             }
 
             y = 5;
             if (ConfigFlag == 0 || ConfigFlag == 1) {
-              if (GUI.Button(new Rect (445, y, 60, 20), "再読込", gsButton)) {
+              if (GUI.Button(new Rect (430, y, 60, 20), "再読込", gsButton)) {
                 ConfigFileLoad();
                 vrShortCutController.init(cfgw, bOculusVR); //再設定
                 if (osawari != null) osawari.cfgw = cfgw; //参照が変わるので再設定
+
+                //胸のコライダーのオフセット等を更新
+                muneCollider.updateMuneColliderParam(stockMaids, maidsState, cfgw, SubMans, osawari.getTouchCollider());
                 //胸衝突設定再読み込み
-                if (cfgw.muneYoriEnabled) VisibleMaidCheck(true);
+                if (cfgw.muneYoriEnabled || cfgw.muneColliderEnabled) {
+                  foreach (int maidID in vmId) {
+                    MaidState maidState = maidsState[maidID];
+                    initVisibleMaidMune(maidID, stockMaids[maidID].mem, maidState);
+                  }
+                }
+
               }
 
-              if (GUI.Button(new Rect (510, y, 80, 20), "設定保存", gsButton)) {
+              if (GUI.Button(new Rect (505, y, 80, 20), "設定保存", gsButton)) {
                 ConfigFileSave();
               }
             }
 
 
-            if (GUI.Button(new Rect (160, y, 125, 20), "メインメイド操作", gsButton)) {
-              ConfigFlag = 0;
+            if (ConfigFlag == 0) {
+              GUI.Label(new Rect (160, y, 135, 20), "［ メインメイド操作 ］" , gsLabel);
+            } else {
+              if (GUI.Button(new Rect (160, y, 125, 20), "メインメイド操作", gsButton)) {
+                ConfigFlag = 0;
+              }
             }
-            if (GUI.Button(new Rect (300, y, 80, 20), "各種設定", gsButton)) {
-              ConfigFlag = 1;
+            if (ConfigFlag == 1) {
+              GUI.Label(new Rect (300, y, 90, 20), "［ 各種設定 ］" , gsLabel);
+            } else {
+              if (GUI.Button(new Rect (300, y, 80, 20), "各種設定", gsButton)) {
+                ConfigFlag = 1;
+              }
             }
 
             switch (ConfigFlag) {
@@ -12364,7 +12609,9 @@ namespace CM3D2.VibeYourMaid.Plugin
                       maid.body0.SetMask(TBody.SlotID.shoes, true);
                       maid.body0.SetMask(TBody.SlotID.accKubi, true);
                       maid.body0.SetMask(TBody.SlotID.accKubiwa, true);
+                      #if EmpiresLife
                       dCheck = true;
+                      #endif
                     }
 
                     if (GUI.Button(new Rect (10, y+25, 85, 20), "下着", gsButton)){
@@ -12373,12 +12620,12 @@ namespace CM3D2.VibeYourMaid.Plugin
                       maid.body0.SetMask(TBody.SlotID.onepiece, false);
                       maid.body0.SetMask(TBody.SlotID.skirt, false);
                       maid.body0.SetMask(TBody.SlotID.shoes, false);
-
                       maid.body0.SetMask(TBody.SlotID.bra, true);
                       maid.body0.SetMask(TBody.SlotID.panz, true);
                       maid.body0.SetMask(TBody.SlotID.stkg, true);
-
+                      #if EmpiresLife
                       dCheck = true;
+                      #endif
                     }
 
                     if (GUI.Button(new Rect (10, y+50, 85, 20), "全裸", gsButton)){
@@ -12396,121 +12643,163 @@ namespace CM3D2.VibeYourMaid.Plugin
                       maid.body0.SetMask(TBody.SlotID.shoes, false);
                       maid.body0.SetMask(TBody.SlotID.accKubi, false);
                       maid.body0.SetMask(TBody.SlotID.accKubiwa, false);
+                      #if EmpiresLife
                       dCheck = true;
+                      #endif
                     }
 
                     if (GUI.Button(new Rect (110, y, 80, 20), "トップス", gsButton)){
                       if (maid.body0.GetSlotVisible(TBody.SlotID.wear)) UndressingReaction(tgID, maid.body0.GetMask(TBody.SlotID.bra) ? 0 : 2);
                       maid.body0.SetMask(TBody.SlotID.wear, !maid.body0.GetMask(TBody.SlotID.wear));
+                      #if EmpiresLife
                       dCheck = true;
+                      #endif
                     }
 
                     if (GUI.Button(new Rect (110, y+25, 80, 20), "ワンピース", gsButton)){
                       if (maid.body0.GetSlotVisible(TBody.SlotID.onepiece)) UndressingReaction(tgID, 1);
                       maid.body0.SetMask(TBody.SlotID.onepiece, !maid.body0.GetMask(TBody.SlotID.onepiece));
+                      #if EmpiresLife
                       dCheck = true;
+                      #endif
                     }
 
                     if (GUI.Button(new Rect (110, y+50, 80, 20), "スカート", gsButton)){
                       if (maid.body0.GetSlotVisible(TBody.SlotID.skirt)) UndressingReaction(tgID, 1);
                       maid.body0.SetMask(TBody.SlotID.skirt, !maid.body0.GetMask(TBody.SlotID.skirt));
+                      #if EmpiresLife
                       dCheck = true;
+                      #endif
                     }
 
                     if (GUI.Button(new Rect (200, y, 80, 20), "水着", gsButton)){
                       if (maid.body0.GetSlotVisible(TBody.SlotID.mizugi)) UndressingReaction(tgID, 3);
                       maid.body0.SetMask(TBody.SlotID.mizugi, !maid.body0.GetMask(TBody.SlotID.mizugi));
+                      #if EmpiresLife
                       dCheck = true;
+                      #endif
                     }
 
 		                if (GUI.Button(new Rect (200, y+25, 80, 20), "ブラジャー", gsButton)){
                       if (maid.body0.GetSlotVisible(TBody.SlotID.bra)) UndressingReaction(tgID, 2);
                       maid.body0.SetMask(TBody.SlotID.bra, !maid.body0.GetMask(TBody.SlotID.bra));
+                      #if EmpiresLife
                       dCheck = true;
+                      #endif
 		                }
 
                     if (GUI.Button(new Rect (200, y+50, 80, 20), "ショーツ", gsButton)){
                       if (maid.body0.GetSlotVisible(TBody.SlotID.panz)) UndressingReaction(tgID, 3);
                       maid.body0.SetMask(TBody.SlotID.panz, !maid.body0.GetMask(TBody.SlotID.panz));
+                      #if EmpiresLife
                       dCheck = true;
+                      #endif
 		                }
 
                     if (GUI.Button(new Rect (295, y, 55, 20), "頭", gsButton)){
                       bool isHeadset = maid.body0.GetMask(TBody.SlotID.headset) || maid.body0.GetMask(TBody.SlotID.accHat);
                       maid.body0.SetMask(TBody.SlotID.headset, !isHeadset);
                       maid.body0.SetMask(TBody.SlotID.accHat, !isHeadset);
+                      #if EmpiresLife
                       dCheck = true;
+                      #endif
 		                }
 
                     if (GUI.Button(new Rect (360, y, 55, 20), "首", gsButton)){
                       bool isKubi = maid.body0.GetMask(TBody.SlotID.accKubi) || maid.body0.GetMask(TBody.SlotID.accKubiwa);
                       maid.body0.SetMask(TBody.SlotID.accKubi, !isKubi);
                       maid.body0.SetMask(TBody.SlotID.accKubiwa, !isKubi);
+                      #if EmpiresLife
                       dCheck = true;
+                      #endif
 		                }
 
                     if (GUI.Button(new Rect (425, y, 55, 20), "耳", gsButton)){
                       bool isMimi = maid.body0.GetMask(TBody.SlotID.accMiMiR) || maid.body0.GetMask(TBody.SlotID.accMiMiL);
                       maid.body0.SetMask(TBody.SlotID.accMiMiR, !isMimi);
                       maid.body0.SetMask(TBody.SlotID.accMiMiL, !isMimi);
+                      #if EmpiresLife
                       dCheck = true;
+                      #endif
 		                }
 
                     if (GUI.Button(new Rect (490, y, 55, 20), "帽子", gsButton)){
                       maid.body0.SetMask(TBody.SlotID.accHat, !maid.body0.GetMask(TBody.SlotID.accHat));
+                      #if EmpiresLife
                       dCheck = true;
+                      #endif
 		                }
 
                     if (GUI.Button(new Rect (555, y, 55, 20), "メガネ", gsButton)){
                       bool isMegane = maid.body0.GetMask(TBody.SlotID.megane) || maid.body0.GetMask(TBody.SlotID.accHead);
                       maid.body0.SetMask(TBody.SlotID.megane, !isMegane);
                       maid.body0.SetMask(TBody.SlotID.accHead, !isMegane);
+                      #if EmpiresLife
                       dCheck = true;
+                      #endif
 		                }
 
                     if (GUI.Button(new Rect (295, y+25, 55, 20), "背中", gsButton)){
                       maid.body0.SetMask(TBody.SlotID.accSenaka, !maid.body0.GetMask(TBody.SlotID.accSenaka));
+                      #if EmpiresLife
                       dCheck = true;
+                      #endif
 		                }
 
                     if (GUI.Button(new Rect (360, y+25, 55, 20), "手", gsButton)){
                       maid.body0.SetMask(TBody.SlotID.glove, !maid.body0.GetMask(TBody.SlotID.glove));
+                      #if EmpiresLife
                       dCheck = true;
+                      #endif
 		                }
 
                     if (GUI.Button(new Rect (425, y+25, 55, 20), "腕", gsButton)){
                       maid.body0.SetMask(TBody.SlotID.accUde, !maid.body0.GetMask(TBody.SlotID.accUde));
+                      #if EmpiresLife
                       dCheck = true;
+                      #endif
 		                }
 
                     if (GUI.Button(new Rect (490, y+25, 55, 20), "あそこ", gsButton)){
                       maid.body0.SetMask(TBody.SlotID.accXXX, !maid.body0.GetMask(TBody.SlotID.accXXX));
+                      #if EmpiresLife
                       dCheck = true;
+                      #endif
 		                }
 
                     if (GUI.Button(new Rect (555, y+25, 55, 20), "Uヘアー", gsButton)){
                       maid.body0.SetMask(TBody.SlotID.underhair, !maid.body0.GetMask(TBody.SlotID.underhair));
+                      #if EmpiresLife
                       dCheck = true;
+                      #endif
 		                }
 
                     if (GUI.Button(new Rect (295, y+50, 55, 20), "靴", gsButton)){
                       maid.body0.SetMask(TBody.SlotID.shoes, !maid.body0.GetMask(TBody.SlotID.shoes));
+                      #if EmpiresLife
                       dCheck = true;
+                      #endif
 	            	    }
 
                     if (GUI.Button(new Rect (360, y+50, 55, 20), "靴下", gsButton)){
                       maid.body0.SetMask(TBody.SlotID.stkg, !maid.body0.GetMask(TBody.SlotID.stkg));
+                      #if EmpiresLife
                       dCheck = true;
+                      #endif
 		                }
 
                     if (GUI.Button(new Rect (425, y+50, 55, 20), "足首", gsButton)){
                       maid.body0.SetMask(TBody.SlotID.accAshi, !maid.body0.GetMask(TBody.SlotID.accAshi));
+                      #if EmpiresLife
                       dCheck = true;
+                      #endif
 	            	    }
 
                     if (GUI.Button(new Rect (490, y+50, 55, 20), "しっぽ", gsButton)){
                       maid.body0.SetMask(TBody.SlotID.accShippo, !maid.body0.GetMask(TBody.SlotID.accShippo));
+                      #if EmpiresLife
                       dCheck = true;
+                      #endif
 	            	    }
 
                     if (GUI.Button(new Rect (555, y+50, 55, 20), "その他", gsButton)){
@@ -12520,7 +12809,9 @@ namespace CM3D2.VibeYourMaid.Plugin
                       maid.body0.SetMask(TBody.SlotID.accNipR, !isAccSonota);
                       maid.body0.SetMask(TBody.SlotID.accNipL, !isAccSonota);
                       maid.body0.SetMask(TBody.SlotID.accHeso, !isAccSonota);
+                      #if EmpiresLife
                       dCheck = true;
+                      #endif
 		                }
 
                     y = 120;
@@ -12681,7 +12972,7 @@ namespace CM3D2.VibeYourMaid.Plugin
                   y += 40;
 
                   if (man.Visible) fpsModeEnabled = GUI.Toggle(new Rect (10, y, 95, 20), fpsModeEnabled, "一人称視点" , gsToggle );
-                  else GUI.Label(new Rect(10, y+2, 95, 20), "× 一人称視点", gsLabel);
+                  else GUI.Label(new Rect(10, y+2, 95, 20), "☒ 一人称視点", gsLabel);
 
                   bool bToggle = GUI.Toggle(new Rect (105, y, 95, 20), maidFollowEnabled, "メイド固定" , gsToggle );
                   if (maidFollowEnabled != bToggle) {
@@ -12709,8 +13000,8 @@ namespace CM3D2.VibeYourMaid.Plugin
                   }
 
                   GUI.Label(new Rect (5, y, 105, 20), "【ボイスセット】", gsLabel);
-                  vsNormalMode = GUI.Toggle(new Rect (110, y, 40, 20), vsNormalMode, "通常" , gsToggle );
-                  vsNormalMode = !GUI.Toggle(new Rect (155, y, 40, 20), !vsNormalMode, "キス" , gsToggle );
+                  vsNormalMode = GUI.Toggle(new Rect (110, y+2, 40, 20), vsNormalMode, "通常" , gsToggle );
+                  vsNormalMode = !GUI.Toggle(new Rect (155, y+2, 40, 20), !vsNormalMode, "キス" , gsToggle );
                   y += 22;
 
                   if (vsNormalMode) {
@@ -12810,11 +13101,11 @@ namespace CM3D2.VibeYourMaid.Plugin
                   GUI.Label(new Rect (205, y, 60, 20), "【興奮値】", gsLabel);
                   cfgw.yotogiExciteLink = GUI.Toggle(new Rect (270, y, 100, 20), cfgw.yotogiExciteLink, "絶頂値に連動", gsToggle);
                   y += 22;
-                  GUI.Label(new Rect (210, y, 30, 20), ""+stockMaids[tgID].mem.status.currentExcite, gsLabelR);
+                  GUI.Label(new Rect (205, y, 30, 20), ""+stockMaids[tgID].mem.status.currentExcite, gsLabelR);
                   int excite = stockMaids[tgID].mem.status.currentExcite;
                   if (GUI.Button(new Rect (350, y, 20, 20), "-", gsButton)) excite -= 50;
                   if (GUI.Button(new Rect (375, y, 20, 20), "+", gsButton)) excite += 50;
-                  excite = (int)Math.Round(GUI.HorizontalSlider(new Rect(245, y+5, 100, 20), excite, -100, 300)/10)*10;
+                  excite = (int)Math.Round(GUI.HorizontalSlider(new Rect(240, y+5, 100, 20), excite, -100, 300)/10)*10;
                   if (excite != stockMaids[tgID].mem.status.currentExcite) setExcite(tgID, maid, excite);
 
 
@@ -13156,14 +13447,14 @@ namespace CM3D2.VibeYourMaid.Plugin
                     obj = maid.GetPrefab("夜伽_愛液3");
                     if (obj) obj.SetActive(cfgw.AiekiEnabled);
                   }
-
+                  cfgw.aseAnimeEnabled = GUI.Toggle(new Rect (140, y, 40, 20), cfgw.aseAnimeEnabled, "汗" , gsToggle );
                   cfgw.HohoEnabled = GUI.Toggle(new Rect (5, y+20, 65, 20), cfgw.HohoEnabled, "頬染め" , gsToggle );
                   cfgw.NamidaEnabled = GUI.Toggle(new Rect (80, y+20, 40, 20), cfgw.NamidaEnabled, "涙" , gsToggle );
-                  cfgw.aseAnimeEnabled = GUI.Toggle(new Rect (140, y+20, 40, 20), cfgw.aseAnimeEnabled, "汗" , gsToggle );
-                  cfgw.YodareEnabled = GUI.Toggle(new Rect (5, y+40, 55, 20), cfgw.YodareEnabled, "よだれ" , gsToggle );
-                  cfgw.CliAnimeEnabled = GUI.Toggle(new Rect (80, y+40, 75, 20), cfgw.CliAnimeEnabled, "クリ勃起" , gsToggle );
-                  cfgw.SioEnabled = GUI.Toggle(new Rect (5, y+60, 55, 20), cfgw.SioEnabled, "潮吹き" , gsToggle );
-                  cfgw.NyoEnabled = GUI.Toggle(new Rect (80, y+60, 70, 20), cfgw.NyoEnabled, "お漏らし" , gsToggle );
+                  cfgw.YodareEnabled = GUI.Toggle(new Rect (140, y+20, 55, 20), cfgw.YodareEnabled, "よだれ" , gsToggle );
+                  cfgw.SioEnabled = GUI.Toggle(new Rect (5, y+40, 55, 20), cfgw.SioEnabled, "潮吹き" , gsToggle );
+                  cfgw.NyoEnabled = GUI.Toggle(new Rect (80, y+40, 70, 20), cfgw.NyoEnabled, "お漏らし" , gsToggle );
+                  cfgw.uDatsuEnabled = GUI.Toggle(new Rect (5, y+60, 55, 20), cfgw.uDatsuEnabled, "子宮脱" , gsToggle );
+                  cfgw.CliAnimeEnabled = GUI.Toggle(new Rect (80, y+60, 75, 20), cfgw.CliAnimeEnabled, "クリ勃起" , gsToggle );
                   cfgw.OrgsmAnimeEnabled = GUI.Toggle(new Rect (5, y+80, 75, 20), cfgw.OrgsmAnimeEnabled, "痙攣動作" , gsToggle );
                   cfgw.AheEnabled = GUI.Toggle(new Rect (80, y+80, 100, 20), cfgw.AheEnabled, "瞳上昇（アヘ）" , gsToggle );
                   cfgw.zViceWaitEnabled = GUI.Toggle(new Rect (5, y+100, 190, 20), cfgw.zViceWaitEnabled, "絶頂時に音声終了を待つ" , gsToggle );
@@ -13188,8 +13479,8 @@ namespace CM3D2.VibeYourMaid.Plugin
                   GUI.Label(new Rect (10, y, 85, 20), "判定距離：" + Math.Floor(cfgw.camCheckRange * 100) , gsLabel);
                   cfgw.camCheckRange = GUI.HorizontalSlider(new Rect(95, y+5, 100, 20), cfgw.camCheckRange, 0.0F, 1.0F);
                   cfgw.camCheckEnabled = GUI.Toggle(new Rect (10, y+20, 190, 20), cfgw.camCheckEnabled, "自動でキスに変更する" , gsToggle );
-                  cfgw.camCheckVoiceEnabled = GUI.Toggle(new Rect (10, y+40, 190, 20), cfgw.camCheckVoiceEnabled, "距離とボイスセットを連動" , gsToggle );
-                  y += 65;
+                  cfgw.camCheckVoiceEnabled = GUI.Toggle(new Rect (10, y+40, 190, 20), cfgw.camCheckVoiceEnabled, "距離とキスボイスを連動" , gsToggle );
+                  y += 68;
 
                   GUI.Label(new Rect (5, y, 40, 20), "【SE】" , gsLabel);
                   if (GUI.Button(new Rect (50, y, 60, 20), "切替", gsButton)) {
@@ -13215,79 +13506,110 @@ namespace CM3D2.VibeYourMaid.Plugin
                   cfgw.hibuAnime1Enabled = GUI.Toggle(new Rect (205, y, 190, 20), cfgw.hibuAnime1Enabled, "動作時" , gsToggle );
                   GUI.Label(new Rect (210, y+20, 80, 20), "kupa開度：" , gsLabel);
                   GUI.Label(new Rect (250, y+20, 40, 20), ""+Math.Floor(maidsState[tgID].hibuSlider1Value) , gsLabelR);
-                  maidsState[tgID].hibuSlider1Value = GUI.HorizontalSlider(new Rect(295, y+25, 100, 20), maidsState[tgID].hibuSlider1Value, 0.0F, 100.0F);
+                  maidsState[tgID].hibuSlider1Value = GUI.HorizontalSlider(new Rect(295, y+25, 110, 20), maidsState[tgID].hibuSlider1Value, 0.0F, 100.0F);
                   GUI.Label(new Rect (210, y+40, 80, 20), "anal開度：" , gsLabel);
                   GUI.Label(new Rect (250, y+40, 40, 20), ""+Math.Floor(maidsState[tgID].analSlider1Value) , gsLabelR);
-                  maidsState[tgID].analSlider1Value = GUI.HorizontalSlider(new Rect(295, y+45, 100, 20), maidsState[tgID].analSlider1Value, 0.0F, 100.0F);
+                  maidsState[tgID].analSlider1Value = GUI.HorizontalSlider(new Rect(295, y+45, 110, 20), maidsState[tgID].analSlider1Value, 0.0F, 100.0F);
                   y += 60;
                   cfgw.hibuAnime2Enabled = GUI.Toggle(new Rect (205, y, 190, 20), cfgw.hibuAnime2Enabled, "停止時" , gsToggle );
                   GUI.Label(new Rect (210, y+20, 80, 20), "kupa開度：" , gsLabel);
                   GUI.Label(new Rect (250, y+20, 40, 20), ""+Math.Floor(maidsState[tgID].hibuSlider2Value) , gsLabelR);
-                  maidsState[tgID].hibuSlider2Value = GUI.HorizontalSlider(new Rect(295, y+25, 100, 20), maidsState[tgID].hibuSlider2Value, 0.0F, 100.0F);
+                  maidsState[tgID].hibuSlider2Value = GUI.HorizontalSlider(new Rect(295, y+25, 110, 20), maidsState[tgID].hibuSlider2Value, 0.0F, 100.0F);
                   GUI.Label(new Rect (210, y+40, 80, 20), "anal開度：" , gsLabel);
                   GUI.Label(new Rect (250, y+40, 40, 20), ""+Math.Floor(maidsState[tgID].analSlider2Value) , gsLabelR);
-                  maidsState[tgID].analSlider2Value = GUI.HorizontalSlider(new Rect(295, y+45, 100, 20), maidsState[tgID].analSlider2Value, 0.0F, 100.0F);
-                  y += 65;
+                  maidsState[tgID].analSlider2Value = GUI.HorizontalSlider(new Rect(295, y+45, 110, 20), maidsState[tgID].analSlider2Value, 0.0F, 100.0F);
+                  y += 62;
 
-                  GUI.Label(new Rect (205, y, 190, 20), "【モーションアジャスト】" , gsLabel);
-                  y += 18;
-                  cfgw.majEnabled = GUI.Toggle(new Rect (205, y, 190, 20), cfgw.majEnabled, "モーションアジャスト有効" , gsToggle );
+                  GUI.Label(new Rect (205, y+2, 40, 20), "【" , gsLabel);
+                  cfgw.majEnabled = GUI.Toggle(new Rect (217, y, 190, 20), cfgw.majEnabled, "モーションアジャスト有効】" , gsToggle );
                   cfgw.majItemClear = GUI.Toggle(new Rect (215, y+20, 190, 20), cfgw.majItemClear, "実行時にアイテムをクリア" , gsToggle );
                   cfgw.majKupaEnabled = GUI.Toggle(new Rect (215, y+40, 190, 20), cfgw.majKupaEnabled, "kupa値変更を有効" , gsToggle );
                   y += 65;
 
-                  GUI.Label(new Rect (205, y, 210, 20), "【マニアック演出】（※要SAVE）" , gsLabel);
-                  if (GUI.Button(new Rect (205, y+20, 70, 20), "クリ属性", gsButton)) {
+                  GUI.Label(new Rect (205, y, 210, 20), "【クリ設定】 （※ 要SAVE）" , gsLabel);
+                  if (GUI.Button(new Rect (210, y+20, 70, 20), "クリ属性", gsButton)) {
                     ++maidsState[tgID].cliMode;
                     if (maidsState[tgID].cliMode > 2) maidsState[tgID].cliMode = 0;
                     ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "cliMode", maidsState[tgID].cliMode.ToString(), true);
-
+                    
                     try { VertexMorph_FromProcItem(maid.body0, "clitoris", 0f); } catch { /*LogError(ex);*/ }
                     try { VertexMorph_FromProcItem(maid.body0, "pussy_clitoris_large", 0f); } catch { /*LogError(ex);*/ }
                     try { VertexMorph_FromProcItem(maid.body0, "pussy_clitoris_penis", 0f); } catch { /*LogError(ex);*/ }
                     if (maidsState[tgID].bokkiValue1 == 0) maidsState[tgID].bokkiValue1++; //0以外ならEffectBokkiで処理されるので値を設定
                     EffectBokki(maid, maidsState[tgID]);
                   }
-                  GUI.Label(new Rect (290, y+20, 70, 20), cliModeText[maidsState[tgID].cliMode] , gsLabel);
+                  GUI.Label(new Rect (295, y+20, 70, 20), cliModeText[maidsState[tgID].cliMode] , gsLabel);
 
                   GUI.Label(new Rect (220, y+42, 150, 20), "クリ縮小：" + Math.Round(maidsState[tgID].cliScale*100.0) +"%" , gsLabel);
-                  if (GUI.Button(new Rect (325, y+42, 25, 20), "-", gsButton)) {
-                    if (maidsState[tgID].cliScale <= 0.1f) return;
-                    maidsState[tgID].cliScale -= 0.1f;
-                    maidsState[tgID].cliScale = (float)(Math.Round((maidsState[tgID].cliScale * 10.0)) * 0.1);
+                  float cliScale = GUI.HorizontalSlider(new Rect(320, y+47, 75, 20), maidsState[tgID].cliScale, 0.1f, 1.0f);
+                  cliScale = (float)(Math.Round(cliScale*10f)*0.1f);
+                  if (maidsState[tgID].cliScale != cliScale) {
+                    maidsState[tgID].cliScale = cliScale;
                     ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "cliScale", maidsState[tgID].cliScale.ToString(), true);
-                    if (maidsState[tgID].bokkiValue1 == 0) maidsState[tgID].bokkiValue1++; //0以外ならEffectBokkiで処理されるので値を設定
+                    if (maidsState[tgID].bokkiValue1 == 0) maidsState[tgID].bokkiValue1++; //0だと反映されないので+1して処理させる
                     EffectBokki(maid, maidsState[tgID]);
                   }
-                  if (GUI.Button(new Rect (355, y+42, 25, 20), "+", gsButton)) {
-                    if (maidsState[tgID].cliScale >= 1f) return;
-                    maidsState[tgID].cliScale += 0.1f;
-                    maidsState[tgID].cliScale = (float)(Math.Round((maidsState[tgID].cliScale * 10.0)) * 0.1);
-                    ExSaveData.Set(maid, "CM3D2.VibeYourMaid.Plugin", "cliScale", maidsState[tgID].cliScale.ToString(), true);
-                    if (maidsState[tgID].bokkiValue1 == 0) maidsState[tgID].bokkiValue1++; //0以外ならEffectBokkiで処理されるので値を設定
-                    EffectBokki(maid, maidsState[tgID]);
-                  }
-                  cfgw.uDatsuEnabled = GUI.Toggle(new Rect (205, y+60, 100, 20), cfgw.uDatsuEnabled, "子宮脱" , gsToggle );
-                  y += 85;
+                  y += 65;
 
-                  GUI.Label(new Rect (205, y, 120, 20), "【胸と腕の衝突判定】" , gsLabel);
+                  GUI.Label(new Rect (205, y, 100, 20), "【胸の衝突判定】" , gsLabel);
                   y += 18;
-                  bool enabled = GUI.Toggle(new Rect (205, y, 110, 20), cfgw.muneYoriEnabled, "胸の衝突有効" , gsToggle );
+                  bool enabled = GUI.Toggle(new Rect (205, y, 110, 20), cfgw.muneYoriEnabled, "上腕での回転" , gsToggle );
                   if (enabled != cfgw.muneYoriEnabled) {
                     cfgw.muneYoriEnabled = enabled;
-                    VisibleMaidCheck(true);
+                    foreach (int maidID in vmId) {
+                      MaidState maidState = maidsState[maidID];
+                      initVisibleMaidMune(maidID, stockMaids[maidID].mem, maidState);
+                    }
                   }
-                  enabled = GUI.Toggle(new Rect (320, y, 90, 20), cfgw.muneDrawGizmo, "範囲表示" , gsToggle );
+                  enabled = GUI.Toggle(new Rect (320, y, 80, 20), cfgw.muneDrawGizmo, "範囲表示" , gsToggle );
                   if (enabled != cfgw.muneDrawGizmo) {
                     cfgw.muneDrawGizmo = enabled;
-                    VisibleMaidCheck(true);
+                    foreach (int maidID in vmId) {
+                      MaidState maidState = maidsState[maidID];
+                      initVisibleMaidMune(maidID, stockMaids[maidID].mem, maidState);
+                    }
+                  }
+                  y += 20;
+                  enabled = GUI.Toggle(new Rect (205, y, 120, 20), cfgw.muneColliderEnabled, "胸コライダー" , gsToggle );
+                  if (enabled != cfgw.muneColliderEnabled) {
+                    cfgw.muneColliderEnabled = enabled;
+                    //メイドの状態を更新 無効状態の場合はレンダラー等が破棄される
+                    foreach (int maidID in vmId) {
+                      MaidState maidState = maidsState[maidID];
+                      initVisibleMaidMune(maidID, stockMaids[maidID].mem, maidState);
+                    }
+                  }
+                  y += 20;
+                  if (!cfgw.muneColliderEnabled) {
+                    GUI.Label(new Rect (215, y+2, 50, 20), "☒ 前腕" , gsLabel);
+                    GUI.Label(new Rect (275, y+2, 50, 20), "☒ 股間" , gsLabel);
+                    GUI.Label(new Rect (335, y+2, 50, 20), "☒ VR手" , gsLabel);
+                  } else {
+                    enabled = GUI.Toggle(new Rect (215, y, 50, 20), cfgw.muneHitForearmEnabled, "前腕" , gsToggle );
+                    if (enabled != cfgw.muneHitForearmEnabled) {
+                      cfgw.muneHitForearmEnabled = enabled;
+                      foreach (MaidState maidState in maidsState) {
+                        muneCollider.setForearmEnabled(maidState.muneColliderInfo, cfgw.muneHitForearmEnabled);
+                      }
+                    }
+                    enabled = GUI.Toggle(new Rect (275, y, 50, 20), cfgw.muneHitChinkoEnabled, "股間" , gsToggle );
+                    if (enabled != cfgw.muneHitChinkoEnabled) {
+                      cfgw.muneHitChinkoEnabled = enabled;
+                      muneCollider.setChinkoColliderEnabledAll(enabled);
+                      chinkoCheckTime = enabled ? 0 : float.PositiveInfinity; //無効ならチェックさせない
+                    }
+                    enabled = GUI.Toggle(new Rect (335, y, 50, 20), cfgw.muneTouchColliderEnabled, "VR手" , gsToggle );
+                    if (enabled != cfgw.muneTouchColliderEnabled) {
+                      cfgw.muneTouchColliderEnabled = enabled;
+                      osawari.setTouchColliderEnabled(cfgw.muneTouchColliderEnabled);
+                    }
                   }
                   y += 25;
 
                   GUI.Label(new Rect (205, y, 190, 20), "【おさわり設定】" , gsLabel);
                   y += 18;
                   cfgw.osawariEnabled = GUI.Toggle(new Rect (205, y, 95, 20), cfgw.osawariEnabled, "おさわり有効" , gsToggle );
-                  cfgw.osawariAlways = GUI.Toggle(new Rect (305, y, 95, 20), cfgw.osawariAlways, "常時判定" , gsToggle );
+                  cfgw.osawariAlways = GUI.Toggle(new Rect (310, y, 95, 20), cfgw.osawariAlways, "常時判定" , gsToggle );
                   GUI.Label(new Rect (210, y+22, 90, 20), "移動倍率：" + cfgw.osawariMoveRate , gsLabel);
                   cfgw.osawariMoveRate = GUI.HorizontalSlider(new Rect(295, y+27, 100, 20), cfgw.osawariMoveRate, 0.1f, 5.0f);
                   cfgw.osawariMoveRate = (float)(Math.Round(cfgw.osawariMoveRate*10)*0.1);
@@ -13295,7 +13617,7 @@ namespace CM3D2.VibeYourMaid.Plugin
 
                   //三列目
                   y = 30;
-                  GUI.Label(new Rect (415, y, 150, 20), "【各EDIT画面を表示】" , gsLabel);
+                  GUI.Label(new Rect (410, y, 150, 20), "【各EDIT画面を表示】" , gsLabel);
                   y += 20;
 
                   /*if (GUI.Button(new Rect (420, y, 190, 20), "基本ボイスセット", gsButton)) { ConfigFlag = 2; }
@@ -13337,7 +13659,7 @@ namespace CM3D2.VibeYourMaid.Plugin
                   }
                   y += 25;*/
 
-                  GUI.Label(new Rect (415, y, 150, 20), "【移動速度】" , gsLabel);
+                  GUI.Label(new Rect (410, y, 150, 20), "【移動速度】" , gsLabel);
                   y += 18;
 
                   GUI.Label(new Rect (415, y, 95, 20), "メイド固定：" + cfgw.maidFollowSpeed , gsLabel);
@@ -13356,7 +13678,7 @@ namespace CM3D2.VibeYourMaid.Plugin
                     cfgw.cameraMoveReturnSpeedY = (float)(Math.Round(cfgw.cameraMoveReturnSpeedY*10)*0.1);
                     y += 23;
 
-                    GUI.Label(new Rect (415, y, 150, 20), "【自由移動制限】" , gsLabel);
+                    GUI.Label(new Rect (410, y, 150, 20), "【自由移動】" , gsLabel);
                     y += 18;
                     cfgw.vrCameraMoveLimit = GUI.Toggle(new Rect (410, y, 100, 20), cfgw.vrCameraMoveLimit, "最短距離：" + (cfgw.vrCameraMoveLimit ? ""+(cfgw.vrCameraMoveLimitDistance*100f) : "無効"), gsToggle);
                     if (cfgw.vrCameraMoveLimit) {
@@ -13364,24 +13686,24 @@ namespace CM3D2.VibeYourMaid.Plugin
                       cfgw.vrCameraMoveLimitDistance = cfgw.vrCameraMoveLimitDistance < 0.2 ? (float)(Math.Round(cfgw.vrCameraMoveLimitDistance*100)*0.01) : (float)(Math.Round(cfgw.vrCameraMoveLimitDistance*20)*0.05);
                     }
                     y += 20;
-                    cfgw.vrCameraMoveLimitHorizontal = GUI.Toggle(new Rect (410, y, 195, 20), cfgw.vrCameraMoveLimitHorizontal, "水平方向正面で制限", gsToggle);
+                    cfgw.vrCameraMoveLimitHorizontal = GUI.Toggle(new Rect (420, y, 200, 20), cfgw.vrCameraMoveLimitHorizontal, "水平方向正面で制限", gsToggle);
                     y += 20;
-                    bool headDirection = GUI.Toggle(new Rect (410, y, 195, 20), cfgw.vrCameraMoveHeadDirection, "HMD方向で自由移動", gsToggle);
+                    GUI.Label(new Rect (420, y, 190, 20), "制限対象メイド自動切替" , gsLabel);
+                    y += 18;
+                    cfgw.vrAutoMaidChange = GUI.Toggle(new Rect (420, y, 95, 20), cfgw.vrAutoMaidChange, "ジャンプ時", gsToggle);
+                    cfgw.vrOutsideMaidChange = GUI.Toggle(new Rect (520, y, 95, 20), cfgw.vrOutsideMaidChange, "正面範囲外", gsToggle);
+                    y += 20;
+
+                    bool headDirection = GUI.Toggle(new Rect (410, y, 200, 20), cfgw.vrCameraMoveHeadDirection, "HMD方向に自由移動", gsToggle);
                     if (cfgw.vrCameraMoveHeadDirection != headDirection) {
                       cfgw.vrCameraMoveHeadDirection = headDirection;
                       //変更時に入れ替える
                       vrShortCutController.setDirectionTransform(cfgw.vrCameraMoveHeadDirection);
                     }
                     y += 20;
-
-                    GUI.Label(new Rect (410, y, 150, 20), "メイド自動切換え" , gsLabel);
-                    y += 15;
-                    cfgw.vrAutoMaidChange = GUI.Toggle(new Rect (415, y, 100, 20), cfgw.vrAutoMaidChange, "ジャンプ時", gsToggle);
-                    cfgw.vrOutsideMaidChange = GUI.Toggle(new Rect (520, y, 100, 20), cfgw.vrOutsideMaidChange, "正面範囲外", gsToggle);
-                    y += 20;
                   }
 
-                  cfgw.vrShortCut = GUI.Toggle(new Rect (410, 425, 190, 20), cfgw.vrShortCut, "VRショートカット有効" , gsToggle );
+                  cfgw.vrShortCut = GUI.Toggle(new Rect (410, 425, 200, 20), cfgw.vrShortCut, "VRショートカット有効" , gsToggle );
 
                   /*開発用
                   if (GUI.Button(new Rect (460, 380, 150, 20), "性格チェック", gsButton)) {
@@ -14164,21 +14486,21 @@ namespace CM3D2.VibeYourMaid.Plugin
                     if (GUI.Button(new Rect (x+65, y+20, 18, 20), "0", gsButton)) {
                       float offset = - majParam[maidsState[motionMaidID].motionID];
                       if (showSubMotionUI) { majParam[maidsState[motionMaidID].motionID] = majParam[maidsState[tgID].motionID]; setSubMotionPosition(motionMaidID, tgID); }
-                      else { majParam[maidsState[motionMaidID].motionID] = 0; setBasicMotionPositionOffset(tgID, offset, 0, 0, 0); }
+                      else { majParam[maidsState[motionMaidID].motionID] = 0; setBasicMotionPositionOffset(tgID, maid, offset, 0, 0, 0); }
                     }
                     if (GUI.Button(new Rect (x+85, y+20, 18, 20), "-", gsButton)) {
                       float value = Mathf.Round(Math.Max(-0.005f, majParam[maidsState[motionMaidID].motionID] - moveValue * 0.001f) * 1000000) * 0.000001f; //移動後の値
                       float offset = value - majParam[maidsState[motionMaidID].motionID];
                       majParam[maidsState[motionMaidID].motionID] = value;
                       if (showSubMotionUI) setSubMotionPosition(motionMaidID, tgID);
-                      else setBasicMotionPositionOffset(tgID, offset, 0, 0, 0);
+                      else setBasicMotionPositionOffset(tgID, maid, offset, 0, 0, 0);
                     }
                     if (GUI.Button(new Rect (x+105, y+20, 18, 20), "+", gsButton)) {
                       float value = Mathf.Round(Math.Min(0.005f, majParam[maidsState[motionMaidID].motionID] + moveValue * 0.001f) * 1000000) * 0.000001f; //移動後の値
                       float offset = value - majParam[maidsState[motionMaidID].motionID];
                       majParam[maidsState[motionMaidID].motionID] = value;
                       if (showSubMotionUI) setSubMotionPosition(motionMaidID, tgID);
-                      else setBasicMotionPositionOffset(tgID, offset, 0, 0, 0);
+                      else setBasicMotionPositionOffset(tgID, maid, offset, 0, 0, 0);
                     }
                     sliderValue = GUI.HorizontalSlider(new Rect(x+130, y+25, 150, 15), majParam[maidsState[motionMaidID].motionID], -0.005f, 0.005f);
                     if (majParam[maidsState[motionMaidID].motionID] != sliderValue) {
@@ -14186,7 +14508,7 @@ namespace CM3D2.VibeYourMaid.Plugin
                       float offset = sliderValue - majParam[maidsState[motionMaidID].motionID];
                       majParam[maidsState[motionMaidID].motionID] = sliderValue;
                       if (showSubMotionUI) setSubMotionPosition(motionMaidID, tgID);
-                      else setBasicMotionPositionOffset(tgID, offset, 0, 0, 0);
+                      else setBasicMotionPositionOffset(tgID, maid, offset, 0, 0, 0);
                     }
 
                     majParam = maj.basicForward;
@@ -14194,21 +14516,21 @@ namespace CM3D2.VibeYourMaid.Plugin
                     if (GUI.Button(new Rect (x+65, y+42, 18, 20), "0", gsButton)) {
                       float offset = - majParam[maidsState[motionMaidID].motionID];
                       if (showSubMotionUI) { majParam[maidsState[motionMaidID].motionID] = majParam[maidsState[tgID].motionID]; setSubMotionPosition(motionMaidID, tgID); }
-                      else { majParam[maidsState[motionMaidID].motionID] = 0; setBasicMotionPositionOffset(tgID, 0, offset, 0, 0); }
+                      else { majParam[maidsState[motionMaidID].motionID] = 0; setBasicMotionPositionOffset(tgID, maid, 0, offset, 0, 0); }
                     }
                     if (GUI.Button(new Rect (x+85, y+42, 18, 20), "-", gsButton)) {
                       float value = Mathf.Round(Math.Max(-0.005f, majParam[maidsState[motionMaidID].motionID] - moveValue * 0.001f) * 1000000) * 0.000001f; //移動後の値
                       float offset = value - majParam[maidsState[motionMaidID].motionID];
                       majParam[maidsState[motionMaidID].motionID] = value;
                       if (showSubMotionUI) setSubMotionPosition(motionMaidID, tgID);
-                      else setBasicMotionPositionOffset(tgID, 0, offset, 0, 0);
+                      else setBasicMotionPositionOffset(tgID, maid, 0, offset, 0, 0);
                     }
                     if (GUI.Button(new Rect (x+105, y+42, 18, 20), "+", gsButton)) {
                       float value = Mathf.Round(Math.Min(0.005f, majParam[maidsState[motionMaidID].motionID] + moveValue * 0.001f) * 1000000) * 0.000001f; //移動後の値
                       float offset = value - majParam[maidsState[motionMaidID].motionID];
                       majParam[maidsState[motionMaidID].motionID] = value;
                       if (showSubMotionUI) setSubMotionPosition(motionMaidID, tgID);
-                      else setBasicMotionPositionOffset(tgID, 0, offset, 0, 0);
+                      else setBasicMotionPositionOffset(tgID, maid, 0, offset, 0, 0);
                     }
                     sliderValue = GUI.HorizontalSlider(new Rect(x+130, y+47, 150, 15), majParam[maidsState[motionMaidID].motionID], -0.005f, 0.005f);
                     if (majParam[maidsState[motionMaidID].motionID] != sliderValue) {
@@ -14216,7 +14538,7 @@ namespace CM3D2.VibeYourMaid.Plugin
                       float offset = sliderValue - majParam[maidsState[motionMaidID].motionID];
                       majParam[maidsState[motionMaidID].motionID] = sliderValue;
                       if (showSubMotionUI) setSubMotionPosition(motionMaidID, tgID);
-                      else setBasicMotionPositionOffset(tgID, 0, offset, 0, 0);
+                      else setBasicMotionPositionOffset(tgID, maid, 0, offset, 0, 0);
                     }
 
                     majParam = maj.basicRight;
@@ -14224,21 +14546,21 @@ namespace CM3D2.VibeYourMaid.Plugin
                     if (GUI.Button(new Rect (x+65, y+64, 18, 20), "0", gsButton)) {
                       float offset = - majParam[maidsState[motionMaidID].motionID];
                       if (showSubMotionUI) { majParam[maidsState[motionMaidID].motionID] = majParam[maidsState[tgID].motionID]; setSubMotionPosition(motionMaidID, tgID); }
-                      else { majParam[maidsState[motionMaidID].motionID] = 0; setBasicMotionPositionOffset(tgID, 0, 0, offset, 0); }
+                      else { majParam[maidsState[motionMaidID].motionID] = 0; setBasicMotionPositionOffset(tgID, maid, 0, 0, offset, 0); }
                     }
                     if (GUI.Button(new Rect (x+85, y+64, 18, 20), "-", gsButton)) {
                       float value = Mathf.Round(Math.Max(-0.005f, majParam[maidsState[motionMaidID].motionID] - moveValue * 0.001f) * 1000000) * 0.000001f; //移動後の値
                       float offset = value - majParam[maidsState[motionMaidID].motionID];
                       majParam[maidsState[motionMaidID].motionID] = value;
                       if (showSubMotionUI) setSubMotionPosition(motionMaidID, tgID);
-                      else setBasicMotionPositionOffset(tgID, 0, 0, offset, 0);
+                      else setBasicMotionPositionOffset(tgID, maid, 0, 0, offset, 0);
                     }
                     if (GUI.Button(new Rect (x+105, y+64, 18, 20), "+", gsButton)) {
                       float value = Mathf.Round(Math.Min(0.005f, majParam[maidsState[motionMaidID].motionID] + moveValue * 0.001f) * 1000000) * 0.000001f; //移動後の値
                       float offset = value - majParam[maidsState[motionMaidID].motionID];
                       majParam[maidsState[motionMaidID].motionID] = value;
                       if (showSubMotionUI) setSubMotionPosition(motionMaidID, tgID);
-                      else setBasicMotionPositionOffset(tgID, 0, 0, offset, 0);
+                      else setBasicMotionPositionOffset(tgID, maid, 0, 0, offset, 0);
                     }
                     sliderValue = GUI.HorizontalSlider(new Rect(x+130, y+69, 150, 15), majParam[maidsState[motionMaidID].motionID], -0.005f, 0.005f);
                     if (majParam[maidsState[motionMaidID].motionID] != sliderValue) {
@@ -14246,7 +14568,7 @@ namespace CM3D2.VibeYourMaid.Plugin
                       float offset = sliderValue - majParam[maidsState[motionMaidID].motionID];
                       majParam[maidsState[motionMaidID].motionID] = sliderValue;
                       if (showSubMotionUI) setSubMotionPosition(motionMaidID, tgID);
-                      else setBasicMotionPositionOffset(tgID, 0, 0, offset, 0);
+                      else setBasicMotionPositionOffset(tgID, maid, 0, 0, offset, 0);
                     }
 
                     majParam = maj.basicAngleY;
@@ -14254,21 +14576,21 @@ namespace CM3D2.VibeYourMaid.Plugin
                     if (GUI.Button(new Rect (x+65, y+86, 18, 20), "0", gsButton)) {
                       float offset = -majParam[maidsState[motionMaidID].motionID];
                       if (showSubMotionUI) { majParam[maidsState[motionMaidID].motionID] = majParam[maidsState[tgID].motionID]; setSubMotionPosition(motionMaidID, tgID); }
-                      else { majParam[maidsState[motionMaidID].motionID] = 0; setBasicMotionPositionOffset(tgID, 0, 0, 0, offset); }
+                      else { majParam[maidsState[motionMaidID].motionID] = 0; setBasicMotionPositionOffset(tgID, maid, 0, 0, 0, offset); }
                     }
                     if (GUI.Button(new Rect (x+85, y+86, 18, 20), "-", gsButton)) {
                       float value = Mathf.Round(Math.Max(-180, majParam[maidsState[motionMaidID].motionID] - moveValue * 100f) * 10) * 0.1f; //移動後の値
                       float offset = value - majParam[maidsState[motionMaidID].motionID];
                       majParam[maidsState[motionMaidID].motionID] = value;
                       if (showSubMotionUI) setSubMotionPosition(motionMaidID, tgID);
-                      else setBasicMotionPositionOffset(tgID, 0, 0, 0, offset);
+                      else setBasicMotionPositionOffset(tgID, maid, 0, 0, 0, offset);
                     }
                     if (GUI.Button(new Rect (x+105, y+86, 18, 20), "+", gsButton)) {
                       float value = Mathf.Round(Math.Min(180, majParam[maidsState[motionMaidID].motionID] + moveValue * 100f) * 10) * 0.1f; //移動後の値
                       float offset = value - majParam[maidsState[motionMaidID].motionID];
                       majParam[maidsState[motionMaidID].motionID] = value;
                       if (showSubMotionUI) setSubMotionPosition(motionMaidID, tgID);
-                      else setBasicMotionPositionOffset(tgID, 0, 0, 0, offset);
+                      else setBasicMotionPositionOffset(tgID, maid, 0, 0, 0, offset);
                     }
                     sliderValue = GUI.HorizontalSlider(new Rect(x+130, y+91, 150, 15), majParam[maidsState[motionMaidID].motionID], -180, 180);
                     if (majParam[maidsState[motionMaidID].motionID] != sliderValue) {
@@ -14276,7 +14598,7 @@ namespace CM3D2.VibeYourMaid.Plugin
                       float offset = sliderValue - majParam[maidsState[motionMaidID].motionID];
                       majParam[maidsState[motionMaidID].motionID] = sliderValue;
                       if (showSubMotionUI) setSubMotionPosition(motionMaidID, tgID);
-                      else setBasicMotionPositionOffset(tgID, 0, 0, 0, offset);
+                      else setBasicMotionPositionOffset(tgID, maid, 0, 0, 0, offset);
                     }
 
                     x = 10;
@@ -14620,13 +14942,11 @@ namespace CM3D2.VibeYourMaid.Plugin
                     GUI.Label(new Rect (x, y, 170, 20), "【設置アイテム】", gsLabel);
                     if (GUI.Button(new Rect (x+10, y+20, 20, 20), "<", gsButton)) {
                       --maj.prefabSet[maidsState[tgID].motionID];
-                      if (maj.prefabSet[maidsState[tgID].motionID] == 3) maj.prefabSet[maidsState[tgID].motionID]--; //椅子拘束台は非表示
                       if (maj.prefabSet[maidsState[tgID].motionID] < 0) maj.prefabSet[maidsState[tgID].motionID] = prefabList[0].Length - 1;
                       addMotionPrefab(tgID, maidsState[tgID].motionID);
                     }
                     if (GUI.Button(new Rect (x+35, y+20, 20, 20), ">", gsButton)) {
                       ++maj.prefabSet[maidsState[tgID].motionID];
-                      if (maj.prefabSet[maidsState[tgID].motionID] == 3) maj.prefabSet[maidsState[tgID].motionID]++; //椅子拘束台は非表示
                       if (maj.prefabSet[maidsState[tgID].motionID] >= prefabList[0].Length) maj.prefabSet[maidsState[tgID].motionID] = 0;
                       addMotionPrefab(tgID, maidsState[tgID].motionID);
                     }
@@ -14987,6 +15307,7 @@ namespace CM3D2.VibeYourMaid.Plugin
               GUI.Label (new Rect (310, 350, 300, 20), "uDatsuWait 子宮脱值：" + maidsState[tgID].uDatsuWait , gsLabel);
               //hidden info #109	
 
+
               /*自分用
               GUI.Label(new Rect (10, 400, 300, 20), "マウス：" + mouse_move , gsLabel);
               GUI.Label(new Rect (10, 420, 300, 20), "おさわりポイント：" + hitName , gsLabel);
@@ -15019,16 +15340,17 @@ namespace CM3D2.VibeYourMaid.Plugin
 
         //乳首設定登録画面
         private void WindowCallback3_9(Maid maid) {
+            MaidState mState = maidsState[tgID];
             int y = 0;
 
               y = 35;
               GUI.Label(new Rect (5, y, 200, 20), "【乳首設定の登録（" + chikubiText[cv] + "）】" , gsLabel);
               y += 25;
 
-              maidsState[tgID].chikubiEnabled = GUI.Toggle(new Rect(10, y, 150, 20), maidsState[tgID].chikubiEnabled, "乳首操作の有効化", gsToggle);
+              mState.chikubiEnabled = GUI.Toggle(new Rect(10, y, 150, 20), mState.chikubiEnabled, "乳首操作の有効化", gsToggle);
 
-              if(maidsState[tgID].chikubiEnabled){
-                maidsState[tgID].chikubiBokkiEnabled = GUI.Toggle(new Rect(160, y, 100, 20), maidsState[tgID].chikubiBokkiEnabled, "勃起の有無", gsToggle);
+              if(mState.chikubiEnabled){
+                mState.chikubiBokkiEnabled = GUI.Toggle(new Rect(160, y, 100, 20), mState.chikubiBokkiEnabled, "勃起の有無", gsToggle);
 
                 y = 50;
                 if (GUI.Button(new Rect (320, y, 80, 30), "着衣時", gsButton)) {
@@ -15039,85 +15361,85 @@ namespace CM3D2.VibeYourMaid.Plugin
                 }
                 y += 40;
 
-                GUI.Label(new Rect (5, y, 100, 20), "乳首基本：" + Math.Floor(maidsState[tgID].tits_chikubi_def[cv] * 100) , gsLabel);
-                maidsState[tgID].tits_chikubi_def[cv] = GUI.HorizontalSlider(new Rect(105, y+5, 190, 20), maidsState[tgID].tits_chikubi_def[cv], 0.0F, 2.0F);
+                GUI.Label(new Rect (5, y, 100, 20), "乳首基本：" + Math.Floor(mState.tits_chikubi_def[cv] * 100) , gsLabel);
+                mState.tits_chikubi_def[cv] = GUI.HorizontalSlider(new Rect(105, y+5, 190, 20), mState.tits_chikubi_def[cv], 0.0F, 2.0F);
                 y += 20;
 
-                GUI.Label(new Rect (5, y, 100, 20), "乳首尖：" + Math.Floor(maidsState[tgID].tits_chikubi_perky[cv] * 100) , gsLabel);
-                maidsState[tgID].tits_chikubi_perky[cv] = GUI.HorizontalSlider(new Rect(105, y+5, 190, 20), maidsState[tgID].tits_chikubi_perky[cv], 0.0F, 2.0F);
+                GUI.Label(new Rect (5, y, 100, 20), "乳首尖：" + Math.Floor(mState.tits_chikubi_perky[cv] * 100) , gsLabel);
+                mState.tits_chikubi_perky[cv] = GUI.HorizontalSlider(new Rect(105, y+5, 190, 20), mState.tits_chikubi_perky[cv], 0.0F, 2.0F);
                 y += 20;
 
-                GUI.Label(new Rect (5, y, 100, 20), "乳首牛：" + Math.Floor(maidsState[tgID].tits_chikubi_cow[cv] * 100) , gsLabel);
-                maidsState[tgID].tits_chikubi_cow[cv] = GUI.HorizontalSlider(new Rect(105, y+5, 190, 20), maidsState[tgID].tits_chikubi_cow[cv], 0.0F, 2.0F);
+                GUI.Label(new Rect (5, y, 100, 20), "乳首牛：" + Math.Floor(mState.tits_chikubi_cow[cv] * 100) , gsLabel);
+                mState.tits_chikubi_cow[cv] = GUI.HorizontalSlider(new Rect(105, y+5, 190, 20), mState.tits_chikubi_cow[cv], 0.0F, 2.0F);
                 y += 20;
 
-                GUI.Label(new Rect (5, y, 100, 20), "乳首凹：" + Math.Floor(maidsState[tgID].tits_chikubi_observe[cv] * 100) , gsLabel);
-                maidsState[tgID].tits_chikubi_observe[cv] = GUI.HorizontalSlider(new Rect(105, y+5, 190, 20), maidsState[tgID].tits_chikubi_observe[cv], 0.0F, 2.0F);
+                GUI.Label(new Rect (5, y, 100, 20), "乳首凹：" + Math.Floor(mState.tits_chikubi_observe[cv] * 100) , gsLabel);
+                mState.tits_chikubi_observe[cv] = GUI.HorizontalSlider(new Rect(105, y+5, 190, 20), mState.tits_chikubi_observe[cv], 0.0F, 2.0F);
                 y += 20;
 
-                GUI.Label(new Rect (5, y, 100, 20), "乳首膨１：" + Math.Floor(maidsState[tgID].tits_chikubi_wide[cv] * 100) , gsLabel);
-                maidsState[tgID].tits_chikubi_wide[cv] = GUI.HorizontalSlider(new Rect(105, y+5, 190, 20), maidsState[tgID].tits_chikubi_wide[cv], 0.0F, 2.0F);
+                GUI.Label(new Rect (5, y, 100, 20), "乳首膨１：" + Math.Floor(mState.tits_chikubi_wide[cv] * 100) , gsLabel);
+                mState.tits_chikubi_wide[cv] = GUI.HorizontalSlider(new Rect(105, y+5, 190, 20), mState.tits_chikubi_wide[cv], 0.0F, 2.0F);
                 y += 20;
 
-                GUI.Label(new Rect (5, y, 100, 20), "乳首膨２：" + Math.Floor(maidsState[tgID].tits_chikubi_ultrawide[cv] * 100) , gsLabel);
-                maidsState[tgID].tits_chikubi_ultrawide[cv] = GUI.HorizontalSlider(new Rect(105, y+5, 190, 20), maidsState[tgID].tits_chikubi_ultrawide[cv], 0.0F, 2.0F);
+                GUI.Label(new Rect (5, y, 100, 20), "乳首膨２：" + Math.Floor(mState.tits_chikubi_ultrawide[cv] * 100) , gsLabel);
+                mState.tits_chikubi_ultrawide[cv] = GUI.HorizontalSlider(new Rect(105, y+5, 190, 20), mState.tits_chikubi_ultrawide[cv], 0.0F, 2.0F);
                 y += 20;
 
-                GUI.Label(new Rect (5, y, 100, 20), "乳首長さ：" + Math.Floor(maidsState[tgID].tits_chikubi_ultralong[cv] * 100) , gsLabel);
-                maidsState[tgID].tits_chikubi_ultralong[cv] = GUI.HorizontalSlider(new Rect(105, y+5, 190, 20), maidsState[tgID].tits_chikubi_ultralong[cv], 0.0F, 2.0F);
+                GUI.Label(new Rect (5, y, 100, 20), "乳首長さ：" + Math.Floor(mState.tits_chikubi_ultralong[cv] * 100) , gsLabel);
+                mState.tits_chikubi_ultralong[cv] = GUI.HorizontalSlider(new Rect(105, y+5, 190, 20), mState.tits_chikubi_ultralong[cv], 0.0F, 2.0F);
                 y += 20;
 
-                GUI.Label(new Rect (5, y, 100, 20), "乳首垂れ：" + Math.Floor(maidsState[tgID].tits_chikubi_ultratare[cv] * 100) , gsLabel);
-                maidsState[tgID].tits_chikubi_ultratare[cv] = GUI.HorizontalSlider(new Rect(105, y+5, 190, 20), maidsState[tgID].tits_chikubi_ultratare[cv], 0.0F, 2.0F);
+                GUI.Label(new Rect (5, y, 100, 20), "乳首垂れ：" + Math.Floor(mState.tits_chikubi_ultratare[cv] * 100) , gsLabel);
+                mState.tits_chikubi_ultratare[cv] = GUI.HorizontalSlider(new Rect(105, y+5, 190, 20), mState.tits_chikubi_ultratare[cv], 0.0F, 2.0F);
                 y += 20;
 
-                GUI.Label(new Rect (5, y, 100, 20), "乳首陥没１：" + Math.Floor(maidsState[tgID].tits_chikubi_kanbotsu_n[cv] * 100) , gsLabel);
-                maidsState[tgID].tits_chikubi_kanbotsu_n[cv] = GUI.HorizontalSlider(new Rect(105, y+5, 190, 20), maidsState[tgID].tits_chikubi_kanbotsu_n[cv], 0.0F, 2.0F);
+                GUI.Label(new Rect (5, y, 100, 20), "乳首陥没１：" + Math.Floor(mState.tits_chikubi_kanbotsu_n[cv] * 100) , gsLabel);
+                mState.tits_chikubi_kanbotsu_n[cv] = GUI.HorizontalSlider(new Rect(105, y+5, 190, 20), mState.tits_chikubi_kanbotsu_n[cv], 0.0F, 2.0F);
                 y += 20;
 
-                GUI.Label(new Rect (5, y, 100, 20), "乳首陥没２：" + Math.Floor(maidsState[tgID].tits_chikubi_kanbotsu_s[cv] * 100) , gsLabel);
-                maidsState[tgID].tits_chikubi_kanbotsu_s[cv] = GUI.HorizontalSlider(new Rect(105, y+5, 190, 20), maidsState[tgID].tits_chikubi_kanbotsu_s[cv], 0.0F, 2.0F);
+                GUI.Label(new Rect (5, y, 100, 20), "乳首陥没２：" + Math.Floor(mState.tits_chikubi_kanbotsu_s[cv] * 100) , gsLabel);
+                mState.tits_chikubi_kanbotsu_s[cv] = GUI.HorizontalSlider(new Rect(105, y+5, 190, 20), mState.tits_chikubi_kanbotsu_s[cv], 0.0F, 2.0F);
                 y += 20;
 
-                GUI.Label(new Rect (5, y, 100, 20), "乳首陥没３：" + Math.Floor(maidsState[tgID].tits_chikubi_kanbotsu_p[cv] * 100) , gsLabel);
-                maidsState[tgID].tits_chikubi_kanbotsu_p[cv] = GUI.HorizontalSlider(new Rect(105, y+5, 190, 20), maidsState[tgID].tits_chikubi_kanbotsu_p[cv], 0.0F, 2.0F);
+                GUI.Label(new Rect (5, y, 100, 20), "乳首陥没３：" + Math.Floor(mState.tits_chikubi_kanbotsu_p[cv] * 100) , gsLabel);
+                mState.tits_chikubi_kanbotsu_p[cv] = GUI.HorizontalSlider(new Rect(105, y+5, 190, 20), mState.tits_chikubi_kanbotsu_p[cv], 0.0F, 2.0F);
                 y = 90;
 
 
-                GUI.Label(new Rect (305, y, 100, 20), "乳輪基本：" + Math.Floor(maidsState[tgID].tits_nipple_def[cv] * 100) , gsLabel);
-                maidsState[tgID].tits_nipple_def[cv] = GUI.HorizontalSlider(new Rect(405, y+5, 190, 20), maidsState[tgID].tits_nipple_def[cv], 0.0F, 2.0F);
+                GUI.Label(new Rect (305, y, 100, 20), "乳輪基本：" + Math.Floor(mState.tits_nipple_def[cv] * 100) , gsLabel);
+                mState.tits_nipple_def[cv] = GUI.HorizontalSlider(new Rect(405, y+5, 190, 20), mState.tits_nipple_def[cv], 0.0F, 2.0F);
                 y += 20;
 
-                GUI.Label(new Rect (305, y, 100, 20), "乳輪尖１：" + Math.Floor(maidsState[tgID].tits_nipple_perky1[cv] * 100) , gsLabel);
-                maidsState[tgID].tits_nipple_perky1[cv] = GUI.HorizontalSlider(new Rect(405, y+5, 190, 20), maidsState[tgID].tits_nipple_perky1[cv], 0.0F, 2.0F);
+                GUI.Label(new Rect (305, y, 100, 20), "乳輪尖１：" + Math.Floor(mState.tits_nipple_perky1[cv] * 100) , gsLabel);
+                mState.tits_nipple_perky1[cv] = GUI.HorizontalSlider(new Rect(405, y+5, 190, 20), mState.tits_nipple_perky1[cv], 0.0F, 2.0F);
                 y += 20;
 
-                GUI.Label(new Rect (305, y, 100, 20), "乳輪尖２：" + Math.Floor(maidsState[tgID].tits_nipple_perky2[cv] * 100) , gsLabel);
-                maidsState[tgID].tits_nipple_perky2[cv] = GUI.HorizontalSlider(new Rect(405, y+5, 190, 20), maidsState[tgID].tits_nipple_perky2[cv], 0.0F, 2.0F);
+                GUI.Label(new Rect (305, y, 100, 20), "乳輪尖２：" + Math.Floor(mState.tits_nipple_perky2[cv] * 100) , gsLabel);
+                mState.tits_nipple_perky2[cv] = GUI.HorizontalSlider(new Rect(405, y+5, 190, 20), mState.tits_nipple_perky2[cv], 0.0F, 2.0F);
                 y += 20;
 
-                GUI.Label(new Rect (305, y, 100, 20), "乳輪伸１：" + Math.Floor(maidsState[tgID].tits_nipple_long1[cv] * 100) , gsLabel);
-                maidsState[tgID].tits_nipple_long1[cv] = GUI.HorizontalSlider(new Rect(405, y+5, 190, 20), maidsState[tgID].tits_nipple_long1[cv], 0.0F, 2.0F);
+                GUI.Label(new Rect (305, y, 100, 20), "乳輪伸１：" + Math.Floor(mState.tits_nipple_long1[cv] * 100) , gsLabel);
+                mState.tits_nipple_long1[cv] = GUI.HorizontalSlider(new Rect(405, y+5, 190, 20), mState.tits_nipple_long1[cv], 0.0F, 2.0F);
                 y += 20;
 
-                GUI.Label(new Rect (305, y, 100, 20), "乳輪伸２：" + Math.Floor(maidsState[tgID].tits_nipple_long2[cv] * 100) , gsLabel);
-                maidsState[tgID].tits_nipple_long2[cv] = GUI.HorizontalSlider(new Rect(405, y+5, 190, 20), maidsState[tgID].tits_nipple_long2[cv], 0.0F, 2.0F);
+                GUI.Label(new Rect (305, y, 100, 20), "乳輪伸２：" + Math.Floor(mState.tits_nipple_long2[cv] * 100) , gsLabel);
+                mState.tits_nipple_long2[cv] = GUI.HorizontalSlider(new Rect(405, y+5, 190, 20), mState.tits_nipple_long2[cv], 0.0F, 2.0F);
                 y += 20;
 
-                GUI.Label(new Rect (305, y, 100, 20), "乳輪膨：" + Math.Floor(maidsState[tgID].tits_nipple_wide[cv] * 100) , gsLabel);
-                maidsState[tgID].tits_nipple_wide[cv] = GUI.HorizontalSlider(new Rect(405, y+5, 190, 20), maidsState[tgID].tits_nipple_wide[cv], 0.0F, 2.0F);
+                GUI.Label(new Rect (305, y, 100, 20), "乳輪膨：" + Math.Floor(mState.tits_nipple_wide[cv] * 100) , gsLabel);
+                mState.tits_nipple_wide[cv] = GUI.HorizontalSlider(new Rect(405, y+5, 190, 20), mState.tits_nipple_wide[cv], 0.0F, 2.0F);
                 y += 20;
 
-                GUI.Label(new Rect (305, y, 100, 20), "ぷっくり：" + Math.Floor(maidsState[tgID].tits_nipple_puffy[cv] * 100) , gsLabel);
-                maidsState[tgID].tits_nipple_puffy[cv] = GUI.HorizontalSlider(new Rect(405, y+5, 190, 20), maidsState[tgID].tits_nipple_puffy[cv], 0.0F, 2.0F);
+                GUI.Label(new Rect (305, y, 100, 20), "ぷっくり：" + Math.Floor(mState.tits_nipple_puffy[cv] * 100) , gsLabel);
+                mState.tits_nipple_puffy[cv] = GUI.HorizontalSlider(new Rect(405, y+5, 190, 20), mState.tits_nipple_puffy[cv], 0.0F, 2.0F);
                 y += 20;
 
-                GUI.Label(new Rect (305, y, 90, 20), "乳首クパ：" + Math.Floor(maidsState[tgID].tits_nipple_kupa[cv] * 100) , gsLabel);
-                maidsState[tgID].tits_nipple_kupa[cv] = GUI.HorizontalSlider(new Rect(405, y+5, 190, 20), maidsState[tgID].tits_nipple_kupa[cv], 0.0F, 2.0F);
+                GUI.Label(new Rect (305, y, 90, 20), "乳首クパ：" + Math.Floor(mState.tits_nipple_kupa[cv] * 100) , gsLabel);
+                mState.tits_nipple_kupa[cv] = GUI.HorizontalSlider(new Rect(405, y+5, 190, 20), mState.tits_nipple_kupa[cv], 0.0F, 2.0F);
                 y += 20;
 
-                GUI.Label(new Rect (305, y, 90, 20), "ちっぱい：" + Math.Floor(maidsState[tgID].tits_munel_chippai[cv] * 100) , gsLabel);
-                maidsState[tgID].tits_munel_chippai[cv] = GUI.HorizontalSlider(new Rect(405, y+5, 190, 20), maidsState[tgID].tits_munel_chippai[cv], 0.0F, 2.0F);
+                GUI.Label(new Rect (305, y, 90, 20), "ちっぱい：" + Math.Floor(mState.tits_munel_chippai[cv] * 100) , gsLabel);
+                mState.tits_munel_chippai[cv] = GUI.HorizontalSlider(new Rect(405, y+5, 190, 20), mState.tits_munel_chippai[cv], 0.0F, 2.0F);
                 y += 40;
 
 
@@ -15135,49 +15457,49 @@ namespace CM3D2.VibeYourMaid.Plugin
 
                 if (GUI.Button(new Rect (10, y, 120, 20), "基本乳首", gsButton)) {
                   ChikubiReset(tgID, cv);
-                  maidsState[tgID].tits_chikubi_def[cv] = 0.22f;
-                  maidsState[tgID].tits_chikubi_perky[cv] = 0.35f;
-                  maidsState[tgID].tits_chikubi_wide[cv] = 0.40f;
-                  maidsState[tgID].tits_nipple_puffy[cv] = 0.31f;
+                  mState.tits_chikubi_def[cv] = 0.22f;
+                  mState.tits_chikubi_perky[cv] = 0.35f;
+                  mState.tits_chikubi_wide[cv] = 0.40f;
+                  mState.tits_nipple_puffy[cv] = 0.31f;
                 }
 
                 if (GUI.Button(new Rect (140, y, 120, 20), "大きい乳首", gsButton)) {
                   ChikubiReset(tgID, cv);
-                  maidsState[tgID].tits_chikubi_perky[cv] = 0.46f;
-                  maidsState[tgID].tits_chikubi_wide[cv] = 0.42f;
-                  maidsState[tgID].tits_nipple_wide[cv] = 0.75f;
-                  maidsState[tgID].tits_nipple_puffy[cv] = 0.42f;
+                  mState.tits_chikubi_perky[cv] = 0.46f;
+                  mState.tits_chikubi_wide[cv] = 0.42f;
+                  mState.tits_nipple_wide[cv] = 0.75f;
+                  mState.tits_nipple_puffy[cv] = 0.42f;
                 }
 
                 if (GUI.Button(new Rect (270, y, 120, 20), "陥没乳首", gsButton)) {
                   ChikubiReset(tgID, cv);
-                  maidsState[tgID].tits_chikubi_def[cv] = 0.80f;
-                  maidsState[tgID].tits_chikubi_wide[cv] = 0.60f;
-                  maidsState[tgID].tits_chikubi_kanbotsu_n[cv] = 0.44f;
-                  maidsState[tgID].tits_chikubi_kanbotsu_p[cv] = 1.40f;
-                  maidsState[tgID].tits_nipple_wide[cv] = 1.0f;
-                  maidsState[tgID].tits_nipple_puffy[cv] = 0.40f;
+                  mState.tits_chikubi_def[cv] = 0.80f;
+                  mState.tits_chikubi_wide[cv] = 0.60f;
+                  mState.tits_chikubi_kanbotsu_n[cv] = 0.44f;
+                  mState.tits_chikubi_kanbotsu_p[cv] = 1.40f;
+                  mState.tits_nipple_wide[cv] = 1.0f;
+                  mState.tits_nipple_puffy[cv] = 0.40f;
                 }
 
                 if (GUI.Button(new Rect (410, y, 120, 20), "デカ乳輪", gsButton)) {
                   ChikubiReset(tgID, cv);
-                  maidsState[tgID].tits_chikubi_def[cv] = 0.42f;
-                  maidsState[tgID].tits_chikubi_perky[cv] = 0.35f;
-                  maidsState[tgID].tits_chikubi_wide[cv] = 0.77f;
-                  maidsState[tgID].tits_nipple_perky1[cv] = 0.29f;
-                  maidsState[tgID].tits_nipple_wide[cv] = 1.6f;
-                  maidsState[tgID].tits_nipple_puffy[cv] = 0.80f;
+                  mState.tits_chikubi_def[cv] = 0.42f;
+                  mState.tits_chikubi_perky[cv] = 0.35f;
+                  mState.tits_chikubi_wide[cv] = 0.77f;
+                  mState.tits_nipple_perky1[cv] = 0.29f;
+                  mState.tits_nipple_wide[cv] = 1.6f;
+                  mState.tits_nipple_puffy[cv] = 0.80f;
                 }
                 y += 30;
 
                 if (GUI.Button(new Rect (10, y, 120, 20), "トンガリ乳首", gsButton)) {
                   ChikubiReset(tgID, cv);
-                  maidsState[tgID].tits_chikubi_def[cv] = 0.21f;
-                  maidsState[tgID].tits_chikubi_perky[cv] = 0.34f;
-                  maidsState[tgID].tits_chikubi_wide[cv] = 0.40f;
-                  maidsState[tgID].tits_nipple_perky1[cv] = 0.75f;
-                  maidsState[tgID].tits_nipple_wide[cv] = 0.52f;
-                  maidsState[tgID].tits_nipple_puffy[cv] = 0.72f;
+                  mState.tits_chikubi_def[cv] = 0.21f;
+                  mState.tits_chikubi_perky[cv] = 0.34f;
+                  mState.tits_chikubi_wide[cv] = 0.40f;
+                  mState.tits_nipple_perky1[cv] = 0.75f;
+                  mState.tits_nipple_wide[cv] = 0.52f;
+                  mState.tits_nipple_puffy[cv] = 0.72f;
                 }
                 y += 10;
 
@@ -15200,7 +15522,7 @@ namespace CM3D2.VibeYourMaid.Plugin
                   ChikubiSave(tgID, 1);
                 }
 
-                ChikubiSet(stockMaids[tgID].mem, maidsState[tgID], cv);
+                ChikubiSet(stockMaids[tgID].mem, mState, cv);
               }
         }
 
@@ -15312,6 +15634,7 @@ namespace CM3D2.VibeYourMaid.Plugin
 
         void WindowCallback4(int id)
         {
+          MaidState mState = maidsState[tgID];
 
           cfgw.autoManEnabled = GUI.Toggle(new Rect (230, 0, 60, 20), cfgw.autoManEnabled, "" , gsToggle );
           GUI.Label(new Rect (245, 0, 100, 20), "男を自動表示", gsLabel);
@@ -15367,7 +15690,7 @@ namespace CM3D2.VibeYourMaid.Plugin
                   }
                 } else {
                   h = 5 + (int)Math.Ceiling(emsFiles.Count/3.0) * 22;
-                  if (maidsState[tgID].editMotionSetName != "") h += 25;
+                  if (mState.editMotionSetName != "") h += 25;
                   if (h < (185 - y * 25))h = 185 - y * 25;
                 }
 
@@ -15377,7 +15700,7 @@ namespace CM3D2.VibeYourMaid.Plugin
                 YotogiScrollPos = GUI.BeginScrollView( scrlRect, YotogiScrollPos, contentRect, false, true );
 
                 Maid maid = stockMaids[tgID].mem;
-
+                
                 //夜伽モーションのリスト画面
                 if (YotogiGroup.Count - 1 > YotogiMenu) {
                   y = 0;
@@ -15398,7 +15721,7 @@ namespace CM3D2.VibeYourMaid.Plugin
                     visibleYotogiCount++;
 
 
-                    bool selected = (maidsState[tgID].motionID != -1 && maj.motionName[maidsState[tgID].motionID] == t);
+                    bool selected = (mState.motionID != -1 && maj.motionName[mState.motionID] == t);
                     if (selected) {
                       gsButton.normal.textColor = Color.yellow;
                       gsButton.hover.textColor = Color.yellow;
@@ -15433,18 +15756,18 @@ namespace CM3D2.VibeYourMaid.Plugin
                   x = 0;
                   w = 195;
 
-                  if (maidsState[tgID].editMotionSetName != "") {
+                  if (mState.editMotionSetName != "") {
                     if (GUI.Button(new Rect (x, y, 50, 20), "解除", gsButton)) {
                       MotionSetClear(tgID);
                     }
-                    GUI.Label(new Rect (x + 60, y, 600, 20), "『" + maidsState[tgID].editMotionSetName +"』：『"+MotionNameChange(maj.motionName[maidsState[tgID].motionID])+"』再生中" , gsLabel);
+                    GUI.Label(new Rect (x + 60, y, 600, 20), "『" + mState.editMotionSetName +"』：『"+MotionNameChange(maj.motionName[mState.motionID])+"』再生中" , gsLabel);
                     y += 25;
                   }
 
                   foreach (string f in emsFiles) {
                     string emsName = f.Replace("ems_", "").Replace(".xml", "");
 
-                    bool selected = (maidsState[tgID].editMotionSetName == emsName);
+                    bool selected = (mState.editMotionSetName == emsName);
                     if (selected) {
                       gsButton.normal.textColor = Color.yellow;
                       gsButton.hover.textColor = Color.yellow;
@@ -16174,12 +16497,11 @@ namespace CM3D2.VibeYourMaid.Plugin
       #endif
 
 
-        private bool dCheck = false;
-
       //-------------------------------------------------
       #if EmpiresLife
       //エンパイアズライフ関係---------------------------
         //エンパイアズライフ用変数
+        private bool dCheck = false;
         private int bgID = 0;
         private bool elFade = false;
         private int lifeStart = 0;
@@ -18549,10 +18871,25 @@ namespace CM3D2.VibeYourMaid.Plugin
       //胸衝突時の変形オフセット情報 参照渡しするのでclass
       public class MuneOffset
       {
-        public float x = 0; //現在の胸寄り補正
-        public float y = 0; //最終的な胸寄り補正
-        public float targetX = 0; //現在の胸寄り補正
-        public float targetY = 0; //最終的な胸寄り補正
+        //現在の胸寄り補正
+        public float x = 0;
+        public float y = 0;
+        //最終的な胸寄り補正
+        public float targetX = 0;
+        public float targetY = 0;
+        //反復動作させるために遅延変動させる移動速度
+        public float speedX = 0;
+        public float speedY = 0;
+
+        public void reset()
+        {
+          targetX = 0;
+          targetY = 0;
+          x = 0;
+          y = 0;
+          speedX = 0;
+          speedY = 0;
+        }
       }
 
       //胸衝突判定用の座標情報  設定ファイルと拡張セーブデータから取得
@@ -18560,16 +18897,20 @@ namespace CM3D2.VibeYourMaid.Plugin
       public class MuneParam
       {
         //メイド個別設定 cgfwの値をデフォルト設定
-        public float moveSpeed;
-        public float retuenSpeed;
+        //胸移動速度
+        public float moveSpeedAmp;
+        public float moveSpeedTime;
+        //public float returnSpeedAmp;
+        //public float returnSpeedTime;
 
-        public float curvePointX;
-        public float curvePointY;
-
+        //胸変動倍率
         public float moveRatioX;
         public float moveRatioY;
         public float moveLimitX;
         public float moveLimitY;
+        //胸変動量2次曲線反転位置
+        public float curvePointX;
+        public float curvePointY;
 
         public float scale;  //セットした時のメイドのスケール
 
@@ -18625,8 +18966,10 @@ namespace CM3D2.VibeYourMaid.Plugin
         public MuneParam(VibeYourMaidCfgWriting cfgw, Maid maid)
         {
           //メイド個別設定 拡張セーブデータから取得 なければcfgwの値
-          moveSpeed = ExSaveData.GetFloat(maid, "CM3D2.VibeYourMaid.Plugin", "muneMoveSpeed", cfgw.muneMoveSpeed);
-          retuenSpeed = ExSaveData.GetFloat(maid, "CM3D2.VibeYourMaid.Plugin", "muneRetuenSpeed", cfgw.muneRetuenSpeed);
+          moveSpeedAmp = ExSaveData.GetFloat(maid, "CM3D2.VibeYourMaid.Plugin", "muneMoveSpeedAmp", cfgw.muneMoveSpeedAmp);
+          moveSpeedTime = ExSaveData.GetFloat(maid, "CM3D2.VibeYourMaid.Plugin", "muneMoveSpeedTime", cfgw.muneMoveSpeedTime);
+          //returnSpeedAmp = ExSaveData.GetFloat(maid, "CM3D2.VibeYourMaid.Plugin", "muneReturnSpeedAmp", cfgw.muneReturnSpeedAmp);
+          //returnSpeedTime = ExSaveData.GetFloat(maid, "CM3D2.VibeYourMaid.Plugin", "muneReturnSpeedTime", cfgw.muneReturnSpeedTime);
           moveRatioX = ExSaveData.GetFloat(maid, "CM3D2.VibeYourMaid.Plugin", "muneMoveRatioX", cfgw.muneMoveRatioX);
           moveRatioY = ExSaveData.GetFloat(maid, "CM3D2.VibeYourMaid.Plugin", "muneMoveRatioY", cfgw.muneMoveRatioY);
           moveLimitX = ExSaveData.GetFloat(maid, "CM3D2.VibeYourMaid.Plugin", "muneMoveLimitX", cfgw.muneMoveLimitX);
@@ -18679,14 +19022,14 @@ namespace CM3D2.VibeYourMaid.Plugin
           updown = (updown - 50) * sizeRatio;
           tare = (tare - 50) * sizeRatio;
 
-          //胸サイズによる拡大比率 50以下は補正しない
-          if (size <= 50) size = 0;
-          else size = (size-50f);
+          //胸サイズによる拡大比率  40以下はあまり動かなくなるため敢えてマイナス補正しない
+          size = (Math.Max(40, size)-50f);
 
           //腕の原点からのオフセット 腕の軸に合わせる Yは胸の大きさに連動
           muneArmY = muneArmY - size*cfgw.muneArmOffsetY*0.01f; //サイズ補正
-          armOffsetL = new Vector3(muneArmY, -muneArmZ , muneArmX);
-          armOffsetR = new Vector3(muneArmY, -muneArmZ , -muneArmX); //左右反転
+          //_IK_UpperArmL/Rとのずれ 0.09768134 は補正する
+          armOffsetL = new Vector3(muneArmY-0.09768134f, -muneArmZ , muneArmX);
+          armOffsetR = new Vector3(muneArmY-0.09768134f, -muneArmZ , -muneArmX); //左右反転
 
           //左右
           outside = muneOutside + size*cfgw.muneSizeExpandX*0.01f;
@@ -18751,229 +19094,14 @@ namespace CM3D2.VibeYourMaid.Plugin
           rangeBack = Math.Min(back, downBack);
 
           if (cfgw.muneDrawGizmo) {
-            Console.WriteLine("[VibeYourMaid] muneYori Enabled Maid="+maid.status.lastName+" "+maid.status.firstName);
-            Console.WriteLine("  MoveSpeed="+moveSpeed+" RetuenSpeed="+retuenSpeed+" CurvePoint x="+curvePointX+" y="+curvePointY);
-            Console.WriteLine("  MoveRatio X="+moveRatioX+" Y="+moveRatioY+" MoveLimit X="+moveLimitX+" Y="+moveLimitY);
-            Console.WriteLine("  angle=("+muneAngleX+","+muneAngleY+","+muneAngleZ+")");
-            Console.WriteLine("  ArmOffset=("+armOffsetL.x+","+armOffsetL.y+","+armOffsetL.z+")");
-            Console.WriteLine("  outside="+outside+" centerX="+centerX);
-            Console.WriteLine("  top="+top+" centerY="+centerY+" bottom="+bottom);
-            Console.WriteLine("  front="+front+" centerZ="+centerFrontZ+" centerBackZ="+centerBackZ+" back="+back);
-            Console.WriteLine("  down cx="+downCenterX+" outside="+downOutside+" cy="+downCenterY+" top="+downTop+" bottom="+downBottom+" cz="+downCenterZ+" front="+downFront+" back="+downBack);
-            Console.WriteLine("  range outside="+rangeOutside+" top="+rangeTop+" bottom="+rangeBottom+" front="+rangeFront+" back="+rangeBack);
+            Debug.Log("[VibeYourMaid] muneYori Enabled : Maid="+maid);
+            Debug.Log("  MoveSpeed T="+moveSpeedTime+" A="+moveSpeedAmp+" CurvePoint x="+curvePointX+" y="+curvePointY);
+            Debug.Log("  MoveRatio X="+moveRatioX+" Y="+moveRatioY+"  MoveLimit X="+moveLimitX+" Y="+moveLimitY);
+            Debug.Log("  angle=("+muneAngleX+","+muneAngleY+","+muneAngleZ+")  ArmOffset=("+armOffsetL.x+","+armOffsetL.y+","+armOffsetL.z+")");
+            Debug.Log("  outside="+outside+" centerX="+centerX+"  top="+top+" centerY="+centerY+" bottom="+bottom+"  front="+front+" centerZ="+centerFrontZ+" centerBackZ="+centerBackZ+" back="+back);
+            Debug.Log("  down cx="+downCenterX+" outside="+downOutside+" cy="+downCenterY+" top="+downTop+" bottom="+downBottom+" cz="+downCenterZ+" front="+downFront+" back="+downBack);
+            //Debug.Log("  range outside="+rangeOutside+" top="+rangeTop+" bottom="+rangeBottom+" front="+rangeFront+" back="+rangeBack);
           }
-        }
-      }
-
-      //胸衝突範囲のGizmoをGLで描画する 左のみ
-      public class MuneYoriRenderer : MonoBehaviour
-      {
-        Maid maid;
-        MaidState maidState;
-        MuneParam muneParam;
-        Transform spine1a;
-        Transform mune;
-        Transform armL;
-        Transform armR;
-
-        Color xColor1;
-        Color xColor2;
-        Color yColor1;
-        Color yColor2;
-        Material lineMaterial;
-        Vector3 munePos;
-
-        public void init(Maid maid, MaidState maidState)
-        {
-          this.maid = maid;
-          this.maidState = maidState;
-          this.muneParam = maidState.muneParam;
-          this.spine1a = maidState.maidMuneA;
-          #if COM3D2_5
-          if (maid.IsCrcBody) this.mune = maid.body0.dbMuneL.transform;
-          else this.mune = maid.body0.jbMuneL.transform;
-          #else 
-          this.mune = maid.body0.jbMuneL.transform;
-          #endif
-          this.armL = maidState.maidArmL;
-          this.armR = maidState.maidArmR;
-
-          this.xColor1 = new Color(1f,0.3f,0.6f,1f);
-          this.xColor2 = Color.red;
-          this.yColor1 = new Color(0.3f,0.6f,1f,1f);
-          this.yColor2 = Color.blue;
-
-          if (lineMaterial == null) {
-            lineMaterial = new Material(Shader.Find("Hidden/Internal-Colored"));
-            lineMaterial.hideFlags = HideFlags.HideAndDontSave;
-            lineMaterial.SetInt("_ZTest", 0); //最前面表示にはこれが必要
-            lineMaterial.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
-            lineMaterial.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-            lineMaterial.SetInt("_Cull", (int)UnityEngine.Rendering.CullMode.Off);
-            lineMaterial.SetInt("_ZWrite", 0);
-            lineMaterial.renderQueue = 5000;
-          }
-        }
-
-        //GL描画はOnRenderObjectで実行しないと描画されない
-        private void OnRenderObject()
-        {
-          if (mune == null) return;
-
-          Vector3 pos = mune.position;
-          munePos = Quaternion.Inverse(spine1a.rotation) * (pos - spine1a.position);
-          Quaternion rot = muneParam.rotY;
-
-          GL.PushMatrix();
-          try {
-            //腕原点
-            if (maidState.muneOffsetL.targetX > 0.0001f && maidState.muneOffsetL.targetY > 0.0001f) lineMaterial.color = Color.red;
-            else if (maidState.muneOffsetL.targetX > 0.0001f) lineMaterial.color = Color.yellow;
-            else if (maidState.muneOffsetL.targetY > 0.0001f) lineMaterial.color = Color.blue;
-            else lineMaterial.color = Color.green;
-            lineMaterial.SetPass(0);
-            GL.MultMatrix(armL.localToWorldMatrix);
-            drawCross(muneParam.armOffsetL, 0.02f);
-
-            if (maidState.muneOffsetR.targetX > 0.0001f && maidState.muneOffsetR.targetY > 0.0001f) lineMaterial.color = Color.red;
-            else if (maidState.muneOffsetR.targetX > 0.0001f) lineMaterial.color = Color.yellow;
-            else if (maidState.muneOffsetR.targetY > 0.0001f) lineMaterial.color = Color.blue;
-            else lineMaterial.color = Color.green;
-            lineMaterial.SetPass(0);
-            GL.MultMatrix(armR.localToWorldMatrix);
-            drawCross(muneParam.armOffsetR, 0.02f);
-
-            //左胸原点
-            lineMaterial.color = Color.green;
-            lineMaterial.SetPass(0);
-            GL.MultMatrix(mune.localToWorldMatrix);
-            drawCross(Vector3.zero, 0.02f);
-
-            //胸(spine1a)の座標系に
-            GL.MultMatrix(spine1a.localToWorldMatrix);
-            //胸原点
-            //drawCross(Vector3.zero, 0.02f);
-
-            //左右移動範囲
-            lineMaterial.color = Color.Lerp(xColor1, xColor2, Math.Min(muneParam.moveLimitX, maidState.muneOffsetL.targetX * muneParam.moveRatioX)); //色を値で変更
-            lineMaterial.SetPass(0);
-            float w, ht, hb, d;
-            Vector3 center = new Vector3(muneParam.centerX, muneParam.centerY, muneParam.centerFrontZ);
-            w = muneParam.outside - muneParam.centerX;
-            ht = muneParam.top - muneParam.centerY;
-            hb = muneParam.bottom - muneParam.centerY;
-            d = muneParam.front - muneParam.centerFrontZ;
-            drawArcXY(center, w, ht, 0, 180, rot); //左右 上半分
-            drawArcXY(center, w, hb, 0, 180, rot); //左右 下半分
-            drawArcXZ(center, w, d, 0, 90, rot); //水平面 外側前
-            //drawLine(center.x, center.y, muneParam.front, center.x, muneParam.top, center.z, rot); //垂直面 前 上 直線
-            //drawArcYZ(center, ht, d, 0, 90, rot); //垂直面 前 上 円弧
-            drawBrestFront(center.x, center.y, center.z, ht, d, rot); //垂直面 前 上
-            drawArcYZ(center, hb, d, 0, 90, rot); //垂直面 前 下半分
-            drawLine(center.x, muneParam.top, center.z, center.x-w, muneParam.top, center.z, rot); //内側横線 上
-            drawLine(center.x, center.y, muneParam.front, center.x-w, center.y, muneParam.front, rot); //内側横線 前
-            d = muneParam.centerFrontZ - muneParam.back;
-
-            //乳の後ろ側 水平のみcenterBackZから
-            center.z = muneParam.centerBackZ;
-            d = muneParam.back - muneParam.centerBackZ;
-            drawArcXY(center, w, ht, 0, 180, rot); //左右 上半分
-            drawArcXY(center, w, hb, 0, 180, rot); //左右 下半分
-            drawArcXZ(center, w, d, 0, 90, rot); //水平面 後ろ
-            drawLine(center.x, muneParam.top, center.z, center.x-w, muneParam.top, center.z, rot); //内側横線 上
-            drawLine(center.x, center.y, muneParam.back, center.x-w, center.y, muneParam.back, rot); //内側横線 後
-            drawArcYZ(center, hb, d, 0, 90, rot); //垂直面 後 下半分 
-            drawArcYZ(center, ht, d, 0, 90, rot); //垂直面 後 上半分
-            drawLine(center.x, muneParam.top, muneParam.centerFrontZ, center.x, muneParam.top, muneParam.centerBackZ, rot); //接続線 上
-            drawLine(muneParam.outside, center.y, muneParam.centerFrontZ, muneParam.outside, center.y, muneParam.centerBackZ, rot); //接続線 横
-            drawLine(center.x, muneParam.bottom, muneParam.centerFrontZ, center.x, muneParam.bottom, muneParam.centerBackZ, rot); //接続線 下
-
-            //乳下げ範囲 左右
-            lineMaterial.color = Color.Lerp(yColor1, yColor2, Math.Min(muneParam.moveLimitY, maidState.muneOffsetL.targetY * muneParam.moveRatioY)); //色を値で変更
-            lineMaterial.SetPass(0);
-            Vector3 downCenter = new Vector3(muneParam.downCenterX, muneParam.downCenterY, muneParam.downCenterZ);
-            w = muneParam.downOutside - muneParam.downCenterX;
-            ht = muneParam.downTop - muneParam.downCenterY;
-            hb = muneParam.downBottom - muneParam.downCenterY;
-            d = muneParam.downFront - muneParam.downCenterZ;
-            drawArcXY(downCenter, w, ht, 0, 180, rot); //左右 上半分
-            drawArcXY(downCenter, w, hb, 0, 180, rot); //左右 下半分
-            drawArcXZ(downCenter, w, d, 0, 360, rot); //水平面 一周
-            drawArcYZ(downCenter, ht, d, 0, 180, rot); //垂直面 中心 上側
-            drawArcYZ(downCenter, hb, d, 0, 180, rot); //垂直面 中心 下側
-
-          } finally {
-            GL.PopMatrix();
-          }
-        }
-
-        //指定位置に十字
-        private void drawCross(Vector3 c, float size)
-        {
-          GL.Begin(GL.LINES);
-            GL.Vertex3(c.x-size, c.y, c.z);
-            GL.Vertex3(c.x+size, c.y, c.z);
-            GL.Vertex3(c.x, c.y-size, c.z);
-            GL.Vertex3(c.x, c.y+size, c.z);
-            GL.Vertex3(c.x, c.y, c.z-size);
-            GL.Vertex3(c.x, c.y, c.z+size);
-          GL.End();
-        }
-
-        private void drawLine(float x1, float y1, float z1, float x2, float y2, float z2, Quaternion rot)
-        {
-            GL.Begin(GL.LINES);
-            GL.Vertex(munePos + rot * new Vector3(-y1, z1, x1));
-            GL.Vertex(munePos + rot * new Vector3(-y2, z2, x2));
-            GL.End();
-        }
-
-        //胸の前 上側ラインの描画 判定計算処理にあわせる
-        private void drawBrestFront(float x0, float y0, float z0, float h, float d, Quaternion rot)
-        {
-          GL.Begin(GL.LINE_STRIP);
-          for (int i=0; i<=90; i+=5) {
-            float z = (float)Math.Cos(Math.PI*i/180.0);
-            float y = (float)Math.Sin(Math.PI*i/180.0);
-            //dy = dy * (1f + dz * 0.7f); //前側のyを70%高くする
-            //y = y - (y-(1f-z)) / 1.7f;
-            y = y / (1f + z * 0.7f);
-            GL.Vertex(munePos + rot * new Vector3(-(y0 + y*h), z0 + z*d, x0));
-          }
-          GL.End();
-        }
-
-        //放物線を描画
-        private void drawParaboraYZ(float x0, float y0, float z0, float h, float d, Quaternion rot)
-        {
-          GL.Begin(GL.LINE_STRIP);
-          for (int i=0; i<=20; i++) {
-            float z = i*0.05f;
-            GL.Vertex(munePos + rot * new Vector3(-(y0 + h*z*z), z0 + z*d, x0));
-          }
-          GL.End();
-        }
-
-        //垂直面 左右 外側が0 5度単位
-        private void drawArcXY(Vector3 c, float w, float h, int angle1, int angle2, Quaternion rot)
-        {
-          GL.Begin(GL.LINE_STRIP);
-          for (int i=angle1; i<=angle2; i+=5) GL.Vertex(munePos + rot * new Vector3(-(c.y+(float)Math.Sin(Math.PI*i/180.0)*h), c.z, c.x+(float)Math.Cos(Math.PI*i/180.0)*w));
-          GL.End();
-        }
-        //垂直面 前後 前側が0  5度単位
-        private void drawArcYZ(Vector3 c, float h, float d, int angle1, int angle2, Quaternion rot)
-        {
-          GL.Begin(GL.LINE_STRIP);
-          for (int i=angle1; i<=angle2; i+=5) GL.Vertex(munePos + rot * new Vector3(-(c.y+(float)Math.Sin(Math.PI*i/180.0)*h), c.z+(float)Math.Cos(Math.PI*i/180.0)*d, c.x));
-          GL.End();
-        }
-        //水平面 外側が0  5度単位
-        private void drawArcXZ(Vector3 c, float w, float d, int angle1, int angle2, Quaternion rot)
-        {
-          GL.Begin(GL.LINE_STRIP);
-          for (int i=angle1; i<=angle2; i+=5) GL.Vertex(munePos + rot * new Vector3(-c.y, c.z+(float)Math.Sin(Math.PI*i/180.0)*d, c.x+(float)Math.Cos(Math.PI*i/180.0)*w));
-          GL.End();
         }
       }
 
@@ -18982,35 +19110,22 @@ namespace CM3D2.VibeYourMaid.Plugin
       //とりあえず距離のみで横移動のみ実装
       private void checkMuneYori(Maid maid, MaidState maidState)
       {
-        //初期化前 または 無効時
+        //メイドが破棄された場合は処理しない
         if (maidState.maidMuneA == null) return;
 
         //無効化時は元に戻す
         if (!cfgw.muneYoriEnabled) {
+          //無効化済み
+          if (maidState.muneParam == null) return;
+
           if (maidState.muneOffsetL.x != 0 || maidState.muneOffsetL.y != 0) {
-            maidState.muneOffsetL.targetX = 0;
-            maidState.muneOffsetL.targetY = 0;
-            maidState.muneOffsetL.x = 0;
-            maidState.muneOffsetL.y = 0;
-            osawari.muneMorph(
-              #if COM3D2_5
-              maid.body0.dbMuneL,
-              #endif
-              maid.body0.jbMuneL, maid, maidState, maidState.muneOffsetL, 0f, 0f);
+            resetMuneYoriL(maid, maidState);
           }
           if (maidState.muneOffsetR.x != 0 || maidState.muneOffsetR.y != 0) {
-            maidState.muneOffsetR.targetX = 0;
-            maidState.muneOffsetR.targetY = 0;
-            maidState.muneOffsetR.x = 0;
-            maidState.muneOffsetR.y = 0;
-            osawari.muneMorph(
-              #if COM3D2_5
-              maid.body0.dbMuneR,
-              #endif
-              maid.body0.jbMuneR, maid, maidState, maidState.muneOffsetR, 0f, 0f);
+            resetMuneYoriR(maid, maidState);
           }
-          //メイドの腕を削除して次から無効化
-          maidState.maidMuneA = null;
+          //胸設定を削除して次から無効化
+          maidState.muneParam = null;
           return;
         }
 
@@ -19038,64 +19153,126 @@ namespace CM3D2.VibeYourMaid.Plugin
         directionL.Set(-directionL.z, directionL.x, -directionL.y); //左胸は左右反転して外向きに
         directionR.Set(directionR.z, directionR.x, -directionR.y);
 
-        //胸の角度に応じて座標のほうを逆回転させる
+        //胸の角度に応じて上腕原点座標を逆に回転させる
         directionL = muneParam.invRotY * directionL;
         directionR = muneParam.invRotY * directionR;
-        //if (cfgw.muneDrawGizmo) Console.WriteLine("x="+directionL.x+", y="+directionL.y+", z="+directionL.z); //DEBUG
+        //if (cfgw.muneDrawGizmo) { Debug.Log("L ("+directionL.x+", "+directionL.y+", "+directionL.z+")"); Debug.Log("R ("+directionR.x+", "+directionR.y+", "+directionR.z+")"); } //DEBUG
 
         //左胸 回転前の座標で範囲チェック 範囲外ならsetMuneYoriからfalseが返ってくる
-        if (!setMuneYori(
-          #if COM3D2_5
-          maid.body0.dbMuneL,
-          #endif
-          maid.body0.jbMuneL, maid, maidState, maidState.muneOffsetL, muneParam, directionL)
-        ) {
-          if (maidState.muneOffsetL.x != 0 || maidState.muneOffsetL.y != 0) {
-            maidState.muneOffsetL.targetX = 0;
-            maidState.muneOffsetL.targetY = 0;
-            maidState.muneOffsetL.x -= maidState.muneOffsetL.x * muneParam.retuenSpeed * Time.deltaTime;
-            maidState.muneOffsetL.y -= maidState.muneOffsetL.y * muneParam.retuenSpeed * Time.deltaTime;
-            if (maidState.muneOffsetL.x < 0.0001f) maidState.muneOffsetL.x = 0;
-            if (maidState.muneOffsetL.y < 0.0001f) maidState.muneOffsetL.y = 0;
+        MuneOffset muneOffset = maidState.muneOffsetL;
+        if (setMuneYori(maid, maidState, muneOffset, muneParam, directionL)) {
+          float muneDeltaTime = Math.Min(0.02f, Time.deltaTime); //50fps制限 fpsが低いと移動量が大きすぎて揺れが収束せずに暴れる
+          //反復収束移動
+          float preSpeedX = muneOffset.speedX;
+          float preSpeedY = muneOffset.speedY;
+          //秒速
+          muneOffset.speedX = preSpeedX - (preSpeedX+(muneOffset.x-muneOffset.targetX) * muneParam.moveSpeedAmp) * muneParam.moveSpeedTime * muneDeltaTime;
+          muneOffset.speedY = preSpeedY - (preSpeedY+(muneOffset.y-muneOffset.targetY) * muneParam.moveSpeedAmp) * muneParam.moveSpeedTime * muneDeltaTime;
+          //ほぼ動かないなら変形処理はスキップ
+          if (Math.Abs(muneOffset.speedX) > 0.001f || Math.Abs(muneOffset.speedY) > 0.001f) {
+            //胸オフセット移動
+            muneOffset.x += muneOffset.speedX * muneDeltaTime;
+            muneOffset.y += muneOffset.speedY * muneDeltaTime;
+            //胸変形
             osawari.muneMorph(
               #if COM3D2_5
               maid.body0.dbMuneL,
               #endif
-              maid.body0.jbMuneL, maid, maidState, maidState.muneOffsetL, 0f, 0f);
+              maid.body0.jbMuneL, maid, maidState, muneOffset, 0f, 0f);
+          }
+        } else {
+          //範囲外の戻し処理
+          if (muneOffset.x != 0 || muneOffset.y != 0 || muneOffset.speedX != 0 || muneOffset.speedY != 0) {
+            setMuneReturn(muneParam, muneOffset);
+            osawari.muneMorph(
+              #if COM3D2_5
+              maid.body0.dbMuneL,
+              #endif
+              maid.body0.jbMuneL, maid, maidState, muneOffset, 0f, 0f);
           }
         }
 
-        //右胸 回転前の座標で範囲チェック
-        if (!setMuneYori(
-          #if COM3D2_5
-          maid.body0.dbMuneR,
-          #endif
-          maid.body0.jbMuneR, maid, maidState, maidState.muneOffsetR, muneParam, directionR)
-        ) {
-          if (maidState.muneOffsetR.x != 0 || maidState.muneOffsetR.y != 0) {
-            maidState.muneOffsetR.targetX = 0;
-            maidState.muneOffsetR.targetY = 0;
-            maidState.muneOffsetR.x -= maidState.muneOffsetR.x * muneParam.retuenSpeed * Time.deltaTime;
-            maidState.muneOffsetR.y -= maidState.muneOffsetR.y * muneParam.retuenSpeed * Time.deltaTime;
-            if (maidState.muneOffsetR.x < 0.0001f) maidState.muneOffsetR.x = 0;
-            if (maidState.muneOffsetR.y < 0.0001f) maidState.muneOffsetR.y = 0;
-
+        //右胸 回転前の座標で範囲チェック 範囲外ならsetMuneYoriからfalseが返ってくる
+        muneOffset = maidState.muneOffsetR;
+        if (setMuneYori(maid, maidState, muneOffset, muneParam, directionR)) {
+          float muneDeltaTime = Math.Min(0.02f, Time.deltaTime); //50fps制限 fpsが低いと移動量が大きすぎて揺れが収束せずに暴れる
+          //反復収束移動
+          float preSpeedX = muneOffset.speedX;
+          float preSpeedY = muneOffset.speedY;
+          //秒速
+          muneOffset.speedX = preSpeedX - (preSpeedX+(muneOffset.x-muneOffset.targetX) * muneParam.moveSpeedAmp) * muneParam.moveSpeedTime * muneDeltaTime;
+          muneOffset.speedY = preSpeedY - (preSpeedY+(muneOffset.y-muneOffset.targetY) * muneParam.moveSpeedAmp) * muneParam.moveSpeedTime * muneDeltaTime;
+          //ほぼ動かないなら変形処理はスキップ
+          if (Math.Abs(muneOffset.speedX) > 0.001f || Math.Abs(muneOffset.speedY) > 0.001f) {
+            //胸オフセット移動
+            muneOffset.x += muneOffset.speedX * muneDeltaTime;
+            muneOffset.y += muneOffset.speedY * muneDeltaTime;
+            //胸変形
             osawari.muneMorph(
               #if COM3D2_5
               maid.body0.dbMuneR,
               #endif
-              maid.body0.jbMuneR, maid, maidState, maidState.muneOffsetR, 0f, 0f);
+              maid.body0.jbMuneR, maid, maidState, muneOffset, 0f, 0f);
+          }
+
+        } else {
+          //範囲外の戻し処理
+          if (muneOffset.x != 0 || muneOffset.y != 0 || muneOffset.speedX != 0 || muneOffset.speedY != 0) {
+            setMuneReturn(muneParam, muneOffset);
+            osawari.muneMorph(
+              #if COM3D2_5
+              maid.body0.dbMuneR,
+              #endif
+              maid.body0.jbMuneR, maid, maidState, muneOffset, 0f, 0f);
           }
         }
       }
 
-      //胸寄りを計算して変形処理を実行 2.5はdbMuneを引数に追加
+      //胸寄りの移動量を初期化 左胸
+      private void resetMuneYoriL(Maid maid, MaidState maidState)
+      {
+        //オフセットとスピードを0に
+        maidState.muneOffsetL.reset();
+        //胸変形を0に戻す
+        osawari.muneMorph(
+          #if COM3D2_5
+          maid.body0.dbMuneL,
+          #endif
+          maid.body0.jbMuneL, maid, maidState, maidState.muneOffsetL, 0f, 0f);
+      }
+      //胸寄りの移動量を初期化 右胸
+      private void resetMuneYoriR(Maid maid, MaidState maidState)
+      {
+        maidState.muneOffsetR.reset();
+        osawari.muneMorph(
+          #if COM3D2_5
+          maid.body0.dbMuneR,
+          #endif
+          maid.body0.jbMuneR, maid, maidState, maidState.muneOffsetR, 0f, 0f);
+      }
+      //胸の衝突範囲外 胸の移動量を戻す
+      private void setMuneReturn(MuneParam muneParam, MuneOffset muneOffset)
+      {
+          float muneDeltaTime = Math.Min(0.02f, Time.deltaTime); //50fps制限 fpsが低いと移動量が大きすぎて揺れが収束せずに暴れる
+          float preSpeedX = muneOffset.speedX;
+          float preSpeedY = muneOffset.speedY;
+          muneOffset.speedX = preSpeedX - (preSpeedX+muneOffset.x * muneParam.moveSpeedAmp) * muneParam.moveSpeedTime * muneDeltaTime;
+          muneOffset.speedY = preSpeedY - (preSpeedY+muneOffset.y * muneParam.moveSpeedAmp) * muneParam.moveSpeedTime * muneDeltaTime;
+          muneOffset.x += muneOffset.speedX * muneDeltaTime;
+          muneOffset.y += muneOffset.speedY * muneDeltaTime;
+          if (muneOffset.x < 0.01f && Math.Abs(muneOffset.speedX) < 0.01f) {
+            muneOffset.x = 0;
+            muneOffset.speedX = 0;
+          }
+          if (muneOffset.y < 0.01f && Math.Abs(muneOffset.speedY) < 0.01f) {
+            muneOffset.y = 0;
+            muneOffset.speedY = 0;
+          }
+      }
+
+      //胸の衝突範囲内 胸寄りを計算して変形処理を実行 2.5はdbMuneを引数に追加
       //腕が範囲内ならtrueを返す
-      private bool setMuneYori(
-        #if COM3D2_5
-        DynamicMuneBone dbMune,
-        #endif
-        jiggleBone jbMune, Maid maid, MaidState maidState, MuneOffset muneOffset, MuneParam muneParam, Vector3 d
+      private bool setMuneYori(Maid maid, MaidState maidState, MuneOffset muneOffset, MuneParam muneParam, Vector3 d
       ) {
 
         //乳寄せの判定
@@ -19124,7 +19301,7 @@ namespace CM3D2.VibeYourMaid.Plugin
             }
           }
           muneOffset.targetX = 1f - Math.Min(1f, (float)(Math.Sqrt(dx*dx + dy*dy + dz*dz))); //中心からの距離で 1～0
-          //if (cfgw.muneDrawGizmo) Console.WriteLine("dx="+dx+" dy="+dy+" dz="+dz);
+          //if (cfgw.muneDrawGizmo) Debug.Log("dx="+dx+" dy="+dy+" dz="+dz);
         }
 
         //乳下げの判定 中心はdownCenterX downCenterY downCenterZを利用
@@ -19139,29 +19316,1033 @@ namespace CM3D2.VibeYourMaid.Plugin
           if (d.y > muneParam.downCenterY) dy = ((d.y - muneParam.downCenterY) * muneParam.normarizeDYT); //上
           else dy = (muneParam.downCenterY - d.y) * muneParam.normarizeDYB; //下
           dz = (d.z - muneParam.downCenterZ) * muneParam.normarizeDZ; //前後
-          muneOffset.targetY = 1f - Math.Min(1f, (float)(Math.Sqrt(dx*dx + dy*dy + dz*dz))); //中心からの距離で 1～0
+          muneOffset.targetY = 1f - Math.Min(1f, (float)(Math.Sqrt(dx*dx + dy*dy + dz*dz))); //中心からの距離で1～0 中心が1
         }
 
         //範囲外なのでfalseを返して戻し処理を行う
         if (muneOffset.targetX == 0 && muneOffset.targetY == 0) return false;
-
-        //遅延移動
-        float offsetX = (muneOffset.targetX - muneOffset.x) * Math.Min(1f, (muneOffset.targetX < muneOffset.x ? muneParam.moveSpeed : muneParam.retuenSpeed) * Time.deltaTime); //+で外に戻る
-        float offsetY = (muneOffset.targetY - muneOffset.y) * Math.Min(1f, (muneOffset.targetY < muneOffset.y ? muneParam.moveSpeed : muneParam.retuenSpeed) * Time.deltaTime); //+で上に戻る
-
-        //ほぼ動かないなら変形処理はスキップ
-        if (Math.Abs(offsetX) > 0.0001f || Math.Abs(offsetY) > 0.0001f) {
-          //if (cfgw.muneDrawGizmo) Console.WriteLine("tx="+muneOffset.targetX+", ty="+muneOffset.targetY+", x="+offsetX+", y="+offsetY);
-          muneOffset.x += offsetX;
-          muneOffset.y += offsetY;
-          //胸変形
-          osawari.muneMorph(
-            #if COM3D2_5
-            dbMune,
-            #endif
-            jbMune, maid, maidState, muneOffset, 0f, 0f);
-        }
         return true;
+      }
+
+
+      //胸衝突判定 コライダー (VRコントローラー、前腕、ポール)----------------------
+
+      //Updateで利用 メイドごとに保存
+      public class MuneColliderInfo
+      {
+        //TBodyから取得
+        public Transform m_trsMuneL;
+        public Transform m_trsMuneLsub;
+        public Transform m_trsMuneR;
+        public Transform m_trsMuneRsub;
+
+        //コライダーセット時に作成される
+        public Transform m_trHitParentL;
+        public Transform m_trHitChildL;
+        public Transform m_trHitParentR;
+        public Transform m_trHitChildR;
+
+        //前腕コライダーを動かす用
+        public Transform foreArmL;
+        public Transform foreArmR;
+
+        //胸のコライダーを設定するオブジェクト
+        public SphereCollider muneColliderL;
+        public SphereCollider muneColliderR;
+        //前腕のコライダーを設定するオブジェクト
+        public CapsuleCollider foreArmColliderL;
+        public CapsuleCollider foreArmColliderR;
+        public Vector3 foreArmPosL;
+        public Quaternion foreArmRotL;
+        public Vector3 foreArmSclL;
+        public Vector3 foreArmPosR;
+        public Quaternion foreArmRotR;
+        public Vector3 foreArmSclR;
+
+
+        //前側の移動制限 胸サイズで調整 通常時の位置+1mm程度 CRCボディは値が違う
+        const float FTONR_LIMIT = -0.087f;
+        const float FTONR_LIMIT_CRC = -0.106f;
+        private float frontLimit = FTONR_LIMIT;
+
+        //全方向の最大移動量 動きすぎるので胸サイズでは広げない
+        private float hitLimit = 0.01f + (0.04f - 0.01f) * 0.5f/1.3f;
+
+        public MuneColliderInfo(Maid maid, VibeYourMaidCfgWriting cfgw)
+        {
+          //TBodyにあるものと同じ privateなのでm_trBonesから取得
+          if (maid.body0.m_trBones) {
+            m_trsMuneL = CMT.SearchObjName(maid.body0.m_trBones, "Mune_L", true);
+            m_trsMuneLsub = CMT.SearchObjName(maid.body0.m_trBones, "Mune_L_sub", true);
+            m_trsMuneR = CMT.SearchObjName(maid.body0.m_trBones, "Mune_R", true);
+            m_trsMuneRsub = CMT.SearchObjName(maid.body0.m_trBones, "Mune_R_sub", true);
+          }
+
+          //設定ファイルに合わせて調整
+          updateParam(maid, cfgw);
+        }
+
+        public void updateParam(Maid maid, VibeYourMaidCfgWriting cfgw)
+        {
+          //移動制限
+          float distanceMin = ExSaveData.GetFloat(maid, "CM3D2.VibeYourMaid.Plugin", "muneHitLimitDistanceMin", cfgw.muneHitLimitDistanceMin);
+          float distanceMax = ExSaveData.GetFloat(maid, "CM3D2.VibeYourMaid.Plugin", "muneHitLimitDistanceMax", cfgw.muneHitLimitDistanceMax);
+          hitLimit = distanceMin + (distanceMax - distanceMin) * (float)maid.GetProp(MPN.MuneL).value / 130f;
+          //前側の移動制限
+          if (maid.IsCrcBody) frontLimit = FTONR_LIMIT_CRC;
+          //オフセットさせる
+          frontLimit -= ExSaveData.GetFloat(maid, "CM3D2.VibeYourMaid.Plugin", "muneColliderFrontLimit", cfgw.muneColliderFrontLimit);
+        }
+
+        //メイドごとの胸変形処理 手前や外側への移動は制限したい
+        public void Update(Maid maid)
+        {
+          //親子付けするとエラーになるので自力で動かす
+          float bodyScale = maid.body0.transform.localScale.x;
+          Vector3 localScale = foreArmSclL * bodyScale;
+          if (foreArmColliderL) {
+            foreArmColliderL.transform.rotation = foreArmL.rotation * foreArmRotL;
+            foreArmColliderL.transform.position = foreArmL.position + foreArmL.rotation * foreArmPosL * bodyScale; //オフセットは回転と拡大縮小してから加算
+            foreArmColliderL.transform.localScale  = localScale;
+          }
+          if (foreArmColliderR) {
+            foreArmColliderR.transform.rotation = foreArmR.rotation * foreArmRotR;
+            foreArmColliderR.transform.position = foreArmR.position + foreArmR.rotation * foreArmPosR * bodyScale; //オフセットは回転と拡大縮小してから加算
+            foreArmColliderR.transform.localScale  = localScale;
+          }
+
+          if (m_trsMuneLsub != null && m_trHitChildL != null) {
+            Vector3 vector2 = m_trsMuneL.InverseTransformPoint(m_trHitChildL.position);
+            //移動制限
+            //Debug.Log("vector2=("+vector2.x+","+vector2.y+","+vector2.z+")");
+            if (vector2.x < frontLimit) vector2.x = frontLimit;
+
+            if ((vector2 - m_trHitParentL.localPosition).magnitude < hitLimit) {
+              m_trsMuneLsub.localPosition = vector2;
+            } else {
+              m_trsMuneLsub.localPosition = m_trHitParentL.localPosition + (vector2 - m_trHitParentL.localPosition).normalized * hitLimit;
+              m_trHitChildL.position = m_trsMuneLsub.position;
+            }
+          }
+          if (m_trsMuneRsub != null && m_trHitChildR != null) {
+            Vector3 vector2 = m_trsMuneR.InverseTransformPoint(m_trHitChildR.position);
+            //移動制限
+            if (vector2.x < frontLimit) vector2.x = frontLimit;
+            
+            if ((vector2 - m_trHitParentR.localPosition).magnitude < hitLimit) {
+              m_trsMuneRsub.localPosition = vector2;
+            } else {
+              m_trsMuneRsub.localPosition = m_trHitParentR.localPosition + (vector2 - m_trHitParentR.localPosition).normalized * hitLimit;
+              m_trHitChildR.position = m_trsMuneRsub.position;
+            }
+          }
+        }
+
+        //メイドに設定された胸コライダーと前腕のコライダーオブジェクトを破棄する
+        public void destroyMuneCollider()
+        {
+          //再設定時にずれないように位置を戻す
+          if (m_trsMuneLsub && m_trHitParentL) m_trsMuneLsub.localPosition = m_trHitParentL.localPosition;
+          if (m_trsMuneRsub && m_trHitParentR) m_trsMuneRsub.localPosition = m_trHitParentR.localPosition;
+
+          m_trsMuneL = null;
+          m_trsMuneLsub = null;
+          m_trsMuneR = null;
+          m_trsMuneRsub = null;
+
+          if (muneColliderL) GameObject.Destroy(muneColliderL);
+          if (muneColliderR) GameObject.Destroy(muneColliderR);
+
+          if (foreArmColliderL) {
+            GameObject obj = foreArmColliderL.gameObject;
+            GameObject.Destroy(foreArmColliderL);
+            GameObject.Destroy(obj);
+          }
+          if (foreArmColliderR) {
+            GameObject obj = foreArmColliderR.gameObject;
+            GameObject.Destroy(foreArmColliderR);
+            GameObject.Destroy(obj);
+          }
+          if (m_trHitParentL) GameObject.Destroy(m_trHitParentL.gameObject);
+          if (m_trHitChildL) GameObject.Destroy(m_trHitChildL.gameObject);
+          if (m_trHitParentR) GameObject.Destroy(m_trHitParentR.gameObject);
+          if (m_trHitChildR) GameObject.Destroy(m_trHitChildR.gameObject);
+        }
+      }
+
+      //メイドに胸のコライダーを追加するクラス
+      public class MuneCollider
+      {
+        const int LAYER_NO = 27;
+
+        //竿のコライダー シーンロード時に破棄する 男はシーン内で0～6で固定 init時のupdateChinkoPosで配列は拡大される
+        public CapsuleCollider[] chinkoCollider = new CapsuleCollider[10];
+
+        //ポールダンスのポール位置に追加したオブジェクト
+        GameObject[] poleColliderObj = new GameObject[3];
+
+        public VibeYourMaidCfgWriting cfgw;
+
+        //ダンス前に無効化していたらダンス終了後に戻す
+        public bool muneHitChinkoEnabledBak = false;
+        public bool muneTouchColliderEnabledBak = false;
+
+        public MuneCollider(VibeYourMaidCfgWriting cfgw)
+        {
+          this.cfgw = cfgw;
+        }
+
+        //TBodyに設定されている胸とコントローラのコライダーを無効化する 髪やスカートは別制御なので影響ない
+        public void disableTBodyMuneCollider(Maid maid, MuneColliderInfo colInfo)
+        {
+          //TBodyのUpdateを無効化する m_trsMuneLsub側はnullにしない
+          FieldInfo fieldInfo;
+          fieldInfo = typeof(TBody).GetField("m_trHitChildL", BindingFlags.Instance | BindingFlags.NonPublic);
+          fieldInfo.SetValue(maid.body0, null);
+          fieldInfo = typeof(TBody).GetField("m_trHitChildR", BindingFlags.Instance | BindingFlags.NonPublic);
+          fieldInfo.SetValue(maid.body0, null);
+
+          //追加済みのobjectとコライダーを無効化
+          Transform t = colInfo.m_trsMuneL.Find("SphereParent(Clone)");
+          if (t) {
+            SphereCollider sphereCollider = t.gameObject.GetComponent<SphereCollider>();
+            if (sphereCollider) sphereCollider.enabled = false;
+            //t.gameObject.SetActive(false);
+            DestroyImmediate(t.gameObject);
+          }
+          t = colInfo.m_trsMuneL.Find("SphereChild(Clone)");
+          if (t) {
+            SphereCollider sphereCollider = t.gameObject.GetComponent<SphereCollider>();
+            if (sphereCollider) sphereCollider.enabled = false;
+            DestroyImmediate(t.gameObject);
+          }
+          t = colInfo.m_trsMuneL.Find("SphereParent(Clone)");
+          if (t) {
+            SphereCollider sphereCollider = t.gameObject.GetComponent<SphereCollider>();
+            if (sphereCollider) sphereCollider.enabled = false;
+            DestroyImmediate(t.gameObject);
+          }
+          t = colInfo.m_trsMuneL.Find("SphereChild(Clone)");
+          if (t) {
+            SphereCollider sphereCollider = t.gameObject.GetComponent<SphereCollider>();
+            if (sphereCollider) sphereCollider.enabled = false;
+            DestroyImmediate(t.gameObject);
+          }
+        }
+
+        //初期化 mmaidState.muneColliderInfo がない場合のみ実行
+        public MuneColliderInfo initMuneCollider(Maid maid, MaidState maidState)
+        {
+          if (!maid.body0.m_trBones) return null;
+          
+          //Updateで利用する胸の位置をセットする
+          MuneColliderInfo colInfo = new MuneColliderInfo(maid, cfgw);
+
+          //コライダーの位置が胸の変形でずれるので胸の変形を初期状態に戻す
+          Vector3 muneScaleL = maid.body0.jbMuneL.transform.localScale;
+          Vector3 muneScaleR = maid.body0.jbMuneR.transform.localScale;
+          resetMuneValue(maid);
+
+          //VR用のTBodyに元々あるコライダーは破棄
+          if (GameMain.Instance.VRMode) {
+            //TBodyのコライダーとUpdateを無効化
+            disableTBodyMuneCollider(maid, colInfo);
+          }
+
+          //TbodyのLoadBody_Rの生成と同じ
+          colInfo.m_trHitParentL = (UnityEngine.Object.Instantiate(Resources.Load("OVR/SphereParent")) as GameObject).transform;
+          colInfo.m_trHitChildL = (UnityEngine.Object.Instantiate(Resources.Load("OVR/SphereChild")) as GameObject).transform;
+          colInfo.m_trHitParentR = (UnityEngine.Object.Instantiate(Resources.Load("OVR/SphereParent")) as GameObject).transform;
+          colInfo.m_trHitChildR = (UnityEngine.Object.Instantiate(Resources.Load("OVR/SphereChild")) as GameObject).transform;
+
+          //メイドが動いていてコライダーのcenterがspine1aの向きになっていないので回す必要がある
+          //立ちポーズの時のspine1aが正面で(0,270,277→(0,0,0)) 後ろ(0,90,277)→（0,180,0）仰向けで(360,270,7)→(270,0,0)になるように調整
+          Quaternion rot = Quaternion.Euler(277-maidState.maidMuneA.eulerAngles.z, maidState.maidMuneA.eulerAngles.y-270, maidState.maidMuneA.eulerAngles.x);
+
+          //ポーズで胸が移動しているとずれるので回転
+          colInfo.m_trHitParentL.rotation = rot;
+          colInfo.m_trHitChildL.rotation = rot;
+          SpringJoint springJoint = colInfo.m_trHitChildL.GetComponent<SpringJoint>();
+          springJoint.connectedBody = colInfo.m_trHitParentL.GetComponent<Rigidbody>();
+          updateSpringJointParam(springJoint);
+          colInfo.m_trHitParentL.parent = colInfo.m_trsMuneL;
+          colInfo.m_trHitChildL.parent = colInfo.m_trsMuneL;
+          colInfo.m_trHitParentL.localPosition = colInfo.m_trsMuneLsub.localPosition;
+          colInfo.m_trHitChildL.localPosition = colInfo.m_trsMuneLsub.localPosition;
+
+          colInfo.m_trHitParentR.rotation = rot;
+          colInfo.m_trHitChildR.rotation = rot;
+          springJoint = colInfo.m_trHitChildR.GetComponent<SpringJoint>();
+          springJoint.connectedBody = colInfo.m_trHitParentR.GetComponent<Rigidbody>();
+          updateSpringJointParam(springJoint);
+          colInfo.m_trHitParentR.parent = colInfo.m_trsMuneR;
+          colInfo.m_trHitChildR.parent = colInfo.m_trsMuneR;
+          colInfo.m_trHitParentR.localPosition = colInfo.m_trsMuneRsub.localPosition;
+          colInfo.m_trHitChildR.localPosition = colInfo.m_trsMuneRsub.localPosition;
+
+          //1に戻したスケールを復元
+          restoreMuneValue(maid, muneScaleL, muneScaleR);
+
+          //SphereColliderの位置を調整
+          colInfo.muneColliderL = adjustMuneCollider(maid, colInfo.m_trHitChildL, null, true);
+          colInfo.muneColliderR = adjustMuneCollider(maid, colInfo.m_trHitChildR, null, false);
+
+          //上腕にコライダー追加 IKはつかむとずれるので使わない privateなのでm_Bonesから取得  腕の中心(_IK_ForeArmL/R)とのずれ 0.09420826
+          colInfo.foreArmL = CMT.SearchObjName(maid.body0.m_Bones.transform, "Bip01 L Forearm", true);
+          colInfo.foreArmR = CMT.SearchObjName(maid.body0.m_Bones.transform, "Bip01 R Forearm", true);
+
+          colInfo.foreArmColliderL = addForearmCollider(maid, colInfo.foreArmL, true);
+          colInfo.foreArmPosL = colInfo.foreArmColliderL.transform.localPosition;
+          colInfo.foreArmRotL = colInfo.foreArmColliderL.transform.localRotation;
+          colInfo.foreArmSclL = colInfo.foreArmColliderL.transform.localScale;
+
+          colInfo.foreArmColliderR = addForearmCollider(maid, colInfo.foreArmR, false);
+          colInfo.foreArmPosR = colInfo.foreArmColliderR.transform.localPosition;
+          colInfo.foreArmRotR = colInfo.foreArmColliderR.transform.localRotation;
+          colInfo.foreArmSclR = colInfo.foreArmColliderR.transform.localScale;
+
+          return colInfo;
+        }
+
+        //コライダーの位置が胸の変形でずれるので胸の変形を初期状態に戻す （MuneYori MuneUpDownは親の胸が回転するので反映されている）
+        public void resetMuneValue(Maid maid)
+        {
+          #if COM3D2_5
+          if (maid.IsCrcBody) {
+              maid.body0.dbMuneL.PhysicsReset();
+              maid.body0.dbMuneR.PhysicsReset();
+          } else 
+          #endif
+          {
+            FieldInfo defQtnFieldInfo = typeof(jiggleBone).GetField("defQtn", BindingFlags.Instance | BindingFlags.NonPublic);
+            maid.body0.jbMuneL.transform.localRotation = (Quaternion)defQtnFieldInfo.GetValue(maid.body0.jbMuneL);
+            maid.body0.jbMuneL.transform.localScale = Vector3.one;
+            maid.body0.jbMuneR.transform.localRotation = (Quaternion)defQtnFieldInfo.GetValue(maid.body0.jbMuneR);
+            maid.body0.jbMuneR.transform.localScale = Vector3.one;
+          }
+        }
+        //初期化した胸のスケールを戻す
+        public void restoreMuneValue(Maid maid, Vector3 muneScaleL, Vector3 muneScaleR)
+        {
+          #if COM3D2_5
+          if (maid.IsCrcBody) {
+              maid.body0.dbMuneL.transform.localScale = muneScaleL;
+              maid.body0.dbMuneR.transform.localScale = muneScaleR;
+          } else 
+          #endif
+          {
+            maid.body0.jbMuneL.transform.localScale = muneScaleL;
+            maid.body0.jbMuneR.transform.localScale = muneScaleR;
+          }
+        }
+
+        //設定ファイル読み込み後の位置等の調整 → コライダーの原点は生成時から移動できない
+        public void updateMuneColliderParam(List<MaidInfo> stockMaids, List<MaidState> maidsState, VibeYourMaidCfgWriting cfgw, Maid[] SubMans, SphereCollider[] touchCollider)
+        {
+          //設定置き換え
+          this.cfgw = cfgw;
+
+          foreach (MaidInfo maidInfo in stockMaids) {
+            Maid maid = maidInfo.mem;
+            MaidState maidState = maidsState[maidInfo.id];
+            MuneColliderInfo colInfo = maidState.muneColliderInfo;
+            if (colInfo == null) continue;
+
+            colInfo.updateParam(maid, cfgw);
+
+            adjustMuneCollider(maid, colInfo.m_trHitChildL, colInfo.muneColliderL, true);
+            adjustMuneCollider(maid, colInfo.m_trHitChildR, colInfo.muneColliderR, false);
+
+            //SpringJoint設定更新
+            updateSpringJointParam(colInfo.m_trHitChildL.GetComponent<SpringJoint>());
+            updateSpringJointParam(colInfo.m_trHitChildR.GetComponent<SpringJoint>());
+
+            //前腕コライダー有効状態
+            setForearmEnabled(colInfo, cfgw.muneColliderEnabled);
+            //前腕コライダー更新
+            if (colInfo.foreArmColliderL) setForeArmPos(maid, colInfo.foreArmColliderL.gameObject, colInfo.foreArmColliderL, true);
+            if (colInfo.foreArmColliderR) setForeArmPos(maid, colInfo.foreArmColliderR.gameObject, colInfo.foreArmColliderR, false);
+
+          }
+
+          //竿の位置調整 enabled関係なくすべて位置調整
+          updateChinkoPos();
+
+          updateTouchCollider(touchCollider);
+
+          //ポール更新
+          addPoleDanceCollider();
+        }
+
+        private SphereCollider adjustMuneCollider(Maid maid, Transform hitChild, SphereCollider sphereCollider, bool bLeft)
+        {
+          //SphereParent(Clone) のlocalScaleは 0.15 程度になっている  ボディのlocalScaleに対応
+          float normalize = 1f / hitChild.localScale.x * maid.body0.transform.localScale.x;
+
+          //半径増加分
+          float radiusExpand = ExSaveData.GetFloat(maid, "CM3D2.VibeYourMaid.Plugin", "muneColliderRadiusExpand", cfgw.muneColliderRadiusExpand) * normalize;
+
+          float offsetX;
+          float offsetY;
+          float offsetZ;
+          if (maid.IsCrcBody) {
+            offsetX = cfgw.muneColliderOffsetCrcX;
+            offsetY = cfgw.muneColliderOffsetCrcY;
+            offsetZ = cfgw.muneColliderOffsetCrcZ;
+          } else {
+            offsetX = cfgw.muneColliderOffsetX;
+            offsetY = cfgw.muneColliderOffsetY;
+            offsetZ = cfgw.muneColliderOffsetZ;
+          }
+          offsetX = ExSaveData.GetFloat(maid, "CM3D2.VibeYourMaid.Plugin", "muneColliderOffsetX", offsetX) * normalize;
+          offsetY = ExSaveData.GetFloat(maid, "CM3D2.VibeYourMaid.Plugin", "muneColliderOffsetY", offsetY) * normalize;
+          offsetZ = ExSaveData.GetFloat(maid, "CM3D2.VibeYourMaid.Plugin", "muneColliderOffsetZ", offsetZ) * normalize;
+
+          //BlendValueはMuneLの値 0～1
+          //float num = maid.body0.jbMuneL.BlendValue / 1.3f;
+          float muneSize = (float)maid.GetProp(MPN.MuneL).value;
+          float num = muneSize / 130f;
+
+          //TBodyのデフォルト値 m_fHitRadiusMin = 0.1f; m_fHitRadiusMax = 0.32f;
+          float hitRadiusMin = maid.body0.m_fHitRadiusMin + radiusExpand;
+          float hitRadiusMax = maid.body0.m_fHitRadiusMax + radiusExpand;
+
+          float minRadius = hitRadiusMin;
+          float radius = hitRadiusMin + (hitRadiusMax - hitRadiusMin) * num;
+          //float z = maid.body0.m_fHitCenterZMin + (maid.body0.m_fHitCenterZMax - maid.body0.m_fHitCenterZMin) * num;
+
+          //コライダーがnullなら取得
+          if (sphereCollider == null) sphereCollider = hitChild.GetComponent<SphereCollider>();
+
+          //胸の位置を初期化した状態で補正
+          if (muneSize > 0) {
+            offsetX += (radius-minRadius) * cfgw.muneColliderOffsetXRatio;
+            //大きいと回転してさらに下に行くので下げすぎない
+            offsetY -= (radius-minRadius) * cfgw.muneColliderOffsetYRatio * Math.Max(0f, (1f-((muneSize-50f)/80f))); //0->1.625 50->1 130以上->0
+            offsetZ += (radius-minRadius) * cfgw.muneColliderOffsetZRatio;
+          }
+
+          if (bLeft) offsetX = -offsetX;
+          //centerはコライダーの親Objectの回転方向に移動する
+          sphereCollider.center = new Vector3(offsetX, offsetY, offsetZ);
+          sphereCollider.radius = radius;
+
+          return sphereCollider;
+        }
+
+        //SpringJointのばね設定を更新
+        private void updateSpringJointParam(SpringJoint springJoint)
+        {
+          springJoint.spring = cfgw.muneColliderSpring;
+          springJoint.damper = cfgw.muneColliderDamper;
+          springJoint.minDistance = cfgw.muneColliderMinDistance;
+          springJoint.maxDistance = cfgw.muneColliderMaxDistance;
+          springJoint.tolerance = cfgw.muneColliderTolerance;
+        }
+
+        //前腕のコライダーを追加
+        private CapsuleCollider addForearmCollider(Maid maid, Transform trArm, bool bLeft)
+        {
+          if (trArm == null) return null;
+
+          //Debug.Log(GetHierarchyPath(trArm) + " (lScl="+trArm.localScale+" lPos="+trArm.localPosition+" Ang="+trArm.eulerAngles+" lAng="+trArm.localEulerAngles+")");
+          GameObject gameObject = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+          gameObject.GetComponent<Renderer>().enabled = false; //非表示
+          gameObject.name = "ForeArmCollider_" + trArm.name;
+          gameObject.layer = LAYER_NO;
+          //gameObject.transform.SetParent(trArm, false); //スタジオのポーズ設定中の解除でエラーになる
+          return setForeArmPos(maid, gameObject, null, bLeft);
+        }
+        //前腕のコライダーサイズを調整
+        private CapsuleCollider setForeArmPos(Maid maid, GameObject gameObject, CapsuleCollider capsuleCollider, bool bLeft)
+        {
+          int sintyo = Math.Max(-10, maid.GetProp(MPN.sintyou).value);
+          int UdeScl = maid.GetProp(MPN.UdeScl).value;
+          float mpnLength = (sintyo-60) * 0.0002f + (UdeScl-60) * 0.00015f;
+          float mpnOffsetY = (sintyo-50) * 0.000133f + (UdeScl-50) * 0.0001f;
+          
+          float localScale = 1f;//maid.body0.transform.localScale.x;
+          float radius = ExSaveData.GetFloat(maid, "CM3D2.VibeYourMaid.Plugin", "muneHitForearmRadius", cfgw.muneHitForearmRadius) * localScale;
+          float length = (ExSaveData.GetFloat(maid, "CM3D2.VibeYourMaid.Plugin", "muneHitForearmLength", cfgw.muneHitForearmLength) + mpnLength) * localScale;
+          float offsetX = ExSaveData.GetFloat(maid, "CM3D2.VibeYourMaid.Plugin", "muneHitForearmOffsetX", cfgw.muneHitForearmOffsetX) * localScale;
+          float offsetY = -(0.09f + ExSaveData.GetFloat(maid, "CM3D2.VibeYourMaid.Plugin", "muneHitForearmOffsetY", cfgw.muneHitForearmOffsetY) + mpnOffsetY) * localScale;
+          float offsetZ = -ExSaveData.GetFloat(maid, "CM3D2.VibeYourMaid.Plugin", "muneHitForearmOffsetZ", cfgw.muneHitForearmOffsetZ) * localScale;
+          if (bLeft) offsetZ = -offsetZ;
+          float angleX = ExSaveData.GetFloat(maid, "CM3D2.VibeYourMaid.Plugin", "muneHitForearmAngleX", cfgw.muneHitForearmAngleX);
+          float angleZ = ExSaveData.GetFloat(maid, "CM3D2.VibeYourMaid.Plugin", "muneHitForearmAngleZ", cfgw.muneHitForearmAngleZ);
+          
+          gameObject.transform.localPosition = new Vector3(offsetY, offsetX, offsetZ); //x-が指先側 前腕の中心を基準にするためxを-0.09 軸はXYが逆
+          gameObject.transform.localScale = new Vector3(radius*2, length*0.5f, radius*2); //コライダーもなぜかこのサイズになる
+          gameObject.transform.localRotation = Quaternion.Euler(0, angleZ, 90f+angleX); //軸は回転済 Y軸は回転不要
+          //コライダーがなければ追加
+          if (capsuleCollider == null) capsuleCollider = gameObject.AddComponent<CapsuleCollider>();
+          capsuleCollider.height = length; //オブジェクトのサイズから変わらないが範囲描画用に設定
+          capsuleCollider.radius = radius;
+          capsuleCollider.enabled = true;
+          return capsuleCollider;
+        }
+        //前腕のコライダーの有効無効のみ変更
+        public void setForearmEnabled(MuneColliderInfo colInfo, bool enabled)
+        {
+          if (colInfo != null) {
+            if (colInfo.foreArmColliderL) {
+              colInfo.foreArmColliderL.gameObject.SetActive(enabled);
+              colInfo.foreArmColliderL.enabled = enabled;
+            }
+            if (colInfo.foreArmColliderR) {
+              colInfo.foreArmColliderR.gameObject.SetActive(enabled);
+              colInfo.foreArmColliderR.enabled = enabled;
+            }
+          }
+        }
+
+        //すべての男の竿をチェックしてコライダーを設定 Updateから定期的に実行される 最大7人？
+        public void checkChinkoColliderAll()
+        {
+          int manCnt = GameMain.Instance.CharacterMgr.GetStockManCount();
+          for (int i = 0; i < manCnt; i++) {
+            Maid man = GameMain.Instance.CharacterMgr.GetStockMan(i);
+            if (man.Visible) {
+              //コライダー有効化 なければ追加
+              CapsuleCollider collider = this.chinkoCollider[i];
+              if (collider == null) { //破棄されたコライダーが残っていたら再作成
+                collider = addChinkoCollider(man);
+                if (collider == null) continue; //追加できなかったらスキップ
+                this.chinkoCollider[i] = collider;
+                
+              }
+              //竿が表示されていなければ無効化 chinkoCenterのlocalScaleがVector3.zero うまく動かないのでコメントアウト
+              //bool enabled = collider.transform.parent.parent.localScale.x != 0;
+              collider.enabled = true;
+              collider.gameObject.SetActive(true);
+            } else {
+              //コライダー無効化
+              CapsuleCollider collider = this.chinkoCollider[i];
+              if (collider != null) {
+                collider.enabled = false;
+                collider.gameObject.SetActive(false);
+              }
+            }
+          }
+        }
+        //すべての竿コライダーを有効・無効化
+        public void setChinkoColliderEnabledAll(bool enabled)
+        {
+          foreach (CapsuleCollider collider in this.chinkoCollider) {
+            if (collider != null) { //男が破棄されていればnull
+              collider.enabled = enabled;
+              collider.gameObject.SetActive(enabled);
+            }
+          }
+        }
+        //竿コライダーを破棄 シーンロード時と胸コライダー無効化時に実行
+        public void destroyChinkoColliderAll()
+        {
+          for (int i=0; i<this.chinkoCollider.Length; i++) {
+            CapsuleCollider collider = this.chinkoCollider[i];
+            if (collider != null) { //男が破棄されていればnull
+              Destroy(collider.gameObject);
+              this.chinkoCollider[i] = null;
+            }
+          }
+        }
+        //竿コライダー生成
+        private CapsuleCollider addChinkoCollider(Maid man)
+        {
+          if (!man || !man.body0 || !man.body0.m_Bones) return null;
+
+          Transform trChinko = man.body0.trManChinko.Find("chinko1");
+          if (trChinko) {
+            GameObject gameObject = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+            gameObject.GetComponent<Renderer>().enabled = false; //非表示
+            gameObject.name = "ChinkoCollider_" + trChinko.name;
+            gameObject.layer = LAYER_NO;
+            gameObject.transform.SetParent(trChinko, false);
+
+            return setChinkoPos(man, gameObject, null);
+          }
+          return null;
+        }
+        //男全員の追加済みの竿コライダーの位置を調整
+        public void updateChinkoPos()
+        {
+          int manCnt = GameMain.Instance.CharacterMgr.GetStockManCount();
+          //配列サイズを拡張
+          if (manCnt > this.chinkoCollider.Length) Array.Resize(ref this.chinkoCollider, manCnt);
+          for (int i = 0; i < manCnt; i++) {
+            Maid man = GameMain.Instance.CharacterMgr.GetStockMan(i);
+            if (man.Visible) {
+              CapsuleCollider collider = this.chinkoCollider[i];
+              if (collider != null) {
+                setChinkoPos(man, collider.gameObject, collider);
+              }
+            }
+          }
+        }
+        //竿の位置を調整
+        private CapsuleCollider setChinkoPos(Maid man, GameObject gameObject, CapsuleCollider capsuleCollider)
+        {
+          float localScale = man.body0.transform.localScale.x;
+          float radius = cfgw.muneHitChinkoRadius * localScale;
+          float length = cfgw.muneHitChinkoLength * localScale;
+          float offsetX = cfgw.muneHitChinkoOffsetX * localScale;
+          float offsetY = cfgw.muneHitChinkoOffsetY * localScale;
+          
+          gameObject.transform.localPosition = new Vector3(offsetX, offsetY, 0); //x-が指先側 前腕の中心を基準にするためxを-0.09 軸はXYが逆
+          gameObject.transform.localScale = new Vector3(radius*2, length*0.5f, radius*2); //コライダーもなぜかこのサイズになる
+          gameObject.transform.localRotation = Quaternion.Euler(0f, 0f, -cfgw.muneHitChinkoAngle); //Z軸のみ 上を+にする
+
+          //コライダーがなければ追加
+          if (capsuleCollider == null) capsuleCollider = gameObject.AddComponent<CapsuleCollider>();
+          capsuleCollider.height = length;
+          capsuleCollider.radius = radius;
+          capsuleCollider.enabled = man.Visible; //表示されている場合のみ有効
+          return capsuleCollider;
+        }
+
+        //VRコントローラーのコライダー有効状態とサイズ調整
+        public void updateTouchCollider(SphereCollider[] touchCollider)
+        {
+          foreach (SphereCollider collider in touchCollider) {
+            collider.enabled = cfgw.muneTouchColliderEnabled;
+            collider.radius = cfgw.muneTouchColliderRadius / collider.transform.localScale.x;
+          }
+        }
+
+        //ポールダンスの背景ならポールに胸用のコライダーを追加
+        public void addPoleDanceCollider()
+        {
+          //太さ0以下は無効
+          if (cfgw.muneHitPoleRadius <= 0) return;
+
+          GameObject stage;
+          if (GameMain.Instance.GetNowSceneName().StartsWith("SceneDance_")) {
+            stage = GameObject.Find("LiveGimic/PoleDanceStage"); //ダンス
+          } else {
+            stage = GameObject.Find("__GameMain__/BG/PoleDanceStage(Clone)"); //スタジオ
+          }
+          if (!stage) return;
+
+          Debug.Log("[VibeYourMaid] addPoleDanceCollider Stage="+stage);
+
+          //追加する前に削除
+          destroyPoleDanceCollider();
+
+          poleColliderObj[0] = addPoleCollider(stage.transform.Find("ctrl_pole_Center"), cfgw.muneHitPoleRadius, 3f);
+          poleColliderObj[1] = addPoleCollider(stage.transform.Find("ctrl_pole_Left"), cfgw.muneHitPoleRadius, 3f);
+          poleColliderObj[2] = addPoleCollider(stage.transform.Find("ctrl_pole_Right"), cfgw.muneHitPoleRadius, 3f);
+        }
+        private void destroyPoleDanceCollider()
+        {
+          foreach (GameObject gameObject in poleColliderObj) {
+            if (gameObject) Destroy(gameObject);
+          }
+        }
+        private GameObject addPoleCollider(Transform trPole, float radius, float height)
+        {
+          if (!trPole) return null;
+          GameObject gameObject = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+          gameObject.GetComponent<Renderer>().enabled = false;
+          gameObject.name = "PoleCollider_" + trPole.name;
+          gameObject.layer = LAYER_NO;
+          gameObject.transform.position = new Vector3(trPole.position.x, trPole.position.y+height*0.5f, trPole.position.z);
+          gameObject.transform.parent = trPole;
+          gameObject.transform.localScale = new Vector3(radius*2, height, radius*2); //半径調整
+          CapsuleCollider capsuleCollider = gameObject.AddComponent<CapsuleCollider>();
+          capsuleCollider.radius = radius; //こっちの設定は効かないけど一応設定
+          capsuleCollider.enabled = true;
+          return gameObject;
+        }
+
+        #if DEBUG
+        static private void printPos(string name, Transform tm) {
+          Debug.Log(name+" pos=("+tm.position.x+","+tm.position.y+","+tm.position.z+")"+
+          " lpos=("+tm.localPosition.x+","+tm.localPosition.y+","+tm.localPosition.z+")");
+        }
+        static private void printRot(string name, Transform tm) {
+          Debug.Log(name+" rot=("+tm.rotation.eulerAngles.x+","+tm.rotation.eulerAngles.y+","+tm.rotation.eulerAngles.z+")"+
+          " lrot=("+tm.localRotation.eulerAngles.x+","+tm.localRotation.eulerAngles.y+","+tm.localRotation.eulerAngles.z+")");
+        }
+        #endif
+      }
+
+      //胸衝突範囲のGizmoをGLで描画する 左のみ（腕座標がわを変換しているので右胸座標の向きは問題ない）
+      //胸コライダーは両胸描画
+      public class MuneColliderRenderer : MonoBehaviour
+      {
+        Maid maid;
+        MaidState maidState;
+        Transform spine1a;
+        Transform muneL;
+        Transform muneR;
+        Transform armL;
+        Transform armR;
+
+        SphereCollider[] touchCollider;
+        CapsuleCollider[] chinkoCollider;
+
+        Color xColor1;
+        Color xColor2;
+        Color yColor1;
+        Color yColor2;
+        Material lineMaterial;
+
+        Vector3 munePosL;
+        Vector3 munePosR;
+
+        //胸のコライダー設定 無効時はnull
+        MuneColliderInfo colliderInfo;
+        SphereCollider muneColliderL;
+        SphereCollider muneColliderR;
+
+        public void init(Maid maid, MaidState maidState, CapsuleCollider[] chinkoCollider, SphereCollider[] touchCollider)
+        {
+          this.maid = maid;
+          this.maidState = maidState;
+          this.spine1a = maidState.maidMuneA;
+          #if COM3D2_5
+          if (maid.IsCrcBody) {
+            this.muneL = maid.body0.dbMuneL.transform;
+            this.muneR = maid.body0.dbMuneR.transform;
+          } else {
+            this.muneL = maid.body0.jbMuneL.transform;
+            this.muneR = maid.body0.jbMuneR.transform;
+          }
+          #else 
+          this.muneL = maid.body0.jbMuneL.transform;
+          this.muneR = maid.body0.jbMuneR.transform;
+          #endif
+          this.armL = maidState.maidArmL;
+          this.armR = maidState.maidArmR;
+
+          this.chinkoCollider = chinkoCollider;
+          this.touchCollider = touchCollider;
+
+          this.colliderInfo = maidState.muneColliderInfo;
+          if (this.colliderInfo != null) {
+            this.muneColliderL = this.colliderInfo.m_trHitChildL.GetComponent<SphereCollider>();
+            this.muneColliderR = this.colliderInfo.m_trHitChildR.GetComponent<SphereCollider>();
+          }
+
+          this.xColor1 = new Color(1f,0.5f,0.75f,1f);
+          this.xColor2 = Color.red;
+          this.yColor1 = new Color(0.5f,0.75f,1f,1f);
+          this.yColor2 = Color.blue;
+
+          if (lineMaterial == null) {
+            lineMaterial = new Material(Shader.Find("Hidden/Internal-Colored"));
+            lineMaterial.hideFlags = HideFlags.HideAndDontSave;
+            lineMaterial.SetInt("_ZTest", 0); //最前面表示にはこれが必要
+            lineMaterial.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+            lineMaterial.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+            lineMaterial.SetInt("_Cull", (int)UnityEngine.Rendering.CullMode.Off);
+            lineMaterial.SetInt("_ZWrite", 0);
+            lineMaterial.renderQueue = 5000;
+          }
+        }
+
+        //GL描画はOnRenderObjectで実行しないと描画されない
+        private void OnRenderObject()
+        {
+          //メイドが破棄された場合は破棄
+          if (maidState.maidMuneA == null) {
+            GameObject.Destroy(this);
+            return;
+          }
+
+          GL.PushMatrix();
+          try {
+
+          MuneParam muneParam = maidState.muneParam;
+          if (muneParam != null) {
+
+            Vector3 pos = muneL.position;
+            //spine1aからのOffset
+            munePosL = Quaternion.Inverse(spine1a.rotation) * (pos - spine1a.position);
+            munePosR = Quaternion.Inverse(spine1a.rotation) * (pos - spine1a.position);
+            Quaternion rot = muneParam.rotY;
+
+            //腕原点
+            if (maidState.muneOffsetL.targetX > 0.0001f && maidState.muneOffsetL.targetY > 0.0001f) lineMaterial.color = Color.red;
+            else if (maidState.muneOffsetL.targetX > 0.0001f) lineMaterial.color = Color.yellow;
+            else if (maidState.muneOffsetL.targetY > 0.0001f) lineMaterial.color = Color.blue;
+            else lineMaterial.color = Color.green;
+            lineMaterial.SetPass(0);
+            GL.MultMatrix(armL.localToWorldMatrix);
+            drawCross(muneParam.armOffsetL, 0.02f);
+
+            if (maidState.muneOffsetR.targetX > 0.0001f && maidState.muneOffsetR.targetY > 0.0001f) lineMaterial.color = Color.red;
+            else if (maidState.muneOffsetR.targetX > 0.0001f) lineMaterial.color = Color.yellow;
+            else if (maidState.muneOffsetR.targetY > 0.0001f) lineMaterial.color = Color.blue;
+            else lineMaterial.color = Color.green;
+            lineMaterial.SetPass(0);
+            GL.MultMatrix(armR.localToWorldMatrix);
+            drawCross(muneParam.armOffsetR, 0.02f);
+
+            //左胸原点
+            lineMaterial.color = Color.white;
+            lineMaterial.SetPass(0);
+            GL.MultMatrix(muneL.localToWorldMatrix);
+            drawCross(Vector3.zero, 0.02f);
+            drawCrossRGB(Vector3.zero, 0.02f);
+
+            //右原点
+            lineMaterial.color = Color.white;
+            lineMaterial.SetPass(0);
+            GL.MultMatrix(muneR.localToWorldMatrix);
+            drawCross(Vector3.zero, 0.02f);
+            drawCrossRGB(Vector3.zero, 0.02f);
+
+            //胸(spine1a)の座標系に
+            //localScaleが反映されているのでMatrix側をスケールする
+            //GL.MultMatrix(spine1a.localToWorldMatrix);
+            Matrix4x4 matrix = spine1a.localToWorldMatrix;
+            Transform t = maid.body0.transform;
+            matrix *= Matrix4x4.Scale(new Vector3(1f/t.localScale.x, 1f/t.localScale.y, 1f/t.localScale.z));
+            GL.MultMatrix(matrix);
+            //胸原点
+            //drawCross(Vector3.zero, 0.02f);
+
+            //左右移動範囲
+            lineMaterial.color = Color.Lerp(xColor1, xColor2, Math.Min(muneParam.moveLimitX, maidState.muneOffsetL.targetX * muneParam.moveRatioX)); //色を値で変更
+            lineMaterial.SetPass(0);
+            float rx, ryt, ryb, rz;
+            Vector3 center = new Vector3(muneParam.centerX, muneParam.centerY, muneParam.centerFrontZ);
+            rx = muneParam.outside - muneParam.centerX;
+            ryt = muneParam.top - muneParam.centerY;
+            ryb = muneParam.bottom - muneParam.centerY;
+            rz = muneParam.front - muneParam.centerFrontZ;
+            drawArcXY(munePosL, center, rx, ryt, 0, 90, rot); //左右 上半分
+            drawArcXY(munePosL, center, rx, ryb, 0, 90, rot); //左右 下半分
+            drawArcZX(munePosL, center, rx, rz, 0, 90, rot); //水平面 外側前
+            //drawLine(munePosL, center.x, center.y, muneParam.front, center.x, muneParam.top, center.z, rot); //垂直面 前 上 直線
+            //drawArcYZ(munePosL, center, ryt, rz, 0, 90, rot); //垂直面 前 上 円弧
+            drawBrestFront(munePosL, center.x, center.y, center.z, ryt, rz, rot); //垂直面 前 上
+            drawArcYZ(munePosL, center, ryb, rz, 0, 90, rot); //垂直面 前 下半分
+            drawLine(munePosL, center.x, muneParam.top, center.z, center.x-rx*0.5f, muneParam.top, center.z, rot); //内側横線 上
+            drawLine(munePosL, center.x, center.y, muneParam.front, center.x-rx*0.5f, center.y, muneParam.front, rot); //内側横線 前
+            rz = muneParam.centerFrontZ - muneParam.back;
+
+            //乳の後ろ側 水平のみcenterBackZから
+            center.z = muneParam.centerBackZ;
+            rz = muneParam.back - muneParam.centerBackZ;
+            drawArcXY(munePosL, center, rx, ryt, 0, 90, rot); //左右 上半分
+            drawArcXY(munePosL, center, rx, ryb, 0, 90, rot); //左右 下半分
+            drawArcZX(munePosL, center, rx, rz, 0, 90, rot); //水平面 後ろ
+            drawLine(munePosL, center.x, muneParam.top, center.z, center.x-rx*0.5f, muneParam.top, center.z, rot); //内側横線 上
+            drawLine(munePosL, center.x, center.y, muneParam.back, center.x-rx*0.5f, center.y, muneParam.back, rot); //内側横線 後
+            drawArcYZ(munePosL, center, ryb, rz, 0, 90, rot); //垂直面 後 下半分 
+            drawArcYZ(munePosL, center, ryt, rz, 0, 90, rot); //垂直面 後 上半分
+            drawLine(munePosL, center.x, muneParam.top, muneParam.centerFrontZ, center.x, muneParam.top, muneParam.centerBackZ, rot); //接続線 上
+            drawLine(munePosL, muneParam.outside, center.y, muneParam.centerFrontZ, muneParam.outside, center.y, muneParam.centerBackZ, rot); //接続線 横
+            drawLine(munePosL, center.x, muneParam.bottom, muneParam.centerFrontZ, center.x, muneParam.bottom, muneParam.centerBackZ, rot); //接続線 下
+
+            //乳下げ範囲 左右
+            lineMaterial.color = Color.Lerp(yColor1, yColor2, Math.Min(muneParam.moveLimitY, maidState.muneOffsetL.targetY * muneParam.moveRatioY)); //色を値で変更
+            lineMaterial.SetPass(0);
+            Vector3 downCenter = new Vector3(muneParam.downCenterX, muneParam.downCenterY, muneParam.downCenterZ);
+            rx = muneParam.downOutside - muneParam.downCenterX;
+            ryt = muneParam.downTop - muneParam.downCenterY;
+            ryb = muneParam.downBottom - muneParam.downCenterY;
+            rz = muneParam.downFront - muneParam.downCenterZ;
+            drawArcXY(munePosL, downCenter, rx, ryt, 0, 180, rot); //左右 上半分
+            drawArcXY(munePosL, downCenter, rx, ryb, 0, 180, rot); //左右 下半分
+            drawArcZX(munePosL, downCenter, rx, rz, 0, 360, rot); //水平面 一周
+            drawArcYZ(munePosL, downCenter, ryt, rz, 0, 180, rot); //垂直面 中心 上側
+            drawArcYZ(munePosL, downCenter, ryb, rz, 0, 180, rot); //垂直面 中心 下側
+          }
+
+          //胸コライダー 半径はlocalScale分大きくなっている
+          if (this.muneColliderL != null && this.muneColliderR != null) {
+            GL.MultMatrix(this.muneColliderL.transform.localToWorldMatrix);
+            lineMaterial.color = Color.white;
+            lineMaterial.SetPass(0);
+            //左胸
+            drawCross(this.muneColliderL.center, this.muneColliderL.radius);
+            drawSphere(this.muneColliderL.center, this.muneColliderL.radius);
+            //右胸
+            GL.MultMatrix(this.muneColliderR.transform.localToWorldMatrix);
+            drawCross(this.muneColliderR.center, this.muneColliderR.radius);
+            drawSphere(this.muneColliderR.center, this.muneColliderR.radius);
+
+            //前腕 左
+            if (this.colliderInfo.foreArmColliderL != null && this.colliderInfo.foreArmColliderL.enabled) {
+              lineMaterial.color = Color.white;
+              lineMaterial.SetPass(0);
+              //前腕の子になっていなければスケール調整はしない
+              drawCapsuleCollider(this.colliderInfo.foreArmColliderL, maid.body0.transform.localScale);
+            }
+            //前腕 右
+            if (this.colliderInfo.foreArmColliderR != null && this.colliderInfo.foreArmColliderR.enabled) {
+              lineMaterial.color = Color.white;
+              lineMaterial.SetPass(0);
+              //前腕の子になっていなければスケール調整はしない
+              drawCapsuleCollider(this.colliderInfo.foreArmColliderR, maid.body0.transform.localScale);
+            }
+          }
+
+          //竿 初期化されていないか破棄されていたらコライダーはnull
+          if (chinkoCollider != null) {
+            foreach (CapsuleCollider collider in chinkoCollider) {
+              if (collider && collider.enabled) {
+                lineMaterial.color = Color.cyan;
+                lineMaterial.SetPass(0);
+                drawCapsuleCollider(collider, Vector3.one);
+              }
+            }
+          }
+
+          //VRコントローラー
+          if (touchCollider != null) {
+            foreach (SphereCollider collider in touchCollider) {
+              if (collider && collider.enabled) {
+                lineMaterial.color = Color.cyan;
+                lineMaterial.SetPass(0);
+                GL.MultMatrix(collider.transform.localToWorldMatrix);
+                drawSphere(collider.center, collider.radius);
+                drawCrossRGB(collider.center, collider.radius);
+              }
+            }
+          }
+
+          } finally {
+            GL.PopMatrix();
+          }
+        }
+
+        //指定位置に十字
+        private void drawCross(Vector3 c, float radius)
+        {
+          GL.Begin(GL.LINES);
+            GL.Vertex3(c.x-radius, c.y, c.z); GL.Vertex3(c.x+radius, c.y, c.z);
+            GL.Vertex3(c.x, c.y-radius, c.z); GL.Vertex3(c.x, c.y+radius, c.z);
+            GL.Vertex3(c.x, c.y, c.z-radius); GL.Vertex3(c.x, c.y, c.z+radius);
+          GL.End();
+        }
+
+        //xyz +側先端ををRGBで描画
+        private void drawCrossRGB(Vector3 c, float radius)
+        {
+          lineMaterial.color = Color.red;
+          lineMaterial.SetPass(0);
+          GL.Begin(GL.LINES); GL.Vertex3(c.x+radius, c.y, c.z); GL.Vertex3(c.x+radius*0.5f, c.y, c.z); GL.End();
+          lineMaterial.color = Color.green;
+          lineMaterial.SetPass(0);
+          GL.Begin(GL.LINES); GL.Vertex3(c.x, c.y+radius, c.z); GL.Vertex3(c.x, c.y+radius*0.5f, c.z); GL.End();
+          lineMaterial.color = Color.blue;
+          lineMaterial.SetPass(0);
+          GL.Begin(GL.LINES); GL.Vertex3(c.x, c.y, c.z+radius); GL.Vertex3(c.x, c.y, c.z+radius*0.5f); GL.End();
+        }
+
+        private void drawLine(Vector3 pos, float x1, float y1, float z1, float x2, float y2, float z2, Quaternion rot)
+        {
+            GL.Begin(GL.LINES);
+            GL.Vertex(pos + rot * new Vector3(-y1, z1, x1));
+            GL.Vertex(pos + rot * new Vector3(-y2, z2, x2));
+            GL.End();
+        }
+
+        //胸の前 上側ラインの描画 判定計算処理にあわせる
+        private void drawBrestFront(Vector3 pos, float x0, float y0, float z0, float h, float d, Quaternion rot)
+        {
+          GL.Begin(GL.LINE_STRIP);
+          for (int i=0; i<=90; i+=5) {
+            float z = (float)Math.Cos(Math.PI*i/180.0);
+            float y = (float)Math.Sin(Math.PI*i/180.0);
+            //dy = dy * (1f + dz * 0.7f); //前側のyを70%高くする
+            //y = y - (y-(1f-z)) / 1.7f;
+            y = y / (1f + z * 0.7f);
+            GL.Vertex(pos + rot * new Vector3(-(y0 + y*h), z0 + z*d, x0));
+          }
+          GL.End();
+        }
+
+        //放物線を描画
+        private void drawParaboraYZ(Vector3 pos, float x0, float y0, float z0, float h, float d, Quaternion rot)
+        {
+          GL.Begin(GL.LINE_STRIP);
+          for (int i=0; i<=20; i++) {
+            float z = i*0.05f;
+            GL.Vertex(pos + rot * new Vector3(-(y0 + h*z*z), z0 + z*d, x0));
+          }
+          GL.End();
+        }
+
+        //垂直面 左右 外側が0 5度単位 cの軸は左胸座標に合わせて入れ替えている -y,z,x
+        private void drawArcXY(Vector3 pos, Vector3 c, float rx, float ry, int angle1, int angle2, Quaternion rot)
+        {
+          float rad = Mathf.PI/180.0f;
+          GL.Begin(GL.LINE_STRIP);
+          for (int i=angle1; i<=angle2; i+=5) GL.Vertex(pos + rot * new Vector3(-(c.y+(float)Math.Sin(rad*i)*ry), c.z, c.x+(float)Math.Cos(rad*i)*rx));
+          GL.End();
+        }
+        //垂直面 前後 前側が0  5度単位 cの軸は左胸座標に合わせて入れ替えている -y,z,x
+        private void drawArcYZ(Vector3 pos, Vector3 c, float ry, float rz, int angle1, int angle2, Quaternion rot)
+        {
+          float rad = Mathf.PI/180.0f;
+          GL.Begin(GL.LINE_STRIP);
+          for (int i=angle1; i<=angle2; i+=5) GL.Vertex(pos + rot * new Vector3(-(c.y+(float)Math.Sin(rad*i)*ry), c.z+(float)Math.Cos(rad*i)*rz, c.x));
+          GL.End();
+        }
+        //水平面 外側が0  5度単位 cの軸は左胸座標に合わせて入れ替えている -y,z,x
+        private void drawArcZX(Vector3 pos, Vector3 c, float rx, float rz, int angle1, int angle2, Quaternion rot)
+        {
+          float rad = Mathf.PI/180.0f;
+          GL.Begin(GL.LINE_STRIP);
+          for (int i=angle1; i<=angle2; i+=5) GL.Vertex(pos + rot * new Vector3(-c.y, c.z+(float)Math.Sin(rad*i)*rz, c.x+(float)Math.Cos(rad*i)*rx));
+          GL.End();
+        }
+        //球
+        private void drawSphere(Vector3 c, float r)
+        {
+          float rad = Mathf.PI/180.0f;
+          GL.Begin(GL.LINE_STRIP);
+          for (int i=0; i<=360; i+=5) GL.Vertex3(c.x-(float)Math.Sin(rad*i)*r, c.y, c.z+(float)Math.Cos(rad*i)*r);
+          GL.End();
+          GL.Begin(GL.LINE_STRIP);
+          for (int i=0; i<=360; i+=5) GL.Vertex3(c.x-(float)Math.Sin(rad*i)*r, c.y+(float)Math.Cos(rad*i)*r, c.z);
+          GL.End();
+          GL.Begin(GL.LINE_STRIP);
+          for (int i=0; i<=360; i+=5) GL.Vertex3(c.x, c.y+(float)Math.Sin(rad*i)*r, c.z+(float)Math.Cos(rad*i)*r);
+          GL.End();
+        }
+
+        //カプセル高さがy方向
+        private void drawCapsuleCollider(CapsuleCollider capsule, Vector3 scale)
+        {
+          Transform t = capsule.transform;
+          Matrix4x4 matrix = t.localToWorldMatrix;
+          matrix *= Matrix4x4.Scale(new Vector3(scale.x/t.localScale.x, scale.y/t.localScale.y, scale.z/t.localScale.z));
+          GL.MultMatrix(matrix);
+          drawCapsule(capsule.center, capsule.radius, capsule.height); //高さがy方向
+          drawCross(Vector3.zero, capsule.radius);
+          drawCrossRGB(Vector3.zero, capsule.radius);
+        }
+        private void drawCapsule(Vector3 center, float radius, float height)
+        {
+          Vector3 yt = new Vector3(center.x, center.y - height*0.5f + radius, center.z);
+          Vector3 yb = new Vector3(center.x, center.y + height*0.5f - radius, center.z);
+          drawArcXY(yt, Vector3.zero, radius, radius, 0, 360, Quaternion.identity);
+          drawArcXY(yb, Vector3.zero, radius, radius, 0, 360, Quaternion.identity);
+          drawArcYZ(yt, Vector3.zero, radius, radius, 90, 270, Quaternion.identity);
+          drawArcYZ(yb, Vector3.zero, radius, radius, -90, 90, Quaternion.identity);
+          drawArcZX(yt, Vector3.zero, radius, radius, 180, 360, Quaternion.identity);
+          drawArcZX(yb, Vector3.zero, radius, radius, 0, 180, Quaternion.identity);
+          yt.x = center.x - radius;
+          yb.x = center.x - radius;
+          GL.Begin(GL.LINES); GL.Vertex(yt); GL.Vertex(yb); GL.End();
+          yt.x = center.x + radius;
+          yb.x = center.x + radius;
+          GL.Begin(GL.LINES); GL.Vertex(yt); GL.Vertex(yb); GL.End();
+          yt.x = center.x;
+          yb.x = center.x;
+          yt.z = center.z - radius;
+          yb.z = center.z - radius;
+          GL.Begin(GL.LINES); GL.Vertex(yt); GL.Vertex(yb); GL.End();
+          yt.z = center.z + radius;
+          yb.z = center.z + radius;
+          GL.Begin(GL.LINES); GL.Vertex(yt); GL.Vertex(yb); GL.End();
+        }
       }
 
 
@@ -19184,28 +20365,43 @@ namespace CM3D2.VibeYourMaid.Plugin
         maidState.targetSphere_mouth.GetComponent<Renderer>().enabled = false;
         //BoxCollider boxCollider0 = maidState.targetSphere_mouth.AddComponent<BoxCollider>();
         maidState.targetSphere_mouth.GetComponent<Collider>().isTrigger = true;
-        maidState.IK_mouth = CMT.SearchObjName(maid.body0.m_Bones.transform, "Bip01 Head", true);
+        maidState.IK_mouth = maid.body0.trsHead; //CMT.SearchObjName(maid.body0.m_Bones.transform, "Bip01 Head", true);
 
-        //むね
+        //胸サイス 20～100まで可変 (20→-1.5cm 60→1cm 100→5cm)
+        float muneSize = (bVR ? 0.12f : 0.2f) + 0.002f * (Math.Min(100, Math.Max(20, maid.GetProp(MPN.MuneL).value - 50f)));
+        //右胸
         maidState.targetSphere_muneR = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         maidState.targetSphere_muneR.layer = 8;
         maidState.targetSphere_muneR.name = "MR_" + maidID;
-        maidState.targetSphere_muneR.transform.localScale = bVR ? new Vector3(0.15f, 0.15f, 0.15f) : new Vector3(0.2f, 0.2f, 0.2f); //VRとマウスで大きさ調整
+        maidState.targetSphere_muneR.transform.localScale = new Vector3(muneSize, muneSize, muneSize); //VRとマウスで大きさ調整
         maidState.targetSphere_muneR.GetComponent<Renderer>().enabled = false;
         //BoxCollider boxCollider1 = maidState.targetSphere_muneR.AddComponent<BoxCollider>();
         maidState.targetSphere_muneR.GetComponent<Collider>().isTrigger = true;
-        maidState.IK_muneR = CMT.SearchObjName(maid.body0.m_Bones.transform, "_IK_muneR", true);
-
+        //maidState.IK_muneR = CMT.SearchObjName(maid.body0.m_Bones.transform, "_IK_muneR", true); //ずれるので使わない
+        #if COM3D2_5
+        if (maid.IsCrcBody)maidState.IK_muneR = maid.body0.dbMuneR.transform;
+        else maidState.IK_muneR = maid.body0.jbMuneR.transform;
+        #else
+        maidState.IK_muneR = maid.body0.jbMuneR.transform;
+        #endif
+        //左胸
         maidState.targetSphere_muneL = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         maidState.targetSphere_muneL.layer = 8;
         maidState.targetSphere_muneL.name = "ML_" + maidID;
-        maidState.targetSphere_muneL.transform.localScale = bVR ? new Vector3(0.15f, 0.15f, 0.15f) : new Vector3(0.2f, 0.2f, 0.2f); //VRとマウスで大きさ調整
+        maidState.targetSphere_muneL.transform.localScale = new Vector3(muneSize, muneSize, muneSize); //VRとマウスで大きさ調整
         maidState.targetSphere_muneL.GetComponent<Renderer>().enabled = false;
         //BoxCollider boxCollider2 = maidState.targetSphere_muneL.AddComponent<BoxCollider>();
         maidState.targetSphere_muneL.GetComponent<Collider>().isTrigger = true;
-        maidState.IK_muneL = CMT.SearchObjName(maid.body0.m_Bones.transform, "_IK_muneL", true);
+        //maidState.IK_muneL = CMT.SearchObjName(maid.body0.m_Bones.transform, "_IK_muneL", true); //ずれるので使わない
+        #if COM3D2_5
+        if (maid.IsCrcBody)maidState.IK_muneL = maid.body0.dbMuneL.transform;
+        else maidState.IK_muneL = maid.body0.jbMuneL.transform;
+        #else
+        maidState.IK_muneL = maid.body0.jbMuneL.transform;
+        #endif
 
         //おしり
+        //左
         maidState.targetSphere_hipL = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         maidState.targetSphere_hipL.layer = 8;
         maidState.targetSphere_hipL.name = "HL_" + maidID;
@@ -19215,7 +20411,7 @@ namespace CM3D2.VibeYourMaid.Plugin
         maidState.targetSphere_hipL.GetComponent<Collider>().isTrigger = true;
         maidState.IK_hipL = CMT.SearchObjName(maid.body0.m_Bones.transform, "_IK_hipL", true);
         maidState.Hip_L = CMT.SearchObjName(maid.body0.m_Bones.transform, "Hip_L", true);
-
+        //右
         maidState.targetSphere_hipR = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         maidState.targetSphere_hipR.layer = 8;
         maidState.targetSphere_hipR.name = "HR_" + maidID;
@@ -19234,7 +20430,7 @@ namespace CM3D2.VibeYourMaid.Plugin
         maidState.targetSphere_vagina.GetComponent<Renderer>().enabled = false;
         //BoxCollider boxCollider5 = maidState.targetSphere_vagina.AddComponent<BoxCollider>();
         maidState.targetSphere_vagina.GetComponent<Collider>().isTrigger = true;
-        maidState.IK_vagina = CMT.SearchObjName(maid.body0.m_Bones.transform, "Bip01 Pelvis", true);
+        maidState.IK_vagina = maid.body0.Pelvis; //CMT.SearchObjName(maid.body0.m_Bones.transform, "Bip01 Pelvis", true);
 
         //アナル
         maidState.targetSphere_anal = GameObject.CreatePrimitive(PrimitiveType.Sphere);
@@ -19266,10 +20462,10 @@ namespace CM3D2.VibeYourMaid.Plugin
 
 
       //ターゲット位置の更新 おさわりが有効の場合は毎フレーム呼ばれる
-      private void targetInstallation(int maidID, MaidState maidState) {
+      private void targetUpdate(int maidID, Maid maid, MaidState maidState) {
         try {
         //if (maidState.bodyName != stockMaids[maidID].mem.GetProp(MPN.body).strFileName) targetDestroy(maidID); //例外処理で対応
-        //if (!maidState.targetSphere_mouth) targetSet(maidID, meid, maidState); //例外処理で対応
+        //if (!maidState.targetSphere_mouth) targetSet(maidID, maid, maidState); //例外処理で対応
 
         maidState.targetSphere_mouth.transform.position = maidState.IK_mouth.transform.position;
 
@@ -19295,23 +20491,15 @@ namespace CM3D2.VibeYourMaid.Plugin
         } catch { //(Exception e) {
           //初回のtargetSet未実施の場合もここで例外処理して再作成される
           //スタジオで同じメイドをロードした場合にIK_mouthが取得できずにエラーになる
-          //UnityEngine.Debug.LogError("targetInstallation Error : "+stockMaids[maidID].mem);
+          //UnityEngine.Debug.LogError("targetUpdate Error : "+stockMaids[maidID].mem);
           targetDestroy(maidID, maidState);
-          targetSet(maidID, stockMaids[maidID].mem, maidState);
+          targetSet(maidID, maid, maidState);
         }
       }
 
 
       //おさわり管理クラス初期化
       Osawari osawari = null;
-
-      //おさわり時の処理 Update()から呼ばれる
-      private void osawariHand()
-      {
-        //おさわり処理実行
-        osawari.osawariHand(vmId);
-
-      }
 
       //おさわりクラス初期化
       private void initOsawari()
@@ -19505,6 +20693,28 @@ namespace CM3D2.VibeYourMaid.Plugin
           return false;
         }
 
+        //コントローラーの胸コライダーの有効無効を切り変える
+        public void setTouchColliderEnabled(bool enabled)
+        {
+          //おさわり中でも変更する
+          foreach (OsawariInput input in osawariInput) {
+            if (input.touchCollider != null) input.touchCollider.enabled = enabled;
+            if (input.touchGrab != null) input.touchGrab.gameObject.SetActive(enabled);
+          }
+        }
+        //コントローラーの胸コライダーを取得 VR以外は長さ0の配列
+        public SphereCollider[] getTouchCollider()
+        {
+          if (!bVR) return new SphereCollider[0];
+
+          SphereCollider[] col = new SphereCollider[osawariInput.Length];
+          for (int i=0; i<col.Length; i++) {
+            col[i] = osawariInput[i].touchCollider;
+          }
+          return col;
+        }
+
+
         public float getMouseMove(int maidID)
         {
           float mouse_move = 0f;
@@ -19659,7 +20869,7 @@ namespace CM3D2.VibeYourMaid.Plugin
         }
 
         //おさわり処理を実行
-        public void osawariHand(List<int> vmId)
+        public void osawariHand()
         {
           //マルチタッチの入れ替え処理 とりあえず2つのみ
           if (Input.touchCount == 1) {
@@ -19681,7 +20891,7 @@ namespace CM3D2.VibeYourMaid.Plugin
 
           //各osawariInputのおさわり処理を逆順で実行
       		for (int i=osawariInput.Length-1; i>=0; i--) { //逆順で実行 タッチ入れ替えのため
-            osawariInput[i].osawariHand(vmId);
+            osawariInput[i].osawariHand();
           }
 
         }
@@ -19934,7 +21144,9 @@ namespace CM3D2.VibeYourMaid.Plugin
         float checkHandTime = float.PositiveInfinity;
 
         //VR標準の胸変形コライダー 胸おさわり時は無効にする
-        Collider touchCollider = null;
+        public SphereCollider touchCollider = null;
+        //VRつかみ操作用VRGrabber
+        public Transform touchGrab = null;
 
         //おさわりポイントの向き Bodyからの差分
         static readonly Quaternion rotMune = Quaternion.Inverse(new Quaternion(0.4f, -0.6f, -0.4f, 0.6f));
@@ -19983,7 +21195,8 @@ namespace CM3D2.VibeYourMaid.Plugin
 
           //VR胸変形コライダー キャンセル用
           Transform touchSphere = handAnchor.Find("TouchSphere");
-          if (touchSphere) touchCollider = touchSphere.gameObject.GetComponent<Collider>();
+          if (touchSphere) touchCollider = touchSphere.gameObject.GetComponent<SphereCollider>();
+          touchGrab = handAnchor.Find("Grab");
 
           initVR();
         }
@@ -20010,7 +21223,9 @@ namespace CM3D2.VibeYourMaid.Plugin
 
           //VR胸変形コライダー キャンセル用
           GameObject touchSphere = GameObject.Find("Controller (" + (bLeft ?  "left" : "right") + ")/TouchSphere");
-          if (touchSphere) touchCollider = touchSphere.GetComponent<Collider>();
+          if (touchSphere) {
+            touchCollider = touchSphere.GetComponent<SphereCollider>();
+          }
 
           initVR();
         }
@@ -20024,7 +21239,7 @@ namespace CM3D2.VibeYourMaid.Plugin
           releaseDistance = osawari.cfgw.osawariRelease;
           osawariHandRadius = osawari.cfgw.osawariHandRadius;
           osawariHSliderMin = osawari.cfgw.osawariHSliderMin;
-          osawariASliderMin = osawari.cfgw.osawariASliderMin;;
+          osawariASliderMin = osawari.cfgw.osawariASliderMin;
         }
 
         /** おさわり中のシーン切り替え等があったら呼ぶ */
@@ -20047,7 +21262,7 @@ namespace CM3D2.VibeYourMaid.Plugin
                 osawariMaid.body0.dbMuneL,
                 #endif
                 osawariMaid.body0.jbMuneL, osawariMaid, osawariMaidState, osawariMaidState.muneOffsetL, Move_atp.x, Move_atp.y);
-              if (touchCollider != null) touchCollider.enabled = true; //VR用コライダー有効
+              if (touchCollider != null && osawari.cfgw.muneTouchColliderEnabled) touchCollider.enabled = true; //VR用コライダー有効
               osawariPoint = "";
             } else if (osawariPoint == "MR_") {
               OsawariRelease osawariRelease = osawari.getMuneRelease(false, osawariID);
@@ -20057,7 +21272,7 @@ namespace CM3D2.VibeYourMaid.Plugin
                 osawariMaid.body0.dbMuneR,
                 #endif
                 osawariMaid.body0.jbMuneR, osawariMaid, osawariMaidState, osawariMaidState.muneOffsetR, -Move_atp.x, Move_atp.y);
-              if (touchCollider != null) touchCollider.enabled = true; //VR用コライダー有効
+              if (touchCollider != null && osawari.cfgw.muneTouchColliderEnabled) touchCollider.enabled = true; //VR用コライダー有効
               osawariPoint = "";
             }
             osawariLock = 3; //胸以外の変形初期化
@@ -20124,7 +21339,7 @@ namespace CM3D2.VibeYourMaid.Plugin
             if (osawariController.getType() == 1) {
               controllerPos += controllerRot * (bLeft ? cameraPosL : cameraPosR);
             } else {
-              controllerPos -= controllerRot * (bLeft ? cameraPosL : cameraPosR);;
+              controllerPos -= controllerRot * (bLeft ? cameraPosL : cameraPosR);
             }
             direction = controllerRot * cameraDirection; //カメラ先端
             break;
@@ -20196,7 +21411,7 @@ namespace CM3D2.VibeYourMaid.Plugin
         /**
          * おさわり処理 (オリジナルの osawariHand() の処理)
          */
-        public void osawariHand(List<int> vmId)
+        public void osawariHand()
         {
 
           if (osawariLock == 0) {
@@ -20275,7 +21490,7 @@ namespace CM3D2.VibeYourMaid.Plugin
                 //変数に格納
                 osawariMaid = osawari.stockMaids[osawariID].mem;
                 osawariMaidState = osawari.maidsState[osawariID];
-
+                
                 //if (isMouseDown) {
                   osawariLock = 1;
                   //osawariID = intCnv(osawariReg.Replace(hitName, ""));
@@ -20412,11 +21627,11 @@ namespace CM3D2.VibeYourMaid.Plugin
               if (osawariPoint == "ML_") {
                 osawariPoint = "";
                 osawari.addMuneRelease(new OsawariRelease(osawari, true, osawariID, osawariMaidState.muneValue, osawariMaidState.muneOffsetL, Mune_atp));
-                if (touchCollider != null) touchCollider.enabled = true; //VR用コライダー有効
+                if (touchCollider != null && osawari.cfgw.muneTouchColliderEnabled) touchCollider.enabled = true; //VR用コライダー有効
               } else if (osawariPoint == "MR_") {
                 osawariPoint = "";
                 osawari.addMuneRelease(new OsawariRelease(osawari, false, osawariID, osawariMaidState.muneValue, osawariMaidState.muneOffsetR, Mune_atp));
-                if (touchCollider != null) touchCollider.enabled = true; //VR用コライダー有効
+                if (touchCollider != null && osawari.cfgw.muneTouchColliderEnabled) touchCollider.enabled = true; //VR用コライダー有効
               }
               osawariLock = 3; //ドラッグ終了
             }
