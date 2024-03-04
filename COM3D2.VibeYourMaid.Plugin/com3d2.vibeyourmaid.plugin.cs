@@ -23,18 +23,18 @@ using CM3D2.ExternalSaveData.Managed;
 #else
 [assembly: AssemblyTitle("VibeYourMaid COM3D2")]
 #endif
-[assembly: AssemblyVersion("2.0.6.3")]
+[assembly: AssemblyVersion("2.0.6.34")]
 
 namespace CM3D2.VibeYourMaid.Plugin
 {
     [
       PluginFilter("COM3D2x64"), PluginFilter("COM3D2VRx64"), PluginFilter("COM3D2OHx64"), PluginFilter("COM3D2OHVRx64"),
-      PluginName("VibeYourMaid"), PluginVersion("2.0.6.33.ovr"),
+      PluginName("VibeYourMaid"), PluginVersion("2.0.6.34.ovr"),
       DefaultExecutionOrder(-1) //プラグインの実行順を最初にする
     ]
     public class VibeYourMaid : PluginBase
     {
-        const string PluginVersionLabel = "2.0.6.33-Inory";
+        const string PluginVersionLabel = "2.0.6.34-Inory";
 
         //GUIで設定保存したい変数はここ
         public class VibeYourMaidCfgWriting  //@API実装//→API用にpublicに変更
@@ -414,9 +414,9 @@ namespace CM3D2.VibeYourMaid.Plugin
           //トリガー・グリップは文字列で設定 (左トリガー:LT , 右トリガー:RT , 左グリップ:LG , 右グリップ:RG , 常時有効:ALWAYS , それ以外なら操作無効)
           public string vrShortCutFollowOn = "RT";        //VRメイド固定 開始 右トリガー(変更可) + AXボタンでメイド固定ON (固定開始時にHMD中央のメイドに自動切換え)
           public string vrShortCutFollowOff = "RG";       //VRメイド固定 解除 右グリップ(変更可) + AXボタンでメイド固定OFF (※開始と同じボタンならトグル動作になる)
-          //public string vrShortCutDirectionReset = "RT";  //VRメイド固定解除操作でHMD方向に正面をリセットする 右トリガー(変更可) + メイド固定解除ボタン（右グリップ＋AX）
-          public string vrShortCutMaidTarget = "RT";      //VRメイド切替 グリップ+スティック左右でメイド切り替え
-          public string vrShortCutMaidFocus = "RG";       //VRメイド切替 ↑の切り替えでメイド固定中でもカメラを即時切り替える スティックは↑と同じ側を利用
+          public string vrShortCutMaidTarget = "RT";      //VRメイド切替 トリガー+スティック左右でメイド切り替え
+          //public bool vrShortCutMaidTargetBeside = true;  //VRメイド切替 ↑のメイド切り替えをメイド順ではなく左右の隣のメイドに切り替える(3人以上の場合)
+          public string vrShortCutMaidFocus = "RG";       //VRメイド切替 メイド切り替え時にカメラをメイドの近くにジャンプさせる
           public string vrShortCutVibe = "RG";            //VRバイブ操作 グリップ+スティック上下で強弱切 (※トリガーとグリップ同時押し時は動作しない)
           public string vrShortCutMotion = "RTG";         //VRモーション切替 ボタンとスティック上下 LT,LG,LTG,RT,RG,RTG 設定時のみ有効
           public bool vrShortCutVibeLookingMaid = true;   //VRバイブ操作 HMD視野の中心のメイドを対象にする
@@ -2107,7 +2107,7 @@ namespace CM3D2.VibeYourMaid.Plugin
         //DCMクラスとカメラ無効プロパティの有無
         bool hasDcmIgnoreCameraMotion = false;
         #endif
-
+        
         //子宮脱按钮用 #109
         private bool manualTriggeredUterusDatsu = false;
         //子宮脱按钮用 #109
@@ -2447,6 +2447,11 @@ namespace CM3D2.VibeYourMaid.Plugin
               //VRショートカット
               ShortCutVR(vrShortCutController);
             }
+
+            #if EmpiresLife
+            if (vSceneLevel == 3 && lifeStart != 0) StartCoroutine("EmpiresLife");
+            #endif
+
             //ここで終了
             return;
           }
@@ -2752,10 +2757,10 @@ namespace CM3D2.VibeYourMaid.Plugin
           //子宮脱按钮用 #109
 
 
-
           #if EmpiresLife
           //エンパイアズライフ開始
-          if (vSceneLevel == 3 && Input.GetKeyDown(cfgw.keyPluginToggleV11)) {
+          if (vSceneLevel == 3) {
+            if (Input.GetKeyDown(cfgw.keyPluginToggleV11)) {
             //背景が存在するかどうかチェック
             UnityEngine.Object @object = GameMain.Instance.BgMgr.CreateAssetBundle("Shitsumu_ChairRot");
             if (@object == null) {
@@ -2777,9 +2782,10 @@ namespace CM3D2.VibeYourMaid.Plugin
                 ElEnd();
               }
             }
+            }
+            //エンパイアズライフモードの処理
+            if (lifeStart != 0) StartCoroutine("EmpiresLife");
           }
-          //エンパイアズライフモードの処理
-          if (vSceneLevel == 3) StartCoroutine("EmpiresLife");
           #endif
 
           //マウスがウィンドウ上ならキー以外のイベントはキャンセルして透過させない
@@ -2964,9 +2970,9 @@ namespace CM3D2.VibeYourMaid.Plugin
           if (!cfgw.bPluginEnabledV || cfgw.mainGuiFlag == 0) return;
           //フェード中も非表示
           if (GameMain.Instance.MainCamera.IsFadeProc()) return;
-          //メイドがいなかったら非表示
-          if (tgID == -1) return;
 
+            //メイドがいなかったらリモコンは非表示
+            if (tgID != -1) {
               if (SceneLevelEnable){
 
                 if (vSceneLevel == 15 && WaitTime < 120 ){
@@ -3010,23 +3016,23 @@ namespace CM3D2.VibeYourMaid.Plugin
                   }
                 }
               }
-
-            if (cfgw.mainGuiFlag == 1) { //リモコン展開時のみ
-            #if EmpiresLife
-            if (tgID != -1 || (lifeStart > 0 && !elFade)) {
-            #else
-            if (tgID != -1) {
-            #endif
-              if (cfgw.subGuiFlag == 2) {
-                node2 = GUI.Window(324102, node2, WindowCallback2b, "メイド呼び出し", gsWin);
-              } else {
-                node2 = GUI.Window(324102, node2, WindowCallback2a, "サブキャラ操作", gsWin);
-              }
             }
 
-            #if EmpiresLife
+            if (cfgw.mainGuiFlag == 1) { //リモコン展開時のみ
+              #if EmpiresLife
+              if (tgID != -1 || (lifeStart > 0 && !elFade)) {
+              #else
+              if (tgID != -1) {
+              #endif
+                if (cfgw.subGuiFlag == 2 || tgID == -1) {
+                  node2 = GUI.Window(324102, node2, WindowCallback2b, "メイド呼び出し", gsWin);
+                } else {
+                  node2 = GUI.Window(324102, node2, WindowCallback2a, "サブキャラ操作", gsWin);
+                }
+              }
+              #if EmpiresLife
               if (lifeStart > 0 && !elFade) node5 = GUI.Window(324105, node5, WindowCallback5, "エンパイアズライフ", gsWin);
-            #endif
+              #endif
             }
 
         }
@@ -3400,10 +3406,10 @@ namespace CM3D2.VibeYourMaid.Plugin
               //if (!maidState.visibleBack) { //新たにメイドが表示されていた場合の処理
               // →  プライベートモードはVisibleのままbody0が入れ替わるのでフェード終了で常に再取得
               if (checkActibvte) { //シーンロード時以外は再取得
-                VisibleMaidCheckActivate(sm.id, sm.mem, maidState);
-
-                //汗が表示されないようにする
+                //これ以降のエラーでも汗が表示されないようにする
                 try { VertexMorph_FromProcItem(sm.mem.body0, "dry", 1f); } catch { /*LogError(ex);*/ }
+
+                VisibleMaidCheckActivate(sm.id, sm.mem, maidState);
               }
 
             } else {
@@ -3489,16 +3495,6 @@ namespace CM3D2.VibeYourMaid.Plugin
           }
         }
 
-        //遅延初期化用コルーチン
-        /*private IEnumerator initVisibleMaidMuneCoroutine(int maidID, Maid maid, MaidState maidState, float wait)
-        {
-          //ボディロード後にwaitの秒数待機
-          if (wait > 0) yield return new WaitForSeconds(wait);
-          //待機中にボディが破棄されていたら終了
-          if (!maid.body0.m_trBones) yield break;
-
-          initVisibleMaidMune(maidID, maid, maidState);
-        }*/
         //胸衝突回りの初期化処理
         private void initVisibleMaidMune(int maidID, Maid maid, MaidState maidState)
         {
@@ -3646,6 +3642,9 @@ namespace CM3D2.VibeYourMaid.Plugin
             newmaid.Visible = true;
             newmaid.AllProcProp();
             newmaid.boMabataki = true;
+
+            //再設定
+            VisibleMaidCheck(true);
         }
 
 
@@ -10596,11 +10595,11 @@ namespace CM3D2.VibeYourMaid.Plugin
             }
 
             if (tgID != -1) {
-              //メイド操作 トリガー+左右でメインメイド切り替え メイド固定中のみ
-              bool maidPress = vrCtrl.getPress(vrCtrl.maidButtonIdx) > 0f;
-              bool focusPress = vrCtrl.getPress(vrCtrl.focusButtonIdx) > 0f;
-              if (maidPress || focusPress) {
-                Vector2 xy = vrCtrl.getAxis(vrCtrl.maidAxisIdx);
+            //メイド操作 トリガー+左右でメインメイド切り替え メイド固定中のみ
+            bool maidPress = vrCtrl.getPress(vrCtrl.maidButtonIdx) > 0f;
+            bool focusPress = vrCtrl.getPress(vrCtrl.focusButtonIdx) > 0f;
+            if (maidPress || focusPress) {
+                              Vector2 xy = vrCtrl.getAxis(vrCtrl.maidAxisIdx);
                 //アクティブメイド変更
                 if (xy.x > -0.7f && xy.x < 0.7f) { //軸が戻った判定
                   vrCtrl.maidAxisEnabled = true;
@@ -10609,7 +10608,7 @@ namespace CM3D2.VibeYourMaid.Plugin
                     vrCtrl.maidAxisEnabled = false;
                     followReturnSpeedY = -1f; //縦移動速度は標準に戻す
                     if (maidPress) changeTargetMaid(getPrevMaid());
-                    if (focusPress) {
+                                        if (focusPress) {
                       if (vrCtrl.vrCameraOrigin) {
                         //GripMoveの移動をリセット 回転はそのまま
                         mainCamera.SetRealHeadPos(mainCamera.GetRealHeadTransform().position, false); //GripMoveの移動をリセット 回転はそのまま
@@ -10621,7 +10620,7 @@ namespace CM3D2.VibeYourMaid.Plugin
                     vrCtrl.maidAxisEnabled = false;
                     followReturnSpeedY = -1f; //縦移動速度は標準に戻す
                     if (maidPress) changeTargetMaid(getNextMaid());
-                    //カメラ位置をメイド正面に切替
+                                        //カメラ位置をメイド正面に切替
                     if (focusPress) {
                       if (vrCtrl.vrCameraOrigin) {
                         //GripMoveの移動をリセット 回転はそのまま
@@ -10629,14 +10628,14 @@ namespace CM3D2.VibeYourMaid.Plugin
                       }
                       //ダンス中でメイド固定でない
                       if (maidFollowEnabled || RhythmAction_Mgr.Instance == null) CameraChange(tgID);
-                    }
-                  }
+                                      }
                 }
               }
+            }
 
-              float vibePress = vrCtrl.getPress(vrCtrl.vibeButtonIdx);
+            float vibePress = vrCtrl.getPress(vrCtrl.vibeButtonIdx);
               if (vibePress > 0) {
-                //上下でバイブ切り替え
+                              //上下でバイブ切り替え
                 Vector2 xy = vrCtrl.getAxis(vrCtrl.vibeAxisIdx);
                 if (xy.y > -0.7f && xy.y < 0.7f) { //軸が戻った判定
                   vrCtrl.vibeAxisEnabled = true;
@@ -10668,9 +10667,11 @@ namespace CM3D2.VibeYourMaid.Plugin
                   }
                 }
               }
+            }
 
               //モーション切り替え パネル表示時のみ
-              if (cfgw.unzipGuiFlag && cfgw.mainGuiFlag != 0) {
+            if (cfgw.unzipGuiFlag && cfgw.mainGuiFlag != 0) {
+              if (tgID != -1) {
                 //トリガーとグリップ同時押しにも対応
                 if (vrCtrl.getPress(vrCtrl.motionButtonIdx) > 0 && (vrCtrl.motionButton2Idx == 4 ||vrCtrl.getPress(vrCtrl.motionButton2Idx) > 0)) {
                 //if (vrCtrl.isNoPress(vrCtrl.motionAxisIdx)) { //トリガーもグリップも無し
@@ -11027,7 +11028,7 @@ namespace CM3D2.VibeYourMaid.Plugin
             }
           }
           else {
-            //ジャンプでない場合
+            //カメラジャンプでない場合
             //右グリップ＋上スティックで狭い範囲で正面判定、右グリップのみなら対象がフレームアウトしたら正面再判定
             if (vmId.Count > 1) {
               //グリップが押されている
@@ -11375,6 +11376,48 @@ namespace CM3D2.VibeYourMaid.Plugin
             }
           }
           return closestMaidID;
+        }
+
+        //横のメイドを取得 一番端なら反対側を選択
+        private int GetSideMaid(int currentID, Transform cameraTm, bool bLeft)
+        {
+          Vector3 camPos = cameraTm.position;
+          float cameraAngleY = cameraTm.rotation.eulerAngles.y;
+          float radian = Mathf.Deg2Rad * cameraAngleY;
+
+          float minX = float.PositiveInfinity;
+          float maxX = float.NegativeInfinity;
+          int besideMaidID = currentID;
+          int oppositeMaidID = currentID;
+          foreach (int maidID in vmId) {
+            if (maidID != currentID && isActiveMaid(stockMaids[maidID].mem)) {
+              Transform maidTm = maidsState[maidID].maidMune;
+              if (maidTm) {
+                float dx = maidTm.position.x - camPos.x;
+                float dz = maidTm.position.z - camPos.z;
+                float sin = (float)Math.Sin(radian);
+                float cos = (float)Math.Cos(radian);
+                float x = dx * cos - dz * sin; //左側が-
+                if (bLeft) x = -x;
+                //float z = dx * sin + dz * cos;
+                //Debug.Log("x="+x+" z="+z+" angY="+cameraTm.rotation.eulerAngles.y);
+                if (x > 0) {
+                  if (minX > x) {
+                    minX = x;
+                    besideMaidID = maidID;
+                  }
+                } else {
+                  if (maxX < x) {
+                    maxX = x;
+                    oppositeMaidID = maidID;
+                  }
+                }
+              }
+            }
+          }
+          //横のメイドがいない場合は反対側の一番遠くに
+          if (currentID == besideMaidID) return oppositeMaidID;
+          return besideMaidID;
         }
 
         //ダンスシーンの移動カメラを一時的に有効無効を切り替える VRのみ
@@ -12594,7 +12637,7 @@ namespace CM3D2.VibeYourMaid.Plugin
                       manualTriggeredUterusDatsu = true;
                     }
                     //子宮脱按钮 #109
-                    
+
                     y += 20;
 
                     if (GUI.Button(new Rect (10, y, 85, 20), "全着衣", gsButton)){
@@ -15289,7 +15332,6 @@ namespace CM3D2.VibeYourMaid.Plugin
               GUI.Label(new Rect (10, 350, 300, 20), "潮：" + maidsState[tgID].sioVolume , gsLabel);
               GUI.Label(new Rect (10, 370, 300, 20), "尿：" + maidsState[tgID].nyoVolume , gsLabel);
 
-
               //hidden info #109
 				      GUI.Label(new Rect(310, 30, 300, 20), "【机密信息】", gsLabel);
               GUI.Label(new Rect(310, 60, 300, 20), "子宮脱条件：感度base + uDatsuStock 大于65，感度 base 需要高潮数大于 15 时才会到 50", gsLabel);
@@ -15307,7 +15349,6 @@ namespace CM3D2.VibeYourMaid.Plugin
               GUI.Label (new Rect (310, 320, 300, 20), "uDatsuStock 子宮脱值：" + maidsState[tgID].uDatsuStock , gsLabel);
               GUI.Label (new Rect (310, 350, 300, 20), "uDatsuWait 子宮脱值：" + maidsState[tgID].uDatsuWait , gsLabel);
               //hidden info #109	
-
 
               /*自分用
               GUI.Label(new Rect (10, 400, 300, 20), "マウス：" + mouse_move , gsLabel);
@@ -19540,8 +19581,18 @@ namespace CM3D2.VibeYourMaid.Plugin
           MuneColliderInfo colInfo = new MuneColliderInfo(maid, cfgw);
 
           //コライダーの位置が胸の変形でずれるので胸の変形を初期状態に戻す
-          Vector3 muneScaleL = maid.body0.jbMuneL.transform.localScale;
-          Vector3 muneScaleR = maid.body0.jbMuneR.transform.localScale;
+          Vector3 muneScaleL;
+          Vector3 muneScaleR;
+          #if COM3D2_5
+          if (maid.IsCrcBody) {
+            muneScaleL = maid.body0.dbMuneL.transform.localScale;
+            muneScaleR = maid.body0.dbMuneR.transform.localScale;
+          } else 
+          #endif
+          {
+            muneScaleL = maid.body0.jbMuneL.transform.localScale;
+            muneScaleR = maid.body0.jbMuneR.transform.localScale;
+          }
           resetMuneValue(maid);
 
           //VR用のTBodyに元々あるコライダーは破棄
