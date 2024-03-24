@@ -10450,6 +10450,9 @@ namespace CM3D2.VibeYourMaid.Plugin
             //　一人称視点切り替え
             if (Input.GetKeyDown(cfgw.keyPluginToggleV7)) {
               fpsModeEnabled = !fpsModeEnabled;
+              //第一人称 #109
+              Console.WriteLine("一人称視点切り替え");
+              //第一人称 #109
             }
 
             //マウスホイールによる高さ調整
