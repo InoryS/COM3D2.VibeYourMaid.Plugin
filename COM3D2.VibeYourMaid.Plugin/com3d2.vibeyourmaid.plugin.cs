@@ -23,18 +23,18 @@ using CM3D2.ExternalSaveData.Managed;
 #else
 [assembly: AssemblyTitle("VibeYourMaid COM3D2")]
 #endif
-[assembly: AssemblyVersion("2.0.6.44")]
+[assembly: AssemblyVersion("2.0.6.45")]
 
 namespace CM3D2.VibeYourMaid.Plugin
 {
     [
       PluginFilter("COM3D2x64"), PluginFilter("COM3D2VRx64"), PluginFilter("COM3D2OHx64"), PluginFilter("COM3D2OHVRx64"),
-      PluginName("VibeYourMaid"), PluginVersion("2.0.6.44.ovr"),
+      PluginName("VibeYourMaid"), PluginVersion("2.0.6.45.ovr"),
       DefaultExecutionOrder(-1) //プラグインの実行順を他のプラグインより前にする
     ]
     public class VibeYourMaid : PluginBase
     {
-        const string PluginVersionLabel = "2.0.6.44-Inory";
+        const string PluginVersionLabel = "2.0.6.45-Inory";
 
         /// <summary>
         /// 設定パラメータクラス
@@ -2520,6 +2520,12 @@ namespace CM3D2.VibeYourMaid.Plugin
               //VRショートカット
               ShortCutVR(vrShortCutController);
             }
+
+            //フェードなしでメイドが表示されたかチェック
+            if (visibleCheckTime < Time.time) {
+              VisibleMaidCheck(true);
+              visibleCheckTime = Time.time + 1.0f; //1秒後
+            }
           }
           //メイド選択中のメイン処理
           else { //&& SceneLevelEnable は常にtrueなので不要
@@ -3086,6 +3092,8 @@ namespace CM3D2.VibeYourMaid.Plugin
         public int tgID = -1;
         public int tgIDBack = -1;
         public int maidCount = 0;
+        
+        public float visibleCheckTime = 0f;
 
         /// <summary>
         /// メイド情報格納クラス
@@ -3504,7 +3512,7 @@ namespace CM3D2.VibeYourMaid.Plugin
           maidState.visibleBack = true;
 
           //TBodyの各部位をmateStateに設定
-          setTBodyTransform(maid, maidState);
+          setTBodyTransform(maidState);
 
           //胸コライダーと上腕衝突範囲初期化
           initVisibleMaidMune(maidState);
@@ -3550,15 +3558,17 @@ namespace CM3D2.VibeYourMaid.Plugin
           }
         }
 
-        private void setTBodyTransform(Maid maid, MaidState maidState)
+        private void setTBodyTransform(MaidState maidState)
         {
-          maidState.maidHead = maid.body0.trsHead;
-          maidState.maidMune = CMT.SearchObjName(maid.body0.m_trBones, "Bip01 Spine1", true);
-          maidState.maidHara = maid.body0.Spine;
-          maidState.maidXxx = maid.body0.Pelvis;
-          maidState.maidMuneA = maid.body0.Spine1a; //胸衝突判定用
-          maidState.maidArmL = maid.body0.UpperArmL;  //胸衝突判定用
-          maidState.maidArmR = maid.body0.UpperArmR;  //胸衝突判定用
+          TBody body0 = maidState.maid.body0;
+          maidState.maidHead = body0.trsHead;
+          maidState.maidMune = CMT.SearchObjName(body0.m_trBones, "Bip01 Spine1", true);
+          maidState.maidHara = body0.Spine;
+          maidState.maidXxx = body0.Pelvis;
+          //胸と上腕の衝突判定用
+          maidState.maidMuneA = body0.Spine1a;
+          maidState.maidArmL = body0.UpperArmL;
+          maidState.maidArmR = body0.UpperArmR;
         }
 
         //胸衝突回りの初期化処理
@@ -10451,7 +10461,7 @@ namespace CM3D2.VibeYourMaid.Plugin
             if (Input.GetKeyDown(cfgw.keyPluginToggleV7)) {
               fpsModeEnabled = !fpsModeEnabled;
               //第一人称 #109
-              Console.WriteLine("一人称視点切り替え");
+              Console.WriteLine("[VibeYourMaid]一人称視点切り替え");
               //第一人称 #109
             }
 
@@ -12853,13 +12863,16 @@ namespace CM3D2.VibeYourMaid.Plugin
 
                 //胸のコライダーのオフセット等を更新
                 muneCollider.updateMuneColliderParam(maidsState, cfgw, SubMans, osawari.getTouchCollider());
-                //胸衝突設定再読み込み
-                if (cfgw.muneYoriEnabled || cfgw.muneColliderEnabled) {
+
+                //メイド表示状態再チェック メイドステータスや乳首設定のロードや胸の状態の初期化
+                VisibleMaidCheck(true);
+                //胸衝突設定再読み込み VisibleMaidCheckで実行されるので不要
+                /*if (cfgw.muneYoriEnabled || cfgw.muneColliderEnabled) {
                   foreach (int maidID in vmId) {
                     MaidState maidState = maidsState[maidID];
                     initVisibleMaidMune(maidState);
                   }
-                }
+                }*/
                 //MLsit.txt再読み込み
                 ItazuraMotionLoad();
               }
@@ -13894,6 +13907,7 @@ namespace CM3D2.VibeYourMaid.Plugin
                     cfgw.muneYoriEnabled = enabled;
                     foreach (int maidID in vmId) {
                       MaidState maidState = maidsState[maidID];
+                      setTBodyTransform(maidState); //Body変更対策
                       initVisibleMaidMune(maidState);
                     }
                   }
@@ -13902,6 +13916,7 @@ namespace CM3D2.VibeYourMaid.Plugin
                     cfgw.muneDrawGizmo = enabled;
                     foreach (int maidID in vmId) {
                       MaidState maidState = maidsState[maidID];
+                      setTBodyTransform(maidState); //Body変更対策
                       initVisibleMaidMune(maidState);
                     }
                   }
@@ -13912,6 +13927,7 @@ namespace CM3D2.VibeYourMaid.Plugin
                     //メイドの状態を更新 無効状態の場合はレンダラー等が破棄される
                     foreach (int maidID in vmId) {
                       MaidState maidState = maidsState[maidID];
+                      setTBodyTransform(maidState); //Body変更対策
                       initVisibleMaidMune(maidState);
                     }
                   }
@@ -19572,6 +19588,7 @@ namespace CM3D2.VibeYourMaid.Plugin
       {
         //オフセットとスピードを0に
         maidState.muneOffsetL.reset();
+        maidState.muneOffsetR.reset();
         //胸変形を0に戻す
         osawari.muneMorphLeft(maid, maidState, 0f, 0f);
         osawari.muneMorphRight(maid, maidState, 0f, 0f);
@@ -19730,12 +19747,12 @@ namespace CM3D2.VibeYourMaid.Plugin
           //親子付けするとエラーになるので自力で動かす
           float bodyScale = maid.body0.transform.localScale.x;
           Vector3 localScale = foreArmSclL * bodyScale;
-          if (foreArmColliderL) {
+          if (foreArmColliderL && foreArmL) { //ボディ切り替え時はforeArmLがnullになるため両方チェック
             foreArmColliderL.transform.rotation = foreArmL.rotation * foreArmRotL;
             foreArmColliderL.transform.position = foreArmL.position + foreArmL.rotation * foreArmPosL * bodyScale; //オフセットは回転と拡大縮小してから加算
             foreArmColliderL.transform.localScale  = localScale;
           }
-          if (foreArmColliderR) {
+          if (foreArmColliderR && foreArmR) { //ボディ切り替え時はforeArmRがnullになるため両方チェック
             foreArmColliderR.transform.rotation = foreArmR.rotation * foreArmRotR;
             foreArmColliderR.transform.position = foreArmR.position + foreArmR.rotation * foreArmPosR * bodyScale; //オフセットは回転と拡大縮小してから加算
             foreArmColliderR.transform.localScale  = localScale;
@@ -19933,15 +19950,18 @@ namespace CM3D2.VibeYourMaid.Plugin
           colInfo.foreArmL = CMT.SearchObjName(maid.body0.m_Bones.transform, "Bip01 L Forearm", true);
           colInfo.foreArmR = CMT.SearchObjName(maid.body0.m_Bones.transform, "Bip01 R Forearm", true);
 
-          colInfo.foreArmColliderL = addForearmCollider(maid, colInfo.foreArmL, true);
-          colInfo.foreArmPosL = colInfo.foreArmColliderL.transform.localPosition;
-          colInfo.foreArmRotL = colInfo.foreArmColliderL.transform.localRotation;
-          colInfo.foreArmSclL = colInfo.foreArmColliderL.transform.localScale;
-
-          colInfo.foreArmColliderR = addForearmCollider(maid, colInfo.foreArmR, false);
-          colInfo.foreArmPosR = colInfo.foreArmColliderR.transform.localPosition;
-          colInfo.foreArmRotR = colInfo.foreArmColliderR.transform.localRotation;
-          colInfo.foreArmSclR = colInfo.foreArmColliderR.transform.localScale;
+          if (colInfo.foreArmL) {
+            colInfo.foreArmColliderL = addForearmCollider(maid, colInfo.foreArmL, true);
+            colInfo.foreArmPosL = colInfo.foreArmColliderL.transform.localPosition;
+            colInfo.foreArmRotL = colInfo.foreArmColliderL.transform.localRotation;
+            colInfo.foreArmSclL = colInfo.foreArmColliderL.transform.localScale;
+          }
+          if (colInfo.foreArmR) {
+            colInfo.foreArmColliderR = addForearmCollider(maid, colInfo.foreArmR, false);
+            colInfo.foreArmPosR = colInfo.foreArmColliderR.transform.localPosition;
+            colInfo.foreArmRotR = colInfo.foreArmColliderR.transform.localRotation;
+            colInfo.foreArmSclR = colInfo.foreArmColliderR.transform.localScale;
+          }
 
           return colInfo;
         }
@@ -20721,13 +20741,14 @@ namespace CM3D2.VibeYourMaid.Plugin
         maidState.targetSphere_muneR.GetComponent<Renderer>().enabled = false;
         //BoxCollider boxCollider1 = maidState.targetSphere_muneR.AddComponent<BoxCollider>();
         maidState.targetSphere_muneR.GetComponent<Collider>().isTrigger = true;
-        //maidState.IK_muneR = CMT.SearchObjName(maid.body0.m_Bones.transform, "_IK_muneR", true); //ずれるので使わない
         #if COM3D2_5
-        if (maid.IsCrcBody)maidState.IK_muneR = maid.body0.dbMuneR.transform;
+        if (maid.IsCrcBody) maidState.IK_muneR = maid.body0.dbMuneR.transform;
         else maidState.IK_muneR = maid.body0.jbMuneR.transform;
         #else
         maidState.IK_muneR = maid.body0.jbMuneR.transform;
         #endif
+        //位置がずれるので取得できない場合のみ
+        if (maidState.IK_muneR == null) maidState.IK_muneR = CMT.SearchObjName(maid.body0.m_Bones.transform, "_IK_muneR", true);
         //左胸
         maidState.targetSphere_muneL = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         maidState.targetSphere_muneL.layer = 8;
@@ -20736,13 +20757,14 @@ namespace CM3D2.VibeYourMaid.Plugin
         maidState.targetSphere_muneL.GetComponent<Renderer>().enabled = false;
         //BoxCollider boxCollider2 = maidState.targetSphere_muneL.AddComponent<BoxCollider>();
         maidState.targetSphere_muneL.GetComponent<Collider>().isTrigger = true;
-        //maidState.IK_muneL = CMT.SearchObjName(maid.body0.m_Bones.transform, "_IK_muneL", true); //ずれるので使わない
         #if COM3D2_5
-        if (maid.IsCrcBody)maidState.IK_muneL = maid.body0.dbMuneL.transform;
+        if (maid.IsCrcBody) maidState.IK_muneL = maid.body0.dbMuneL.transform;
         else maidState.IK_muneL = maid.body0.jbMuneL.transform;
         #else
         maidState.IK_muneL = maid.body0.jbMuneL.transform;
         #endif
+        //位置がずれるので取得できない場合のみ
+        if (maidState.IK_muneL == null) maidState.IK_muneL = CMT.SearchObjName(maid.body0.m_Bones.transform, "_IK_muneL", true);
 
         //おしり
         //左
@@ -20789,7 +20811,7 @@ namespace CM3D2.VibeYourMaid.Plugin
         } catch { //(Exception e) {
           UnityEngine.Debug.LogError("targetSet Error : "+maid);
           targetDestroy(maidState); //targetを削除
-          setTBodyTransform(maidState.maid, maidState); //TBodyの部位をmadeStateに再設定
+          setTBodyTransform(maidState); //TBodyの部位をmadeStateに再設定
         }
       }
 
