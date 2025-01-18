@@ -1,78 +1,75 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{F79A513B-5568-4439-BDA0-ED63DF0D4C9A}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CM3D2.VibeYourMaid.Plugin</RootNamespace>
-    <AssemblyName>COM3D2.VibeYourMaid.Plugin</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <Deterministic>true</Deterministic>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>\home\runner\work\COM3D2.VibeYourMaid.Plugin\COM3D2.VibeYourMaid.Plugin\lib\Assembly-CSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="Assembly-CSharp-firstpass">
-      <HintPath>\home\runner\work\COM3D2.VibeYourMaid.Plugin\COM3D2.VibeYourMaid.Plugin\lib\Assembly-CSharp-firstpass.dll</HintPath>
-    </Reference>
-    <Reference Include="COM3D2.ExternalSaveData.Managed">
-      <HintPath>\home\runner\work\COM3D2.VibeYourMaid.Plugin\COM3D2.VibeYourMaid.Plugin\lib\COM3D2.ExternalSaveData.Managed.dll</HintPath>
-    </Reference>
-    <Reference Include="PluginExt">
-      <HintPath>\home\runner\work\COM3D2.VibeYourMaid.Plugin\COM3D2.VibeYourMaid.Plugin\lib\PluginExt.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-    <Reference Include="UnityEngine">
-      <HintPath>\home\runner\work\COM3D2.VibeYourMaid.Plugin\COM3D2.VibeYourMaid.Plugin\lib\UnityEngine.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityInjector">
-      <HintPath>\home\runner\work\COM3D2.VibeYourMaid.Plugin\COM3D2.VibeYourMaid.Plugin\lib\UnityInjector.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="BasicVoiceSet.cs" />
-    <Compile Include="BasicVoiceSetup.cs" />
-    <Compile Include="com3d2.vibeyourmaid.plugin.cs" />
-    <Compile Include="EmpiresLifeUtill.cs" />
-    <Compile Include="MaidInfo.cs" />
-    <Compile Include="MaidState.cs" />
-    <Compile Include="MotionAdjust.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SeiekiInfo.cs" />
-    <Compile Include="SeiekiInfoSetup.cs" />
-    <Compile Include="VibeYourMaidCfgWriting.cs" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>
-	</PostBuildEvent>
-  </PropertyGroup>
+<!--
+dotnet build -c Release COM3D2.VibeYourMaid.Plugin.csproj
+-->
+
+<Project Sdk="Microsoft.NET.Sdk">
+	<ItemGroup>
+		<Compile Include="COM3D2.VibeYourMaid.Plugin.cs" />
+		<Compile Include="COM3D2.VibeYourMaid.Language.cs" />
+	</ItemGroup>
+	<ItemGroup>
+		<!--Reference Include="InputSystem">
+			<HintPath>..\COM3D2_5\COM3D2x64_Data\Managed\Unity.InputSystem.dll</HintPath>
+		</Reference-->
+
+		<Reference Include="UnityEngine">
+			<HintPath>..\COM3D2_5\COM3D2x64_Data\Managed\UnityEngine.dll</HintPath>
+		</Reference>
+		<Reference Include="CoreModule">
+			<HintPath>..\COM3D2_5\COM3D2x64_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+		</Reference>
+		<Reference Include="AnimationModule">
+			<HintPath>..\COM3D2_5\COM3D2x64_Data\Managed\UnityEngine.AnimationModule.dll</HintPath>
+		</Reference>
+		<Reference Include="AudioModule">
+			<HintPath>..\COM3D2_5\COM3D2x64_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
+		</Reference>
+		<Reference Include="PhysicsModule">
+			<HintPath>..\COM3D2_5\COM3D2x64_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
+		</Reference>
+		<Reference Include="ParticleSystemModule">
+			<HintPath>..\COM3D2_5\COM3D2x64_Data\Managed\UnityEngine.ParticleSystemModule.dll</HintPath>
+		</Reference>
+		<Reference Include="IMGUIModule">
+			<HintPath>..\COM3D2_5\COM3D2x64_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
+		</Reference>
+		<Reference Include="InputLegacyModule">
+			<HintPath>..\COM3D2_5\COM3D2x64_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
+		</Reference>
+		<Reference Include="TextRenderingModule">
+			<HintPath>..\COM3D2_5\COM3D2x64_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
+		</Reference>
+		<Reference Include="XRModule">
+			<HintPath>..\COM3D2_5\COM3D2x64_Data\Managed\UnityEngine.XRModule.dll</HintPath>
+		</Reference>
+
+		<Reference Include="UnityInjector">
+			<HintPath>.\UnityInjector.dll</HintPath>
+		</Reference>
+
+		<Reference Include="COM3D2">
+			<HintPath>..\COM3D2_5\COM3D2x64_Data\Managed\Assembly-CSharp.dll</HintPath>
+		</Reference>
+		<Reference Include="COM3D2-firstpass">
+			<HintPath>..\COM3D2_5\COM3D2x64_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+		</Reference>
+
+		<Reference Include="CM3D2.ExternalSaveData">
+			<HintPath>..\COM3D2_5\Sybaris\COM3D2.ExternalSaveData.Managed.dll</HintPath>
+		</Reference>
+
+	</ItemGroup>
+	<Target Name="Build">
+		<Csc Sources="@(Compile)"/>
+	</Target>
+	<PropertyGroup>
+		<TargetFramework>net4.8-windows</TargetFramework>
+		<Deterministic>true</Deterministic>
+		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+		<Optimize>true</Optimize>
+
+		<DefineConstants>COM3D2_5 UNITY_2022_3 EmpiresLife</DefineConstants>
+		<AssemblyTitle>VibeYourMaid COM3D2.5 Unity2022.3</AssemblyTitle>
+		<AssemblyVersion>2.1.0.5</AssemblyVersion>
+	</PropertyGroup>
 </Project>
