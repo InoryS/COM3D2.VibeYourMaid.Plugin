@@ -26,7 +26,7 @@ jobs:
         with:
           nuget-api-key: ${{ secrets.NuGetAPIKey }}
           nuget-version: '5.x'
-      - run: nuget restore COM3D2.HighHeel.sln
+      - run: nuget restore COM3D2.VibeYourMaid.Plugin.sln
 
       - name: Publish Artifact
         uses: actions/upload-artifact@v4
