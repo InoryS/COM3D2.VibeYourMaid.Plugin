@@ -1,75 +1,103 @@
-<!--
-dotnet build -c Release COM3D2.VibeYourMaid.Plugin.csproj
--->
-
-<Project Sdk="Microsoft.NET.Sdk">
-	<ItemGroup>
-		<Compile Include="COM3D2.VibeYourMaid.Plugin.cs" />
-		<Compile Include="COM3D2.VibeYourMaid.Language.cs" />
-	</ItemGroup>
-	<ItemGroup>
-		<!--Reference Include="InputSystem">
-			<HintPath>..\COM3D2_5\COM3D2x64_Data\Managed\Unity.InputSystem.dll</HintPath>
-		</Reference-->
-
-		<Reference Include="UnityEngine">
-			<HintPath>..\COM3D2_5\COM3D2x64_Data\Managed\UnityEngine.dll</HintPath>
-		</Reference>
-		<Reference Include="CoreModule">
-			<HintPath>..\COM3D2_5\COM3D2x64_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
-		</Reference>
-		<Reference Include="AnimationModule">
-			<HintPath>..\COM3D2_5\COM3D2x64_Data\Managed\UnityEngine.AnimationModule.dll</HintPath>
-		</Reference>
-		<Reference Include="AudioModule">
-			<HintPath>..\COM3D2_5\COM3D2x64_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
-		</Reference>
-		<Reference Include="PhysicsModule">
-			<HintPath>..\COM3D2_5\COM3D2x64_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
-		</Reference>
-		<Reference Include="ParticleSystemModule">
-			<HintPath>..\COM3D2_5\COM3D2x64_Data\Managed\UnityEngine.ParticleSystemModule.dll</HintPath>
-		</Reference>
-		<Reference Include="IMGUIModule">
-			<HintPath>..\COM3D2_5\COM3D2x64_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
-		</Reference>
-		<Reference Include="InputLegacyModule">
-			<HintPath>..\COM3D2_5\COM3D2x64_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
-		</Reference>
-		<Reference Include="TextRenderingModule">
-			<HintPath>..\COM3D2_5\COM3D2x64_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
-		</Reference>
-		<Reference Include="XRModule">
-			<HintPath>..\COM3D2_5\COM3D2x64_Data\Managed\UnityEngine.XRModule.dll</HintPath>
-		</Reference>
-
-		<Reference Include="UnityInjector">
-			<HintPath>.\UnityInjector.dll</HintPath>
-		</Reference>
-
-		<Reference Include="COM3D2">
-			<HintPath>..\COM3D2_5\COM3D2x64_Data\Managed\Assembly-CSharp.dll</HintPath>
-		</Reference>
-		<Reference Include="COM3D2-firstpass">
-			<HintPath>..\COM3D2_5\COM3D2x64_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
-		</Reference>
-
-		<Reference Include="CM3D2.ExternalSaveData">
-			<HintPath>..\COM3D2_5\Sybaris\COM3D2.ExternalSaveData.Managed.dll</HintPath>
-		</Reference>
-
-	</ItemGroup>
-	<Target Name="Build">
-		<Csc Sources="@(Compile)"/>
-	</Target>
+﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net4.8-windows</TargetFramework>
-		<Deterministic>true</Deterministic>
-		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
-		<Optimize>true</Optimize>
-
-		<DefineConstants>COM3D2_5 UNITY_2022_3 EmpiresLife</DefineConstants>
-		<AssemblyTitle>VibeYourMaid COM3D2.5 Unity2022.3</AssemblyTitle>
-		<AssemblyVersion>2.1.0.5</AssemblyVersion>
+		<LangVersion>latest</LangVersion>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<RestoreAdditionalProjectSources>
+			https://api.nuget.org/v3/index.json;
+			https://nuget.bepinex.dev/v3/index.json;
+			https://nuget.samboy.dev/v3/index.json
+		</RestoreAdditionalProjectSources>
+		<Configurations>COM3D2-DEBUG;COM3D2-Release;COM3D25-Debug;COM3D25-Release</Configurations>
+		<Platforms>AnyCPU</Platforms>
 	</PropertyGroup>
+
+	<Choose>
+		<!-- Configure COM3D2 related dependencies -->
+		<When Condition="$(Configuration.Contains('COM3D2'))">
+			<ItemGroup>
+				<PackageReference Include="COM3D2.GameLibs" Version="2.39.0-r.0" />
+				<Reference Include="COM3D2.ExternalSaveData.Managed">
+					<HintPath>..\lib\COM3D2.ExternalSaveData.Managed.dll</HintPath>
+				</Reference>
+				<Reference Include="PluginExt">
+					<HintPath>..\lib\PluginExt.dll</HintPath>
+				</Reference>
+				<Reference Include="UnityEngine">
+					<HintPath>..\lib\UnityEngine.dll</HintPath>
+				</Reference>
+				<Reference Include="UnityInjector">
+					<HintPath>..\lib\UnityInjector.dll</HintPath>
+				</Reference>
+				<Reference Include="System" />
+				<Reference Include="System.Core" />
+				<Reference Include="System.Windows.Forms" />
+				<Reference Include="System.Xml.Linq" />
+				<Reference Include="System.Data.DataSetExtensions" />
+				<Reference Include="System.Data" />
+				<Reference Include="System.Xml" />
+			</ItemGroup>
+		</When>
+
+		<!-- Configure COM3D2.5 related dependencies -->
+		<When Condition="$(Configuration.Contains('COM3D25'))">
+			<ItemGroup>
+				<PackageReference Include="COM3D2.GameLibs" Version="3.41.0-r.0" />
+				<!-- TBD -->
+			</ItemGroup>
+		</When>
+	</Choose>
+
+	<Choose>
+		<!-- COM3D2 related configuration -->
+		<When Condition="'$(Configuration)|$(Platform)' == 'COM3D2-DEBUG|AnyCPU'">
+			<PropertyGroup>
+				<TargetFramework>net35</TargetFramework>
+				<Deterministic>true</Deterministic>
+				<OutputPath>bin\COM3D2\Debug\</OutputPath>
+				<Optimize>false</Optimize>
+				<DefineConstants>COM3D2;EmpiresLife;DEBUG;TRACE</DefineConstants>
+				<AssemblyTitle>VibeYourMaid COM3D2</AssemblyTitle>
+				<ErrorReport>prompt</ErrorReport>
+				<WarningLevel>4</WarningLevel>
+			</PropertyGroup>
+		</When>
+		<When Condition="'$(Configuration)|$(Platform)' == 'COM3D2-Release|AnyCPU'">
+			<PropertyGroup>
+				<TargetFramework>net35</TargetFramework>
+				<Deterministic>true</Deterministic>
+				<OutputPath>bin\COM3D2\Release\</OutputPath>
+				<Optimize>true</Optimize>
+				<DefineConstants>COM3D2;EmpiresLife</DefineConstants>
+				<AssemblyTitle>VibeYourMaid COM3D2</AssemblyTitle>
+				<ErrorReport>prompt</ErrorReport>
+				<WarningLevel>4</WarningLevel>
+			</PropertyGroup>
+		</When>
+
+		<!-- COM3D2.5 related configuration -->
+		<When Condition="'$(Configuration)|$(Platform)' == 'COM3D25-Debug|AnyCPU'">
+			<PropertyGroup>
+				<TargetFramework>net48</TargetFramework>
+				<Deterministic>true</Deterministic>
+				<OutputPath>bin\COM3D25\Debug\</OutputPath>
+				<Optimize>false</Optimize>
+				<DefineConstants>COM3D2_5;UNITY_2022_3;EmpiresLife;DEBUG;TRACE</DefineConstants>
+				<AssemblyTitle>VibeYourMaid COM3D2.5 Unity2022.3</AssemblyTitle>
+				<ErrorReport>prompt</ErrorReport>
+				<WarningLevel>4</WarningLevel>
+			</PropertyGroup>
+		</When>
+		<When Condition="'$(Configuration)|$(Platform)' == 'COM3D25-Release|AnyCPU'">
+			<PropertyGroup>
+				<TargetFramework>net48</TargetFramework>
+				<Deterministic>true</Deterministic>
+				<OutputPath>bin\Release\COM3D25\</OutputPath>
+				<Optimize>true</Optimize>
+				<DefineConstants>COM3D2_5;UNITY_2022_3;EmpiresLife</DefineConstants>
+				<AssemblyTitle>VibeYourMaid COM3D2.5 Unity2022.3</AssemblyTitle>
+				<ErrorReport>prompt</ErrorReport>
+				<WarningLevel>4</WarningLevel>
+			</PropertyGroup>
+		</When>
+	</Choose>
 </Project>
