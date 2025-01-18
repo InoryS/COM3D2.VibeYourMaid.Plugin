@@ -24,7 +24,7 @@ jobs:
         
       - name: Build
         run: |
-          msbuild /p:Configuration=Release /p:TargetFrameworkVersion=v3.5
+          msbuild /p:Configuration=COM3D2-Release /p:TargetFrameworkVersion=v3.5
 
       - name: Publish Artifact
         uses: actions/upload-artifact@v4
